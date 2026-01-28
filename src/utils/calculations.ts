@@ -64,7 +64,7 @@ export const checkAllocationLimits = (
 export const calculateReturns = (
     currentValue: number,
     initialValue: number,
-    period: 'day' | 'month' | 'year'
+    // period: 'day' | 'month' | 'year' // future use
 ): number => {
     if (initialValue === 0) return 0;
     return ((currentValue - initialValue) / initialValue) * 100;

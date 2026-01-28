@@ -12,7 +12,7 @@ const SearchEngine: React.FC<SearchEngineProps> = ({ onSelectSymbol }) => {
     const [isSearching, setIsSearching] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [showDropdown, setShowDropdown] = useState(false);
-    const debounceTimeout = useRef<number>();
+    const debounceTimeout = useRef<number | null>(null);
 
     useEffect(() => {
         if (!query || query.length < 1) {

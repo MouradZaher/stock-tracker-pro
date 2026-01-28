@@ -29,7 +29,6 @@ export const STOCKS_BY_SECTOR: Record<string, { symbol: string; name: string }[]
         { symbol: 'AVGO', name: 'Broadcom Inc.' },
         { symbol: 'ORCL', name: 'Oracle Corporation' },
         { symbol: 'ADBE', name: 'Adobe Inc.' },
-        { symbol: 'ADBE', name: 'Adobe Inc.' },
         { symbol: 'CRM', name: 'Salesforce Inc.' },
         { symbol: 'MU', name: 'Micron Technology' },
         { symbol: 'WDC', name: 'Western Digital (f. SanDisk)' },

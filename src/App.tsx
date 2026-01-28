@@ -9,7 +9,6 @@ import Portfolio from './components/Portfolio';
 import AIRecommendations from './components/AIRecommendations';
 
 import MarketOverview from './components/MarketOverview';
-import StockHeatmap from './components/StockHeatmap';
 import WatchlistSidebar from './components/WatchlistSidebar';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';

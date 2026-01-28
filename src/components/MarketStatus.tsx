@@ -30,7 +30,6 @@ const MarketStatus: React.FC = () => {
             const parts = nyFormatter.formatToParts(now);
             const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
             const minute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
-            const type = parts.find(p => p.type === 'dayPeriod')?.value; // Usually not present in hour24 but good to be safe if changing logic
             const weekday = parts.find(p => p.type === 'weekday')?.value;
 
             const timeInMinutes = hour * 60 + minute;
