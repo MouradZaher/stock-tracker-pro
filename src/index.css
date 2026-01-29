@@ -215,12 +215,10 @@ h6 {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* Prevent global scroll */
   position: relative;
   padding: 0;
-  /* Remove padding to allow edge-to-edge */
   max-width: 100%;
-  /* Fill entire width */
+  width: 100%;
   margin: 0;
 }
 
@@ -542,14 +540,6 @@ h6 {
   /* Ensure content stays within */
 }
 
-.main-content {
-  flex: 1;
-  overflow: hidden;
-  padding: 0;
-  max-width: 100%;
-  width: 100%;
-  margin: 0;
-}
 
 .portfolio-table {
   width: 100%;
