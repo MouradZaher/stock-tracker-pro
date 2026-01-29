@@ -6,6 +6,7 @@ const MarketStatus: React.FC = () => {
     const [tokyoStatus, setTokyoStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [londonStatus, setLondonStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [hkStatus, setHkStatus] = useState({ isOpen: false, rangeEGP: '' });
+    const [egyptStatus, setEgyptStatus] = useState({ isOpen: false, rangeEGP: '' });
 
     useEffect(() => {
         const updateTime = () => {
@@ -22,7 +23,7 @@ const MarketStatus: React.FC = () => {
             setCairoTime(cairoFormatter.format(now));
 
             // Helper to check session status
-            const getSessionStatus = (tz: string, openH: number, openM: number, closeH: number, closeM: number) => {
+            const getSessionStatus = (tz: string, openH: number, openM: number, closeH: number, closeM: number, isEgypt = false) => {
                 const formatter = new Intl.DateTimeFormat('en-US', {
                     timeZone: tz,
                     hour: 'numeric',
@@ -40,8 +41,11 @@ const MarketStatus: React.FC = () => {
                 const openMinutes = openH * 60 + openM;
                 const closeMinutes = closeH * 60 + closeM;
 
-                const isOpen = weekday !== 'Saturday' && weekday !== 'Sunday' &&
-                    timeInMinutes >= openMinutes && timeInMinutes < closeMinutes;
+                const isWeekend = isEgypt
+                    ? (weekday === 'Friday' || weekday === 'Saturday')
+                    : (weekday === 'Saturday' || weekday === 'Sunday');
+
+                const isOpen = !isWeekend && timeInMinutes >= openMinutes && timeInMinutes < closeMinutes;
 
                 // Calculate EGP Range
                 const getEGPTime = (h: number, m: number) => {
@@ -79,6 +83,7 @@ const MarketStatus: React.FC = () => {
             setTokyoStatus(getSessionStatus('Asia/Tokyo', 9, 0, 15, 0));
             setLondonStatus(getSessionStatus('Europe/London', 8, 0, 16, 30));
             setHkStatus(getSessionStatus('Asia/Hong_Kong', 9, 30, 16, 0));
+            setEgyptStatus(getSessionStatus('Africa/Cairo', 10, 0, 14, 30, true));
         };
 
         updateTime();
@@ -103,7 +108,8 @@ const MarketStatus: React.FC = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '400px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '450px' }}>
+                <SessionBadge name="Egypt" status={egyptStatus} />
                 <SessionBadge name="Tokyo" status={tokyoStatus} />
                 <SessionBadge name="HK" status={hkStatus} />
                 <SessionBadge name="London" status={londonStatus} />
