@@ -118,51 +118,51 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
             <div className="section">
                 <h3 className="section-title">Market Statistics</h3>
                 <div className="stats-grid">
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Open</div>
                         <div className="stat-value">{formatCurrency(stock.open)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">High</div>
                         <div className="stat-value">{formatCurrency(stock.high)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Low</div>
                         <div className="stat-value">{formatCurrency(stock.low)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Prev Close</div>
                         <div className="stat-value">{formatCurrency(stock.previousClose)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Volume</div>
                         <div className="stat-value">{formatNumberPlain(stock.volume)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Avg Volume</div>
                         <div className="stat-value">{formatNumberPlain(stock.avgVolume)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Market Cap</div>
                         <div className="stat-value">{formatNumber(stock.marketCap)}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">P/E Ratio</div>
                         <div className="stat-value">{stock.peRatio ? stock.peRatio.toFixed(2) : 'N/A'}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">EPS</div>
                         <div className="stat-value">{stock.eps ? formatCurrency(stock.eps) : 'N/A'}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Dividend Yield</div>
                         <div className="stat-value">{stock.dividendYield ? `${stock.dividendYield.toFixed(2)}%` : 'N/A'}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">52W High</div>
                         <div className="stat-value">{stock.fiftyTwoWeekHigh ? formatCurrency(stock.fiftyTwoWeekHigh) : 'N/A'}</div>
                     </div>
-                    <div className="stat-card">
+                    <div className="stat-card glass-card">
                         <div className="stat-label">52W Low</div>
                         <div className="stat-value">{stock.fiftyTwoWeekLow ? formatCurrency(stock.fiftyTwoWeekLow) : 'N/A'}</div>
                     </div>

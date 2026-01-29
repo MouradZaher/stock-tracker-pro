@@ -1,23 +1,98 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Professional US stock portfolio tracker with real-time data, AI recommendations, and comprehensive analytics" />
-    <meta name="theme-color" content="#0a0a0f" />
-    <title>StockTracker Pro - Real-Time Portfolio Management</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    
-    <!-- TradingView Widget -->
-    <script src="https://s3.tradingview.com/tv.js" async></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+  <!-- Viewport & Mobile Optimization -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Primary Meta Tags -->
+  <title>StockTracker Pro - Real-Time Portfolio Management & AI Stock Analysis</title>
+  <meta name="title" content="StockTracker Pro - Real-Time Portfolio Management & AI Stock Analysis" />
+  <meta name="description"
+    content="Professional US stock portfolio tracker with real-time data, AI-powered recommendations, comprehensive analytics, and market insights. Track your investments with precision." />
+  <meta name="keywords"
+    content="stock tracker, portfolio management, stock market, AI recommendations, real-time quotes, investment tracking, stock analysis, market data" />
+  <meta name="author" content="StockTracker Pro" />
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: light)" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://stocktracker.pro/" />
+  <meta property="og:title" content="StockTracker Pro - Real-Time Portfolio Management" />
+  <meta property="og:description"
+    content="Professional US stock portfolio tracker with real-time data, AI-powered recommendations, and comprehensive analytics." />
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:site_name" content="StockTracker Pro" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://stocktracker.pro/" />
+  <meta name="twitter:title" content="StockTracker Pro - Real-Time Portfolio Management" />
+  <meta name="twitter:description"
+    content="Professional US stock portfolio tracker with real-time data, AI-powered recommendations, and comprehensive analytics." />
+  <meta name="twitter:image" content="/twitter-card.png" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+  <!-- Preconnect to External Resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://s3.tradingview.com" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- TradingView Widget -->
+  <script src="https://s3.tradingview.com/tv.js" async></script>
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "StockTracker Pro",
+      "description": "Professional US stock portfolio tracker with real-time data and AI recommendations",
+      "url": "https://stocktracker.pro",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Real-time stock quotes",
+        "Portfolio management",
+        "AI-powered recommendations",
+        "Market analytics",
+        "Dividend tracking"
+      ]
+    }
+    </script>
+</head>
+
+<body>
+  <!-- Skip to main content for accessibility -->
+  <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

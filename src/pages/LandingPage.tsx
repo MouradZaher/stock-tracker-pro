@@ -4,6 +4,7 @@ import { Shield, ArrowRight, Mail, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LiveTicker from '../components/LiveTicker';
 import BenefitsGrid from '../components/BenefitsGrid';
+import { soundService } from '../services/soundService';
 
 const LandingPage: React.FC = () => {
     const { signInWithEmail } = useAuth();
@@ -20,6 +21,7 @@ const LandingPage: React.FC = () => {
         setLoading(false);
 
         if (error) {
+            soundService.playError();
             console.error('Login error:', error);
             if (error.status === 429 || error.message?.includes('Too many requests') || error.message?.includes('rate limit')) {
                 toast.error('Too many attempts. Please wait 60 seconds before trying again.');
@@ -27,6 +29,7 @@ const LandingPage: React.FC = () => {
                 toast.error(error.message || 'Failed to send magic link. Please try again.');
             }
         } else {
+            soundService.playSuccess();
             setLinkSent(true);
             toast.success('Check your email for the magic link!');
         }
@@ -34,22 +37,40 @@ const LandingPage: React.FC = () => {
 
     if (linkSent) {
         return (
-            <div className="landing-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-                <div className="login-card" style={{ background: 'var(--color-bg-secondary)', padding: '3rem', borderRadius: 'var(--radius-xl)', border: '1px solid var(--color-border)', maxWidth: '450px', width: '100%', boxShadow: 'var(--shadow-xl)' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                        <div className="icon-circle" style={{ background: 'var(--color-accent-light)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
-                            <Mail size={32} color="var(--color-accent)" />
+            <div className="landing-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: 'var(--spacing-md)' }}>
+                <div className="login-card glass-effect" style={{ padding: '3rem', maxWidth: '450px', width: '100%', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '2rem' }}>
+                        <div className="icon-circle" style={{
+                            background: 'var(--color-success-light)',
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto 1.5rem auto',
+                            boxShadow: '0 0 20px rgba(16, 185, 129, 0.2)'
+                        }}>
+                            <Mail size={40} color="var(--color-success)" />
                         </div>
-                        <h2 style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>Check Your Email</h2>
-                        <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
-                            We've sent a magic link to <strong style={{ color: 'var(--color-text-primary)' }}>{email}</strong>.<br />
-                            Click the link in your inbox to sign in securely.
+                        <h2 style={{ fontSize: '2rem', marginBottom: '0.75rem', fontWeight: 800 }}>Check Your Inbox</h2>
+                        <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6', fontSize: '1.1rem' }}>
+                            We've sent a magic link to <br />
+                            <strong style={{ color: 'var(--color-text-primary)' }}>{email}</strong>
+                        </p>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '1rem', border: '1px solid var(--glass-border)', marginBottom: '2rem' }}>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)' }}>
+                            Click the institutional secure link in your email to instantly access your dashboard.
                         </p>
                     </div>
                     <button
-                        className="btn btn-secondary"
-                        style={{ width: '100%', padding: '1rem' }}
-                        onClick={() => setLinkSent(false)}
+                        className="btn btn-secondary glass-button"
+                        style={{ width: '100%', padding: '1.25rem', borderRadius: '1rem' }}
+                        onClick={() => {
+                            soundService.playTap();
+                            setLinkSent(false);
+                        }}
                     >
                         Use a different email
                     </button>

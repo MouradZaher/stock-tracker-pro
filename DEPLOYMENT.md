@@ -26,7 +26,7 @@ git commit -m "Initial commit for Vercel deployment"
 7.  Copy the commands under "…or push an existing repository from the command line". They will look like this:
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/stock-tracker-pro.git
+git remote add origin https://github.com/MouradZaher/stock-tracker-pro.git
 git branch -M main
 git push -u origin main
 ```

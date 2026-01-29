@@ -5,7 +5,6 @@ const MarketStatus: React.FC = () => {
     const [nyStatus, setNyStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [tokyoStatus, setTokyoStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [londonStatus, setLondonStatus] = useState({ isOpen: false, rangeEGP: '' });
-    const [hkStatus, setHkStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [egyptStatus, setEgyptStatus] = useState({ isOpen: false, rangeEGP: '' });
 
     useEffect(() => {
@@ -33,8 +32,10 @@ const MarketStatus: React.FC = () => {
                 });
 
                 const parts = formatter.formatToParts(now);
-                const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-                const minute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+                const hourPart = parts.find(p => p.type === 'hour')?.value || '0';
+                const minutePart = parts.find(p => p.type === 'minute')?.value || '0';
+                const hour = parseInt(hourPart);
+                const minute = parseInt(minutePart);
                 const weekday = parts.find(p => p.type === 'weekday')?.value;
 
                 const timeInMinutes = hour * 60 + minute;
@@ -50,14 +51,13 @@ const MarketStatus: React.FC = () => {
                 // Calculate EGP Range
                 const getEGPTime = (h: number, m: number) => {
                     // Use a specific date in the local timezone and convert to Cairo
-                    const localDate = new Date(now.toLocaleString('en-US', { timeZone: tz }));
-                    localDate.setHours(h, m, 0, 0);
+                    const localDateStr = now.toLocaleString('en-US', { timeZone: tz });
+                    const localDateParsed = new Date(localDateStr);
+                    localDateParsed.setHours(h, m, 0, 0);
 
                     // Find offset difference between TZ and Cairo
                     const cairoDateStr = now.toLocaleString('en-US', { timeZone: 'Africa/Cairo' });
-                    const localDateStr = now.toLocaleString('en-US', { timeZone: tz });
                     const cairoDate = new Date(cairoDateStr);
-                    const localDateParsed = new Date(localDateStr);
                     const offsetDiff = (cairoDate.getTime() - localDateParsed.getTime()) / (1000 * 60 * 60);
 
                     const egpHour = (h + Math.floor(offsetDiff)) % 24;
@@ -67,7 +67,7 @@ const MarketStatus: React.FC = () => {
                         const hFixed = (hh + 24) % 24;
                         const period = hFixed >= 12 ? 'PM' : 'AM';
                         const h12 = hFixed % 12 || 12;
-                        return `${h12}:${mm.toString().padStart(2, '0')} ${period}`;
+                        return `${h12}:${mm.toString().padStart(2, '0')}${period}`;
                     };
 
                     return formatTime(egpHour, egpMin);
@@ -82,7 +82,6 @@ const MarketStatus: React.FC = () => {
             setNyStatus(getSessionStatus('America/New_York', 9, 30, 16, 0));
             setTokyoStatus(getSessionStatus('Asia/Tokyo', 9, 0, 15, 0));
             setLondonStatus(getSessionStatus('Europe/London', 8, 0, 16, 30));
-            setHkStatus(getSessionStatus('Asia/Hong_Kong', 9, 30, 16, 0));
             setEgyptStatus(getSessionStatus('Africa/Cairo', 10, 0, 14, 30, true));
         };
 
@@ -92,40 +91,37 @@ const MarketStatus: React.FC = () => {
     }, []);
 
     const SessionBadge = ({ name, status }: { name: string, status: { isOpen: boolean, rangeEGP: string } }) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem' }}>
             <span style={{
-                width: '6px',
-                height: '6px',
+                width: '4px',
+                height: '4px',
                 borderRadius: '50%',
-                backgroundColor: status.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)',
-                boxShadow: status.isOpen ? '0 0 6px var(--color-success)' : 'none'
+                backgroundColor: status.isOpen ? 'var(--color-success)' : 'rgba(255,255,255,0.1)'
             }} />
-            <span style={{ color: status.isOpen ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}>
+            <span style={{ color: status.isOpen ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)', whiteSpace: 'nowrap' }}>
                 {name}: {status.rangeEGP}
             </span>
         </div>
     );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '450px' }}>
-                <SessionBadge name="Egypt" status={egyptStatus} />
-                <SessionBadge name="Tokyo" status={tokyoStatus} />
-                <SessionBadge name="HK" status={hkStatus} />
-                <SessionBadge name="London" status={londonStatus} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', overflowX: 'auto', maxWidth: '300px', scrollbarWidth: 'none' }}>
+                <SessionBadge name="EGX" status={egyptStatus} />
+                <SessionBadge name="TKY" status={tokyoStatus} />
+                <SessionBadge name="LND" status={londonStatus} />
                 <SessionBadge name="NYC" status={nyStatus} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem' }}>
                 <span style={{
-                    width: '8px',
-                    height: '8px',
+                    width: '6px',
+                    height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: nyStatus.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)',
+                    backgroundColor: nyStatus.isOpen ? 'var(--color-success)' : 'var(--color-error)',
                     boxShadow: nyStatus.isOpen ? '0 0 8px var(--color-success)' : 'none'
                 }} />
-                <span style={{ fontWeight: 600 }}>{nyStatus.isOpen ? 'Market Open' : 'Market Closed'}</span>
-                <span style={{ color: 'var(--color-text-tertiary)' }}>•</span>
-                <span>{cairoTime} (Cairo)</span>
+                <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{cairoTime}</span>
+                <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.65rem' }}>CAIRO</span>
             </div>
         </div>
     );

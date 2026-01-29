@@ -9,10 +9,39 @@ interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
 }
 
+const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color }) => {
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min;
+    const width = 100;
+    const height = 30;
+
+    const points = data.map((val, i) => {
+        const x = (i / (data.length - 1)) * width;
+        const y = height - ((val - min) / (range || 1)) * height;
+        return `${x},${y}`;
+    }).join(' ');
+
+    return (
+        <svg width={width} height={height} style={{ overflow: 'visible' }}>
+            <polyline
+                fill="none"
+                stroke={color}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={points}
+            />
+        </svg>
+    );
+};
+
 const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     const { watchlist, removeFromWatchlist } = useWatchlist();
     const [stockData, setStockData] = useState<Record<string, Stock>>({});
     const [loading, setLoading] = useState(false);
+    const [activeCategory, setActiveCategory] = useState('All');
+    const categories = ['All', 'Tech', 'Growth', 'Dividends'];
 
     useEffect(() => {
         const fetchWatchlistData = async () => {
@@ -75,69 +104,96 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
 
     return (
         <div className="watchlist-page" style={{ padding: '0 var(--spacing-xl)' }}>
-            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Star size={24} fill="currentColor" className="text-warning" />
-                My Watchlist
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Star size={24} fill="currentColor" className="text-warning" />
+                    My Watchlist
+                </h2>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {categories.map(cat => (
+                        <button
+                            key={cat}
+                            className={`glass-button ${activeCategory === cat ? 'active' : ''}`}
+                            onClick={() => setActiveCategory(cat)}
+                            style={{
+                                padding: '6px 16px',
+                                borderRadius: 'var(--radius-full)',
+                                fontSize: '0.875rem',
+                                border: activeCategory === cat ? '1px solid var(--color-accent)' : '1px solid var(--glass-border)',
+                                background: activeCategory === cat ? 'var(--color-accent-light)' : 'rgba(255,255,255,0.05)',
+                                color: activeCategory === cat ? 'var(--color-accent)' : 'var(--color-text-secondary)'
+                            }}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {loading && Object.keys(stockData).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading watchlist data...</div>
+                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                    <div className="spinner" style={{ margin: '0 auto 1rem' }} />
+                    Loading watchlist data...
+                </div>
             ) : (
                 <div className="watchlist-grid" style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: '1.5rem'
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
+                    gap: '1.5rem',
+                    paddingBottom: '2rem'
                 }}>
                     {watchlist.map(symbol => {
                         const stock = stockData[symbol];
                         if (!stock) return null;
 
+                        // Mock trend data for sparkline
+                        const mockTrend = Array.from({ length: 10 }, () => stock.price * (0.98 + Math.random() * 0.04));
+                        const trendColor = stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)';
+
                         return (
                             <div
                                 key={symbol}
-                                className="watchlist-card"
+                                className="watchlist-card glass-card"
                                 style={{
-                                    background: 'var(--color-bg-elevated)',
-                                    border: '1px solid var(--color-border)',
-                                    borderRadius: 'var(--radius-lg)',
                                     padding: '1.5rem',
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s',
                                     position: 'relative'
                                 }}
                                 onClick={() => onSelectSymbol(symbol)}
-                                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-accent)'}
-                                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
                             >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                     <div>
-                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{symbol}</h3>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{stock.name}</p>
+                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{symbol}</h3>
+                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>{stock.name}</p>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formatCurrency(stock.price)}</div>
-                                        <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.9rem' }}>
+                                        <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
+                                        <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.875rem', fontWeight: 600 }}>
                                             {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                             {formatPercent(stock.changePercent)}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
-                                        Vol: {stock.volume.toLocaleString()}
-                                    </span>
-                                    <button
-                                        className="btn-icon delete-btn"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            removeFromWatchlist(symbol);
-                                        }}
-                                        title="Remove from watchlist"
-                                        style={{ color: 'var(--color-text-tertiary)' }}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.5rem' }}>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>7D Trend</div>
+                                        <Sparkline data={mockTrend} color={trendColor} />
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <button
+                                            className="btn-icon delete-btn glass-button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeFromWatchlist(symbol);
+                                            }}
+                                            title="Remove from watchlist"
+                                            style={{ color: 'var(--color-text-tertiary)', borderRadius: '50%', padding: '6px' }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         );
