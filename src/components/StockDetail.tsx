@@ -16,6 +16,7 @@ interface StockDetailProps {
 
 const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+    const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
 
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['stock', symbol],
@@ -51,8 +52,6 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
     }
 
     const { stock, profile } = data;
-
-    const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
     const inWatchlist = isInWatchlist(stock.symbol);
 
     const toggleWatchlist = () => {
