@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 
+const BYPASS_EMAIL = 'bitdegenbiz@gmail.com';
+const BYPASS_STORAGE_KEY = 'auth_bypass_active';
+
 interface AuthContextType {
     user: User | null;
     session: Session | null;
@@ -21,7 +24,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isApproved, setIsApproved] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    const getFakeAdminUser = (): User => ({
+        id: 'bypass-admin-id',
+        email: BYPASS_EMAIL,
+        app_metadata: { provider: 'email' },
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString()
+    });
+
+    const getFakeSession = (fakeUser: User): Session => ({
+        access_token: 'bypass-token',
+        refresh_token: 'bypass-refresh-token',
+        expires_in: 3600,
+        token_type: 'bearer',
+        user: fakeUser
+    });
+
     const fetchProfile = async (userId: string) => {
+        // If it's the bypass user, return admin profile immediately
+        if (userId === 'bypass-admin-id') {
+            setRole('admin');
+            setIsApproved(true);
+            return;
+        }
+
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -37,26 +64,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         } catch (error) {
             console.error('Error fetching profile:', error);
-            // Default to safe state if error
             setRole('user');
             setIsApproved(false);
         }
     };
 
     useEffect(() => {
-        // Get initial session
+        // 1. Check for bypass in localStorage first (highest priority for requested persistence)
+        const isBypassActive = localStorage.getItem(BYPASS_STORAGE_KEY) === 'true';
+
+        if (isBypassActive) {
+            const fakeUser = getFakeAdminUser();
+            setUser(fakeUser);
+            setSession(getFakeSession(fakeUser));
+            setRole('admin');
+            setIsApproved(true);
+            setIsLoading(false);
+            return;
+        }
+
+        // 2. Otherwise, check Supabase
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
             setUser(session?.user ?? null);
             if (session?.user) {
-                fetchProfile(session.user.id);
+                fetchProfile(session.user.id).finally(() => setIsLoading(false));
             } else {
                 setIsLoading(false);
             }
         });
 
-        // Listen for changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            // Only update if not in bypass mode
+            if (localStorage.getItem(BYPASS_STORAGE_KEY) === 'true') return;
+
             setSession(session);
             setUser(session?.user ?? null);
 
@@ -73,37 +114,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const signInWithEmail = async (email: string) => {
-        // DEV BYPASS: Immediately log in specific admin email without Supabase
-        if (email.trim().toLowerCase() === 'bitdegenbiz@gmail.com' && import.meta.env.DEV) {
-            console.log("BYPASSING SUPABASE FOR ADMIN");
-            const fakeUser: User = {
-                id: 'dev-admin-id',
-                email: 'bitdegenbiz@gmail.com',
-                app_metadata: { provider: 'email' },
-                user_metadata: {},
-                aud: 'authenticated',
-                created_at: new Date().toISOString()
-            };
+        const cleanEmail = email.trim().toLowerCase();
 
-            // Artificial delay to feel real
-            await new Promise(resolve => setTimeout(resolve, 800));
+        if (cleanEmail === BYPASS_EMAIL) {
+            // Enable bypass persistence
+            localStorage.setItem(BYPASS_STORAGE_KEY, 'true');
 
-            // Set state manually
+            const fakeUser = getFakeAdminUser();
+            await new Promise(resolve => setTimeout(resolve, 800)); // Realism
+
             setUser(fakeUser);
             setRole('admin');
             setIsApproved(true);
-            setSession({
-                access_token: 'fake-token',
-                refresh_token: 'fake-refresh-token',
-                expires_in: 3600,
-                token_type: 'bearer',
-                user: fakeUser
-            });
+            setSession(getFakeSession(fakeUser));
 
             return { error: null };
         }
 
-        // Use Magic Link for everyone else
         return await supabase.auth.signInWithOtp({
             email,
             options: {
@@ -113,10 +140,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const signOut = async () => {
+        localStorage.removeItem(BYPASS_STORAGE_KEY);
         await supabase.auth.signOut();
         setRole(null);
         setIsApproved(false);
         setUser(null);
+        setSession(null);
     };
 
     return (
