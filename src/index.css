@@ -215,7 +215,13 @@ h6 {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Prevent global scroll */
   position: relative;
+  padding: 0;
+  /* Remove padding to allow edge-to-edge */
+  max-width: 100%;
+  /* Fill entire width */
+  margin: 0;
 }
 
 .tab-content {
@@ -224,6 +230,7 @@ h6 {
   flex-direction: column;
   overflow: hidden;
   animation: fadeIn var(--transition-base);
+  height: 100%;
 }
 
 @keyframes fadeIn {
@@ -243,9 +250,12 @@ h6 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--spacing-md) var(--spacing-2xl) 0 var(--spacing-2xl);
-  gap: var(--spacing-md);
+  justify-content: flex-start;
+  padding: var(--spacing-md) 0 0 0;
+  gap: var(--spacing-sm);
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
 }
 
 .search-container {
@@ -534,12 +544,11 @@ h6 {
 
 .main-content {
   flex: 1;
-  overflow-y: auto;
-  /* Allow ONLY main content to scroll */
-  padding: var(--spacing-2xl);
-  max-width: 1400px;
+  overflow: hidden;
+  padding: 0;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .portfolio-table {
@@ -1308,6 +1317,7 @@ h6 {
     transform: scale(1);
   }
 }
+
 /* Ticker Animation */
 .ticker-wrapper {
   width: 100%;
@@ -1369,6 +1379,7 @@ h6 {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }

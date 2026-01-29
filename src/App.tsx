@@ -118,7 +118,7 @@ function AppContent() {
         onClose={() => setIsAdminOpen(false)}
       />
 
-      <main className="main-content" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+      <main className="main-content">
         {activeTab === 'search' && (
           <div className="tab-content">
             {!selectedSymbol ? (
