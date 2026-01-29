@@ -4,6 +4,8 @@ const MarketStatus: React.FC = () => {
     const [cairoTime, setCairoTime] = useState('');
     const [nyStatus, setNyStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [tokyoStatus, setTokyoStatus] = useState({ isOpen: false, rangeEGP: '' });
+    const [londonStatus, setLondonStatus] = useState({ isOpen: false, rangeEGP: '' });
+    const [hkStatus, setHkStatus] = useState({ isOpen: false, rangeEGP: '' });
 
     useEffect(() => {
         const updateTime = () => {
@@ -75,6 +77,8 @@ const MarketStatus: React.FC = () => {
 
             setNyStatus(getSessionStatus('America/New_York', 9, 30, 16, 0));
             setTokyoStatus(getSessionStatus('Asia/Tokyo', 9, 0, 15, 0));
+            setLondonStatus(getSessionStatus('Europe/London', 8, 0, 16, 30));
+            setHkStatus(getSessionStatus('Asia/Hong_Kong', 9, 30, 16, 0));
         };
 
         updateTime();
@@ -83,7 +87,7 @@ const MarketStatus: React.FC = () => {
     }, []);
 
     const SessionBadge = ({ name, status }: { name: string, status: { isOpen: boolean, rangeEGP: string } }) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
             <span style={{
                 width: '6px',
                 height: '6px',
@@ -98,10 +102,12 @@ const MarketStatus: React.FC = () => {
     );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '400px' }}>
                 <SessionBadge name="Tokyo" status={tokyoStatus} />
-                <SessionBadge name="New York" status={nyStatus} />
+                <SessionBadge name="HK" status={hkStatus} />
+                <SessionBadge name="London" status={londonStatus} />
+                <SessionBadge name="NYC" status={nyStatus} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
                 <span style={{
