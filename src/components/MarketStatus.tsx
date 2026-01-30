@@ -48,30 +48,49 @@ const MarketStatus: React.FC = () => {
 
                 const isOpen = !isWeekend && timeInMinutes >= openMinutes && timeInMinutes < closeMinutes;
 
-                // Calculate EGP Range
+                // Calculate EGP Range - Fixed timezone conversion
                 const getEGPTime = (h: number, m: number) => {
-                    // Use a specific date in the local timezone and convert to Cairo
-                    const localDateStr = now.toLocaleString('en-US', { timeZone: tz });
-                    const localDateParsed = new Date(localDateStr);
-                    localDateParsed.setHours(h, m, 0, 0);
+                    // Create a date object for the market time in the target timezone
+                    const marketFormatter = new Intl.DateTimeFormat('en-US', {
+                        timeZone: tz,
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                    });
+                    const marketDateParts = marketFormatter.formatToParts(now);
+                    const year = marketDateParts.find(p => p.type === 'year')?.value;
+                    const month = marketDateParts.find(p => p.type === 'month')?.value;
+                    const day = marketDateParts.find(p => p.type === 'day')?.value;
 
-                    // Find offset difference between TZ and Cairo
-                    const cairoDateStr = now.toLocaleString('en-US', { timeZone: 'Africa/Cairo' });
-                    const cairoDate = new Date(cairoDateStr);
-                    const offsetDiff = (cairoDate.getTime() - localDateParsed.getTime()) / (1000 * 60 * 60);
+                    // Create UTC timestamp for the market open/close time
+                    const marketTimeStr = `${year}-${month}-${day}T${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
+                    const marketDateInTZ = new Date(marketTimeStr + ' GMT');
 
-                    const egpHour = (h + Math.floor(offsetDiff)) % 24;
-                    const egpMin = Math.round(m + (offsetDiff % 1 * 60));
+                    // Convert to Cairo timezone
+                    const cairoFormatter = new Intl.DateTimeFormat('en-US', {
+                        timeZone: 'Africa/Cairo',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                    });
 
-                    const formatTime = (hh: number, mm: number) => {
-                        const hFixed = (hh + 24) % 24;
-                        const mFixed = Math.round(mm);
-                        const period = hFixed >= 12 ? 'PM' : 'AM';
-                        const h12 = hFixed % 12 || 12;
-                        return `${h12}:${mFixed.toString().padStart(2, '0')}${period}`;
-                    };
+                    // Get offset between timezones
+                    const tzOffsetStr = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'short' });
+                    const cairoOffsetStr = now.toLocaleString('en-US', { timeZone: 'Africa/Cairo', timeZoneName: 'short' });
 
-                    return formatTime(egpHour, egpMin);
+                    // Simple approach: format the time directly
+                    const tzHours = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+                    tzHours.setHours(h, m, 0, 0);
+
+                    const cairoTime = new Date(tzHours.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));
+
+                    const cairoHour = cairoTime.getHours();
+                    const cairoMinute = cairoTime.getMinutes();
+
+                    const period = cairoHour >= 12 ? 'PM' : 'AM';
+                    const h12 = cairoHour % 12 || 12;
+
+                    return `${h12}:${cairoMinute.toString().padStart(2, '0')}${period}`;
                 };
 
                 return {
@@ -106,8 +125,8 @@ const MarketStatus: React.FC = () => {
     );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', overflowX: 'auto', maxWidth: '300px', scrollbarWidth: 'none' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', minWidth: '280px' }}>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '400px' }}>
                 <SessionBadge name="EGX" status={egyptStatus} />
                 <SessionBadge name="TKY" status={tokyoStatus} />
                 <SessionBadge name="LND" status={londonStatus} />

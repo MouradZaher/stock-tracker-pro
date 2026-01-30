@@ -1,10 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-interface StockHeatmapProps {
-    onSelectStock?: (symbol: string) => void;
-}
-
-const StockHeatmap: React.FC<StockHeatmapProps> = ({ onSelectStock }) => {
+const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -37,7 +33,7 @@ const StockHeatmap: React.FC<StockHeatmapProps> = ({ onSelectStock }) => {
 
         const widgetContainer = document.createElement('div');
         widgetContainer.className = 'tradingview-widget-container__widget';
-        
+
         if (containerRef.current) {
             containerRef.current.appendChild(widgetContainer);
             widgetContainer.appendChild(script);
@@ -65,9 +61,9 @@ const StockHeatmap: React.FC<StockHeatmapProps> = ({ onSelectStock }) => {
                 </h3>
             </div>
 
-            <div 
-                className="tradingview-widget-container" 
-                ref={containerRef} 
+            <div
+                className="tradingview-widget-container"
+                ref={containerRef}
                 style={{
                     minHeight: '500px',
                     width: '100%'

@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const getFakeAdminUser = (): User => ({
         id: 'bypass-admin-id',
-        email: BYPASS_EMAIL,
+        email: BYPASS_EMAIL!,  // Safe: only called when BYPASS_EMAIL is non-null in dev mode
         app_metadata: { provider: 'email' },
         user_metadata: {},
         aud: 'authenticated',
@@ -133,12 +133,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return { error: null };
         }
 
-        return await supabase.auth.signInWithOtp({
-            email,
-            options: {
-                emailRedirectTo: window.location.origin,
-            },
-        });
+        // Enhanced error handling and logging for production magic links
+        try {
+            console.log('📧 Sending magic link to:', cleanEmail);
+
+            const { data, error } = await supabase.auth.signInWithOtp({
+                email: cleanEmail,
+                options: {
+                    emailRedirectTo: window.location.origin,
+                    shouldCreateUser: true, // Auto-create user if doesn't exist
+                },
+            });
+
+            if (error) {
+                console.error('❌ Supabase OTP Error:', error);
+                return { error };
+            }
+
+            console.log('✅ Magic link sent successfully to:', cleanEmail);
+            return { error: null, data };
+        } catch (err: any) {
+            console.error('❌ Unexpected error sending magic link:', err);
+            return { error: err };
+        }
     };
 
     const signOut = async () => {

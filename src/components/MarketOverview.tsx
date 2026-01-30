@@ -8,7 +8,7 @@ interface MarketOverviewProps {
 const MarketOverview: React.FC<MarketOverviewProps> = ({ onSelectStock }) => {
     return (
         <div className="market-overview" style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <StockHeatmap onSelectStock={onSelectStock} />
+            <StockHeatmap />
         </div>
     );
 };

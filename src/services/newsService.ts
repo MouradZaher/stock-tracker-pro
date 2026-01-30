@@ -1,85 +1,49 @@
-import { finnhubApi, hasAPIKeys } from './api';
 import type { NewsArticle } from '../types';
 
-// Mock news generator
+// Enhanced mock news generator with more variety
 const generateMockNews = (symbol: string): NewsArticle[] => {
-    const headlines = [
-        `${symbol} Reports Strong Quarterly Earnings`,
-        `Analysts Upgrade ${symbol} Price Target`,
-        `${symbol} Announces New Product Launch`,
-        `Market Outlook: ${symbol} Shows Promising Growth`,
-        `${symbol} Expands Into New Markets`,
+    // Use symbol and date as seed for consistent but varied results
+    const now = Date.now();
+    const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+    const newsTemplates = [
+        { headline: `${symbol} Reports Strong Quarterly Earnings Beat`, sentiment: 'positive' as const },
+        { headline: `Analysts Raise ${symbol} Price Target on Growth Prospects`, sentiment: 'positive' as const },
+        { headline: `${symbol} Announces Strategic Partnership and Product Launch`, sentiment: 'positive' as const },
+        { headline: `Market Outlook: ${symbol} Shows Promising Long-term Growth`, sentiment: 'positive' as const },
+        { headline: `${symbol} Expands Into Emerging Markets with New Initiative`, sentiment: 'positive' as const },
+        { headline: `${symbol} CEO Discusses Future Strategy in Investor Call`, sentiment: 'neutral' as const },
+        { headline: `Financial Review: ${symbol} Maintains Steady Performance`, sentiment: 'neutral' as const },
+        { headline: `${symbol} Announces Dividend and Share Buyback Program`, sentiment: 'positive' as const },
+        { headline: `Industry Trends: How ${symbol} is Positioning for Success`, sentiment: 'neutral' as const },
+        { headline: `${symbol} Invests in Technology and Innovation`, sentiment: 'positive' as const },
     ];
 
-    const sentiments: Array<'positive' | 'neutral' | 'negative'> = ['positive', 'neutral', 'negative'];
+    const sources = ['Reuters', 'Bloomberg', 'CNBC', 'MarketWatch', 'Financial Times', 'WSJ'];
 
-    return headlines.map((headline, index) => ({
-        id: `mock-${symbol}-${index}`,
-        headline,
-        summary: `Recent developments show ${symbol} continues to perform in the market with various strategic initiatives.`,
-        source: 'Market News',
-        url: '#',
-        datetime: Math.floor(Date.now() / 1000) - index * 86400,
-        image: null,
-        sentiment: sentiments[index % 3],
-    }));
+    // Rotate through templates based on seed
+    return newsTemplates.slice(0, 8).map((template, index) => {
+        const daysAgo = index;
+        const sourceIndex = (seed + index) % sources.length;
+
+        return {
+            id: `mock-${symbol}-${index}`,
+            headline: template.headline,
+            summary: `${template.headline}. Industry analysts and market observers are monitoring ${symbol}'s performance and strategic initiatives as the company continues to navigate market conditions.`,
+            source: sources[sourceIndex],
+            url: '#',
+            datetime: Math.floor((now - daysAgo * 86400000) / 1000),
+            image: null,
+            sentiment: template.sentiment,
+        };
+    });
 };
 
-// Get news from Finnhub
+// Get stock news (using enhanced mock data)
 export const getStockNews = async (symbol: string, limit: number = 5): Promise<NewsArticle[]> => {
-    const apiKeys = hasAPIKeys();
+    console.log(`📰 Generating news for ${symbol}...`);
 
-    if (apiKeys.finnhub) {
-        try {
-            const toDate = new Date();
-            const fromDate = new Date();
-            fromDate.setDate(fromDate.getDate() - 7);
-
-            const response = await finnhubApi.get('/company-news', {
-                params: {
-                    symbol,
-                    from: fromDate.toISOString().split('T')[0],
-                    to: toDate.toISOString().split('T')[0],
-                },
-            });
-
-            if (response.data && response.data.length > 0) {
-                return response.data.slice(0, limit).map((article: any) => ({
-                    id: `${article.id}`,
-                    headline: article.headline,
-                    summary: article.summary || article.headline,
-                    source: article.source,
-                    url: article.url,
-                    datetime: article.datetime,
-                    image: article.image,
-                    sentiment: analyzeSentiment(article.headline + ' ' + article.summary),
-                }));
-            }
-        } catch (error) {
-            console.warn('Finnhub news failed:', error);
-        }
-    }
-
-    // Fallback to mock news
+    // Return enhanced mock news
     return generateMockNews(symbol).slice(0, limit);
 };
 
-// Simple sentiment analysis based on keywords
-const analyzeSentiment = (text: string): 'positive' | 'neutral' | 'negative' => {
-    const lowerText = text.toLowerCase();
-
-    const positiveKeywords = ['growth', 'profit', 'record', 'beat', 'upgrade', 'strong', 'success', 'gain', 'rise', 'high'];
-    const negativeKeywords = ['loss', 'decline', 'fall', 'downgrade', 'weak', 'miss', 'concern', 'risk', 'drop', 'low'];
-
-    let score = 0;
-    positiveKeywords.forEach(keyword => {
-        if (lowerText.includes(keyword)) score += 1;
-    });
-    negativeKeywords.forEach(keyword => {
-        if (lowerText.includes(keyword)) score -= 1;
-    });
-
-    if (score > 0) return 'positive';
-    if (score < 0) return 'negative';
-    return 'neutral';
-};

@@ -1,123 +1,111 @@
-import { finnhubApi, alphaVantageApi, hasAPIKeys } from './api';
+import { yahooFinanceApi, getCachedData, setCachedData } from './api';
 import type { Stock, CompanyProfile } from '../types';
 import { getAllSymbols } from '../data/sectors';
 
-// Mock data generator for when APIs are unavailable
+// Enhanced mock data generator with more realistic patterns
 const generateMockStock = (symbol: string): Stock => {
-    const basePrice = 100 + Math.random() * 400;
-    const change = (Math.random() - 0.5) * 10;
+    // Use symbol as seed for consistent mock data
+    const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const random = (seed: number) => {
+        const x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    };
+
+    const basePrice = 50 + random(seed) * 450;
+    const volatility = 0.02 + random(seed + 1) * 0.03;
+    const change = (random(seed + 2) - 0.5) * basePrice * volatility;
     const changePercent = (change / basePrice) * 100;
 
     return {
         symbol,
         name: symbol,
-        price: basePrice,
-        change,
-        changePercent,
-        previousClose: basePrice - change,
-        open: basePrice + (Math.random() - 0.5) * 5,
-        high: basePrice + Math.random() * 5,
-        low: basePrice - Math.random() * 5,
-        volume: Math.floor(Math.random() * 100000000),
-        avgVolume: Math.floor(Math.random() * 80000000),
-        marketCap: Math.floor(basePrice * Math.random() * 10000000000),
-        peRatio: 15 + Math.random() * 30,
-        eps: basePrice / (15 + Math.random() * 30),
-        dividendYield: Math.random() * 3,
-        fiftyTwoWeekHigh: basePrice * (1 + Math.random() * 0.2),
-        fiftyTwoWeekLow: basePrice * (1 - Math.random() * 0.3),
+        price: parseFloat(basePrice.toFixed(2)),
+        change: parseFloat(change.toFixed(2)),
+        changePercent: parseFloat(changePercent.toFixed(2)),
+        previousClose: parseFloat((basePrice - change).toFixed(2)),
+        open: parseFloat((basePrice + (random(seed + 3) - 0.5) * basePrice * 0.01).toFixed(2)),
+        high: parseFloat((basePrice + random(seed + 4) * basePrice * 0.02).toFixed(2)),
+        low: parseFloat((basePrice - random(seed + 5) * basePrice * 0.02).toFixed(2)),
+        volume: Math.floor(random(seed + 6) * 100000000),
+        avgVolume: Math.floor(random(seed + 7) * 80000000),
+        marketCap: Math.floor(basePrice * random(seed + 8) * 10000000000),
+        peRatio: parseFloat((15 + random(seed + 9) * 30).toFixed(2)),
+        eps: parseFloat((basePrice / (15 + random(seed + 10) * 30)).toFixed(2)),
+        dividendYield: parseFloat((random(seed + 11) * 3).toFixed(2)),
+        fiftyTwoWeekHigh: parseFloat((basePrice * (1 + random(seed + 12) * 0.2)).toFixed(2)),
+        fiftyTwoWeekLow: parseFloat((basePrice * (1 - random(seed + 13) * 0.3)).toFixed(2)),
         lastUpdated: new Date(),
     };
 };
 
-// Get real-time quote from Finnhub
-const getQuoteFromFinnhub = async (symbol: string): Promise<Partial<Stock> | null> => {
+// Get real-time quote from Yahoo Finance (FREE!)
+const getQuoteFromYahoo = async (symbol: string): Promise<Partial<Stock> | null> => {
     try {
-        const response = await finnhubApi.get('/quote', { params: { symbol } });
-        const data = response.data;
+        // Check cache first
+        const cacheKey = `quote_${symbol}`;
+        const cached = getCachedData(cacheKey);
+        if (cached) {
+            console.log(`✅ Using cached data for ${symbol}`);
+            return cached;
+        }
 
-        if (data.c === 0) return null;
-
-        return {
-            price: data.c,
-            change: data.d,
-            changePercent: data.dp,
-            previousClose: data.pc,
-            open: data.o,
-            high: data.h,
-            low: data.l,
-            lastUpdated: new Date(),
-        };
-    } catch (error) {
-        console.warn('Finnhub quote failed:', error);
-        return null;
-    }
-};
-
-// Get quote from Alpha Vantage
-const getQuoteFromAlphaVantage = async (symbol: string): Promise<Partial<Stock> | null> => {
-    try {
-        const response = await alphaVantageApi.get('/query', {
-            params: {
-                function: 'GLOBAL_QUOTE',
-                symbol,
-            },
+        console.log(`📊 Fetching live data for ${symbol} from Yahoo Finance...`);
+        const response = await yahooFinanceApi.get('/v8/finance/quote', {
+            params: { symbols: symbol },
         });
 
-        const quote = response.data['Global Quote'];
-        if (!quote || !quote['05. price']) return null;
+        const quotes = response.data?.quoteResponse?.result;
+        if (!quotes || quotes.length === 0) return null;
 
-        return {
-            price: parseFloat(quote['05. price']),
-            change: parseFloat(quote['09. change']),
-            changePercent: parseFloat(quote['10. change percent']?.replace('%', '') || '0'),
-            previousClose: parseFloat(quote['08. previous close']),
-            open: parseFloat(quote['02. open']),
-            high: parseFloat(quote['03. high']),
-            low: parseFloat(quote['04. low']),
-            volume: parseInt(quote['06. volume']),
+        const quote = quotes[0];
+
+        const stockData: Partial<Stock> = {
+            price: quote.regularMarketPrice || quote.ask || 0,
+            change: quote.regularMarketChange || 0,
+            changePercent: quote.regularMarketChangePercent || 0,
+            previousClose: quote.regularMarketPreviousClose || 0,
+            open: quote.regularMarketOpen || 0,
+            high: quote.regularMarketDayHigh || 0,
+            low: quote.regularMarketDayLow || 0,
+            volume: quote.regularMarketVolume || 0,
+            avgVolume: quote.averageDailyVolume3Month || 0,
+            marketCap: quote.marketCap || 0,
+            peRatio: quote.trailingPE || 0,
+            eps: quote.epsTrailingTwelveMonths || 0,
+            dividendYield: quote.dividendYield ? quote.dividendYield * 100 : 0,
+            fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
+            fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
             lastUpdated: new Date(),
         };
-    } catch (error) {
-        console.warn('Alpha Vantage quote failed:', error);
+
+        // Cache the result
+        setCachedData(cacheKey, stockData);
+
+        return stockData;
+    } catch (error: any) {
+        console.warn(`⚠️ Yahoo Finance quote failed for ${symbol}:`, error.message);
         return null;
     }
 };
 
-// Get stock quote with fallbacks
+// Get stock quote with fallback to mock data
 export const getStockQuote = async (symbol: string): Promise<Stock> => {
-    const apiKeys = hasAPIKeys();
+    // Try Yahoo Finance first
+    const quote = await getQuoteFromYahoo(symbol);
 
-    // Try Finnhub first
-    if (apiKeys.finnhub) {
-        const quote = await getQuoteFromFinnhub(symbol);
-        if (quote) {
-            const profile = await getCompanyProfile(symbol);
-            return {
-                ...generateMockStock(symbol),
-                ...quote,
-                name: profile?.name || symbol,
-                symbol,
-            };
-        }
-    }
-
-    // Try Alpha Vantage
-    if (apiKeys.alphaVantage) {
-        const quote = await getQuoteFromAlphaVantage(symbol);
-        if (quote) {
-            const profile = await getCompanyProfile(symbol);
-            return {
-                ...generateMockStock(symbol),
-                ...quote,
-                name: profile?.name || symbol,
-                symbol,
-            };
-        }
+    if (quote && quote.price && quote.price > 0) {
+        const profile = await getCompanyProfile(symbol);
+        console.log(`✅ Live data retrieved for ${symbol}`);
+        return {
+            ...generateMockStock(symbol),
+            ...quote,
+            name: profile?.name || symbol,
+            symbol,
+        };
     }
 
     // Fallback to mock data
-    console.warn('Using mock data for', symbol);
+    console.log(`📝 Using mock data for ${symbol}`);
     const profile = await getCompanyProfile(symbol);
     return {
         ...generateMockStock(symbol),
@@ -126,40 +114,50 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
     };
 };
 
-// Get company profile from Finnhub
-const getProfileFromFinnhub = async (symbol: string): Promise<CompanyProfile | null> => {
+// Get company profile from Yahoo Finance
+const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | null> => {
     try {
-        const response = await finnhubApi.get('/stock/profile2', { params: { symbol } });
-        const data = response.data;
+        // Check cache first
+        const cacheKey = `profile_${symbol}`;
+        const cached = getCachedData(cacheKey);
+        if (cached) return cached;
 
-        if (!data || !data.name) return null;
+        const response = await yahooFinanceApi.get('/v8/finance/quote', {
+            params: { symbols: symbol },
+        });
 
-        return {
+        const quotes = response.data?.quoteResponse?.result;
+        if (!quotes || quotes.length === 0) return null;
+
+        const quote = quotes[0];
+
+        const profile: CompanyProfile = {
             symbol,
-            name: data.name,
-            description: data.finnhubIndustry || '',
+            name: quote.longName || quote.shortName || symbol,
+            description: `${quote.longName || symbol} is a publicly traded company.`,
             ceo: null,
-            founded: data.ipo || null,
-            sector: data.finnhubIndustry || 'Unknown',
-            industry: data.finnhubIndustry || 'Unknown',
-            logo: data.logo || null,
-            website: data.weburl || null,
+            founded: null,
+            sector: quote.sector || 'Unknown',
+            industry: quote.industry || 'Unknown',
+            logo: null,
+            website: null,
         };
+
+        // Cache the result
+        setCachedData(cacheKey, profile);
+
+        return profile;
     } catch (error) {
-        console.warn('Finnhub profile failed:', error);
+        console.warn(`Yahoo Finance profile failed for ${symbol}:`, error);
         return null;
     }
 };
 
 // Get company profile with fallbacks
 export const getCompanyProfile = async (symbol: string): Promise<CompanyProfile | null> => {
-    const apiKeys = hasAPIKeys();
-
-    // Try Finnhub
-    if (apiKeys.finnhub) {
-        const profile = await getProfileFromFinnhub(symbol);
-        if (profile) return profile;
-    }
+    // Try Yahoo Finance
+    const profile = await getProfileFromYahoo(symbol);
+    if (profile) return profile;
 
     // Try to find in static data
     const allSymbols = getAllSymbols();
@@ -189,81 +187,86 @@ export const getStockData = async (symbol: string): Promise<{ stock: Stock; prof
         getCompanyProfile(symbol),
     ]);
 
-    // Add additional stats from Alpha Vantage if available
-    try {
-        const apiKeys = hasAPIKeys();
-        if (apiKeys.alphaVantage) {
-            const overviewResponse = await alphaVantageApi.get('/query', {
-                params: {
-                    function: 'OVERVIEW',
-                    symbol,
-                },
-            });
-
-            const overview = overviewResponse.data;
-            if (overview && overview.Symbol) {
-                stock.marketCap = parseFloat(overview.MarketCapitalization) || stock.marketCap;
-                stock.peRatio = parseFloat(overview.PERatio) || stock.peRatio;
-                stock.eps = parseFloat(overview.EPS) || stock.eps;
-                stock.dividendYield = parseFloat(overview.DividendYield) * 100 || stock.dividendYield;
-                stock.fiftyTwoWeekHigh = parseFloat(overview['52WeekHigh']) || stock.fiftyTwoWeekHigh;
-                stock.fiftyTwoWeekLow = parseFloat(overview['52WeekLow']) || stock.fiftyTwoWeekLow;
-
-                if (profile) {
-                    profile.description = overview.Description || profile.description;
-                    profile.sector = overview.Sector || profile.sector;
-                    profile.industry = overview.Industry || profile.industry;
-                }
-            }
-        }
-    } catch (error) {
-        console.warn('Could not fetch overview data:', error);
-    }
-
     return { stock, profile };
 };
 
-// Search for symbols
+// Search for symbols in static data (no API needed)
 export const searchSymbols = async (query: string): Promise<any[]> => {
     if (!query || query.length < 1) return [];
 
-    // First, search in static data
+    // Search in static data
     const allSymbols = getAllSymbols();
-    const staticResults = allSymbols
+    const results = allSymbols
         .filter(s =>
             s.symbol.toLowerCase().includes(query.toLowerCase()) ||
             s.name.toLowerCase().includes(query.toLowerCase())
         )
-        .slice(0, 10);
+        .slice(0, 20);
 
-    // If we have API access, also search via API
+    return results;
+};
+
+// Get multiple quotes efficiently (for heatmaps, watchlists, etc.)
+export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, Stock>> => {
+    const stockMap = new Map<string, Stock>();
+
     try {
-        const apiKeys = hasAPIKeys();
-        if (apiKeys.finnhub) {
-            const response = await finnhubApi.get('/search', { params: { q: query } });
-            if (response.data && response.data.result) {
-                const apiResults = response.data.result
-                    .filter((r: any) => r.type === 'Common Stock' || r.type === 'ETP')
-                    .slice(0, 10);
+        // Try to fetch all at once from Yahoo Finance
+        const symbolsString = symbols.join(',');
+        const cacheKey = `multi_${symbolsString}`;
+        const cached = getCachedData(cacheKey);
 
-                // Merge with static results, prioritizing exact matches
-                const combined = [...staticResults];
-                apiResults.forEach((apiResult: any) => {
-                    if (!combined.find(s => s.symbol === apiResult.symbol)) {
-                        combined.push({
-                            symbol: apiResult.symbol,
-                            name: apiResult.description,
-                            type: apiResult.type === 'ETP' ? 'ETF' : 'Stock',
-                        });
-                    }
-                });
-
-                return combined.slice(0, 10);
-            }
+        if (cached) {
+            console.log(`✅ Using cached data for ${symbols.length} symbols`);
+            return cached;
         }
-    } catch (error) {
-        console.warn('API search failed, using static data only:', error);
+
+        console.log(`📊 Fetching live data for ${symbols.length} symbols from Yahoo Finance...`);
+        const response = await yahooFinanceApi.get('/v8/finance/quote', {
+            params: { symbols: symbolsString },
+        });
+
+        const quotes = response.data?.quoteResponse?.result || [];
+
+        for (const quote of quotes) {
+            const symbol = quote.symbol;
+            const stock: Stock = {
+                symbol,
+                name: quote.longName || quote.shortName || symbol,
+                price: quote.regularMarketPrice || quote.ask || 0,
+                change: quote.regularMarketChange || 0,
+                changePercent: quote.regularMarketChangePercent || 0,
+                previousClose: quote.regularMarketPreviousClose || 0,
+                open: quote.regularMarketOpen || 0,
+                high: quote.regularMarketDayHigh || 0,
+                low: quote.regularMarketDayLow || 0,
+                volume: quote.regularMarketVolume || 0,
+                avgVolume: quote.averageDailyVolume3Month || 0,
+                marketCap: quote.marketCap || 0,
+                peRatio: quote.trailingPE || 0,
+                eps: quote.epsTrailingTwelveMonths || 0,
+                dividendYield: quote.dividendYield ? quote.dividendYield * 100 : 0,
+                fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
+                fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
+                lastUpdated: new Date(),
+            };
+            stockMap.set(symbol, stock);
+        }
+
+        // Cache the result
+        setCachedData(cacheKey, stockMap);
+
+        console.log(`✅ Retrieved live data for ${stockMap.size} symbols`);
+    } catch (error: any) {
+        console.warn(`⚠️ Yahoo Finance multi-quote failed:`, error.message);
     }
 
-    return staticResults;
+    // Fill in missing symbols with mock data
+    for (const symbol of symbols) {
+        if (!stockMap.has(symbol)) {
+            stockMap.set(symbol, generateMockStock(symbol));
+        }
+    }
+
+    return stockMap;
 };

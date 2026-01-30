@@ -1,83 +1,85 @@
-import React from 'react';
-import { Shield, TrendingUp, CheckCircle, List, Calendar } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { TrendingUp } from 'lucide-react';
 
 const BenefitsGrid: React.FC = () => {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        // Clear previous widget
+        containerRef.current.innerHTML = '';
+
+        // Create TradingView Stock Heatmap widget
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+        script.async = true;
+        script.type = 'text/javascript';
+        script.innerHTML = JSON.stringify({
+            "exchanges": [],
+            "dataSource": "SPX500",
+            "grouping": "sector",
+            "blockSize": "market_cap_basic",
+            "blockColor": "change",
+            "locale": "en",
+            "symbolUrl": "",
+            "colorTheme": "dark",
+            "hasTopBar": false,
+            "isDataSetEnabled": false,
+            "isZoomEnabled": true,
+            "hasSymbolTooltip": true,
+            "width": "100%",
+            "height": "500"
+        });
+
+        const widgetContainer = document.createElement('div');
+        widgetContainer.className = 'tradingview-widget-container__widget';
+
+        if (containerRef.current) {
+            containerRef.current.appendChild(widgetContainer);
+            widgetContainer.appendChild(script);
+        }
+
+        return () => {
+            if (containerRef.current) {
+                containerRef.current.innerHTML = '';
+            }
+        };
+    }, []);
+
     return (
         <div className="hero-visual">
             <div
-                className="visual-card"
+                className="visual-card glass-card"
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    padding: '2.5rem'
+                    padding: '1.5rem',
+                    minHeight: '600px'
                 }}
             >
-                <div className="card-header" style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+                <div className="card-header" style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <TrendingUp size={20} color="var(--color-accent)" />
-                    <span style={{ fontSize: '1.1rem' }}>Included with Premium Access</span>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        📊 Live S&P 500 Market Heatmap
+                    </span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', rowGap: '2rem' }}>
-                    <div className="benefit-item" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                        <div style={{ background: 'rgba(57, 255, 20, 0.1)', padding: '10px', borderRadius: '10px', height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <TrendingUp size={20} color="#39FF14" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', lineHeight: '1.2' }}>Real-time Data</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Live prices & charts for US markets</p>
-                        </div>
-                    </div>
+                <div
+                    className="tradingview-widget-container"
+                    ref={containerRef}
+                    style={{
+                        minHeight: '500px',
+                        width: '100%',
+                        flex: 1
+                    }}
+                />
 
-                    <div className="benefit-item" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '10px', borderRadius: '10px', height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Shield size={20} color="#38bdf8" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', lineHeight: '1.2' }}>AI Insights</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Smart buy/sell signals & analysis</p>
-                        </div>
-                    </div>
-
-                    <div className="benefit-item" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                        <div style={{ background: 'rgba(250, 204, 21, 0.1)', padding: '10px', borderRadius: '10px', height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <CheckCircle size={20} color="#facc15" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', lineHeight: '1.2' }}>Portfolio Tracker</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Track P/L and dividends easily</p>
-                        </div>
-                    </div>
-
-                    <div className="benefit-item" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                        <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '10px', borderRadius: '10px', height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <TrendingUp size={20} color="#f43f5e" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', lineHeight: '1.2' }}>Market Heatmap</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Visualize S&P 500 performance</p>
-                        </div>
-                    </div>
-
-                    <div className="benefit-item" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                        <div style={{ background: 'rgba(168, 85, 247, 0.1)', padding: '10px', borderRadius: '10px', height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <List size={20} color="#a855f7" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', lineHeight: '1.2' }}>Smart Watchlists</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Organize & track favorites</p>
-                        </div>
-                    </div>
-
-                    <div className="benefit-item" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                        <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '10px', height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Calendar size={20} color="#10b981" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', lineHeight: '1.2' }}>Dividend Calendar</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Track upcoming payouts</p>
-                        </div>
-                    </div>
+                <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textAlign: 'center', margin: 0 }}>
+                        Real-time visualization of S&P 500 stocks • Click any block to explore details
+                    </p>
                 </div>
             </div>
         </div>
@@ -85,3 +87,4 @@ const BenefitsGrid: React.FC = () => {
 };
 
 export default BenefitsGrid;
+
