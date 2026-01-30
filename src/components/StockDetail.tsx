@@ -3,9 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Clock, TrendingUp, TrendingDown } from 'lucide-react';
 
 import { getStockData } from '../services/stockDataService';
+import { REFRESH_INTERVALS } from '../services/api';
 import { formatCurrency, formatPercent, formatNumber, formatNumberPlain, formatTimeAgo, getChangeClass } from '../utils/formatters';
 import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
+import LiveBadge from './LiveBadge';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,10 +20,11 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
 
-    const { data, isLoading, error, refetch } = useQuery({
+    const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
         queryKey: ['stock', symbol],
         queryFn: () => getStockData(symbol),
-        refetchInterval: 10000, // Refetch every 10 seconds
+        refetchInterval: REFRESH_INTERVALS.STOCK_PRICE, // 10 seconds
+        refetchIntervalInBackground: true,
         staleTime: 5000,
     });
 
@@ -71,6 +74,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
                 <div className="stock-title">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <div className="stock-symbol">{stock.symbol}</div>
+                        <LiveBadge lastUpdate={dataUpdatedAt} />
                         <button
                             className={`btn-icon ${inWatchlist ? 'text-warning' : ''}`}
                             onClick={toggleWatchlist}
@@ -83,7 +87,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
                     <div className="stock-name">{stock.name}</div>
                     {profile?.ceo && (
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>
-                            CEO: {profile.ceo} {profile.founded && `• Founded: ${profile.founded}`}
+                            CEO: {profile.ceo} {profile?.founded && `• Founded: ${profile.founded}`}
                         </div>
                     )}
                     {!profile?.ceo && profile?.founded && (

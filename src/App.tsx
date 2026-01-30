@@ -27,8 +27,13 @@ import './index.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      retry: 2,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchInterval: 30000, // Default: 30 seconds
+      refetchIntervalInBackground: true, // Keep refreshing even when tab is inactive
+      staleTime: 5000, // Data considered stale after 5 seconds
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
     },
   },
 });
