@@ -140,20 +140,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const { data, error } = await supabase.auth.signInWithOtp({
                 email: cleanEmail,
                 options: {
-                    emailRedirectTo: window.location.origin,
+                    emailRedirectTo: `${window.location.origin}/`,
                     shouldCreateUser: true, // Auto-create user if doesn't exist
                 },
             });
 
             if (error) {
                 console.error('❌ Supabase OTP Error:', error);
+                console.error('Error details:', {
+                    status: error.status,
+                    message: error.message,
+                    name: error.name
+                });
+
+                // Provide specific error messages
+                if (error.message?.includes('rate limit') || error.status === 429) {
+                    console.error('⏱️ Rate limit reached. Please wait before trying again.');
+                } else if (error.message?.includes('Invalid email')) {
+                    console.error('📧 Invalid email format');
+                } else {
+                    console.error('💥 Unexpected error:', error.message);
+                }
+
                 return { error };
             }
 
-            console.log('✅ Magic link sent successfully to:', cleanEmail);
-            return { error: null, data };
-        } catch (err: any) {
-            console.error('❌ Unexpected error sending magic link:', err);
+            console.log('✅ Magic link sent successfully!', data);
+            console.log('📨 Check your inbox for the authentication link');
+            console.log('🔗 Redirect URL:', `${window.location.origin}/`);
+
+            return { error: null };
+        } catch (err) {
+            console.error('💥 Unexpected error sending magic link:', err);
             return { error: err };
         }
     };

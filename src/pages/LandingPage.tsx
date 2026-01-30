@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import LiveTicker from '../components/LiveTicker';
 import BenefitsGrid from '../components/BenefitsGrid';
 import { soundService } from '../services/soundService';
+import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
     const { signInWithEmail } = useAuth();
