@@ -61,13 +61,14 @@ const MarketStatus: React.FC = () => {
                     const offsetDiff = (cairoDate.getTime() - localDateParsed.getTime()) / (1000 * 60 * 60);
 
                     const egpHour = (h + Math.floor(offsetDiff)) % 24;
-                    const egpMin = m + (offsetDiff % 1 * 60);
+                    const egpMin = Math.round(m + (offsetDiff % 1 * 60));
 
                     const formatTime = (hh: number, mm: number) => {
                         const hFixed = (hh + 24) % 24;
+                        const mFixed = Math.round(mm);
                         const period = hFixed >= 12 ? 'PM' : 'AM';
                         const h12 = hFixed % 12 || 12;
-                        return `${h12}:${mm.toString().padStart(2, '0')}${period}`;
+                        return `${h12}:${mFixed.toString().padStart(2, '0')}${period}`;
                     };
 
                     return formatTime(egpHour, egpMin);

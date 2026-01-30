@@ -2,7 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 
-const BYPASS_EMAIL = 'bitdegenbiz@gmail.com';
+// Development-only bypass (disabled in production for security)
+const BYPASS_EMAIL = import.meta.env.DEV ? 'bitdegenbiz@gmail.com' : null;
 const BYPASS_STORAGE_KEY = 'auth_bypass_active';
 
 interface AuthContextType {
@@ -70,8 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
-        // 1. Check for bypass in localStorage first (highest priority for requested persistence)
-        const isBypassActive = localStorage.getItem(BYPASS_STORAGE_KEY) === 'true';
+        // 1. Check for bypass in localStorage (only in development mode)
+        const isBypassActive = import.meta.env.DEV && localStorage.getItem(BYPASS_STORAGE_KEY) === 'true';
 
         if (isBypassActive) {
             const fakeUser = getFakeAdminUser();
@@ -95,8 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            // Only update if not in bypass mode
-            if (localStorage.getItem(BYPASS_STORAGE_KEY) === 'true') return;
+            // Only update if not in bypass mode (development only)
+            if (import.meta.env.DEV && localStorage.getItem(BYPASS_STORAGE_KEY) === 'true') return;
 
             setSession(session);
             setUser(session?.user ?? null);
@@ -116,7 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const signInWithEmail = async (email: string) => {
         const cleanEmail = email.trim().toLowerCase();
 
-        if (cleanEmail === BYPASS_EMAIL) {
+        // Development-only bypass (disabled in production for security)
+        if (import.meta.env.DEV && BYPASS_EMAIL && cleanEmail === BYPASS_EMAIL) {
             // Enable bypass persistence
             localStorage.setItem(BYPASS_STORAGE_KEY, 'true');
 

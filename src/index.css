@@ -2132,6 +2132,29 @@ textarea:focus-visible {
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: 0.8125rem;
   }
+
+  /* Optimize Admin button for mobile */
+  .admin-button-container {
+    top: 8px !important;
+    right: 8px !important;
+  }
+
+  .admin-button-container .btn {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.7rem !important;
+    opacity: 0.9;
+  }
+
+  /* Full-width search on mobile */
+  .search-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .search-input {
+    width: 100%;
+  }
 }
 
 /* Optimize Heatmap for Mobile */

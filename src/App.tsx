@@ -157,17 +157,21 @@ function AppContent() {
 
         {activeTab === 'portfolio' && (
           <div className="tab-content">
-            <Suspense fallback={<PageSkeleton />}>
-              <Portfolio />
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense fallback={<PageSkeleton />}>
+                <Portfolio />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         )}
 
         {activeTab === 'recommendations' && (
           <div className="tab-content" style={{ height: '100%', overflowY: 'auto' }}>
-            <Suspense fallback={<PageSkeleton />}>
-              <AIRecommendations onSelectStock={handleSelectSymbol} />
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense fallback={<PageSkeleton />}>
+                <AIRecommendations onSelectStock={handleSelectSymbol} />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         )}
 
