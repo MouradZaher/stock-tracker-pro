@@ -79,21 +79,20 @@ const BenefitsGrid: React.FC = () => {
         fontWeight: 600,
             marginBottom: '0.5rem',
                 color: 'var(--color-text-primary)'
-}}\u003e
-{ benefit.title }
-\u003c / h3\u003e
-\u003cp style = {{
-    fontSize: '0.9rem',
+}}>
+    { benefit.title }
+</h3 >
+    <p style={{
+        fontSize: '0.9rem',
         color: 'var(--color-text-secondary)',
-            lineHeight: '1.6'
-}}\u003e
-{ benefit.description }
-\u003c / p\u003e
-\u003c / div\u003e
+    }}>
+        {benefit.description}
+    </p>
+</div >
                     );
                 })}
-\u003c / div\u003e
-\u003c / div\u003e
+</div >
+</div >
     );
 };
 
