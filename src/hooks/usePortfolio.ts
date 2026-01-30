@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create, type StateCreator } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { PortfolioPosition, PortfolioSummary } from '../types';
 import { calculateProfitLoss } from '../utils/calculations';
@@ -14,7 +14,7 @@ interface PortfolioStore {
 }
 
 export const usePortfolioStore = create<PortfolioStore>()(
-    persist(
+    persist<PortfolioStore>(
         (set, get) => ({
             positions: [],
 

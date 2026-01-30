@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+// import { motion, AnimatePresence } from 'framer-motion';
+// TEMPORARY: Commenting out framer-motion to fix build - this component is not currently used
 
 interface BottomSheetProps {
     isOpen: boolean;
@@ -64,15 +65,11 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     };
 
     return (
-        <AnimatePresence>
+        <>
             {isOpen && (
                 <>
                     {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
+                    <div
                         onClick={onClose}
                         style={{
                             position: 'fixed',
@@ -86,25 +83,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                     />
 
                     {/* Bottom Sheet */}
-                    <motion.div
+                    <div
                         ref={sheetRef}
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
-                        transition={{
-                            type: 'spring',
-                            damping: 30,
-                            stiffness: 300,
-                        }}
-                        drag="y"
-                        dragConstraints={{ top: 0, bottom: 0 }}
-                        dragElastic={0.2}
-                        onDragEnd={(_, info) => {
-                            // Close if dragged down more than 100px
-                            if (info.offset.y > 100) {
-                                onClose();
-                            }
-                        }}
                         style={{
                             position: 'fixed',
                             bottom: 0,
@@ -182,10 +162,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                         >
                             {children}
                         </div>
-                    </motion.div>
+                    </div>
                 </>
             )}
-        </AnimatePresence>
+        </>
     );
 };
 

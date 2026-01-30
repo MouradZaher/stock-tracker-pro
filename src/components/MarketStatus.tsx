@@ -62,21 +62,14 @@ const MarketStatus: React.FC = () => {
                     const month = marketDateParts.find(p => p.type === 'month')?.value;
                     const day = marketDateParts.find(p => p.type === 'day')?.value;
 
-                    // Create UTC timestamp for the market open/close time
-                    const marketTimeStr = `${year}-${month}-${day}T${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
-                    const marketDateInTZ = new Date(marketTimeStr + ' GMT');
+                    // Direct time conversion without unused variables
 
                     // Convert to Cairo timezone
-                    const cairoFormatter = new Intl.DateTimeFormat('en-US', {
-                        timeZone: 'Africa/Cairo',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true,
-                    });
+                    // Unused: const cairoFormatter = new Intl.DateTimeFormat(...)
 
                     // Get offset between timezones
-                    const tzOffsetStr = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'short' });
-                    const cairoOffsetStr = now.toLocaleString('en-US', { timeZone: 'Africa/Cairo', timeZoneName: 'short' });
+                    // Unused: const tzOffsetStr = ...
+                    // Unused: const cairoOffsetStr = ...
 
                     // Simple approach: format the time directly
                     const tzHours = new Date(now.toLocaleString('en-US', { timeZone: tz }));
