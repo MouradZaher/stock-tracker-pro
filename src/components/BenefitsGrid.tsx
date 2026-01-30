@@ -6,32 +6,38 @@ const BenefitsGrid: React.FC = () => {
         {
             icon: TrendingUp,
             title: 'Real-Time Market Data',
-            description: 'Track S&P 500 stocks with live prices, charts, and comprehensive financial metrics.'
+            description: 'Track S&P 500 stocks with live prices, charts, and comprehensive financial metrics.',
+            gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.05) 100%)'
         },
         {
             icon: PieChart,
             title: 'Portfolio Management',
-            description: 'Monitor your investments, track performance, and optimize your asset allocation.'
+            description: 'Monitor your investments, track performance, and optimize your asset allocation.',
+            gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%)'
         },
         {
             icon: Zap,
             title: 'AI-Powered Insights',
-            description: 'Get smart recommendations based on advanced analysis and market trends.'
+            description: 'Get smart recommendations based on advanced analysis and market trends.',
+            gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 100%)'
         },
         {
             icon: BarChart3,
             title: 'Advanced Analytics',
-            description: 'Deep dive into company financials, ratios, and historical performance data.'
+            description: 'Deep dive into company financials, ratios, and historical performance data.',
+            gradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.05) 100%)'
         },
         {
             icon: Bell,
             title: 'Custom Watchlists',
-            description: 'Create personalized watchlists and stay updated on your favorite stocks.'
+            description: 'Create personalized watchlists and stay updated on your favorite stocks.',
+            gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(219, 39, 119, 0.05) 100%)'
         },
         {
             icon: Shield,
-            title: 'Institutional Security',
-            description: 'Enterprise-grade security with magic link authentication. No passwords needed.'
+            title: 'Secure PIN Access',
+            description: 'Fast and secure authentication with 4-digit PIN. No passwords, no emails, instant access.',
+            gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.05) 100%)'
         }
     ];
 
@@ -53,7 +59,7 @@ const BenefitsGrid: React.FC = () => {
                                 padding: '1.25rem',
                                 borderRadius: 'var(--radius-lg)',
                                 border: '1px solid var(--glass-border)',
-                                background: 'var(--color-bg-elevated)',
+                                background: benefit.gradient,
                                 transition: 'all 0.3s ease',
                                 cursor: 'default'
                             }}
