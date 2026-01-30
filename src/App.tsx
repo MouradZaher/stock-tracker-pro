@@ -19,8 +19,8 @@ import MarketPulsePage from './components/MarketPulsePage';
 import AdminDashboard from './components/AdminDashboard';
 import SentimentGauge from './components/SentimentGauge';
 import MobileNav from './components/MobileNav';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import LandingPage from './pages/LandingPage';
+import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
+import PinLoginPage from './pages/PinLoginPage';
 import { LogOut, Shield } from 'lucide-react';
 import './index.css';
 
@@ -34,49 +34,19 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  const { user, isApproved, role, isLoading, signOut } = useAuth();
+  const { isAuthenticated, user, logout } = usePinAuth();
   const [activeTab, setActiveTab] = useState<TabType>('search');
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // 1. Loading State
-  if (isLoading) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-primary)' }}>
-        <div className="spinner" style={{ width: '40px', height: '40px' }} />
-      </div>
-    );
+  // If not authenticated, show PIN login
+  if (!isAuthenticated) {
+    return <PinLoginPage />;
   }
 
-  // 2. Unauthenticated State -> Landing Page
-  if (!user) {
-    return <LandingPage />;
-  }
-
-  // 3. Authenticated but Not Approved -> Pending Screen
-  if (!isApproved) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-primary)', padding: '2rem' }}>
-        <div style={{ textAlign: 'center', maxWidth: '500px', background: 'var(--color-bg-elevated)', padding: '3rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
-          <Shield size={48} color="var(--color-warning)" style={{ marginBottom: '1.5rem' }} />
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '1rem' }}>Account Pending Approval</h1>
-          <p style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem', lineHeight: '1.6' }}>
-            Thanks for signing up! Your account is currently under review.
-            <br />
-            An admin needs to verify your account before you can access the platform.
-            Please check back later.
-          </p>
-          <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)', marginBottom: '2rem' }}>
-            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)' }}>Logged in as: {user.email}</p>
-          </div>
-          <button className="btn btn-secondary" onClick={() => signOut()}>
-            <LogOut size={16} /> Sign Out
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // User is authenticated - determine their role
+  const role = user?.role || 'user';
 
   // 4. Approved User -> Main App
   const handleSelectSymbol = (symbol: string) => {
@@ -189,23 +159,20 @@ function AppContent() {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AppContent />
-          <Toaster
-            position="bottom-right"
-            toastOptions={{
-              style: {
-                background: 'var(--color-bg-elevated)',
-                color: 'var(--color-text-primary)',
-                border: '1px solid var(--color-border)',
-              },
-            }}
-          />
-        </AuthProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <PinAuthProvider>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: 'var(--color-bg-elevated)',
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-border)',
+          },
+        }}
+      />
+      <AppContent />
+    </PinAuthProvider>
   );
 }
 
