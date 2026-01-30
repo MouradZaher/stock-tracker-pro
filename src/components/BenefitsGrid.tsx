@@ -1,90 +1,100 @@
-import React, { useEffect, useRef } from 'react';
-import { TrendingUp } from 'lucide-react';
+import React from 'react';
+import { TrendingUp, Shield, Zap, PieChart, Bell, BarChart3 } from 'lucide-react';
 
 const BenefitsGrid: React.FC = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!containerRef.current) return;
-
-        // Clear previous widget
-        containerRef.current.innerHTML = '';
-
-        // Create TradingView Stock Heatmap widget
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-        script.async = true;
-        script.type = 'text/javascript';
-        script.innerHTML = JSON.stringify({
-            "exchanges": [],
-            "dataSource": "SPX500",
-            "grouping": "sector",
-            "blockSize": "market_cap_basic",
-            "blockColor": "change",
-            "locale": "en",
-            "symbolUrl": "",
-            "colorTheme": "dark",
-            "hasTopBar": false,
-            "isDataSetEnabled": false,
-            "isZoomEnabled": true,
-            "hasSymbolTooltip": true,
-            "width": "100%",
-            "height": "500"
-        });
-
-        const widgetContainer = document.createElement('div');
-        widgetContainer.className = 'tradingview-widget-container__widget';
-
-        if (containerRef.current) {
-            containerRef.current.appendChild(widgetContainer);
-            widgetContainer.appendChild(script);
+    const benefits = [
+        {
+            icon: TrendingUp,
+            title: 'Real-Time Market Data',
+            description: 'Track S&P 500 stocks with live prices, charts, and comprehensive financial metrics.'
+        },
+        {
+            icon: PieChart,
+            title: 'Portfolio Management',
+            description: 'Monitor your investments, track performance, and optimize your asset allocation.'
+        },
+        {
+            icon: Zap,
+            title: 'AI-Powered Insights',
+            description: 'Get smart recommendations based on advanced analysis and market trends.'
+        },
+        {
+            icon: BarChart3,
+            title: 'Advanced Analytics',
+            description: 'Deep dive into company financials, ratios, and historical performance data.'
+        },
+        {
+            icon: Bell,
+            title: 'Custom Watchlists',
+            description: 'Create personalized watchlists and stay updated on your favorite stocks.'
+        },
+        {
+            icon: Shield,
+            title: 'Institutional Security',
+            description: 'Enterprise-grade security with magic link authentication. No passwords needed.'
         }
-
-        return () => {
-            if (containerRef.current) {
-                containerRef.current.innerHTML = '';
-            }
-        };
-    }, []);
+    ];
 
     return (
-        <div className="hero-visual">
-            <div
-                className="visual-card glass-card"
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    padding: '1.5rem',
-                    minHeight: '600px'
-                }}
-            >
-                <div className="card-header" style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <TrendingUp size={20} color="var(--color-accent)" />
-                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        📊 Live S&P 500 Market Heatmap
-                    </span>
-                </div>
-
-                <div
-                    className="tradingview-widget-container"
-                    ref={containerRef}
-                    style={{
-                        minHeight: '500px',
-                        width: '100%',
-                        flex: 1
-                    }}
-                />
-
-                <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)' }}>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textAlign: 'center', margin: 0 }}>
-                        Real-time visualization of S&P 500 stocks • Click any block to explore details
-                    </p>
-                </div>
-            </div>
-        </div>
+\u003cdiv className = "hero-visual"\u003e
+\u003cdiv className = "benefits-grid" style = {{
+    display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1.5rem',
+                padding: '1rem'
+}}\u003e
+{
+    benefits.map((benefit, index) =\u003e {
+        const Icon = benefit.icon;
+        return(
+            \u003cdiv
+                            key = { index }
+                            className = "benefit-card glass-card"
+                            style = {{
+                padding: '2rem',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--glass-border)',
+                background: 'var(--color-bg-elevated)',
+                transition: 'all 0.3s ease',
+                cursor: 'default'
+                            }}
+        \u003e
+        \u003cdiv
+                                className = "icon-container"
+                                style = {{
+        width: '48px',
+        height: '48px',
+        borderRadius: 'var(--radius-md)',
+        background: 'linear-gradient(135deg, var(--color-accent-light) 0%, rgba(124, 58, 237, 0.1) 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '1rem'
+    }}
+\u003e
+\u003cIcon size = { 24} color = "var(--color-accent)" /\u003e
+\u003c / div\u003e
+\u003ch3 style = {{
+    fontSize: '1.1rem',
+        fontWeight: 600,
+            marginBottom: '0.5rem',
+                color: 'var(--color-text-primary)'
+}}\u003e
+{ benefit.title }
+\u003c / h3\u003e
+\u003cp style = {{
+    fontSize: '0.9rem',
+        color: 'var(--color-text-secondary)',
+            lineHeight: '1.6'
+}}\u003e
+{ benefit.description }
+\u003c / p\u003e
+\u003c / div\u003e
+                    );
+                })}
+\u003c / div\u003e
+\u003c / div\u003e
     );
 };
 
 export default BenefitsGrid;
-
