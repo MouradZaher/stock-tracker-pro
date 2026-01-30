@@ -145,15 +145,20 @@
   line-height: 1.4 !important;
 }
 
-/* Landing Footer - Minimal */
+/* Landing Footer - Absolute Position at Bottom */
 .landing-footer {
-  padding: 0.75rem 2rem !important;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 2rem !important;
   text-align: center;
-  font-size: 0.75rem !important;
+  font-size: 0.7rem !important;
   color: var(--color-text-tertiary);
   border-top: 1px solid var(--color-border);
-  background: var(--color-bg-secondary);
-  flex-shrink: 0;
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 10;
 }
 
 /* Responsive Design */
