@@ -88,10 +88,6 @@ const PinLoginPage: React.FC = () => {
 
             <div className="hero-section">
                 <div className="hero-content">
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-                        <span style={{ width: '6px', height: '6px', background: 'var(--color-accent)', borderRadius: '50%' }}></span>
-                        Secure PIN Access
-                    </div>
                     <h1 className="hero-title">
                         Master the Market <br />
                         <span className="gradient-text">with Precision.</span>
@@ -100,12 +96,12 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div className="login-form">
+                    <div className="login-form" style={{ marginTop: '2rem' }}>
                         <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
                                 Enter Your 4-Digit PIN
                             </label>
-                            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', maxWidth: '300px' }}>
+                            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-start', maxWidth: '280px' }}>
                                 {pin.map((digit, index) => (
                                     <input
                                         key={index}
@@ -117,9 +113,9 @@ const PinLoginPage: React.FC = () => {
                                         onChange={(e) => handlePinChange(index, e.target.value)}
                                         onKeyDown={(e) => handleKeyDown(index, e)}
                                         style={{
-                                            width: '60px',
-                                            height: '70px',
-                                            fontSize: '2rem',
+                                            width: '55px',
+                                            height: '60px',
+                                            fontSize: '1.75rem',
                                             fontWeight: 700,
                                             textAlign: 'center',
                                             background: 'var(--color-bg-secondary)',
@@ -134,9 +130,9 @@ const PinLoginPage: React.FC = () => {
                                 ))}
                             </div>
                         </div>
-                        <p className="form-note" style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Shield size={14} color="var(--color-success)" />
-                            Enterprise-grade security. PIN-protected access.
+                        <p className="form-note" style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Shield size={12} color="var(--color-success)" />
+                            Enterprise-grade security
                         </p>
                     </div>
                 </div>
