@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Clock, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
 
 import { getStockData } from '../services/stockDataService';
-import { REFRESH_INTERVALS } from '../services/api';
+import { REFRESH_INTERVALS } from '../services/api'; // re-trigger fix
 import { formatCurrency, formatPercent, formatNumber, formatNumberPlain, formatTimeAgo, getChangeClass } from '../utils/formatters';
 import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
