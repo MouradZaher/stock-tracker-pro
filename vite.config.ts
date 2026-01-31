@@ -23,7 +23,6 @@ export default defineConfig({
           // Vendor chunks
           'react-vendor': ['react', 'react-dom'],
           'query-vendor': ['@tanstack/react-query'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
           'chart-vendor': ['recharts'],
         },
       },
@@ -47,17 +46,5 @@ export default defineConfig({
   preview: {
     port: 4173,
     strictPort: false,
-  },
-
-  // Dependency optimization
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@tanstack/react-query',
-      'framer-motion',
-      'lucide-react',
-      'zustand',
-    ],
   },
 });

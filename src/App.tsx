@@ -20,6 +20,7 @@ import AdminDashboard from './components/AdminDashboard';
 import SentimentGauge from './components/SentimentGauge';
 import MobileNav from './components/MobileNav';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
 import { LogOut, Shield } from 'lucide-react';
 import './index.css';
@@ -164,20 +165,24 @@ function AppContent() {
 
 function App() {
   return (
-    <PinAuthProvider>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: 'var(--color-bg-elevated)',
-            color: 'var(--color-text-primary)',
-            border: '1px solid var(--color-border)',
-          },
-        }}
-      />
-      <AppContent />
-    </PinAuthProvider>
+    <AuthProvider>
+      <PinAuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--color-border)',
+              },
+            }}
+          />
+          <AppContent />
+        </QueryClientProvider>
+      </PinAuthProvider>
+    </AuthProvider>
   );
 }
 
