@@ -2,7 +2,7 @@ import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const INDICES = ['^GSPC', '^IXIC', '^DJI'];
-const STOCKS = ['AAPL', 'NVDA', 'TSLA', 'BTC-USD', 'ETH-USD'];
+const STOCKS = ['AAPL', 'NVDA', 'TSLA'];
 const SYMBOLS = [...INDICES, ...STOCKS];
 
 const LiveTicker: React.FC = () => {
