@@ -137,7 +137,7 @@ html[data-theme='light'] {
 .glass-card:hover {
   background: var(--glass-bg-hover);
   border-color: var(--glass-border-bright);
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); REMOVED to prevent header jump */
 }
 
 .glass-button {
