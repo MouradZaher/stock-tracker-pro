@@ -285,7 +285,7 @@ h6 {
   /* SMALLER FONT */
   font-weight: 500;
   cursor: pointer;
-  transition: color var(--transition-base);
+  /* transition: color var(--transition-base); REMOVED animation */
   border-radius: var(--radius-md);
   white-space: nowrap;
   z-index: 2;
