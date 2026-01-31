@@ -1,18 +1,19 @@
 import { useState, lazy, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import SearchEngine from './components/SearchEngine';
 import StockDetail from './components/StockDetail';
+import StockHeatmap from './components/StockHeatmap';
 import { PageSkeleton } from './components/LoadingSkeleton';
 
 // Lazy load heavy components
 const Portfolio = lazy(() => import('./components/Portfolio'));
 const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
 
-import MarketOverview from './components/MarketOverview';
 import WatchlistSidebar from './components/WatchlistSidebar';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
@@ -39,8 +40,7 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  const { isAuthenticated, user, logout } = usePinAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('search');
+  const { isAuthenticated, logout, user } = usePinAuth();
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -50,25 +50,43 @@ function AppContent() {
     return <PinLoginPage />;
   }
 
-  // User is authenticated - determine their role
   const role = user?.role || 'user';
 
-  // 4. Approved User -> Main App
-  const handleSelectSymbol = (symbol: string) => {
-    setSelectedSymbol(symbol);
-    setActiveTab('search');
-  };
+  return (
+    <BrowserRouter>
+      <MainLayout
+        role={role}
+        logout={logout}
+        selectedSymbol={selectedSymbol}
+        setSelectedSymbol={setSelectedSymbol}
+        isWatchlistOpen={isWatchlistOpen}
+        setIsWatchlistOpen={setIsWatchlistOpen}
+        isAdminOpen={isAdminOpen}
+        setIsAdminOpen={setIsAdminOpen}
+      />
+    </BrowserRouter>
+  );
+}
+
+function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchlistOpen, setIsWatchlistOpen, isAdminOpen, setIsAdminOpen }: any) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentPath = location.pathname.substring(1) || 'search';
+  const activeTab = (['search', 'watchlist', 'portfolio', 'recommendations', 'pulse'].includes(currentPath) ? currentPath : 'search') as TabType;
 
   const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
-    if (tab !== 'search') {
-      setSelectedSymbol(null);
-    }
+    navigate(`/${tab}`);
+    if (tab !== 'search') setSelectedSymbol(null);
+  };
+
+  const handleSelectSymbol = (symbol: string) => {
+    setSelectedSymbol(symbol);
+    navigate('/search');
   };
 
   return (
     <div className="app">
-
       <Header
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -88,56 +106,62 @@ function AppContent() {
         onClose={() => setIsAdminOpen(false)}
       />
 
-      <main className="main-content">
-        {activeTab === 'search' && (
-          <div className="tab-content">
-            {!selectedSymbol ? (
-              <>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', width: '100%', textAlign: 'center' }}>
-
-                  <div style={{ width: '100%', maxWidth: '700px' }}>
-                    <SearchEngine onSelectSymbol={handleSelectSymbol} />
+      <main className="main-content" style={{ overflowY: activeTab === 'search' ? 'hidden' : 'auto', flex: 1, position: 'relative' }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/search" replace />} />
+          <Route path="/search" element={
+            <div className="tab-content" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              {!selectedSymbol ? (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', width: '100%', textAlign: 'center', padding: '1rem' }}>
+                    <div style={{ width: '100%', maxWidth: '700px' }}>
+                      <SearchEngine onSelectSymbol={handleSelectSymbol} />
+                    </div>
                   </div>
+                  <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    <StockHeatmap />
+                  </div>
+                </>
+              ) : (
+                <div style={{ flex: 1, overflowY: 'auto', width: '100%', padding: '1rem' }}>
+                  <StockDetail
+                    symbol={selectedSymbol}
+                    onBack={() => setSelectedSymbol(null)}
+                  />
                 </div>
-                <MarketOverview onSelectStock={handleSelectSymbol} />
-              </>
-            ) : (
-              <StockDetail symbol={selectedSymbol} />
-            )}
-          </div>
-        )}
-
-        {activeTab === 'watchlist' && (
-          <div className="tab-content">
-            <WatchlistPage onSelectSymbol={handleSelectSymbol} />
-          </div>
-        )}
-
-        {activeTab === 'portfolio' && (
-          <div className="tab-content">
-            <ErrorBoundary>
-              <Suspense fallback={<PageSkeleton />}>
-                <Portfolio />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-        )}
-
-        {activeTab === 'recommendations' && (
-          <div className="tab-content" style={{ height: '100%', overflowY: 'auto' }}>
-            <ErrorBoundary>
-              <Suspense fallback={<PageSkeleton />}>
-                <AIRecommendations onSelectStock={handleSelectSymbol} />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-        )}
-
-        {activeTab === 'pulse' && (
-          <div className="tab-content" style={{ height: '100%', overflowY: 'auto' }}>
-            <MarketPulsePage onSelectStock={handleSelectSymbol} />
-          </div>
-        )}
+              )}
+            </div>
+          } />
+          <Route path="/watchlist" element={
+            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+              <WatchlistPage onSelectSymbol={handleSelectSymbol} />
+            </div>
+          } />
+          <Route path="/portfolio" element={
+            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+              <ErrorBoundary>
+                <Suspense fallback={<PageSkeleton />}>
+                  <Portfolio />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          } />
+          <Route path="/recommendations" element={
+            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+              <ErrorBoundary>
+                <Suspense fallback={<PageSkeleton />}>
+                  <AIRecommendations onSelectStock={handleSelectSymbol} />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          } />
+          <Route path="/pulse" element={
+            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+              <MarketPulsePage onSelectStock={handleSelectSymbol} />
+            </div>
+          } />
+          <Route path="*" element={<Navigate to="/search" replace />} />
+        </Routes>
       </main>
 
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />

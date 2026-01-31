@@ -51,12 +51,13 @@ const StockHeatmap: React.FC = () => {
     return (
         <div className="heatmap-container glass-card" style={{
             width: '100%',
-            height: 'calc(100vh - 250px)', /* Aggressively reduced to ensure bottom visibility */
-            padding: '4px', /* Minimal padding */
+            height: 'calc(100vh - 300px)', /* Further reduced vertical height */
+            padding: '4px',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            marginTop: '0'
+            marginTop: '0',
+            marginBottom: '0'
         }}>
             <div
                 className="tradingview-widget-container"

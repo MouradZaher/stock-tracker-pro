@@ -8,8 +8,6 @@ const TICKER_DATA = [
     { symbol: 'AAPL', price: '234.12', change: '+1.20%', isUp: true },
     { symbol: 'NVDA', price: '145.67', change: '+2.45%', isUp: true },
     { symbol: 'TSLA', price: '321.05', change: '-1.50%', isUp: false },
-    { symbol: 'BTC', price: '98,432.10', change: '+3.10%', isUp: true },
-    { symbol: 'ETH', price: '3,421.55', change: '+1.85%', isUp: true },
 ];
 
 const LiveTicker: React.FC = () => {

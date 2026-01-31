@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Clock, TrendingUp, TrendingDown } from 'lucide-react';
+import { Clock, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
 
 import { getStockData } from '../services/stockDataService';
 import { REFRESH_INTERVALS } from '../services/api';
@@ -15,9 +15,10 @@ import toast from 'react-hot-toast';
 
 interface StockDetailProps {
     symbol: string;
+    onBack?: () => void;
 }
 
-const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
+const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
     const { user } = useAuth();
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
@@ -75,6 +76,16 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
             <div className="stock-header">
                 <div className="stock-title">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        {onBack && (
+                            <button
+                                onClick={onBack}
+                                className="glass-button icon-btn"
+                                style={{ marginRight: '0.5rem' }}
+                                aria-label="Back to Search"
+                            >
+                                <ArrowLeft size={20} />
+                            </button>
+                        )}
                         <div className="stock-symbol">{stock.symbol}</div>
                         <LiveBadge lastUpdate={dataUpdatedAt} />
                         <button

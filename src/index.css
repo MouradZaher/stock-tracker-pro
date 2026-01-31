@@ -303,7 +303,8 @@ h6 {
   position: absolute;
   background: var(--color-accent);
   border-radius: var(--radius-md);
-  transition: all var(--transition-base);
+  transition: none;
+  /* INSTANT CHANGE - NO SLIDING */
   z-index: 1;
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
 }
