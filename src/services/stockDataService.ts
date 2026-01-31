@@ -1,4 +1,4 @@
-import { yahooFinanceApi, getCachedData, setCachedData } from './api';
+import { yahooFinanceApi, YAHOO_ENDPOINT, getCachedData, setCachedData } from './api';
 import type { Stock, CompanyProfile } from '../types';
 import { getAllSymbols } from '../data/sectors';
 
@@ -50,7 +50,7 @@ const getQuoteFromYahoo = async (symbol: string): Promise<Partial<Stock> | null>
         }
 
         console.log(`📊 Fetching live data for ${symbol} from Yahoo Finance...`);
-        const response = await yahooFinanceApi.get('/v8/finance/quote', {
+        const response = await yahooFinanceApi.get(YAHOO_ENDPOINT, {
             params: { symbols: symbol },
         });
 
@@ -122,7 +122,7 @@ const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | nul
         const cached = getCachedData(cacheKey);
         if (cached) return cached;
 
-        const response = await yahooFinanceApi.get('/v8/finance/quote', {
+        const response = await yahooFinanceApi.get(YAHOO_ENDPOINT, {
             params: { symbols: symbol },
         });
 
@@ -222,7 +222,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
         }
 
         console.log(`📊 Fetching live data for ${symbols.length} symbols from Yahoo Finance...`);
-        const response = await yahooFinanceApi.get('/v8/finance/quote', {
+        const response = await yahooFinanceApi.get(YAHOO_ENDPOINT, {
             params: { symbols: symbolsString },
         });
 

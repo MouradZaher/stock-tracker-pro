@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 import { useWatchlist } from '../hooks/useWatchlist';
+import { useAuth } from '../contexts/AuthContext';
 import { getStockData } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
@@ -12,6 +13,7 @@ interface WatchlistSidebarProps {
 }
 
 const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, onSelectSymbol }) => {
+    const { user } = useAuth();
     const { watchlist, removeFromWatchlist } = useWatchlist();
     const [stockData, setStockData] = useState<Record<string, Stock>>({});
 
@@ -102,7 +104,7 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                                             className="btn-icon delete-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                removeFromWatchlist(symbol);
+                                                removeFromWatchlist(symbol, user?.id);
                                             }}
                                         >
                                             <Trash2 size={16} />

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import type { User, Session } from '@supabase/supabase-js';
+import { usePortfolioStore } from '../hooks/usePortfolio';
+import { useWatchlist } from '../hooks/useWatchlist';
 
 // Development-only bypass (disabled in production for security)
 const BYPASS_EMAIL = import.meta.env.DEV ? 'bitdegenbiz@gmail.com' : null;
@@ -70,6 +72,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const syncUserData = async (userId: string) => {
+        console.log('🔄 Syncing user data...');
+        try {
+            // Sync portfolio data
+            const portfolioStore = usePortfolioStore.getState();
+            await portfolioStore.syncWithSupabase(userId);
+
+            // Sync watchlist data
+            const watchlistStore = useWatchlist.getState();
+            await watchlistStore.syncWithSupabase(userId);
+
+            console.log('✅ User data sync completed');
+        } catch (error) {
+            console.error('❌ Error syncing user data:', error);
+        }
+    };
+
     useEffect(() => {
         // 1. Check for bypass in localStorage (only in development mode)
         const isBypassActive = import.meta.env.DEV && localStorage.getItem(BYPASS_STORAGE_KEY) === 'true';
@@ -89,7 +108,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setSession(session);
             setUser(session?.user ?? null);
             if (session?.user) {
-                fetchProfile(session.user.id).finally(() => setIsLoading(false));
+                fetchProfile(session.user.id).finally(() => {
+                    setIsLoading(false);
+                    // Sync user data after authentication
+                    syncUserData(session.user.id);
+                });
             } else {
                 setIsLoading(false);
             }
@@ -103,7 +126,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(session?.user ?? null);
 
             if (session?.user) {
-                fetchProfile(session.user.id).finally(() => setIsLoading(false));
+                fetchProfile(session.user.id).finally(() => {
+                    setIsLoading(false);
+                    // Sync user data when user signs in
+                    syncUserData(session.user.id);
+                });
             } else {
                 setRole(null);
                 setIsApproved(false);

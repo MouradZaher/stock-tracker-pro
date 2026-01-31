@@ -1,1 +1,14 @@
-// Force rebuild timestamp: 2026-01-30 18:35:00
+REBUILD TRIGGER - Updated: 2026-01-31 12:17:00
+
+Changes made:
+- Removed Market Sentiment (SentimentGauge component)
+- Removed Trending Stocks (NVDA, TSLA, AAPL, MSFT, BTC, AMD)
+- Disabled vertical scroll
+- Added Sign Out button to header
+- Improved CSS layout
+
+Please rebuild the app:
+1. Stop the dev server if running (Ctrl+C)
+2. Run: start-dev.bat
+3. Clear browser cache (Ctrl+Shift+R) or hard refresh
+4. Navigate to http://localhost:5173

@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MarketStatus from './MarketStatus';
 import { soundService } from '../services/soundService';
+import { LogOut } from 'lucide-react';
 import type { TabType } from '../types';
 
 interface HeaderProps {
     activeTab: TabType;
     onTabChange: (tab: TabType) => void;
+    onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => {
     const tabs: { id: TabType; label: string }[] = [
         { id: 'search', label: 'Search' },
         { id: 'watchlist', label: 'Watchlist' },
@@ -74,10 +76,46 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
                 ))}
             </nav>
 
-            <div className="header-actions">
+            <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div className="desktop-only">
                     <MarketStatus />
                 </div>
+                <button
+                    className="glass-button"
+                    onClick={() => {
+                        soundService.playTap();
+                        onLogout();
+                    }}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '12px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: 'var(--color-text-secondary)',
+                        backdropFilter: 'blur(8px)'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        e.currentTarget.style.color = 'var(--color-text-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        e.currentTarget.style.color = 'var(--color-text-secondary)';
+                    }}
+                    aria-label="Sign out"
+                >
+                    <LogOut size={16} />
+                    <span className="desktop-only">Sign Out</span>
+                </button>
             </div>
         </header>
     );

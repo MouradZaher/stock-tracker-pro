@@ -4,6 +4,8 @@ const MarketStatus: React.FC = () => {
     const [cairoTime, setCairoTime] = useState('');
     const [nyStatus, setNyStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [tokyoStatus, setTokyoStatus] = useState({ isOpen: false, rangeEGP: '' });
+    const [hongkongStatus, setHongkongStatus] = useState({ isOpen: false, rangeEGP: '' });
+    const [shanghaiStatus, setShanghaiStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [londonStatus, setLondonStatus] = useState({ isOpen: false, rangeEGP: '' });
     const [egyptStatus, setEgyptStatus] = useState({ isOpen: false, rangeEGP: '' });
 
@@ -50,28 +52,6 @@ const MarketStatus: React.FC = () => {
 
                 // Calculate EGP Range - Fixed timezone conversion
                 const getEGPTime = (h: number, m: number) => {
-                    // Create a date object for the market time in the target timezone
-                    const marketFormatter = new Intl.DateTimeFormat('en-US', {
-                        timeZone: tz,
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                    });
-                    const marketDateParts = marketFormatter.formatToParts(now);
-                    const year = marketDateParts.find(p => p.type === 'year')?.value;
-                    const month = marketDateParts.find(p => p.type === 'month')?.value;
-                    const day = marketDateParts.find(p => p.type === 'day')?.value;
-
-                    // Direct time conversion without unused variables
-
-                    // Convert to Cairo timezone
-                    // Unused: const cairoFormatter = new Intl.DateTimeFormat(...)
-
-                    // Get offset between timezones
-                    // Unused: const tzOffsetStr = ...
-                    // Unused: const cairoOffsetStr = ...
-
-                    // Simple approach: format the time directly
                     const tzHours = new Date(now.toLocaleString('en-US', { timeZone: tz }));
                     tzHours.setHours(h, m, 0, 0);
 
@@ -94,6 +74,8 @@ const MarketStatus: React.FC = () => {
 
             setNyStatus(getSessionStatus('America/New_York', 9, 30, 16, 0));
             setTokyoStatus(getSessionStatus('Asia/Tokyo', 9, 0, 15, 0));
+            setHongkongStatus(getSessionStatus('Asia/Hong_Kong', 9, 30, 16, 0));
+            setShanghaiStatus(getSessionStatus('Asia/Shanghai', 9, 30, 15, 0));
             setLondonStatus(getSessionStatus('Europe/London', 8, 0, 16, 30));
             setEgyptStatus(getSessionStatus('Africa/Cairo', 10, 0, 14, 30, true));
         };
@@ -104,38 +86,122 @@ const MarketStatus: React.FC = () => {
     }, []);
 
     const SessionBadge = ({ name, status }: { name: string, status: { isOpen: boolean, rangeEGP: string } }) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem' }}>
+        <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 12px',
+            background: status.isOpen
+                ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.05) 100%)'
+                : 'rgba(255, 255, 255, 0.02)',
+            border: `1px solid ${status.isOpen ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.05)'}`,
+            borderRadius: '8px',
+            transition: 'all 0.3s ease',
+            cursor: 'default',
+            whiteSpace: 'nowrap'
+        }}>
             <span style={{
-                width: '4px',
-                height: '4px',
+                width: '6px',
+                height: '6px',
                 borderRadius: '50%',
-                backgroundColor: status.isOpen ? 'var(--color-success)' : 'rgba(255,255,255,0.1)'
+                backgroundColor: status.isOpen ? '#10b981' : 'rgba(255,255,255,0.15)',
+                boxShadow: status.isOpen ? '0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.3)' : 'none',
+                animation: status.isOpen ? 'pulse-glow 2s ease-in-out infinite' : 'none'
             }} />
-            <span style={{ color: status.isOpen ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)', whiteSpace: 'nowrap' }}>
-                {name}: {status.rangeEGP}
+            <span style={{
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                color: status.isOpen ? '#10b981' : 'rgba(255, 255, 255, 0.4)',
+                letterSpacing: '0.5px'
+            }}>
+                {name}
+            </span>
+            <span style={{
+                fontSize: '0.65rem',
+                color: status.isOpen ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.3)',
+                fontWeight: 500
+            }}>
+                {status.rangeEGP}
             </span>
         </div>
     );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', minWidth: '280px' }}>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '400px' }}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '8px 0'
+        }}>
+            {/* Global Market Sessions */}
+            <div style={{
+                display: 'flex',
+                gap: '8px',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
                 <SessionBadge name="EGX" status={egyptStatus} />
                 <SessionBadge name="TKY" status={tokyoStatus} />
+                <SessionBadge name="HKG" status={hongkongStatus} />
+                <SessionBadge name="SHA" status={shanghaiStatus} />
                 <SessionBadge name="LND" status={londonStatus} />
                 <SessionBadge name="NYC" status={nyStatus} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem' }}>
+
+            {/* Cairo Time Display */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            }}>
                 <span style={{
-                    width: '6px',
-                    height: '6px',
+                    width: '8px',
+                    height: '8px',
                     borderRadius: '50%',
-                    backgroundColor: nyStatus.isOpen ? 'var(--color-success)' : 'var(--color-error)',
-                    boxShadow: nyStatus.isOpen ? '0 0 8px var(--color-success)' : 'none'
+                    backgroundColor: nyStatus.isOpen ? '#10b981' : '#ef4444',
+                    boxShadow: nyStatus.isOpen
+                        ? '0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.4)'
+                        : '0 0 10px rgba(239, 68, 68, 0.8)',
+                    animation: 'pulse-glow 2s ease-in-out infinite'
                 }} />
-                <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{cairoTime}</span>
-                <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.65rem' }}>CAIRO</span>
+                <span style={{
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    color: 'var(--color-text-primary)',
+                    fontFamily: 'monospace',
+                    letterSpacing: '0.5px'
+                }}>
+                    {cairoTime}
+                </span>
+                <span style={{
+                    color: 'var(--color-accent)',
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                    letterSpacing: '1px'
+                }}>
+                    CAIRO
+                </span>
             </div>
+
+            <style>{`
+                @keyframes pulse-glow {
+                    0%, 100% {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                    50% {
+                        opacity: 0.6;
+                        transform: scale(0.9);
+                    }
+                }
+            `}</style>
         </div>
     );
 };

@@ -10,9 +10,19 @@ export const REFRESH_INTERVALS = {
     TICKER: 15000,          // 15 seconds - live ticker
 };
 
+// Use local proxy in production to avoid CORS, direct in dev (or also proxy if running locall)
+const API_BASE_URL = import.meta.env.PROD
+    ? '/api'
+    : 'https://query1.finance.yahoo.com';
+
+// Endpoint handles the difference between proxy (/quote) and direct API (/v8/finance/quote)
+export const YAHOO_ENDPOINT = import.meta.env.PROD
+    ? '/quote'
+    : '/v8/finance/quote';
+
 // Yahoo Finance API - Free, no API key required!
 export const yahooFinanceApi: AxiosInstance = axios.create({
-    baseURL: 'https://query1.finance.yahoo.com',
+    baseURL: API_BASE_URL,
     timeout: 10000,
     headers: {
         'Accept': 'application/json',

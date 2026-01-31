@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useWatchlist } from '../hooks/useWatchlist';
+import { useAuth } from '../contexts/AuthContext';
 import { getStockData } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
@@ -37,6 +38,7 @@ const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color })
 };
 
 const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
+    const { user } = useAuth();
     const { watchlist, removeFromWatchlist } = useWatchlist();
     const [stockData, setStockData] = useState<Record<string, Stock>>({});
     const [loading, setLoading] = useState(false);
@@ -186,7 +188,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                             className="btn-icon delete-btn glass-button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                removeFromWatchlist(symbol);
+                                                removeFromWatchlist(symbol, user?.id);
                                             }}
                                             title="Remove from watchlist"
                                             style={{ color: 'var(--color-text-tertiary)', borderRadius: '50%', padding: '6px' }}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import { usePortfolioStore } from '../hooks/usePortfolio';
+import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote } from '../services/stockDataService';
 import { getDividends } from '../services/dividendService';
 import { formatCurrency, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
@@ -11,6 +12,7 @@ import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 
 const Portfolio: React.FC = () => {
+    const { user } = useAuth();
     const { positions, addPosition, removePosition, getSummary, updatePrice } = usePortfolioStore();
     const [showModal, setShowModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +31,7 @@ const Portfolio: React.FC = () => {
             for (const position of positions) {
                 try {
                     const quote = await getStockQuote(position.symbol);
-                    updatePrice(position.symbol, quote.price);
+                    updatePrice(position.symbol, quote.price, user?.id);
                 } catch (error) {
                     console.error(`Failed to update price for ${position.symbol}:`, error);
                 }
@@ -40,7 +42,7 @@ const Portfolio: React.FC = () => {
         const interval = setInterval(updatePrices, 15000); // Update every 15 seconds
 
         return () => clearInterval(interval);
-    }, [positions]);
+    }, [positions, user?.id]);
 
     const handleAddPosition = async () => {
         if (!formData.symbol || !formData.units || !formData.avgCost) {
@@ -54,7 +56,7 @@ const Portfolio: React.FC = () => {
             const quote = await getStockQuote(symbol);
             const dividends = await getDividends(symbol);
 
-            addPosition({
+            await addPosition({
                 symbol,
                 name: quote.name,
                 units: parseFloat(formData.units),
@@ -62,7 +64,7 @@ const Portfolio: React.FC = () => {
                 currentPrice: quote.price,
                 sector: getSectorForSymbol(symbol),
                 dividends: dividends || [],
-            });
+            }, user?.id);
 
             soundService.playSuccess();
             toast.success(`Position added: ${symbol}`);
@@ -79,7 +81,7 @@ const Portfolio: React.FC = () => {
 
     const handleRemove = (id: string) => {
         if (confirm('Are you sure you want to remove this position?')) {
-            removePosition(id);
+            removePosition(id, user?.id);
         }
     };
 

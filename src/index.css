@@ -264,15 +264,19 @@ h6 {
   width: 100%;
   margin: 0;
   position: relative;
+  overflow: hidden;
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 .tab-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   animation: fadeIn var(--transition-base);
-  height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 @keyframes fadeIn {
@@ -296,8 +300,7 @@ h6 {
   padding: var(--spacing-md) 0 0 0;
   gap: var(--spacing-sm);
   flex: 1;
-  height: 100%;
-  overflow: hidden;
+  width: 100%;
 }
 
 .search-container {
@@ -2498,5 +2501,16 @@ textarea:focus-visible {
 
   .stat-card {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Responsive Visibility Classes */
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
   }
 }

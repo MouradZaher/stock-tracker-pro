@@ -24,18 +24,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
 
     const fetchProfiles = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .order('created_at', { ascending: false });
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        if (error) {
-            toast.error('Failed to load users');
-            console.error(error);
-        } else {
-            setProfiles(data as Profile[]);
+            if (error) {
+                console.error('Supabase profiles error:', error);
+                // Don't show error toast if it's a backend RLS issue
+                if (error.code !== 'PGRST301') {
+                    toast.error('Failed to load users - please check Supabase configuration');
+                }
+                setProfiles([]);
+            } else {
+                setProfiles(data as Profile[] || []);
+            }
+        } catch (err) {
+            console.error('Exception fetching profiles:', err);
+            setProfiles([]);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {

@@ -17,7 +17,6 @@ import WatchlistSidebar from './components/WatchlistSidebar';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
 import AdminDashboard from './components/AdminDashboard';
-import SentimentGauge from './components/SentimentGauge';
 import MobileNav from './components/MobileNav';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -87,6 +86,7 @@ function AppContent() {
       <Header
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        onLogout={logout}
       />
 
       <WatchlistSidebar
@@ -105,17 +105,16 @@ function AppContent() {
           <div className="tab-content">
             {!selectedSymbol ? (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', marginBottom: '1.5rem', width: '100%' }}>
-                  <div style={{ flex: 1, textAlign: 'left' }}>
-                    <h1 style={{ marginBottom: '0.5rem' }}>
-                      Track Your Investments
-                    </h1>
-                    <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1.5rem', maxWidth: '600px' }}>
-                      Search for any US stock or ETF to view real-time data, charts, and comprehensive metrics
-                    </p>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', width: '100%', textAlign: 'center' }}>
+                  <h1 style={{ marginBottom: '0.75rem', fontSize: '2.5rem' }}>
+                    Track Your Investments
+                  </h1>
+                  <p style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem', maxWidth: '600px' }}>
+                    Search for any US stock or ETF to view real-time data, charts, and comprehensive metrics
+                  </p>
+                  <div style={{ width: '100%', maxWidth: '700px' }}>
                     <SearchEngine onSelectSymbol={handleSelectSymbol} />
                   </div>
-                  <SentimentGauge />
                 </div>
                 <MarketOverview onSelectStock={handleSelectSymbol} />
               </>

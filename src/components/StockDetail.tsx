@@ -9,6 +9,7 @@ import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
 import LiveBadge from './LiveBadge';
 import { useWatchlist } from '../hooks/useWatchlist';
+import { useAuth } from '../contexts/AuthContext';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -18,6 +19,7 @@ interface StockDetailProps {
 
 const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+    const { user } = useAuth();
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
 
     const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
@@ -59,10 +61,10 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol }) => {
 
     const toggleWatchlist = () => {
         if (inWatchlist) {
-            removeFromWatchlist(stock.symbol);
+            removeFromWatchlist(stock.symbol, user?.id);
             toast.success(`${stock.symbol} removed from watchlist`);
         } else {
-            addToWatchlist(stock.symbol);
+            addToWatchlist(stock.symbol, user?.id);
             toast.success(`${stock.symbol} added to watchlist`);
         }
     };
