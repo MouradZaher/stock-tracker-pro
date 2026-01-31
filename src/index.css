@@ -2621,9 +2621,14 @@ textarea:focus-visible {
     display: none !important;
   }
 }
+
 /* Critical Scroll Fix & Vercel Build Patch */
-html, body {
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  min-height: 100vh;
+/* Critical Scroll Fix & Vercel Build Patch */
+html,
+body {
+  overflow: hidden !important;
+  /* STRICTLY NO SCROLL */
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }

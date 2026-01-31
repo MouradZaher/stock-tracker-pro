@@ -69,24 +69,12 @@ function AppContent() {
   return (
     <div className="app">
 
-
-      {/* Custom Admin Header Button */}
-      {role === 'admin' && (
-        <div className="admin-button-container" style={{ position: 'fixed', top: '24px', right: '2rem', zIndex: 1001 }}>
-          <button
-            className="btn btn-primary btn-small"
-            style={{ borderRadius: '20px', padding: '0.5rem 1rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-            onClick={() => setIsAdminOpen(true)}
-          >
-            <Shield size={14} /> Admin
-          </button>
-        </div>
-      )}
-
       <Header
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onLogout={logout}
+        showAdmin={role === 'admin'}
+        onAdminClick={() => setIsAdminOpen(true)}
       />
 
       <WatchlistSidebar

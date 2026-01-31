@@ -2,16 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import MarketStatus from './MarketStatus';
 import { soundService } from '../services/soundService';
 import { useTheme } from '../contexts/ThemeContext';
-import { LogOut, Sun, Moon } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield } from 'lucide-react';
 import type { TabType } from '../types';
 
 interface HeaderProps {
     activeTab: TabType;
     onTabChange: (tab: TabType) => void;
     onLogout: () => void;
+    showAdmin?: boolean;
+    onAdminClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick }) => {
     const { theme, toggleTheme } = useTheme();
     const tabs: { id: TabType; label: string }[] = [
         { id: 'search', label: 'Search' },
@@ -73,26 +75,24 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => 
     };
 
     return (
-        <>
-            <div className="market-top-bar">
-                <MarketStatus />
+        <header className="header glass-blur" role="banner" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 1.5rem', height: 'auto' }}>
+            {/* Logo Section */}
+            <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0 }}>
+                <div className="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
+                        <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+                        <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
+                    </svg>
+                </div>
+                <span className="logo-text">
+                    StockTracker <span>PRO</span>
+                </span>
             </div>
 
-            <header className="header glass-blur" role="banner">
-                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer' }}>
-                    <div className="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
-                            <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-                            <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
-                        </svg>
-                    </div>
-                    <span className="logo-text">
-                        StockTracker <span>PRO</span>
-                    </span>
-                </div>
-
-                <nav className="header-nav glass-card" style={{ padding: '4px' }} role="navigation" aria-label="Main navigation">
+            {/* Center Section: Nav + Ticker */}
+            <div className="header-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, overflow: 'hidden' }}>
+                <nav className="header-nav glass-card" style={{ padding: '4px', display: 'flex', justifyContent: 'center' }} role="navigation" aria-label="Main navigation">
                     <div className="tab-indicator" style={{ ...indicatorStyle, background: 'var(--color-accent)' }} aria-hidden="true" />
                     {tabs.map((tab) => (
                         <button
@@ -109,32 +109,53 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => 
                     ))}
                 </nav>
 
-                <div className="header-actions">
+                {/* Scaled Down Ticker */}
+                <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', opacity: 0.9, width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <MarketStatus />
+                </div>
+            </div>
+
+            {/* Actions Section */}
+            <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {showAdmin && (
                     <button
                         className="glass-button icon-btn"
                         onClick={() => {
                             soundService.playTap();
-                            toggleTheme();
+                            onAdminClick?.();
                         }}
-                        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        aria-label="Open Admin Panel"
+                        title="Admin Panel"
+                        style={{ color: 'var(--color-accent)' }}
                     >
-                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        <Shield size={18} />
                     </button>
+                )}
 
-                    <button
-                        className="glass-button logout-btn"
-                        onClick={() => {
-                            soundService.playTap();
-                            onLogout();
-                        }}
-                        aria-label="Sign out"
-                    >
-                        <LogOut size={16} />
-                        <span className="desktop-only">Sign Out</span>
-                    </button>
-                </div>
-            </header>
-        </>
+                <button
+                    className="glass-button icon-btn"
+                    onClick={() => {
+                        soundService.playTap();
+                        toggleTheme();
+                    }}
+                    aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+
+                <button
+                    className="glass-button logout-btn"
+                    onClick={() => {
+                        soundService.playTap();
+                        onLogout();
+                    }}
+                    aria-label="Sign out"
+                >
+                    <LogOut size={16} />
+                    <span className="desktop-only">Sign Out</span>
+                </button>
+            </div>
+        </header>
     );
 };
 
