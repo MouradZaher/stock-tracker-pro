@@ -104,7 +104,6 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                 <input
                     type="text"
                     className="form-input"
-                    className="form-input"
                     placeholder={placeholder}
                     value={query}
                     onChange={(e) => setQuery(e.target.value.toUpperCase())}
