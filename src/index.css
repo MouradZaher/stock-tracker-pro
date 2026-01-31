@@ -276,13 +276,13 @@ h6 {
 
 .header-tab {
   position: relative;
-  padding: 0.35rem 0.85rem;
-  /* SMALLER PADDING */
+  padding: 0.75rem 1.25rem;
+  /* BIGGER PADDING */
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: 0.8rem;
-  /* SMALLER FONT */
+  font-size: 0.9rem;
+  /* SLIGHTLY BIGGER FONT */
   font-weight: 500;
   cursor: pointer;
   /* transition: none !important; REMOVED animation */
@@ -293,7 +293,8 @@ h6 {
 }
 
 .header-tab:hover {
-  color: var(--color-text-primary);
+  /* color: var(--color-text-primary); REMOVED HOVER CHANGE */
+  color: var(--color-text-secondary);
 }
 
 .header-tab.active {

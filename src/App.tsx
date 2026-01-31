@@ -106,7 +106,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         onClose={() => setIsAdminOpen(false)}
       />
 
-      <main className="main-content" style={{ overflowY: activeTab === 'search' ? 'hidden' : 'auto', flex: 1, position: 'relative' }}>
+      <main className="main-content" style={{ overflowY: activeTab === 'search' ? 'hidden' : 'auto', flex: 1, position: 'relative', paddingTop: '1rem' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={
