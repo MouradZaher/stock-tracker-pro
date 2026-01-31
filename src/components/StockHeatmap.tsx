@@ -28,11 +28,13 @@ const StockHeatmap: React.FC = () => {
             "isZoomEnabled": true,
             "hasSymbolTooltip": true,
             "width": "100%",
-            "height": "500"
+            "height": "100%"
         });
 
         const widgetContainer = document.createElement('div');
         widgetContainer.className = 'tradingview-widget-container__widget';
+        widgetContainer.style.height = '100%';
+        widgetContainer.style.width = '100%';
 
         if (containerRef.current) {
             containerRef.current.appendChild(widgetContainer);
@@ -49,24 +51,20 @@ const StockHeatmap: React.FC = () => {
     return (
         <div className="heatmap-container glass-card" style={{
             width: '100%',
-            padding: '1.5rem',
+            height: 'calc(100vh - 120px)', /* Full height minus header */
+            padding: '4px', /* Minimal padding */
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1rem'
+            marginTop: '0'
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    S&P 500 Market Heatmap
-                </h3>
-            </div>
-
             <div
                 className="tradingview-widget-container"
                 ref={containerRef}
                 style={{
-                    minHeight: '500px',
-                    width: '100%'
+                    flex: 1,
+                    width: '100%',
+                    height: '100%'
                 }}
             />
         </div>

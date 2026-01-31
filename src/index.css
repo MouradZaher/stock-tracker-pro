@@ -276,11 +276,13 @@ h6 {
 
 .header-tab {
   position: relative;
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: 0.35rem 0.85rem;
+  /* SMALLER PADDING */
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  /* SMALLER FONT */
   font-weight: 500;
   cursor: pointer;
   transition: color var(--transition-base);
