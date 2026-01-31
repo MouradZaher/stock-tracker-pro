@@ -25,6 +25,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     const fetchProfiles = async () => {
         setLoading(true);
         try {
+            // Mock data for bypass/demo mode
+            if (user?.id?.startsWith('bypass-')) {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                setProfiles([
+                    { id: 'bypass-admin-id', email: 'admin@stocktracker.pro', role: 'admin', is_approved: true, created_at: new Date().toISOString() },
+                    { id: 'bypass-user-1', email: 'investor@example.com', role: 'user', is_approved: true, created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+                    { id: 'bypass-user-2', email: 'newbie@example.com', role: 'user', is_approved: false, created_at: new Date(Date.now() - 86400000 * 0.5).toISOString() },
+                    { id: 'bypass-user-3', email: 'trader@example.com', role: 'user', is_approved: true, created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
+                ]);
+                return;
+            }
+
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')

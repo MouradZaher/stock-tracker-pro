@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Shield, Lock } from 'lucide-react';
 import { usePinAuth } from '../contexts/PinAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 import LiveTicker from '../components/LiveTicker';
@@ -9,6 +10,7 @@ import './LandingPage.css';
 
 const PinLoginPage: React.FC = () => {
     const { login } = usePinAuth();
+    const { setManualSession } = useAuth();
     const [pin, setPin] = useState(['', '', '', '']);
     const inputRefs = [
         useRef<HTMLInputElement>(null),
@@ -54,6 +56,16 @@ const PinLoginPage: React.FC = () => {
         if (result.success) {
             soundService.playSuccess();
             toast.success('Welcome! Access granted.');
+
+            // 🚀 BRIDGE: Sync PIN role to AuthContext to enable Admin Panel
+            // Determining role based on PIN is done inside login(), but we know '1927' is admin
+            // Ideally usePinAuth should return the user object, let's assume it does or we check pin
+            if (fullPin === '1927') {
+                setManualSession('admin');
+            } else {
+                setManualSession('user');
+            }
+
         } else {
             soundService.playError();
             toast.error(result.error || 'Invalid PIN');

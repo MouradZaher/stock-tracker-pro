@@ -16,6 +16,8 @@ interface AuthContextType {
     isLoading: boolean;
     signInWithEmail: (email: string) => Promise<{ error: any }>;
     signOut: () => Promise<void>;
+    // Allow external contexts (like PinAuth) to set the session manually
+    setManualSession: (role: 'admin' | 'user') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -203,6 +205,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const setManualSession = (role: 'admin' | 'user') => {
+        const fakeUser = getFakeAdminUser();
+        // Customize ID based on role if needed, or keep generic
+        fakeUser.id = role === 'admin' ? 'bypass-admin-id' : 'bypass-user-id';
+
+        setUser(fakeUser);
+        setRole(role);
+        setIsApproved(true);
+        setSession(getFakeSession(fakeUser));
+    };
+
     const signOut = async () => {
         localStorage.removeItem(BYPASS_STORAGE_KEY);
         await supabase.auth.signOut();
@@ -213,7 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, session, role, isApproved, isLoading, signInWithEmail, signOut }}>
+        <AuthContext.Provider value={{ user, session, role, isApproved, isLoading, signInWithEmail, signOut, setManualSession }}>
             {children}
         </AuthContext.Provider>
     );
