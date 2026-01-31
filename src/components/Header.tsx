@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => 
     const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({});
     const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-    // Use useLayoutEffect to prevent visual flickering of the tab indicator
+    // Use useLayoutEffect with ResizeObserver for robust sizing
     React.useLayoutEffect(() => {
         const updateIndicator = () => {
             const activeTabElement = tabRefs.current[activeTab];
@@ -41,19 +41,30 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => 
         // Update immediately
         updateIndicator();
 
-        // Update on resize
-        window.addEventListener('resize', updateIndicator);
+        // Observe the nav container for any size changes (robust against font loads, layout shifts)
+        // Find the nav container via the active tab's parent
+        const activeTabElement = tabRefs.current[activeTab];
+        const navContainer = activeTabElement?.parentElement;
 
-        // Update when fonts are ready (fixes layout shift issues)
-        document.fonts.ready.then(updateIndicator);
+        if (navContainer) {
+            const resizeObserver = new ResizeObserver(() => {
+                updateIndicator();
+            });
+            resizeObserver.observe(navContainer);
 
-        // Fallback: Check again after a short delay to ensure DOM is settled
-        const timeoutId = setTimeout(updateIndicator, 100);
+            // Also observe the active tab itself
+            if (activeTabElement) {
+                resizeObserver.observe(activeTabElement);
+            }
 
-        return () => {
-            window.removeEventListener('resize', updateIndicator);
-            clearTimeout(timeoutId);
-        };
+            return () => {
+                resizeObserver.disconnect();
+            };
+        } else {
+            // Fallback if ref not yet attached
+            const timeoutId = setTimeout(updateIndicator, 50);
+            return () => clearTimeout(timeoutId);
+        }
     }, [activeTab, theme]);
 
     const handleTabClick = (tabId: TabType) => {
