@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout }) => 
         { id: 'pulse', label: 'Pulse' },
     ];
 
-    const [indicatorStyle, setIndicatorStyle] = useState({});
+    const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({});
     const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
     // Use useLayoutEffect to prevent visual flickering of the tab indicator
