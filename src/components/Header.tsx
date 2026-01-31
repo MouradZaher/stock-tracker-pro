@@ -91,8 +91,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 </span>
             </div>
 
-            {/* Center Section: Nav + Ticker */}
-            <div className="header-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, overflow: 'hidden' }}>
+            {/* Center Section: Nav + Ticker - Hidden on Mobile */}
+            <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, overflow: 'hidden' }}>
                 <nav className="header-nav glass-card" style={{ padding: '4px', display: 'flex', justifyContent: 'center' }} role="navigation" aria-label="Main navigation">
                     <div className="tab-indicator" style={{ ...indicatorStyle, background: 'var(--color-accent)' }} aria-hidden="true" />
                     {tabs.map((tab) => (
