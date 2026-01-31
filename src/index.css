@@ -233,8 +233,9 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--spacing-xl);
-  height: var(--header-height);
+  padding: max(0.5rem, env(safe-area-inset-top)) var(--spacing-xl) 0.5rem;
+  height: auto;
+  min-height: var(--header-height);
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -2575,7 +2576,7 @@ textarea:focus-visible {
 /* Landscape Mode Optimizations for Mobile */
 @media (max-width: 900px) and (orientation: landscape) {
   .mobile-nav {
-    height: calc(55px + var(--safe-area-bottom));
+    height: calc(55px + env(safe-area-inset-bottom));
   }
 
   .mobile-nav-item {
@@ -2589,7 +2590,7 @@ textarea:focus-visible {
   }
 
   .main-content {
-    padding-bottom: calc(65px + var(--safe-area-bottom)) !important;
+    padding-bottom: calc(65px + env(safe-area-inset-bottom)) !important;
   }
 }
 
