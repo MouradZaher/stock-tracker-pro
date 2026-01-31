@@ -42,8 +42,8 @@ export const useWatchlist = create<WatchlistState>()(
                     watchlist: [...state.watchlist, normalizedSymbol],
                 }));
 
-                // Sync to Supabase if user is logged in
-                if (userId) {
+                // Sync to Supabase only if user is logged in AND not a bypass user
+                if (userId && !userId.startsWith('bypass-')) {
                     try {
                         const success = await watchlistService.addSymbol(userId, normalizedSymbol);
                         if (!success) {
@@ -75,8 +75,8 @@ export const useWatchlist = create<WatchlistState>()(
                     watchlist: state.watchlist.filter((s) => s !== normalizedSymbol),
                 }));
 
-                // Sync to Supabase if user is logged in
-                if (userId) {
+                // Sync to Supabase only if user is logged in AND not a bypass user
+                if (userId && !userId.startsWith('bypass-')) {
                     try {
                         const success = await watchlistService.removeSymbol(userId, normalizedSymbol);
                         if (!success) {
