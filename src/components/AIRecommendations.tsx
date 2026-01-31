@@ -71,15 +71,35 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
 
                 {/* Quick Actions Card */}
-                <div className="glass-card" style={{ padding: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Trade Shortcuts</h3>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        {['Analyze Portfolio', 'Compare Tech', 'Top High-Yielders', 'Risk Check'].map(label => (
-                            <button key={label} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
-                                {label}
-                            </button>
+                <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                        <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Trade Shortcuts</h3>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            {['Analyze Portfolio', 'Compare Tech', 'Top High-Yielders', 'Risk Check'].map(label => (
+                                <button key={label} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Strategy Simulator - Innovation */}
+                <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Shield size={16} /> Strategy Simulator
+                    </h3>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
+                        Test AI performance against S&P 500 over the last 12 months.
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', height: '60px', gap: '4px', marginBottom: '1rem' }}>
+                        {[40, 45, 30, 50, 65, 55, 70, 85, 80, 95].map((h, i) => (
+                            <div key={i} style={{ flex: 1, background: i % 2 === 0 ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)', height: `${h}%`, borderRadius: '2px', opacity: 0.8 }} />
                         ))}
                     </div>
+                    <button className="btn btn-primary" style={{ width: '100%', fontSize: '0.9rem' }} onClick={() => soundService.playSuccess()}>
+                        Run Backtest
+                    </button>
                 </div>
             </div>
 

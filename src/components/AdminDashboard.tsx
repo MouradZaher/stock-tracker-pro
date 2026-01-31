@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Check, X, Shield, Users, Clock, LogOut } from 'lucide-react';
+import { Check, X, Shield, Users, Clock, LogOut, Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { yahooFinanceApi } from '../services/api';
 
 interface Profile {
     id: string;
@@ -21,9 +22,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     const { user, signOut } = useAuth();
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
+    const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+
+    // Test API connection
+    const testApiConnection = async () => {
+        setApiStatus('checking');
+        const toastId = toast.loading('Testing API connection...');
+        try {
+            await yahooFinanceApi.get('', { params: { symbols: 'AAPL' } });
+            setApiStatus('online');
+            toast.success('System Online: API is reachable', { id: toastId });
+        } catch (error) {
+            console.error('API Test Failed:', error);
+            setApiStatus('offline');
+            toast.error('System Offline: API unreachable', { id: toastId });
+        }
+    };
 
     const fetchProfiles = async () => {
         setLoading(true);
+        // Check health on load
+        testApiConnection();
+
         try {
             // Mock data for bypass/demo mode
             if (user?.id?.startsWith('bypass-')) {
@@ -131,6 +151,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         <Clock size={20} className="text-warning" />
                         <span className="stat-value">{profiles.filter(p => !p.is_approved).length}</span>
                         <span className="stat-label">Pending</span>
+                    </div>
+                    <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => testApiConnection()}>
+                        <Activity size={20} className={apiStatus === 'online' ? "text-success" : apiStatus === 'offline' ? "text-error" : "text-muted"} />
+                        <span className="stat-value" style={{ fontSize: '1rem' }}>{apiStatus === 'online' ? 'Online' : apiStatus === 'offline' ? 'Offline' : 'Unknown'}</span>
+                        <span className="stat-label">System Status</span>
                     </div>
                 </div>
 

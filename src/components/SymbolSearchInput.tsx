@@ -117,66 +117,91 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                         background: 'transparent',
                         border: 'none',
                         padding: '10px 0',
-                        width: '100%',
+                        flex: 1,
                         outline: 'none',
                         color: isSearching ? 'var(--color-text-tertiary)' : 'inherit',
                         cursor: isSearching ? 'not-allowed' : 'text'
                     }}
                 />
-            </div>
+                {isSearching && (
+                    <div style={{ marginLeft: '12px', display: 'flex', alignItems: 'center' }}>
+                        <div className="agent-loader" style={{ width: '16px', height: '16px', border: '2px solid var(--color-accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    </div>
+                )}
 
-            {showDropdown && results.length > 0 && (
-                <div className="search-dropdown glass-effect" style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    zIndex: 100,
-                    marginTop: '4px',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '4px',
-                    maxHeight: '240px',
-                    overflowY: 'auto',
-                    boxShadow: 'var(--shadow-lg)',
-                    border: '1px solid var(--glass-border)'
-                }}>
-                    {results.map((result, index) => (
-                        <div
-                            key={result.symbol}
-                            className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
-                            style={{
-                                padding: '8px 12px',
-                                borderRadius: 'var(--radius-sm)',
-                                cursor: 'pointer',
-                                background: index === selectedIndex ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}
-                            onClick={() => handleSelect(result.symbol)}
-                            onMouseEnter={() => setSelectedIndex(index)}
-                        >
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{result.symbol}</span>
-                                <span style={{ fontSize: '0.75rem', opacity: 0.6, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{result.name}</span>
-                            </div>
-                            <span style={{ fontSize: '0.7rem', opacity: 0.5, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{result.type}</span>
+                {/* Trending Pills - Innovation */}
+                {!query && !showDropdown && (
+                    <div style={{ marginTop: '12px', paddingLeft: '4px' }}>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trending Now</div>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            {['NVDA', 'TSLA', 'AMD', 'PLTR', 'SMCI'].map(symbol => (
+                                <button
+                                    key={symbol}
+                                    onClick={() => handleSelect(symbol)}
+                                    className="glass-button"
+                                    style={{
+                                        fontSize: '0.75rem',
+                                        padding: '4px 10px',
+                                        borderRadius: '12px',
+                                        border: '1px solid var(--glass-border)',
+                                        background: 'rgba(255,255,255,0.03)',
+                                        color: 'var(--color-accent)'
+                                    }}
+                                >
+                                    {symbol}
+                                </button>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            )}
+                    </div>
+                )}
 
-            {isSearching && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, padding: '12px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--color-accent)', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)', marginTop: '4px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <div className="agent-loader" style={{ width: '12px', height: '12px', border: '2px solid var(--color-accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                    Agent is thinking...
-                </div>
-            )}
-            <style>{`
+                {showDropdown && results.length > 0 && (
+                    <div className="search-dropdown glass-effect" style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        zIndex: 100,
+                        marginTop: '4px',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '4px',
+                        maxHeight: '240px',
+                        overflowY: 'auto',
+                        boxShadow: 'var(--shadow-lg)',
+                        border: '1px solid var(--glass-border)'
+                    }}>
+                        {results.map((result, index) => (
+                            <div
+                                key={result.symbol}
+                                className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
+                                style={{
+                                    padding: '8px 12px',
+                                    borderRadius: 'var(--radius-sm)',
+                                    cursor: 'pointer',
+                                    background: index === selectedIndex ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}
+                                onClick={() => handleSelect(result.symbol)}
+                                onMouseEnter={() => setSelectedIndex(index)}
+                            >
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{result.symbol}</span>
+                                    <span style={{ fontSize: '0.75rem', opacity: 0.6, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{result.name}</span>
+                                </div>
+                                <span style={{ fontSize: '0.7rem', opacity: 0.5, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{result.type}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+
+                <style>{`
                 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             `}</style>
-        </div>
-    );
+            </div>
+            );
 };
 
-export default SymbolSearchInput;
+            export default SymbolSearchInput;

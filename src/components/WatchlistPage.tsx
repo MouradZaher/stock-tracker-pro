@@ -10,30 +10,92 @@ interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
 }
 
-const Sparkline: React.FC<{ data: number[], color: string }> = ({ data, color }) => {
+interface SparklineProps {
+    data: number[];
+    color: string;
+}
+
+const InteractiveSparkline: React.FC<SparklineProps> = ({ data, color }) => {
+    const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+    const width = 120;
+    const height = 40;
     const min = Math.min(...data);
     const max = Math.max(...data);
-    const range = max - min;
-    const width = 100;
-    const height = 30;
+    const range = max - min || 1;
 
     const points = data.map((val, i) => {
         const x = (i / (data.length - 1)) * width;
-        const y = height - ((val - min) / (range || 1)) * height;
+        const y = height - ((val - min) / range) * (height - 10) - 5; // Padding 5px
         return `${x},${y}`;
     }).join(' ');
 
+    const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const idx = Math.min(data.length - 1, Math.max(0, Math.round((x / width) * (data.length - 1))));
+        setHoverIndex(idx);
+    };
+
     return (
-        <svg width={width} height={height} style={{ overflow: 'visible' }}>
-            <polyline
-                fill="none"
-                stroke={color}
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                points={points}
-            />
-        </svg>
+        <div style={{ position: 'relative', width: width, height: height }}>
+            <svg
+                width={width}
+                height={height}
+                style={{ overflow: 'visible', cursor: 'crosshair' }}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setHoverIndex(null)}
+            >
+                <defs>
+                    <linearGradient id={`gradient-${color}`} x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+                        <stop offset="100%" stopColor={color} stopOpacity="0" />
+                    </linearGradient>
+                </defs>
+                <path
+                    d={`M0,${height} ${points.split(' ').map(p => `L${p}`).join(' ')} L${width},${height}`}
+                    fill={`url(#gradient-${color})`}
+                    stroke="none"
+                />
+                <polyline
+                    fill="none"
+                    stroke={color}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points={points}
+                />
+                {hoverIndex !== null && (
+                    <circle
+                        cx={(hoverIndex / (data.length - 1)) * width}
+                        cy={height - ((data[hoverIndex] - min) / range) * (height - 10) - 5}
+                        r="3"
+                        fill="#fff"
+                        stroke={color}
+                        strokeWidth="2"
+                    />
+                )}
+            </svg>
+            {hoverIndex !== null && (
+                <div style={{
+                    position: 'absolute',
+                    top: '-25px',
+                    left: `${(hoverIndex / (data.length - 1)) * 100}%`,
+                    transform: 'translateX(-50%)',
+                    background: 'var(--color-bg-secondary)',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    border: '1px solid var(--glass-border)',
+                    whiteSpace: 'nowrap',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                }}>
+                    {formatCurrency(data[hoverIndex])}
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -181,7 +243,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.5rem' }}>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>7D Trend</div>
-                                        <Sparkline data={mockTrend} color={trendColor} />
+                                        <InteractiveSparkline data={mockTrend} color={trendColor} />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
                                         <button

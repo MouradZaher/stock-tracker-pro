@@ -9,8 +9,8 @@ export default async function handler(req, res) {
 
     // Use query2 as primary, fallback to query1 if needed
     const endpoints = [
-        'https://query2.finance.yahoo.com/v8/finance/quote',
-        'https://query1.finance.yahoo.com/v8/finance/quote'
+        'https://query2.finance.yahoo.com/v7/finance/quote',
+        'https://query1.finance.yahoo.com/v7/finance/quote'
     ];
 
     for (const endpoint of endpoints) {
@@ -34,11 +34,16 @@ export default async function handler(req, res) {
             return res.status(200).json(response.data);
         } catch (error) {
             console.error(`Failed to fetch from ${endpoint}:`, error.message);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+            }
+
             // Continue to next endpoint if available
             if (endpoint === endpoints[endpoints.length - 1]) {
                 const status = error.response ? error.response.status : 500;
                 const message = error.response ? error.response.data : error.message;
-                return res.status(status).json({ error: message });
+                return res.status(status).json({ error: message, details: 'Proxy failed to fetch from Yahoo Finance' });
             }
         }
     }

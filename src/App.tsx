@@ -30,11 +30,11 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 30000, // Default: 30 seconds
-      refetchIntervalInBackground: true, // Keep refreshing even when tab is inactive
-      staleTime: 5000, // Data considered stale after 5 seconds
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+      refetchInterval: 15000, // 15 seconds for real-time feel
+      refetchIntervalInBackground: true,
+      staleTime: 10000, // Considered stale after 10s to encourage fresh fetches
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     },
   },
 });
@@ -118,7 +118,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
                       <SearchEngine onSelectSymbol={handleSelectSymbol} />
                     </div>
                   </div>
-                  <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden' }}>
                     <StockHeatmap />
                   </div>
                 </>
@@ -141,7 +141,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             <div className="tab-content" style={{ paddingBottom: '80px' }}>
               <ErrorBoundary>
                 <Suspense fallback={<PageSkeleton />}>
-                  <Portfolio />
+                  <Portfolio onSelectSymbol={handleSelectSymbol} />
                 </Suspense>
               </ErrorBoundary>
             </div>

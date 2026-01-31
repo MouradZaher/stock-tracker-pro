@@ -55,8 +55,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     positions: [...state.positions, newPosition],
                 }));
 
-                // Sync to Supabase if user is logged in
-                if (userId) {
+                // Sync to Supabase only if user is logged in AND not a bypass user
+                if (userId && !userId.startsWith('bypass-')) {
                     try {
                         const success = await portfolioService.savePosition(userId, newPosition);
                         if (!success) {
@@ -101,8 +101,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     }),
                 }));
 
-                // Sync to Supabase if user is logged in
-                if (userId && oldPosition) {
+                // Sync to Supabase only if user is logged in AND not a bypass user
+                if (userId && oldPosition && !userId.startsWith('bypass-')) {
                     try {
                         const updatedPosition = get().positions.find(p => p.id === id);
                         if (updatedPosition) {
@@ -135,8 +135,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     positions: state.positions.filter((pos) => pos.id !== id),
                 }));
 
-                // Sync to Supabase if user is logged in
-                if (userId) {
+                // Sync to Supabase only if user is logged in AND not a bypass user
+                if (userId && !userId.startsWith('bypass-')) {
                     try {
                         const success = await portfolioService.deletePosition(userId, id);
                         if (!success) {
@@ -176,8 +176,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     }),
                 }));
 
-                // Sync to Supabase if user is logged in (silently, don't rollback)
-                if (userId) {
+                // Sync to Supabase only if user is logged in AND not a bypass user
+                if (userId && !userId.startsWith('bypass-')) {
                     try {
                         await portfolioService.updatePriceForSymbol(userId, symbol, price);
                     } catch (error) {
@@ -188,6 +188,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
             },
 
             loadFromSupabase: async (userId: string) => {
+                if (!userId || userId.startsWith('bypass-')) return;
                 set({ isLoading: true, error: null });
                 try {
                     const positions = await portfolioService.fetchUserPortfolios(userId);
@@ -207,6 +208,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
             },
 
             syncWithSupabase: async (userId: string) => {
+                if (!userId || userId.startsWith('bypass-')) return;
                 set({ isSyncing: true, error: null });
                 try {
                     const localPositions = get().positions;

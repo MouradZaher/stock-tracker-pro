@@ -11,10 +11,16 @@ import SymbolSearchInput from './SymbolSearchInput';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 
-const Portfolio: React.FC = () => {
+interface PortfolioProps {
+    onSelectSymbol?: (symbol: string) => void;
+}
+
+const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
+    // ... existing hooks ...
     const { positions, addPosition, removePosition, getSummary, updatePrice } = usePortfolioStore();
     const [showModal, setShowModal] = useState(false);
+    // ... existing state ...
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -27,6 +33,7 @@ const Portfolio: React.FC = () => {
 
     // Update prices periodically
     useEffect(() => {
+        // ... existing effect logic ...
         const updatePrices = async () => {
             for (const position of positions) {
                 try {
@@ -45,6 +52,7 @@ const Portfolio: React.FC = () => {
     }, [positions, user?.id]);
 
     const handleAddPosition = async () => {
+        // ... existing add logic ...
         if (!formData.symbol || !formData.units || !formData.avgCost) {
             toast.error('Please fill in all fields');
             return;
@@ -79,10 +87,16 @@ const Portfolio: React.FC = () => {
         }
     };
 
-    const handleRemove = (id: string) => {
+    const handleRemove = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
         if (confirm('Are you sure you want to remove this position?')) {
             removePosition(id, user?.id);
         }
+    };
+
+    const handleRowClick = (symbol: string) => {
+        soundService.playTap();
+        onSelectSymbol?.(symbol);
     };
 
     // Calculate allocations
@@ -110,6 +124,7 @@ const Portfolio: React.FC = () => {
 
     return (
         <div className="portfolio-container">
+            {/* ... existing header and summary ... */}
             <div className="portfolio-header">
                 <h2>My Portfolio</h2>
                 <button className="btn btn-primary" onClick={() => setShowModal(true)}>
@@ -138,6 +153,7 @@ const Portfolio: React.FC = () => {
                 </div>
             </div>
 
+            {/* ... allocations ... */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
                 {/* Sector Allocation View */}
                 <div className="glass-card" style={{ padding: '1.5rem' }}>
@@ -211,7 +227,7 @@ const Portfolio: React.FC = () => {
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
                         {positions.slice(0, 4).map(pos => (
-                            <div key={pos.symbol} className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)' }}>
+                            <div key={pos.symbol} className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)' }} onClick={() => handleRowClick(pos.symbol)}>
                                 <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-text-primary)' }}>{pos.symbol}</div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>Ex-Date: March 12, 2026</div>
                                 <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -224,73 +240,123 @@ const Portfolio: React.FC = () => {
                 )}
             </div>
 
-            {/* Portfolio Table */}
+            {/* Portfolio Content */}
             {positions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: 'var(--spacing-2xl)', color: 'var(--color-text-secondary)' }}>
                     <p>No positions yet. Add your first position to start tracking your portfolio.</p>
                 </div>
             ) : (
-                <div className="table-container glass-card" style={{ padding: '0.5rem' }}>
-                    <table className="portfolio-table">
-                        <thead>
-                            <tr>
-                                <th>Symbol</th>
-                                <th>Name</th>
-                                <th style={{ textAlign: 'right' }}>Units</th>
-                                <th style={{ textAlign: 'right' }}>Avg Cost</th>
-                                <th style={{ textAlign: 'right' }}>Current Price</th>
-                                <th style={{ textAlign: 'right' }}>Market Value</th>
-                                <th style={{ textAlign: 'right' }}>P/L ($)</th>
-                                <th style={{ textAlign: 'right' }}>P/L (%)</th>
-                                <th style={{ textAlign: 'right' }}>Allocation</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {positions.map((position) => {
-                                const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                const allocationCheck = checkAllocationLimits(allocation, 'stock');
-                                const upcomingDividend = position.dividends?.find(d => d.type === 'upcoming');
+                <>
+                    {/* Desktop Table */}
+                    <div className="table-container glass-card desktop-only" style={{ padding: '0.5rem' }}>
+                        <table className="portfolio-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Name</th>
+                                    <th style={{ textAlign: 'right' }}>Units</th>
+                                    <th style={{ textAlign: 'right' }}>Avg Cost</th>
+                                    <th style={{ textAlign: 'right' }}>Current Price</th>
+                                    <th style={{ textAlign: 'right' }}>Market Value</th>
+                                    <th style={{ textAlign: 'right' }}>P/L ($)</th>
+                                    <th style={{ textAlign: 'right' }}>P/L (%)</th>
+                                    <th style={{ textAlign: 'right' }}>Allocation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {positions.map((position) => {
+                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                    const allocationCheck = checkAllocationLimits(allocation, 'stock');
+                                    const upcomingDividend = position.dividends?.find(d => d.type === 'upcoming');
 
-                                return (
-                                    <tr key={position.id}>
-                                        <td>
-                                            <strong>{position.symbol}</strong>
-                                            {upcomingDividend && (
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', marginTop: '0.25rem' }}>
-                                                    💰 Div: {formatCurrency(upcomingDividend.amount)} on {formatDate(new Date(upcomingDividend.paymentDate))}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {position.name}
-                                        </td>
-                                        <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
-                                        <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
-                                        <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
-                                        <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
-                                        <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
-                                            {formatCurrency(position.profitLoss)}
-                                        </td>
-                                        <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
-                                            {formatPercent(position.profitLossPercent)}
-                                        </td>
-                                        <td style={{ textAlign: 'right' }}>
-                                            <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
-                                                {allocation.toFixed(1)}%
+                                    return (
+                                        <tr key={position.id} onClick={() => handleRowClick(position.symbol)} style={{ cursor: 'pointer' }}>
+                                            <td>
+                                                <strong>{position.symbol}</strong>
+                                                {upcomingDividend && (
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', marginTop: '0.25rem' }}>
+                                                        💰 Div: {formatCurrency(upcomingDividend.amount)} on {formatDate(new Date(upcomingDividend.paymentDate))}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {position.name}
+                                            </td>
+                                            <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
+                                            <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
+                                            <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
+                                            <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
+                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
+                                                {formatCurrency(position.profitLoss)}
+                                            </td>
+                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
+                                                {formatPercent(position.profitLossPercent)}
+                                            </td>
+                                            <td style={{ textAlign: 'right' }}>
+                                                <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
+                                                    {allocation.toFixed(1)}%
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button className="btn btn-icon btn-small" onClick={(e) => handleRemove(position.id, e)}>
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {positions.map((position) => {
+                            const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                            return (
+                                <div key={position.id} className="glass-card" style={{ padding: '1rem' }} onClick={() => handleRowClick(position.symbol)}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                        <div>
+                                            <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{position.symbol}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontWeight: 600 }}>{formatCurrency(position.currentPrice)}</div>
+                                            <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                                {formatPercent(position.profitLossPercent)}
                                             </span>
-                                        </td>
-                                        <td>
-                                            <button className="btn btn-icon btn-small" onClick={() => handleRemove(position.id)}>
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
+                                        <div style={{ textAlign: 'right' }}>{position.units}</div>
+
+                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
+                                        <div style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</div>
+
+                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
+                                        <div style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(position.marketValue)}</div>
+
+                                        <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
+                                        <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{formatCurrency(position.profitLoss)}</div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.5rem', borderTop: '1px solid var(--glass-border)' }}>
+                                        <button
+                                            className="btn btn-icon btn-small text-error"
+                                            onClick={(e) => handleRemove(position.id, e)}
+                                            style={{ background: 'rgba(239, 68, 68, 0.1)' }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </>
             )}
 
             {/* Add Position Modal */}
