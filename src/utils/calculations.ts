@@ -63,7 +63,7 @@ export const checkAllocationLimits = (
 // Calculate portfolio returns
 export const calculateReturns = (
     currentValue: number,
-    initialValue: number,
+    initialValue: number
     // period: 'day' | 'month' | 'year' // future use
 ): number => {
     if (initialValue === 0) return 0;
