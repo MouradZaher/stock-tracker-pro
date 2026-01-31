@@ -223,7 +223,10 @@ h6 {
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  /* Fixed height for full app */
+  overflow: hidden;
+  /* Prevent app itself from scrolling */
   width: 100%;
   position: relative;
 }

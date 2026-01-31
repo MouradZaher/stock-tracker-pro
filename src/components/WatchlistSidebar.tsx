@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { useAuth } from '../contexts/AuthContext';
-import { getStockData } from '../services/stockDataService';
+import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
 
@@ -21,22 +21,20 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
         const fetchWatchlistData = async () => {
             if (watchlist.length === 0) return;
 
+            try {
+                // Fetch all data in one batch request
+                const stocksMap = await getMultipleQuotes(watchlist);
 
+                // Convert Map to Record object for state
+                const newData: Record<string, Stock> = {};
+                stocksMap.forEach((value, key) => {
+                    newData[key] = value;
+                });
 
-            const newData: Record<string, Stock> = {};
-
-            await Promise.all(
-                watchlist.map(async (symbol) => {
-                    try {
-                        const { stock } = await getStockData(symbol);
-                        newData[symbol] = stock;
-                    } catch (error) {
-                        console.error(`Failed to fetch data for ${symbol}`, error);
-                    }
-                })
-            );
-
-            setStockData(newData);
+                setStockData(newData);
+            } catch (error) {
+                console.error('Failed to fetch watchlist data', error);
+            }
         };
 
         if (isOpen) {

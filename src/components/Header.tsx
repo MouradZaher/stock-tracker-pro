@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MarketStatus from './MarketStatus';
+import LiveTicker from './LiveTicker';
 import { soundService } from '../services/soundService';
 import { useTheme } from '../contexts/ThemeContext';
 import { LogOut, Sun, Moon, Shield } from 'lucide-react';
@@ -110,7 +111,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 </nav>
 
                 {/* Scaled Down Ticker */}
-                <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', opacity: 0.9, width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', opacity: 0.9, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <LiveTicker />
                     <MarketStatus />
                 </div>
             </div>

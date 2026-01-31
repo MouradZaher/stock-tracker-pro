@@ -104,7 +104,7 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                 <input
                     type="text"
                     className="form-input"
-                    style={{ background: 'transparent', border: 'none', padding: '10px 0', width: '100%', outline: 'none', color: 'inherit' }}
+                    className="form-input"
                     placeholder={placeholder}
                     value={query}
                     onChange={(e) => setQuery(e.target.value.toUpperCase())}
@@ -113,6 +113,16 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                         if (results.length > 0) setShowDropdown(true);
                     }}
                     autoFocus={autoFocus}
+                    disabled={isSearching}
+                    style={{
+                        background: 'transparent',
+                        border: 'none',
+                        padding: '10px 0',
+                        width: '100%',
+                        outline: 'none',
+                        color: isSearching ? 'var(--color-text-tertiary)' : 'inherit',
+                        cursor: isSearching ? 'not-allowed' : 'text'
+                    }}
                 />
             </div>
 
@@ -157,11 +167,15 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                 </div>
             )}
 
-            {isSearching && !showDropdown && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, padding: '8px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
-                    Searching...
+            {isSearching && (
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, padding: '12px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--color-accent)', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)', marginTop: '4px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <div className="agent-loader" style={{ width: '12px', height: '12px', border: '2px solid var(--color-accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    Agent is thinking...
                 </div>
             )}
+            <style>{`
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            `}</style>
         </div>
     );
 };

@@ -7,7 +7,7 @@ export const REFRESH_INTERVALS = {
     WATCHLIST: 30000,
 };
 
-export const YAHOO_ENDPOINT = '/v1/finance/quote';
+export const YAHOO_ENDPOINT = 'quote';
 
 // Simple in-memory cache
 const cache = new Map<string, { data: any; timestamp: number }>();
