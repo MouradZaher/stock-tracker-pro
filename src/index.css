@@ -62,15 +62,19 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
 
-  /* Glass morphism 2.0 */
-  --glass-bg: rgba(25, 25, 35, 0.4);
-  --glass-bg-hover: rgba(40, 40, 55, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-bright: rgba(255, 255, 255, 0.15);
-  --glass-blur: blur(16px);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  /* Glass morphism 2.0 - Premium */
+  --glass-bg: rgba(20, 20, 30, 0.6);
+  --glass-bg-hover: rgba(30, 30, 45, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-bright: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(20px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 
   --header-height: 80px;
+
+  /* Premium Glares */
+  --glare-opacity: 0.1;
+  --noise-opacity: 0.03;
 }
 
 

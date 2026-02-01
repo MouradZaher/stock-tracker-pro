@@ -6,6 +6,7 @@ import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 import LiveTicker from '../components/LiveTicker';
 import BenefitsGrid from '../components/BenefitsGrid';
+import TopBar from '../components/TopBar';
 import './LandingPage.css';
 
 const PinLoginPage: React.FC = () => {
@@ -77,7 +78,7 @@ const PinLoginPage: React.FC = () => {
 
     return (
         <div className="landing-page">
-
+            <TopBar />
             <nav className="landing-nav" style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', fontWeight: 700 }}>
                     <div style={{ background: 'var(--gradient-primary)', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -107,9 +108,7 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div style={{ marginBottom: '2rem', width: '100%', maxWidth: '500px' }}>
-                        <LiveTicker />
-                    </div>
+
 
                     <div className="login-form" style={{ marginTop: '1rem' }}>
                         <div style={{ marginBottom: '1rem' }}>

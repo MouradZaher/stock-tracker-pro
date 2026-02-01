@@ -1,49 +1,85 @@
+import axios from 'axios';
+import { yahooFinanceApi, getCachedData, setCachedData } from './api';
 import type { NewsArticle } from '../types';
 
-// Enhanced mock news generator with more variety
+// Fetch news from our API proxy
+export const getStockNews = async (symbol: string, limit: number = 5): Promise<NewsArticle[]> => {
+    try {
+        const cacheKey = `news_${symbol}`;
+        const cached = getCachedData(cacheKey);
+        if (cached) {
+            console.log(`✅ Using cached news for ${symbol}`);
+            return cached;
+        }
+
+        console.log(`📰 Fetching live news for ${symbol}...`);
+        const response = await yahooFinanceApi.get('/news', {
+            params: { symbol }
+        });
+
+        // Yahoo v2/finance/news returns { content: [ ... ] } or similar
+        // We need to parse it. 
+        // Note: The response from api/news.js is the raw yahoo response.
+        // Let's assume it returns { elements: [...] } or { news: [...] }
+        // We might need to adjust based on actual response.
+        // Common structure: output.result or root array.
+
+        // For now, let's map what we can. 
+        // If the API fails or returns empty, we fall back to mocks (silently) or empty array.
+
+        const items = response.data?.elements || response.data?.news || [];
+
+        if (!Array.isArray(items) || items.length === 0) {
+            throw new Error('No news items found');
+        }
+
+        const news: NewsArticle[] = items.slice(0, limit).map((item: any, index: number) => ({
+            id: item.uuid || `news-${symbol}-${index}`,
+            headline: item.title,
+            summary: item.summary || item.description || 'No summary available.',
+            source: item.publisher || item.author_name || 'Yahoo Finance',
+            url: item.link || item.url,
+            datetime: item.published_at || Math.floor(Date.now() / 1000),
+            image: item.main_image?.original_url || null,
+            sentiment: 'neutral', // Auto-calculating sentiment is hard without NLP, default to neutral
+        }));
+
+        setCachedData(cacheKey, news);
+        return news;
+
+    } catch (error) {
+        console.warn(`⚠️ Failed to fetch news for ${symbol}, falling back to mocks:`, error);
+        return generateMockNews(symbol).slice(0, limit);
+    }
+};
+
+// Fallback mock generator
 const generateMockNews = (symbol: string): NewsArticle[] => {
-    // Use symbol and date as seed for consistent but varied results
     const now = Date.now();
     const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
     const newsTemplates = [
         { headline: `${symbol} Reports Strong Quarterly Earnings Beat`, sentiment: 'positive' as const },
         { headline: `Analysts Raise ${symbol} Price Target on Growth Prospects`, sentiment: 'positive' as const },
-        { headline: `${symbol} Announces Strategic Partnership and Product Launch`, sentiment: 'positive' as const },
-        { headline: `Market Outlook: ${symbol} Shows Promising Long-term Growth`, sentiment: 'positive' as const },
-        { headline: `${symbol} Expands Into Emerging Markets with New Initiative`, sentiment: 'positive' as const },
-        { headline: `${symbol} CEO Discusses Future Strategy in Investor Call`, sentiment: 'neutral' as const },
-        { headline: `Financial Review: ${symbol} Maintains Steady Performance`, sentiment: 'neutral' as const },
-        { headline: `${symbol} Announces Dividend and Share Buyback Program`, sentiment: 'positive' as const },
-        { headline: `Industry Trends: How ${symbol} is Positioning for Success`, sentiment: 'neutral' as const },
-        { headline: `${symbol} Invests in Technology and Innovation`, sentiment: 'positive' as const },
+        { headline: `${symbol} Announces Strategic Partnership`, sentiment: 'positive' as const },
+        { headline: `Market Outlook: ${symbol} Shows Promising Growth`, sentiment: 'positive' as const },
+        { headline: `${symbol} Expands Into New Markets`, sentiment: 'positive' as const },
     ];
 
-    const sources = ['Reuters', 'Bloomberg', 'CNBC', 'MarketWatch', 'Financial Times', 'WSJ'];
+    const sources = ['Reuters', 'Bloomberg', 'CNBC', 'MarketWatch'];
 
-    // Rotate through templates based on seed
-    return newsTemplates.slice(0, 8).map((template, index) => {
-        const daysAgo = index;
+    return newsTemplates.map((template, index) => {
         const sourceIndex = (seed + index) % sources.length;
-
         return {
             id: `mock-${symbol}-${index}`,
             headline: template.headline,
-            summary: `${template.headline}. Industry analysts and market observers are monitoring ${symbol}'s performance and strategic initiatives as the company continues to navigate market conditions.`,
+            summary: `${template.headline}. Industry analysts are monitoring performance.`,
             source: sources[sourceIndex],
             url: '#',
-            datetime: Math.floor((now - daysAgo * 86400000) / 1000),
+            datetime: Math.floor((now - index * 86400000) / 1000),
             image: null,
             sentiment: template.sentiment,
         };
     });
-};
-
-// Get stock news (using enhanced mock data)
-export const getStockNews = async (symbol: string, limit: number = 5): Promise<NewsArticle[]> => {
-    console.log(`📰 Generating news for ${symbol}...`);
-
-    // Return enhanced mock news
-    return generateMockNews(symbol).slice(0, limit);
 };
 

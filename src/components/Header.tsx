@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import MarketStatus from './MarketStatus';
-import LiveTicker from './LiveTicker';
 import { soundService } from '../services/soundService';
 import { useTheme } from '../contexts/ThemeContext';
-import { LogOut, Sun, Moon, Shield } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, LayoutDashboard, List, Briefcase, Activity, Sparkles } from 'lucide-react';
 import type { TabType } from '../types';
 
 interface HeaderProps {
@@ -16,12 +14,12 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick }) => {
     const { theme, toggleTheme } = useTheme();
-    const tabs: { id: TabType; label: string }[] = [
-        { id: 'search', label: 'Search' },
-        { id: 'watchlist', label: 'Watchlist' },
-        { id: 'portfolio', label: 'Portfolio' },
-        { id: 'recommendations', label: 'AI Insights' },
-        { id: 'pulse', label: 'Pulse' },
+    const tabs: { id: TabType; label: string; icon: any }[] = [
+        { id: 'search', label: 'Home', icon: LayoutDashboard },
+        { id: 'watchlist', label: 'Watch', icon: List },
+        { id: 'portfolio', label: 'Port', icon: Briefcase },
+        { id: 'recommendations', label: 'AI', icon: Sparkles },
+        { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 
     const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({});
@@ -101,20 +99,17 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             ref={(el) => { tabRefs.current[tab.id] = el; }}
                             className={`header-tab ${activeTab === tab.id ? 'active' : ''}`}
                             onClick={() => handleTabClick(tab.id)}
-                            style={{ position: 'relative', zIndex: 2 }}
+                            style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '6px' }}
                             aria-label={`Navigate to ${tab.label}`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
+                            <tab.icon size={16} />
                             {tab.label}
                         </button>
                     ))}
                 </nav>
 
-                {/* Scaled Down Ticker */}
-                <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', opacity: 0.9, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                    <LiveTicker />
-                    <MarketStatus />
-                </div>
+
             </div>
 
             {/* Actions Section */}

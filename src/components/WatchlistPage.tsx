@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { useAuth } from '../contexts/AuthContext';
-import { getStockData } from '../services/stockDataService';
+import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
 import { TrendingUp, TrendingDown, Trash2, Star } from 'lucide-react';
@@ -109,24 +109,25 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
 
     useEffect(() => {
         const fetchWatchlistData = async () => {
-            if (watchlist.length === 0) return;
+            if (watchlist.length === 0) {
+                setStockData({});
+                return;
+            }
 
             setLoading(true);
-            const newData: Record<string, Stock> = {};
-
-            await Promise.all(
-                watchlist.map(async (symbol) => {
-                    try {
-                        const { stock } = await getStockData(symbol);
-                        newData[symbol] = stock;
-                    } catch (error) {
-                        console.error(`Failed to fetch data for ${symbol}`, error);
-                    }
-                })
-            );
-
-            setStockData(newData);
-            setLoading(false);
+            try {
+                // Use batch fetching for better performance
+                const quotesMap = await getMultipleQuotes(watchlist);
+                const newData: Record<string, Stock> = {};
+                quotesMap.forEach((value, key) => {
+                    newData[key] = value;
+                });
+                setStockData(newData);
+            } catch (error) {
+                console.error("Failed to fetch watchlist data", error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchWatchlistData();

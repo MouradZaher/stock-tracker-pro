@@ -26,6 +26,19 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
         setActiveTab(tabId);
     };
 
+    // Hide on desktop programmatically to ensure it's removed
+    const [isDesktop, setIsDesktop] = React.useState(window.innerWidth >= 768);
+
+    React.useEffect(() => {
+        const handleResize = () => {
+            setIsDesktop(window.innerWidth >= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    if (isDesktop) return null;
+
     return (
         <nav className="mobile-nav glass-blur" role="navigation" aria-label="Main navigation" style={{
             position: 'fixed',

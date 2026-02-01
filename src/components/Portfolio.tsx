@@ -240,6 +240,63 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 )}
             </div>
 
+            {/* Famous Portfolios Section */}
+            <div className="section" style={{ marginBottom: '2rem' }}>
+                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
+                    Famous Portfolio Holdings
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    {[
+                        {
+                            name: "Warren Buffett", firm: "Berkshire Hathaway", holdings: [
+                                { symbol: 'AAPL', name: 'Apple Inc.', portPercent: 43.5, change: 1.2 },
+                                { symbol: 'BAC', name: 'Bank of America', portPercent: 9.1, change: -0.5 },
+                                { symbol: 'AXP', name: 'American Express', portPercent: 7.2, change: 0.8 },
+                                { symbol: 'KO', name: 'Coca-Cola', portPercent: 6.8, change: 0.2 }
+                            ]
+                        },
+                        {
+                            name: "Michael Burry", firm: "Scion Asset Mgmt", holdings: [
+                                { symbol: 'JD', name: 'JD.com', portPercent: 8.2, change: 2.4 },
+                                { symbol: 'BABA', name: 'Alibaba Group', portPercent: 7.5, change: 1.8 },
+                                { symbol: 'HCA', name: 'HCA Healthcare', portPercent: 5.9, change: -0.3 }
+                            ]
+                        },
+                        {
+                            name: "Cathie Wood", firm: "ARK Invest", holdings: [
+                                { symbol: 'TSLA', name: 'Tesla Inc.', portPercent: 9.8, change: 3.2 },
+                                { symbol: 'COIN', name: 'Coinbase Global', portPercent: 8.4, change: 5.1 },
+                                { symbol: 'ROKU', name: 'Roku Inc.', portPercent: 6.2, change: -1.4 }
+                            ]
+                        }
+                    ].map((guru, idx) => (
+                        <div key={idx} className="glass-card" style={{ padding: '1.5rem' }}>
+                            <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.75rem' }}>
+                                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{guru.name}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>{guru.firm}</div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {guru.holdings.map(h => (
+                                    <div key={h.symbol} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ fontWeight: 600 }}>{h.symbol}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>{h.portPercent}%</div>
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', color: h.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                            {h.change > 0 ? '+' : ''}{h.change}%
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button className="btn glass-button" style={{ width: '100%', marginTop: '1rem', fontSize: '0.8rem' }} onClick={() => onSelectSymbol?.(guru.holdings[0].symbol)}>
+                                View {guru.firm} Portfolio
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             {/* Portfolio Content */}
             {positions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: 'var(--spacing-2xl)', color: 'var(--color-text-secondary)' }}>

@@ -12,6 +12,7 @@ import { useWatchlist } from '../hooks/useWatchlist';
 import { useAuth } from '../contexts/AuthContext';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
+import AIRecommendations from './AIRecommendations';
 
 interface StockDetailProps {
     symbol: string;
@@ -73,7 +74,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     return (
         <div className="stock-detail">
             {/* Header */}
-            <div className="stock-header">
+            <div className="stock-header glass-card" style={{ padding: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
                 <div className="stock-title">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         {onBack && (
@@ -130,6 +131,17 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
             {/* Chart */}
             <TradingViewChart symbol={symbol} />
+
+            {/* Related Insights */}
+            <div className="section" style={{ marginTop: '2rem' }}>
+                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
+                    AI Market Insights
+                </h3>
+                <div style={{ marginTop: '1rem' }}>
+                    <AIRecommendations />
+                </div>
+            </div>
 
             {/* Stats Grid */}
             <div className="section">

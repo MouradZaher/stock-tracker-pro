@@ -23,6 +23,7 @@ import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
 import { LogOut, Shield } from 'lucide-react';
+import TopBar from './components/TopBar';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -87,8 +88,10 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
 
   return (
     <div className="app">
+      <TopBar />
       <Header
         activeTab={activeTab}
+
         onTabChange={handleTabChange}
         onLogout={logout}
         showAdmin={role === 'admin'}
@@ -110,7 +113,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={
-            <div className="tab-content" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div className="tab-content" style={{ paddingBottom: '80px', display: 'flex', flexDirection: 'column' }}>
               {!selectedSymbol ? (
                 <>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', width: '100%', textAlign: 'center', padding: '1rem' }}>
@@ -118,12 +121,12 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
                       <SearchEngine onSelectSymbol={handleSelectSymbol} />
                     </div>
                   </div>
-                  <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden' }}>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     <StockHeatmap />
                   </div>
                 </>
               ) : (
-                <div style={{ flex: 1, overflowY: 'auto', width: '100%', padding: '1rem' }}>
+                <div style={{ width: '100%', padding: '1rem' }}>
                   <StockDetail
                     symbol={selectedSymbol}
                     onBack={() => setSelectedSymbol(null)}
