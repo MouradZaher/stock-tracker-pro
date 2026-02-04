@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Check, X, Shield, Users, Clock, LogOut, Activity } from 'lucide-react';
+import { Check, X, Shield, Users, Clock, LogOut, Activity, Eye, Wallet } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { yahooFinanceApi } from '../services/api';
+import AdminPortfolioView from './AdminPortfolioView';
+import { fetchUserPortfolios } from '../services/portfolioService';
+import { formatCurrency } from '../utils/formatters';
 
 interface Profile {
     id: string;
@@ -11,6 +14,7 @@ interface Profile {
     role: 'admin' | 'user';
     is_approved: boolean;
     created_at: string;
+    portfolioValue?: number;
 }
 
 interface AdminDashboardProps {
@@ -23,6 +27,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+    const [inspectingUser, setInspectingUser] = useState<{ id: string; email: string } | null>(null);
 
     // Test API connection
     const testApiConnection = async () => {
@@ -45,37 +50,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
         testApiConnection();
 
         try {
-            // Mock data for bypass/demo mode
-            if (user?.id?.startsWith('bypass-')) {
-                // Simulate network delay
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                setProfiles([
-                    { id: 'bypass-admin-id', email: 'admin@stocktracker.pro', role: 'admin', is_approved: true, created_at: new Date().toISOString() },
-                    { id: 'bypass-user-1', email: 'investor@example.com', role: 'user', is_approved: true, created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
-                    { id: 'bypass-user-2', email: 'newbie@example.com', role: 'user', is_approved: false, created_at: new Date(Date.now() - 86400000 * 0.5).toISOString() },
-                    { id: 'bypass-user-3', email: 'trader@example.com', role: 'user', is_approved: true, created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
-                ]);
-                return;
-            }
-
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.warn('Supabase profiles error (using fallback data):', error);
-                // Fallback to mock data on error so UI is usable
-                setProfiles([
-                    { id: 'bypass-admin-id', email: 'admin@stocktracker.pro', role: 'admin', is_approved: true, created_at: new Date().toISOString() },
-                    { id: 'investor-1', email: 'investor@example.com', role: 'user', is_approved: true, created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
-                    { id: 'newbie-2', email: 'newbie@example.com', role: 'user', is_approved: false, created_at: new Date(Date.now() - 86400000 * 0.5).toISOString() },
-                    { id: 'trader-3', email: 'trader@example.com', role: 'user', is_approved: true, created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
-                    { id: 'analyst-4', email: 'analyst@stocktracker.pro', role: 'admin', is_approved: true, created_at: new Date(Date.now() - 86400000 * 10).toISOString() },
-                ]);
+                console.error('Supabase profiles error:', error);
+                toast.error('Failed to load real profile data');
+                setProfiles([]);
             } else {
-                setProfiles(data as Profile[] || []);
+                // Fetch portfolio values for each user
+                const profilesWithValues = await Promise.all((data as Profile[]).map(async (profile) => {
+                    try {
+                        const positions = await fetchUserPortfolios(profile.id);
+                        const value = positions.reduce((sum, p) => sum + (p.units * p.currentPrice), 0);
+                        return { ...profile, portfolioValue: value };
+                    } catch (e) {
+                        return { ...profile, portfolioValue: 0 };
+                    }
+                }));
+                setProfiles(profilesWithValues);
             }
         } catch (err) {
             console.error('Exception fetching profiles:', err);
@@ -90,20 +85,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
             fetchProfiles();
         }
     }, [isOpen]);
-
-    const handleApprove = async (id: string, email: string) => {
-        const { error } = await supabase
-            .from('profiles')
-            .update({ is_approved: true })
-            .eq('id', id);
-
-        if (error) {
-            toast.error('Failed to approve user');
-        } else {
-            toast.success(`Approved access for ${email}`);
-            setProfiles(prev => prev.map(p => p.id === id ? { ...p, is_approved: true } : p));
-        }
-    };
 
     const handleReject = async (id: string, email: string) => {
         // In a real app, you might want to soft-delete or just block
@@ -122,6 +103,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     };
 
     if (!isOpen) return null;
+
+    if (inspectingUser) {
+        return (
+            <AdminPortfolioView
+                userId={inspectingUser.id}
+                userEmail={inspectingUser.email}
+                onClose={() => setInspectingUser(null)}
+            />
+        );
+    }
 
     return (
         <div className="admin-overlay" onClick={onClose}>
@@ -151,9 +142,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         <span className="stat-label">Approved</span>
                     </div>
                     <div className="admin-stat-card">
-                        <Clock size={20} className="text-warning" />
-                        <span className="stat-value">{profiles.filter(p => !p.is_approved).length}</span>
-                        <span className="stat-label">Pending</span>
+                        <Wallet size={20} className="text-accent" />
+                        <span className="stat-value">
+                            {formatCurrency(profiles.reduce((sum, p) => sum + (p.portfolioValue || 0), 0))}
+                        </span>
+                        <span className="stat-label">Total AUM</span>
                     </div>
                     <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => testApiConnection()}>
                         <Activity size={20} className={apiStatus === 'online' ? "text-success" : apiStatus === 'offline' ? "text-error" : "text-muted"} />
@@ -172,7 +165,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                     <th>User</th>
                                     <th>Role</th>
                                     <th>Status</th>
-                                    <th>Joined</th>
+                                    <th style={{ textAlign: 'right' }}>Portfolio Value</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -182,7 +175,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                         <td>
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <span className="user-email">{profile.email}</span>
-                                                <span className="user-id">{profile.id.slice(0, 8)}...</span>
+                                                <span className="user-id">{profile.id}</span>
                                             </div>
                                         </td>
                                         <td>
@@ -195,32 +188,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                                 {profile.is_approved ? 'Active' : 'Pending'}
                                             </span>
                                         </td>
-                                        <td>{new Date(profile.created_at).toLocaleDateString()}</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                                            {formatCurrency(profile.portfolioValue || 0)}
+                                        </td>
                                         <td>
-                                            {profile.id !== user?.id && (
-                                                <div className="action-buttons">
-                                                    {!profile.is_approved ? (
-                                                        <button
-                                                            className="btn-icon btn-approve"
-                                                            onClick={() => handleApprove(profile.id, profile.email)}
-                                                            title="Approve User"
-                                                        >
-                                                            <Check size={18} />
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            className="btn-icon btn-reject"
-                                                            onClick={() => handleReject(profile.id, profile.email)}
-                                                            title="Revoke Access"
-                                                        >
-                                                            <X size={18} />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {profile.id === user?.id && (
-                                                <span className="text-muted" style={{ fontSize: '0.8rem' }}> (You)</span>
-                                            )}
+                                            <div className="action-buttons">
+                                                <button
+                                                    className="btn-icon"
+                                                    onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
+                                                    title="View Portfolio"
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+
+                                                {profile.id !== user?.id && (
+                                                    <>
+                                                        {profile.is_approved ? (
+                                                            <button
+                                                                className="btn-icon btn-reject"
+                                                                onClick={() => handleReject(profile.id, profile.email)}
+                                                                title="Revoke Access"
+                                                            >
+                                                                <X size={18} />
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-muted" style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>Auto-approving...</span>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

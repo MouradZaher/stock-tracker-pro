@@ -169,12 +169,10 @@ html,
 body,
 #root {
   width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-}
-
-body {
-  overflow-y: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 body {
@@ -227,7 +225,8 @@ h6 {
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
   position: relative;
@@ -274,48 +273,46 @@ h6 {
   display: flex;
   gap: var(--spacing-sm);
   position: relative;
-  background: var(--color-bg-secondary);
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  background: transparent;
+  padding: 0;
+  border: none;
 }
 
 .header-tab {
   position: relative;
-  padding: 0.75rem 1.25rem;
-  /* BIGGER PADDING */
-  border: none;
-  background: transparent;
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  /* SLIGHTLY BIGGER FONT */
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  /* transition: none !important; REMOVED animation */
-  transition: none !important;
+  transition: all var(--transition-base) !important;
   border-radius: var(--radius-md);
   white-space: nowrap;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 4px;
 }
 
 .header-tab:hover {
-  /* color: var(--color-text-primary); REMOVED HOVER CHANGE */
-  color: var(--color-text-secondary);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
 .header-tab.active {
-  color: var(--color-text-primary);
+  color: white;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  font-weight: 600;
+  box-shadow: 0 0 15px var(--color-accent-light);
 }
 
-.tab-indicator {
-  position: absolute;
-  background: var(--color-accent);
-  border-radius: var(--radius-md);
-  transition: none !important;
-  /* INSTANT CHANGE - NO SLIDING */
-  z-index: 1;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-}
+/* tab-indicator removed */
 
 .logo-icon {
   background: var(--gradient-primary);
@@ -1933,54 +1930,7 @@ html {
 /* --- End of Ultra-Adoption --- */
 
 /* Mobile Bottom Navigation (Native Feel) */
-.mobile-nav {
-  display: none;
-}
 
-@media (max-width: 600px) {
-  .mobile-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: calc(65px + var(--safe-area-bottom));
-    background: rgba(10, 10, 10, 0.85);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 1000;
-    padding-bottom: var(--safe-area-bottom);
-    justify-content: space-around;
-    align-items: center;
-  }
-
-  .mobile-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    color: var(--color-text-tertiary);
-    text-decoration: none;
-    font-size: 0.65rem;
-    font-weight: 500;
-    padding: 8px;
-    flex: 1;
-    transition: all 0.2s ease;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .mobile-nav-item.active {
-    color: var(--color-accent);
-  }
-
-  .mobile-nav-item svg {
-    width: 20px;
-    height: 20px;
-  }
-}
 
 /* --- End of Ultra-Adoption --- */
 /* ============================================
