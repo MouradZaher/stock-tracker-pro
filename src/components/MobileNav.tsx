@@ -15,7 +15,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const navItems: { id: TabType; label: string; icon: any }[] = [
         { id: 'search', label: 'Home', icon: LayoutDashboard },
         { id: 'watchlist', label: 'Watch', icon: List },
-        { id: 'portfolio', label: 'Port', icon: Briefcase },
+        { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
         { id: 'recommendations', label: 'AI', icon: Sparkles },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
@@ -40,75 +40,86 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     if (isDesktop) return null;
 
     return (
-        <nav className="mobile-nav glass-blur" role="navigation" aria-label="Main navigation" style={{
+        <nav className="mobile-nav" role="navigation" aria-label="Main navigation" style={{
             position: 'fixed',
             bottom: 0,
             left: 0,
             right: 0,
             display: 'flex',
-            justifyContent: 'space-around',
+            justifyContent: 'center',
             alignItems: 'center',
-            height: '70px', // Larger touch area
-            paddingBottom: 'env(safe-area-inset-bottom)', // safe area for iPhone
+            height: '80px', // Slightly taller to accommodate floating buttons
+            paddingBottom: 'env(safe-area-inset-bottom)',
             zIndex: 100,
-            borderTop: '1px solid var(--glass-border)',
-            background: 'rgba(10, 10, 15, 0.85)',
-            backdropFilter: 'blur(12px)',
+            background: 'transparent', // Transparent container
+            pointerEvents: 'none', // Let clicks pass through empty areas
+            paddingLeft: '1rem',
+            paddingRight: '1rem',
         }}>
-            {navItems.map((item) => {
-                const isActive = activeTab === item.id;
-                return (
-                    <button
-                        key={item.id}
-                        className={`mobile-nav-item ${isActive ? 'active' : ''}`}
-                        onClick={() => handleTabClick(item.id)}
-                        aria-label={item.label}
-                        aria-current={isActive ? 'page' : undefined}
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px',
-                            width: '100%',
-                            height: '100%',
-                            background: 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            color: isActive ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
-                            position: 'relative',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        }}
-                    >
-                        {isActive && (
-                            <div style={{
-                                position: 'absolute',
-                                top: 0,
-                                width: '40%',
-                                height: '2px',
-                                background: 'var(--color-accent)',
-                                boxShadow: '0 0 10px var(--color-accent), 0 0 20px var(--color-accent)',
-                                borderRadius: '0 0 4px 4px',
-                            }} />
-                        )}
-                        <item.icon
-                            aria-hidden="true"
-                            size={isActive ? 24 : 22}
+            <div style={{
+                display: 'flex',
+                gap: '12px',
+                pointerEvents: 'auto', // Re-enable clicks for buttons
+                padding: '0 1rem',
+                overflowX: 'auto',
+                maxWidth: '100%',
+                scrollbarWidth: 'none', // Hide scrollbar
+                msOverflowStyle: 'none',
+            }}>
+                {navItems.map((item) => {
+                    const isActive = activeTab === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => handleTabClick(item.id)}
+                            aria-label={item.label}
+                            aria-current={isActive ? 'page' : undefined}
                             style={{
-                                filter: isActive ? 'drop-shadow(0 0 8px var(--color-accent))' : 'none',
-                                transition: 'all 0.3s ease'
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px',
+                                minWidth: '70px',
+                                height: '60px',
+                                background: isActive
+                                    ? 'rgba(99, 102, 241, 0.2)' // Accent color bg when active
+                                    : 'rgba(20, 20, 30, 0.6)', // Glass bg when inactive
+                                backdropFilter: 'blur(12px)',
+                                border: isActive
+                                    ? '1px solid var(--color-accent)'
+                                    : '1px solid var(--glass-border)',
+                                borderRadius: '16px', // Rounded corners for "box" look
+                                color: isActive ? 'white' : 'var(--color-text-secondary)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: isActive
+                                    ? '0 0 15px rgba(99, 102, 241, 0.3)'
+                                    : '0 4px 6px rgba(0,0,0,0.1)',
+                                transform: isActive ? 'translateY(-2px)' : 'none',
                             }}
-                        />
-                        <span style={{
-                            fontSize: '0.7rem',
-                            fontWeight: isActive ? 600 : 400,
-                            letterSpacing: '0.02em'
-                        }}>
-                            {item.label}
-                        </span>
-                    </button>
-                );
-            })}
+                        >
+                            <item.icon
+                                aria-hidden="true"
+                                size={isActive ? 22 : 20}
+                                style={{
+                                    filter: isActive ? 'drop-shadow(0 0 8px var(--color-accent))' : 'none',
+                                    transition: 'all 0.3s ease',
+                                    marginBottom: '2px'
+                                }}
+                            />
+                            <span style={{
+                                fontSize: '0.65rem',
+                                fontWeight: isActive ? 600 : 500,
+                                letterSpacing: '0.02em',
+                                opacity: isActive ? 1 : 0.8
+                            }}>
+                                {item.label}
+                            </span>
+                        </button>
+                    );
+                })}
+            </div>
         </nav>
     );
 };

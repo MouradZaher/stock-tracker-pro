@@ -18,6 +18,7 @@ interface AuthContextType {
     signOut: () => Promise<void>;
     // Allow external contexts (like PinAuth) to set the session manually
     setManualSession: (role: 'admin' | 'user') => void;
+    setCustomUser: (customUser: { id: string; email: string; role: 'admin' | 'user'; name: string }) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,6 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         try {
+            // AUTO-APPROVE LOGIC:
+            // 1. Fetch profile
             const { data, error } = await supabase
                 .from('profiles')
                 .select('role, is_approved')
@@ -65,12 +68,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (data) {
                 setRole(data.role as 'admin' | 'user');
-                setIsApproved(data.is_approved);
+
+                // 2. If not approved in DB, approve them now
+                if (!data.is_approved) {
+                    console.log('⚡ Auto-approving user...');
+                    await supabase
+                        .from('profiles')
+                        .update({ is_approved: true })
+                        .eq('id', userId);
+                    setIsApproved(true);
+                } else {
+                    setIsApproved(data.is_approved);
+                }
             }
         } catch (error) {
             console.error('Error fetching profile:', error);
             setRole('user');
-            setIsApproved(false);
+            // Default to approved even on error to ensure access
+            setIsApproved(true);
         }
     };
 
@@ -207,13 +222,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const setManualSession = (role: 'admin' | 'user') => {
         const fakeUser = getFakeAdminUser();
-        // Customize ID based on role if needed, or keep generic
         fakeUser.id = role === 'admin' ? 'bypass-admin-id' : 'bypass-user-id';
 
         setUser(fakeUser);
         setRole(role);
         setIsApproved(true);
         setSession(getFakeSession(fakeUser));
+    };
+
+    // New bridge function for PIN Auth
+    const setCustomUser = (customUser: { id: string; email: string; role: 'admin' | 'user'; name: string }) => {
+        const userObj: User = {
+            id: customUser.id,
+            email: customUser.email,
+            app_metadata: { provider: 'pin' },
+            user_metadata: { name: customUser.name },
+            aud: 'authenticated',
+            created_at: new Date().toISOString()
+        };
+
+        const sessionObj: Session = {
+            access_token: 'pin-auth-token',
+            refresh_token: 'pin-auth-refresh-token',
+            expires_in: 3600,
+            token_type: 'bearer',
+            user: userObj
+        };
+
+        setUser(userObj);
+        setSession(sessionObj);
+        setRole(customUser.role);
+        setIsApproved(true);
+
+        // Trigger initial sync
+        syncUserData(userObj.id);
     };
 
     const signOut = async () => {
@@ -226,7 +268,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, session, role, isApproved, isLoading, signInWithEmail, signOut, setManualSession }}>
+        <AuthContext.Provider value={{ user, session, role, isApproved, isLoading, signInWithEmail, signOut, setManualSession, setCustomUser }}>
             {children}
         </AuthContext.Provider>
     );
