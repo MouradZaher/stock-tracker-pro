@@ -201,14 +201,14 @@ const PinLoginPage: React.FC = () => {
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
                                     Enter Username
                                 </label>
-                                <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '320px' }}>
+                                <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '400px' }}>
                                     <div style={{ flex: 1, position: 'relative' }}>
                                         <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
                                         <input
                                             ref={usernameRef}
                                             type="text"
                                             className="form-input"
-                                            placeholder="Enter Username"
+                                            placeholder="Your username..."
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
                                             onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
@@ -216,8 +216,8 @@ const PinLoginPage: React.FC = () => {
                                             autoFocus
                                             style={{
                                                 paddingLeft: '42px',
-                                                color: 'var(--color-text-primary)', // Theme-aware text color
-                                                caretColor: 'var(--color-text-primary)' // Cursor color
+                                                color: 'var(--color-text-primary)',
+                                                caretColor: 'var(--color-text-primary)'
                                             }}
                                         />
                                     </div>
@@ -226,14 +226,20 @@ const PinLoginPage: React.FC = () => {
                                         disabled={isLoading || !username.trim()}
                                         className="btn btn-primary"
                                         style={{
-                                            padding: '0.75rem 1.25rem',
+                                            padding: '0.75rem 1.5rem',
                                             borderRadius: '0.75rem',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '0.5rem'
+                                            gap: '0.5rem',
+                                            whiteSpace: 'nowrap'
                                         }}
                                     >
-                                        {isLoading ? '...' : <><ArrowRight size={18} /> Next</>}
+                                        {isLoading ? '...' : (
+                                            <>
+                                                Next
+                                                <ArrowRight size={18} />
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>
