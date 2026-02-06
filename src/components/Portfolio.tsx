@@ -27,6 +27,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         symbol: '',
         units: '',
         avgCost: '',
+        name: '',
+        currentPrice: 0 as number
     });
 
     const summary = getSummary();
@@ -64,7 +66,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }, [user?.id, updatePrice]);
 
     const handleAddPosition = async () => {
-        // ... existing add logic ...
         if (!formData.symbol || !formData.units || !formData.avgCost) {
             toast.error('Please fill in all fields');
             return;
@@ -72,31 +73,38 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
         setIsSubmitting(true);
         try {
-            const symbol = formData.symbol.toUpperCase();
-            const quote = await getStockQuote(symbol);
-            const dividends = await getDividends(symbol);
-
             await addPosition({
-                symbol,
-                name: quote.name,
+                symbol: formData.symbol.toUpperCase(),
+                name: formData.name || formData.symbol.toUpperCase(),
                 units: parseFloat(formData.units),
                 avgCost: parseFloat(formData.avgCost),
-                currentPrice: quote.price,
-                sector: getSectorForSymbol(symbol),
-                dividends: dividends || [],
+                currentPrice: formData.currentPrice || 0,
+                sector: getSectorForSymbol(formData.symbol.toUpperCase()),
+                dividends: [],
             }, user?.id);
 
             soundService.playSuccess();
-            toast.success(`Position added: ${symbol}`);
+            toast.success(`Position added: ${formData.symbol.toUpperCase()}`);
             setShowModal(false);
-            setFormData({ symbol: '', units: '', avgCost: '' });
+            setFormData({ symbol: '', units: '', avgCost: '', name: '', currentPrice: 0 });
         } catch (error) {
             soundService.playError();
-            console.error('Add position error:', error);
-            toast.error('Failed to add position. Please check the symbol.');
+            toast.error('Failed to add position.');
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleQuickAdd = (symbol: string, name: string, price: number) => {
+        soundService.playTap();
+        setFormData({
+            symbol,
+            units: '10', // Default units
+            avgCost: price.toString(),
+            name,
+            currentPrice: price
+        } as any);
+        setShowModal(true);
     };
 
     const handleRemove = (id: string, e: React.MouseEvent) => {
@@ -262,111 +270,72 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     {[
                         {
                             name: "Warren Buffett", firm: "Berkshire Hathaway", holdings: [
-                                { symbol: 'AAPL', name: 'Apple Inc.', portPercent: 43.5, change: 1.2 },
-                                { symbol: 'BAC', name: 'Bank of America', portPercent: 9.1, change: -0.5 },
-                                { symbol: 'AXP', name: 'American Express', portPercent: 7.2, change: 0.8 },
-                                { symbol: 'KO', name: 'Coca-Cola', portPercent: 6.8, change: 0.2 }
-                            ]
-                        },
-                        {
-                            name: "Michael Burry", firm: "Scion Asset Mgmt", holdings: [
-                                { symbol: 'JD', name: 'JD.com', portPercent: 8.2, change: 2.4 },
-                                { symbol: 'BABA', name: 'Alibaba Group', portPercent: 7.5, change: 1.8 },
-                                { symbol: 'HCA', name: 'HCA Healthcare', portPercent: 5.9, change: -0.3 }
-                            ]
-                        },
-                        {
-                            name: "Cathie Wood", firm: "ARK Invest", holdings: [
-                                { symbol: 'TSLA', name: 'Tesla Inc.', portPercent: 9.8, change: 3.2 },
-                                { symbol: 'COIN', name: 'Coinbase Global', portPercent: 8.4, change: 5.1 },
-                                { symbol: 'ROKU', name: 'Roku Inc.', portPercent: 6.2, change: -1.4 }
+                                { symbol: 'AAPL', name: 'Apple Inc.', portPercent: 43.5, change: 1.2, currentPrice: 185.92 },
+                                { symbol: 'BAC', name: 'Bank of America', portPercent: 9.1, change: -0.5, currentPrice: 34.12 },
+                                { symbol: 'AXP', name: 'American Express', portPercent: 7.2, change: 0.8, currentPrice: 212.45 }
                             ]
                         },
                         {
                             name: "Nancy Pelosi", firm: "Congress", holdings: [
-                                { symbol: 'NVDA', name: 'NVIDIA Corp', portPercent: 12.5, change: 4.8 },
-                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 10.1, change: 1.5 },
-                                { symbol: 'CRWD', name: 'CrowdStrike', portPercent: 6.5, change: -2.1 }
+                                { symbol: 'NVDA', name: 'NVIDIA Corp', portPercent: 12.5, change: 4.8, currentPrice: 726.13 },
+                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 10.1, change: 1.5, currentPrice: 410.22 },
+                                { symbol: 'PANW', name: 'Palo Alto Networks', portPercent: 4.2, change: 0.8, currentPrice: 312.45 }
                             ]
                         },
                         {
-                            name: "Ray Dalio", firm: "Bridgewater", holdings: [
-                                { symbol: 'IEMG', name: 'Emerging Markets', portPercent: 5.4, change: 0.8 },
-                                { symbol: 'GOOGL', name: 'Alphabet Inc.', portPercent: 4.2, change: 1.2 },
-                                { symbol: 'META', name: 'Meta Platforms', portPercent: 3.8, change: 2.5 }
+                            name: "Michael Burry", firm: "Scion Asset Mgmt", holdings: [
+                                { symbol: 'JD', name: 'JD.com', portPercent: 8.2, change: 2.4, currentPrice: 24.15 },
+                                { symbol: 'BABA', name: 'Alibaba Group', portPercent: 7.5, change: 1.8, currentPrice: 74.52 },
+                                { symbol: 'HCA', name: 'HCA Healthcare', portPercent: 5.9, change: -0.3, currentPrice: 305.12 }
                             ]
                         },
                         {
-                            name: "Bill Ackman", firm: "Pershing Square", holdings: [
-                                { symbol: 'CMG', name: 'Chipotle', portPercent: 18.2, change: 0.5 },
-                                { symbol: 'QSR', name: 'Restaurant Brands', portPercent: 15.4, change: 1.1 },
-                                { symbol: 'HILT', name: 'Hilton Worldwide', portPercent: 12.8, change: -0.2 }
-                            ]
-                        },
-                        {
-                            name: "George Soros", firm: "Soros Fund Mgmt", holdings: [
-                                { symbol: 'GOOGL', name: 'Alphabet Inc.', portPercent: 5.8, change: 1.2 },
-                                { symbol: 'AMZN', name: 'Amazon.com', portPercent: 4.5, change: 0.9 },
-                                { symbol: 'RIVN', name: 'Rivian', portPercent: 3.2, change: -2.5 }
-                            ]
-                        },
-                        {
-                            name: "Carl Icahn", firm: "Icahn Enterprises", holdings: [
-                                { symbol: 'IEP', name: 'Icahn Enterprises', portPercent: 85.2, change: -1.2 },
-                                { symbol: 'CVI', name: 'CVR Energy', portPercent: 8.5, change: 0.5 },
-                                { symbol: 'UAL', name: 'United Airlines', portPercent: 3.1, change: 1.8 }
-                            ]
-                        },
-                        {
-                            name: "David Tepper", firm: "Appaloosa Mgmt", holdings: [
-                                { symbol: 'AMZN', name: 'Amazon.com', portPercent: 11.5, change: 0.9 },
-                                { symbol: 'META', name: 'Meta Platforms', portPercent: 9.8, change: 2.5 },
-                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 8.5, change: 1.5 }
-                            ]
-                        },
-                        {
-                            name: "Stanley Druckenmiller", firm: "Duquesne Family", holdings: [
-                                { symbol: 'NVDA', name: 'NVIDIA Corp', portPercent: 15.2, change: 4.8 },
-                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 12.5, change: 1.5 },
-                                { symbol: 'CPNG', name: 'Coupang', portPercent: 8.8, change: -0.5 }
-                            ]
-                        },
-                        {
-                            name: "Chase Coleman", firm: "Tiger Global", holdings: [
-                                { symbol: 'META', name: 'Meta Platforms', portPercent: 18.5, change: 2.5 },
-                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 14.2, change: 1.5 },
-                                { symbol: 'JD', name: 'JD.com', portPercent: 6.5, change: 2.4 }
-                            ]
-                        },
-                        {
-                            name: "Daniel Loeb", firm: "Third Point", holdings: [
-                                { symbol: 'PFE', name: 'Pfizer Inc.', portPercent: 7.2, change: 0.3 },
-                                { symbol: 'DHR', name: 'Danaher Corp', portPercent: 6.8, change: 1.1 },
-                                { symbol: 'AMZN', name: 'Amazon.com', portPercent: 6.5, change: 0.9 }
+                            name: "Cathie Wood", firm: "ARK Invest", holdings: [
+                                { symbol: 'TSLA', name: 'Tesla Inc.', portPercent: 9.8, change: 3.2, currentPrice: 202.64 },
+                                { symbol: 'COIN', name: 'Coinbase Global', portPercent: 8.4, change: 5.1, currentPrice: 165.34 },
+                                { symbol: 'ROKU', name: 'Roku Inc.', portPercent: 6.2, change: -1.4, currentPrice: 85.12 }
                             ]
                         }
                     ].map((guru, idx) => (
-                        <div key={idx} className="glass-card" style={{ padding: '1.5rem' }}>
+                        <div key={idx} className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s ease', cursor: 'default' }}>
                             <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.75rem' }}>
-                                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{guru.name}</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>{guru.firm}</div>
+                                <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>{guru.name}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600, letterSpacing: '0.02em' }}>{guru.firm.toUpperCase()}</div>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', flex: 1 }}>
                                 {guru.holdings.map(h => (
-                                    <div key={h.symbol} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{ fontWeight: 600 }}>{h.symbol}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>{h.portPercent}%</div>
+                                    <div key={h.symbol} className="guru-holding-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <span
+                                                    style={{ fontWeight: 700, cursor: 'pointer', color: 'var(--color-accent)' }}
+                                                    onClick={() => onSelectSymbol?.(h.symbol)}
+                                                >
+                                                    {h.symbol}
+                                                </span>
+                                                <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>• {h.portPercent}%</span>
+                                            </div>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.name}</div>
                                         </div>
-                                        <div style={{ fontSize: '0.8rem', color: h.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            {h.change > 0 ? '+' : ''}{h.change}%
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontSize: '0.8rem', fontWeight: 600 }}>{formatCurrency(h.currentPrice)}</div>
+                                                <div style={{ fontSize: '0.7rem', color: h.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                                    {h.change > 0 ? '+' : ''}{h.change}%
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="btn-icon"
+                                                onClick={() => handleQuickAdd(h.symbol, h.name, h.currentPrice)}
+                                                style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', border: '1px solid var(--glass-border)' }}
+                                                title="Quick add to portfolio"
+                                            >
+                                                <Plus size={14} />
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            <button className="btn glass-button" style={{ width: '100%', marginTop: '1rem', fontSize: '0.8rem' }} onClick={() => onSelectSymbol?.(guru.holdings[0].symbol)}>
-                                View {guru.firm} Portfolio
-                            </button>
                         </div>
                     ))}
                 </div>

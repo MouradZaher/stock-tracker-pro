@@ -2,14 +2,10 @@
 .landing-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  overflow: hidden !important;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  background: radial-gradient(circle at top right, #1e1b4b 0%, #0a0a0f 40%);
 }
 
 /* Live Ticker - Minimal Height */
@@ -34,11 +30,10 @@
   align-items: center;
   justify-content: center;
   gap: 3rem;
-  padding: 1rem 3rem;
+  padding: 4rem 3rem;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-  overflow: hidden !important;
   min-height: 0;
 }
 
@@ -106,18 +101,17 @@
 /* Hero Visual - Benefits Grid (NO SCROLL) */
 .hero-visual {
   flex: 1;
-  max-width: 600px;
-  overflow: hidden !important;
+  max-width: 630px;
   display: flex;
   align-items: center;
+  padding-bottom: 2rem;
 }
 
 .benefits-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  max-height: 100%;
-  overflow: hidden;
+  gap: 1rem;
+  width: 100%;
 }
 
 .benefit-card {
@@ -147,18 +141,15 @@
 
 /* Landing Footer - Absolute Position at Bottom */
 .landing-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.5rem 2rem !important;
+  padding: 1.5rem 2rem !important;
   text-align: center;
-  font-size: 0.7rem !important;
+  font-size: 0.75rem !important;
   color: var(--color-text-tertiary);
   border-top: 1px solid var(--color-border);
-  background: rgba(10, 10, 15, 0.95);
+  background: rgba(10, 10, 15, 0.4);
   backdrop-filter: blur(10px);
-  z-index: 10;
+  width: 100%;
+  margin-top: auto;
 }
 
 /* Responsive Design */
