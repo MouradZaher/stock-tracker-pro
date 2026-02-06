@@ -56,12 +56,16 @@ const BenefitsGrid: React.FC = () => {
                             key={index}
                             className="benefit-card glass-card"
                             style={{
-                                padding: '1.25rem',
+                                padding: '1rem',
                                 borderRadius: 'var(--radius-lg)',
                                 border: '1px solid var(--glass-border)',
                                 background: benefit.gradient,
                                 transition: 'all 0.3s ease',
-                                cursor: 'default'
+                                cursor: 'default',
+                                height: 'auto',
+                                minHeight: '140px', /* Fixed minimum height to prevent size changes */
+                                display: 'flex',
+                                flexDirection: 'column'
                             }}
                         >
                             <div

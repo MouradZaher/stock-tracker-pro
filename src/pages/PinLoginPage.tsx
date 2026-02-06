@@ -194,10 +194,10 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div className="login-form" style={{ marginTop: '0.5rem' }}>
+                    <div className="login-form" style={{ marginTop: '0.5rem', minHeight: '200px' }}>
                         {/* Step 1: Username Input */}
                         {mode === 'username' && (
-                            <div style={{ marginBottom: '1rem' }}>
+                            <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
                                     Enter Username
                                 </label>
@@ -211,36 +211,15 @@ const PinLoginPage: React.FC = () => {
                                             onChange={(e) => setUsername(e.target.value)}
                                             onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                             placeholder="Your username..."
-                                            style={{
-                                                width: '100%',
-                                                padding: '14px 14px 14px 42px',
-                                                fontSize: '1rem',
-                                                fontWeight: 500,
-                                                background: 'var(--color-bg-secondary)',
-                                                border: `2px solid ${username ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                                                borderRadius: 'var(--radius-lg)',
-                                                color: 'var(--color-text-primary)',
-                                                outline: 'none',
-                                                transition: 'all 0.2s ease'
-                                            }}
+                                            className="landing-input"
+                                            style={{ paddingLeft: '42px' }}
                                         />
                                     </div>
                                     <button
                                         onClick={handleUsernameSubmit}
                                         disabled={isLoading || !username.trim()}
-                                        style={{
-                                            padding: '14px 20px',
-                                            background: 'var(--gradient-primary)',
-                                            border: 'none',
-                                            borderRadius: 'var(--radius-lg)',
-                                            color: 'white',
-                                            fontWeight: 600,
-                                            cursor: isLoading || !username.trim() ? 'not-allowed' : 'pointer',
-                                            opacity: isLoading || !username.trim() ? 0.6 : 1,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px'
-                                        }}
+                                        className="btn btn-primary"
+                                        style={{ padding: '0 20px', borderRadius: 'var(--radius-lg)' }}
                                     >
                                         {isLoading ? '...' : <ArrowRight size={18} />}
                                     </button>
@@ -250,40 +229,41 @@ const PinLoginPage: React.FC = () => {
 
                         {/* Step 2: PIN Input (Login or Signup) */}
                         {(mode === 'login' || mode === 'signup') && (
-                            <div style={{ marginBottom: '1rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                                     <button
                                         onClick={goBack}
+                                        className="glass-button"
                                         style={{
                                             background: 'rgba(255,255,255,0.05)',
                                             border: '1px solid var(--glass-border)',
                                             borderRadius: '8px',
-                                            padding: '6px 10px',
+                                            padding: '4px 10px',
                                             color: 'var(--color-text-secondary)',
                                             cursor: 'pointer',
-                                            fontSize: '0.8rem'
+                                            fontSize: '0.75rem'
                                         }}
                                     >
                                         ← Back
                                     </button>
-                                    <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+                                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                         {mode === 'signup' ? (
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <UserPlus size={16} color="var(--color-success)" />
-                                                Creating account for <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                            </span>
+                                            <>
+                                                <UserPlus size={14} color="var(--color-success)" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                                                New: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                            </>
                                         ) : (
-                                            <span>
-                                                Logging in as <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                            </span>
+                                            <>
+                                                User: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                            </>
                                         )}
                                     </span>
                                 </div>
 
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
                                     {mode === 'signup' ? 'Create a 4-Digit PIN' : 'Enter Your PIN'}
                                 </label>
-                                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-start', maxWidth: '280px' }}>
+                                <div style={{ display: 'flex', gap: '0.65rem', justifyContent: 'flex-start' }}>
                                     {pin.map((digit, index) => (
                                         <input
                                             key={index}
@@ -295,27 +275,21 @@ const PinLoginPage: React.FC = () => {
                                             onChange={(e) => handlePinChange(index, e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(index, e)}
                                             disabled={isLoading}
+                                            className="landing-input"
                                             style={{
-                                                width: '55px',
-                                                height: '60px',
-                                                fontSize: '1.75rem',
-                                                fontWeight: 700,
+                                                width: '50px',
+                                                height: '55px',
+                                                fontSize: '1.5rem',
                                                 textAlign: 'center',
-                                                background: 'var(--color-bg-secondary)',
-                                                border: `2px solid ${digit ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                                                borderRadius: 'var(--radius-lg)',
-                                                color: 'var(--color-text-primary)',
-                                                outline: 'none',
-                                                transition: 'all 0.2s ease',
-                                                opacity: isLoading ? 0.6 : 1
+                                                padding: 0
                                             }}
                                             onFocus={(e) => e.target.select()}
                                         />
                                     ))}
                                 </div>
                                 {mode === 'signup' && (
-                                    <p style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
-                                        Remember this PIN - you'll use it to log in next time.
+                                    <p style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
+                                        Create your PIN for next time.
                                     </p>
                                 )}
                             </div>
