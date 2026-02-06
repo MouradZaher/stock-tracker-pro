@@ -89,11 +89,12 @@ const getQuoteFromYahoo = async (symbol: string): Promise<Partial<Stock> | null>
     }
 };
 
-// Get stock quote with fallback to mock data
+// Get stock quote - PRIORITIZE REAL DATA
 export const getStockQuote = async (symbol: string): Promise<Stock> => {
     const quote = await getQuoteFromYahoo(symbol);
 
     if (quote && quote.price && quote.price > 0) {
+        console.log(`✅ REAL DATA loaded for ${symbol}: $${quote.price}`);
         const stock: Stock = {
             ...generateMockStock(symbol), // Keep as base for fields not in quote
             ...quote,
@@ -102,17 +103,15 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
 
         // Ensure price is valid
         if (stock.price <= 0) {
-            console.warn(`⚠️ Quote price for ${symbol} is invalid (${stock.price}), using strictly mock data.`);
-            return {
-                ...generateMockStock(symbol),
-                symbol,
-            };
+            console.error(`❌ ${symbol}: Invalid price from API (${stock.price}) - CHECK API CONNECTION`);
+            throw new Error(`Failed to get real price for ${symbol}. API returned invalid data.`);
         }
         return stock;
     }
 
-    console.warn(`⚠️ No valid quote found for ${symbol}, falling back to mock data.`);
-
+    // Instead of silently falling back, throw an error or log prominently
+    console.error(`❌ ${symbol}: Yahoo Finance API FAILED - No valid quote received`);
+    console.warn(`⚠️ Using MOCK DATA for ${symbol} as fallback`);
 
     return {
         ...generateMockStock(symbol),
