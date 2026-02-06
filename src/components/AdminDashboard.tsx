@@ -29,18 +29,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
     const [inspectingUser, setInspectingUser] = useState<{ id: string; email: string } | null>(null);
 
-    // Test API connection
+    // Test API connection silently
     const testApiConnection = async () => {
         setApiStatus('checking');
-        const toastId = toast.loading('Testing API connection...');
         try {
-            await yahooFinanceApi.get('', { params: { symbols: 'AAPL' } });
+            // Test with a simple endpoint - don't show loading toast
+            await yahooFinanceApi.get('', { params: { symbols: 'AAPL' }, timeout: 3000 });
             setApiStatus('online');
-            toast.success('System Online: API is reachable', { id: toastId });
+            // Only show success toast on manual click, not on auto-load
         } catch (error) {
-            console.error('API Test Failed:', error);
+            console.log('API health check: Yahoo Finance API currently unreachable (normal on localhost)');
             setApiStatus('offline');
-            toast.error('System Offline: API unreachable', { id: toastId });
+            // Don't show error toast - this is expected on localhost
         }
     };
 
@@ -148,10 +148,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         </span>
                         <span className="stat-label">Total AUM</span>
                     </div>
-                    <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => testApiConnection()}>
-                        <Activity size={20} className={apiStatus === 'online' ? "text-success" : apiStatus === 'offline' ? "text-error" : "text-muted"} />
-                        <span className="stat-value" style={{ fontSize: '1rem' }}>{apiStatus === 'online' ? 'Online' : apiStatus === 'offline' ? 'Offline' : 'Unknown'}</span>
-                        <span className="stat-label">System Status</span>
+                    <div className="admin-stat-card"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                            toast.promise(
+                                testApiConnection(),
+                                {
+                                    loading: 'Testing API connection...',
+                                    success: 'API is online and reachable',
+                                    error: 'API unreachable (normal on localhost)'
+                                }
+                            );
+                        }}
+                        title="Click to test API connection"
+                    >
+                        <Activity size={20} className={apiStatus === 'online' ? "text-success" : apiStatus === 'offline' ? "text-warning" : "text-muted"} />
+                        <span className="stat-value" style={{ fontSize: '1rem' }}>
+                            {apiStatus === 'online' ? 'Online' : apiStatus === 'offline' ? 'Offline' : 'Unknown'}
+                        </span>
+                        <span className="stat-label">System Status{apiStatus === 'offline' ? ' (click to retry)' : ''}</span>
                     </div>
                 </div>
 
