@@ -116,7 +116,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--header-height))', overflow: 'hidden' }}>
               {!selectedSymbol ? (
                 <>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0.5rem 1rem 0.25rem', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0.25rem 1rem 0.25rem', flexShrink: 0 }}>
                     <div style={{ width: '100%', maxWidth: '700px' }}>
                       <SearchEngine onSelectSymbol={handleSelectSymbol} />
                     </div>

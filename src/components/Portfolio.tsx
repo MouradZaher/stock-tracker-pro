@@ -168,7 +168,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 <div className="summary-card glass-card">
                     <div className="summary-label">Portfolio Health</div>
                     <div className="summary-value" style={{ color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)' }}>
-                        {!hasAllocationWarnings ? 'Diversified' : 'Concentrated'}
+                        {!hasAllocationWarnings ? 'Diversified Optimized' : 'Allocation Warning'}
                     </div>
                 </div>
             </div>
@@ -225,69 +225,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             </div>
 
             {hasAllocationWarnings && (
-                <>
-                    <div style={{
-                        padding: 'var(--spacing-md)',
-                        background: 'var(--color-warning-light)',
-                        border: '1px solid var(--color-warning)',
-                        borderRadius: 'var(--radius-md)',
-                        color: 'var(--color-warning)',
-                        marginBottom: 'var(--spacing-md)',
-                    }}>
-                        ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
-                    </div>
-
-                    {/* Preview Table of Problematic Positions */}
-                    <div className="glass-card" style={{ padding: '1rem', marginBottom: 'var(--spacing-lg)', overflow: 'auto' }}>
-                        <table className="portfolio-table" style={{ fontSize: '0.85rem' }}>
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Name</th>
-                                    <th style={{ textAlign: 'right' }}>Units</th>
-                                    <th style={{ textAlign: 'right' }}>Avg Cost</th>
-                                    <th style={{ textAlign: 'right' }}>Current Price</th>
-                                    <th style={{ textAlign: 'right' }}>Market Value</th>
-                                    <th style={{ textAlign: 'right' }}>P/L ($)</th>
-                                    <th style={{ textAlign: 'right' }}>P/L (%)</th>
-                                    <th style={{ textAlign: 'right' }}>Allocation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {positions
-                                    .filter(pos => {
-                                        const allocation = calculateAllocation(pos.marketValue, summary.totalValue);
-                                        const check = checkAllocationLimits(allocation, 'stock');
-                                        return !check.valid;
-                                    })
-                                    .map((position) => {
-                                        const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                        return (
-                                            <tr key={position.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(position.symbol)}>
-                                                <td><strong>{position.symbol}</strong></td>
-                                                <td>{position.name}</td>
-                                                <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
-                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
-                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
-                                                <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
-                                                <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
-                                                    {formatCurrency(position.profitLoss)}
-                                                </td>
-                                                <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
-                                                    {formatPercent(position.profitLossPercent)}
-                                                </td>
-                                                <td style={{ textAlign: 'right' }}>
-                                                    <span style={{ color: 'var(--color-error)', fontWeight: 600 }}>
-                                                        {allocation.toFixed(1)}%
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                            </tbody>
-                        </table>
-                    </div>
-                </>
+                <div style={{
+                    padding: 'var(--spacing-md)',
+                    background: 'var(--color-warning-light)',
+                    border: '1px solid var(--color-warning)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--color-warning)',
+                    marginBottom: 'var(--spacing-md)',
+                }}>
+                    ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
+                </div>
             )}
 
             {/* Dividend Calendar Section */}
@@ -453,8 +400,20 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="btn btn-icon btn-small" onClick={(e) => handleRemove(position.id, e)}>
+                                                <button
+                                                    className="btn btn-icon btn-small text-error"
+                                                    onClick={(e) => handleRemove(position.id, e)}
+                                                    style={{
+                                                        background: 'rgba(239, 68, 68, 0.1)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        padding: '4px 8px',
+                                                        borderRadius: '6px'
+                                                    }}
+                                                >
                                                     <Trash2 size={14} />
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
                                                 </button>
                                             </td>
                                         </tr>
@@ -497,13 +456,21 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{formatCurrency(position.profitLoss)}</div>
                                     </div>
 
-                                    <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.5rem', borderTop: '1px solid var(--glass-border)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
                                         <button
                                             className="btn btn-icon btn-small text-error"
                                             onClick={(e) => handleRemove(position.id, e)}
-                                            style={{ background: 'rgba(239, 68, 68, 0.1)' }}
+                                            style={{
+                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                padding: '6px 12px',
+                                                borderRadius: '8px'
+                                            }}
                                         >
                                             <Trash2 size={16} />
+                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete Position</span>
                                         </button>
                                     </div>
                                 </div>
