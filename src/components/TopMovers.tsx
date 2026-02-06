@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TrendingUp, TrendingDown, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 
 type TabType = 'active' | 'gainers' | 'losers';
 
@@ -41,28 +41,18 @@ const TopMovers: React.FC = () => {
         containerRef.current.appendChild(script);
     }, []);
 
-    const tabs: { id: TabType; label: string; icon: any; color: string }[] = [
-        { id: 'active', label: 'Most Active', icon: Activity, color: 'var(--color-accent)' },
-        { id: 'gainers', label: 'Top Gainers', icon: TrendingUp, color: 'var(--color-success)' },
-        { id: 'losers', label: 'Top Losers', icon: TrendingDown, color: 'var(--color-error)' },
+    const tabs: { id: TabType; label: string; color: string }[] = [
+        { id: 'active', label: 'Most Active', color: 'var(--color-accent)' },
+        { id: 'gainers', label: 'Top Gainers', color: 'var(--color-success)' },
+        { id: 'losers', label: 'Top Losers', color: 'var(--color-error)' },
     ];
 
-    const scrollTabs = (direction: 'left' | 'right') => {
-        if (scrollContainerRef.current) {
-            const scrollAmount = 120;
-            scrollContainerRef.current.scrollBy({
-                left: direction === 'left' ? -scrollAmount : scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-    };
 
     return (
         <div className="movers-container glass-card" style={{
             width: '100%',
-            height: 'calc(100vh - 180px)',
-            minHeight: '400px',
             flex: 1,
+            minHeight: '400px',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden'
@@ -91,25 +81,6 @@ const TopMovers: React.FC = () => {
                     gap: '0.5rem',
                     position: 'relative'
                 }}>
-                    {/* Scroll left button */}
-                    <button
-                        onClick={() => scrollTabs('left')}
-                        style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '28px',
-                            height: '28px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: 'var(--color-text-secondary)',
-                            flexShrink: 0
-                        }}
-                    >
-                        <ChevronLeft size={16} />
-                    </button>
 
                     {/* Tabs scroll container */}
                     <div
@@ -148,31 +119,11 @@ const TopMovers: React.FC = () => {
                                     flexShrink: 0
                                 }}
                             >
-                                <tab.icon size={14} />
                                 {tab.label}
                             </button>
                         ))}
                     </div>
 
-                    {/* Scroll right button */}
-                    <button
-                        onClick={() => scrollTabs('right')}
-                        style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '28px',
-                            height: '28px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: 'var(--color-text-secondary)',
-                            flexShrink: 0
-                        }}
-                    >
-                        <ChevronRight size={16} />
-                    </button>
                 </div>
             </div>
 

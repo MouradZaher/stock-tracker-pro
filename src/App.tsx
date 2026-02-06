@@ -109,19 +109,19 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         onClose={() => setIsAdminOpen(false)}
       />
 
-      <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: '1rem' }}>
+      <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: 'var(--header-height)' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={
-            <div className="tab-content" style={{ paddingBottom: '80px', display: 'flex', flexDirection: 'column' }}>
+            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--header-height))', overflow: 'hidden' }}>
               {!selectedSymbol ? (
                 <>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', width: '100%', textAlign: 'center', padding: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0.5rem 1rem 0.25rem', flexShrink: 0 }}>
                     <div style={{ width: '100%', maxWidth: '700px' }}>
                       <SearchEngine onSelectSymbol={handleSelectSymbol} />
                     </div>
                   </div>
-                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                     <StockHeatmap />
                   </div>
                 </>

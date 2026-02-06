@@ -204,12 +204,23 @@ export const getStockData = async (symbol: string): Promise<{ stock: Stock; prof
 export const searchSymbols = async (query: string): Promise<any[]> => {
     if (!query || query.length < 1) return [];
     const allSymbols = getAllSymbols();
-    return allSymbols
-        .filter(s =>
-            s.symbol.toLowerCase().includes(query.toLowerCase()) ||
-            s.name.toLowerCase().includes(query.toLowerCase())
-        )
-        .slice(0, 20);
+
+    // Filter matching symbols
+    const matches = allSymbols.filter(s =>
+        s.symbol.toLowerCase().includes(query.toLowerCase()) ||
+        s.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // Deduplicate by symbol using Map
+    const uniqueMap = new Map();
+    matches.forEach(item => {
+        if (!uniqueMap.has(item.symbol)) {
+            uniqueMap.set(item.symbol, item);
+        }
+    });
+
+    // Convert back to array and limit to 20 results
+    return Array.from(uniqueMap.values()).slice(0, 20);
 };
 
 // Get multiple quotes efficiently

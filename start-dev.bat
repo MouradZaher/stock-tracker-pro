@@ -7,4 +7,12 @@ SET PATH=%NODE_PATH%;%PATH%
 
 echo Starting Stock Tracker Pro with FREE Yahoo Finance data...
 echo.
-"%NODE_PATH%\node.exe" "%NODE_PATH%\node_modules\npm\bin\npm-cli.js" run dev
+
+REM Start the dev server without auto-opening
+start /B "%NODE_PATH%\node.exe" "%NODE_PATH%\node_modules\npm\bin\npm-cli.js" run dev
+
+REM Wait for server to start
+ping 127.0.0.1 -n 4 > nul
+
+REM Open only localhost in Chrome (new window, no other tabs)
+start chrome --new-window http://localhost:5180/

@@ -225,16 +225,69 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             </div>
 
             {hasAllocationWarnings && (
-                <div style={{
-                    padding: 'var(--spacing-md)',
-                    background: 'var(--color-warning-light)',
-                    border: '1px solid var(--color-warning)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'var(--color-warning)',
-                    marginBottom: 'var(--spacing-lg)',
-                }}>
-                    ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
-                </div>
+                <>
+                    <div style={{
+                        padding: 'var(--spacing-md)',
+                        background: 'var(--color-warning-light)',
+                        border: '1px solid var(--color-warning)',
+                        borderRadius: 'var(--radius-md)',
+                        color: 'var(--color-warning)',
+                        marginBottom: 'var(--spacing-md)',
+                    }}>
+                        ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
+                    </div>
+
+                    {/* Preview Table of Problematic Positions */}
+                    <div className="glass-card" style={{ padding: '1rem', marginBottom: 'var(--spacing-lg)', overflow: 'auto' }}>
+                        <table className="portfolio-table" style={{ fontSize: '0.85rem' }}>
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Name</th>
+                                    <th style={{ textAlign: 'right' }}>Units</th>
+                                    <th style={{ textAlign: 'right' }}>Avg Cost</th>
+                                    <th style={{ textAlign: 'right' }}>Current Price</th>
+                                    <th style={{ textAlign: 'right' }}>Market Value</th>
+                                    <th style={{ textAlign: 'right' }}>P/L ($)</th>
+                                    <th style={{ textAlign: 'right' }}>P/L (%)</th>
+                                    <th style={{ textAlign: 'right' }}>Allocation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {positions
+                                    .filter(pos => {
+                                        const allocation = calculateAllocation(pos.marketValue, summary.totalValue);
+                                        const check = checkAllocationLimits(allocation, 'stock');
+                                        return !check.valid;
+                                    })
+                                    .map((position) => {
+                                        const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                        return (
+                                            <tr key={position.id} style={{ cursor: 'pointer' }} onClick={() => handleRowClick(position.symbol)}>
+                                                <td><strong>{position.symbol}</strong></td>
+                                                <td>{position.name}</td>
+                                                <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
+                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
+                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
+                                                <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
+                                                <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
+                                                    {formatCurrency(position.profitLoss)}
+                                                </td>
+                                                <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
+                                                    {formatPercent(position.profitLossPercent)}
+                                                </td>
+                                                <td style={{ textAlign: 'right' }}>
+                                                    <span style={{ color: 'var(--color-error)', fontWeight: 600 }}>
+                                                        {allocation.toFixed(1)}%
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
             )}
 
             {/* Dividend Calendar Section */}

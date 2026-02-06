@@ -129,6 +129,14 @@ html[data-theme='light'] {
   box-shadow: var(--glass-shadow);
 }
 
+/* Home Tab Desktop Adjustment - Prevent Scroll */
+@media (min-width: 1025px) {
+  .home-tab-content {
+    overflow: hidden !important;
+    height: calc(100vh - var(--header-height)) !important;
+  }
+}
+
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -183,26 +191,14 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Faded cityscape background */
+
+  /* Modern Buildings Faded Look */
   background-image:
-    /* Top gradient overlay for depth */
-    radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-    /* City buildings silhouette using gradient blocks */
-    linear-gradient(to bottom,
-      transparent 60%,
-      rgba(20, 20, 35, 0.3) 60%,
-      rgba(20, 20, 35, 0.4) 65%,
-      rgba(15, 15, 25, 0.5) 70%,
-      rgba(10, 10, 20, 0.6) 80%,
-      rgba(10, 10, 15, 0.8) 100%),
-    /* Subtle grid lines for city feel */
-    repeating-linear-gradient(90deg,
-      transparent,
-      transparent 80px,
-      rgba(99, 102, 241, 0.02) 80px,
-      rgba(99, 102, 241, 0.02) 81px),
-    /* Base dark gradient */
-    linear-gradient(180deg, #0a0a12 0%, #0d0d18 50%, #08080f 100%);
+    linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.92)),
+    url('C:/Users/Mourad.Zaher/.gemini/antigravity/brain/db6397aa-13ad-41d6-a9fc-9595e7fb3dae/modern_skyscraper_faded_bg_1770374110976.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
   background-attachment: fixed;
 }
 
@@ -259,15 +255,14 @@ h6 {
   align-items: center;
   justify-content: space-between;
   padding: max(0.5rem, env(safe-area-inset-top)) var(--spacing-xl) 0.5rem;
-  height: auto;
-  min-height: var(--header-height);
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  height: var(--header-height);
+  background: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border);
-  z-index: 100;
-  position: sticky;
+  z-index: 1000;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
 }
 
 .market-top-bar {
@@ -785,10 +780,7 @@ h6 {
 }
 
 .portfolio-table thead {
-  background: var(--color-bg-tertiary);
-  position: sticky;
-  top: var(--header-height);
-  z-index: 10;
+  z-index: 20;
 }
 
 .portfolio-table th {
@@ -800,7 +792,9 @@ h6 {
   letter-spacing: 0.08em;
   color: var(--color-text-tertiary);
   border-bottom: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-bg-tertiary);
+  position: relative;
+  z-index: 10;
 }
 
 .portfolio-table td {
