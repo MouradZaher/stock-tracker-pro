@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { RefreshCw, TrendingUp, TrendingDown, Minus, X, Shield } from 'lucide-react';
+import { RefreshCw, TrendingUp, TrendingDown, Minus, X, BarChart3, Zap } from 'lucide-react';
 import { getRecommendationsForSector, getAllRecommendations } from '../services/aiRecommendationService';
 import type { StockRecommendation } from '../types';
 import { formatCurrency } from '../utils/formatters';
 import { SECTORS } from '../data/sectors';
-
+import toast from 'react-hot-toast';
 import { soundService } from '../services/soundService';
 
 interface AIRecommendationsProps {
@@ -73,21 +73,30 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 {/* Quick Actions Card */}
                 <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
-                        <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Trade Shortcuts</h3>
+                        <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Zap size={16} /> Trade Shortcuts
+                        </h3>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            {['Analyze Portfolio', 'Compare Tech', 'Top High-Yielders', 'Risk Check'].map(label => (
-                                <button key={label} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
-                                    {label}
-                                </button>
-                            ))}
+                            <button onClick={() => { soundService.playTap(); setSelectedSector('all'); toast.success('Analyzing full portfolio...'); }} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+                                Analyze Portfolio
+                            </button>
+                            <button onClick={() => { soundService.playTap(); setSelectedSector('Technology'); toast.success('Comparing Tech stocks...'); }} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+                                Compare Tech
+                            </button>
+                            <button onClick={() => { soundService.playTap(); setSelectedSector('Financial Services'); toast.success('Finding High-Yielders...'); }} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+                                Top High-Yielders
+                            </button>
+                            <button onClick={() => { soundService.playTap(); setSelectedSector('Healthcare'); toast.success('Running Risk Check...'); }} className="glass-button" style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+                                Risk Check
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 {/* Strategy Simulator - Innovation */}
-                <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Shield size={16} /> Strategy Simulator
+                <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <BarChart3 size={16} /> Strategy Simulator
                     </h3>
                     <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
                         Test AI performance against S&P 500 over the last 12 months.
@@ -283,7 +292,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                     style={{ width: '100%', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                                     onClick={() => handleTradeAction(selectedStock.symbol)}
                                 >
-                                    <Shield size={18} /> Execute {selectedStock.recommendation} Analysis
+                                    <Zap size={18} /> Execute {selectedStock.recommendation} Analysis
                                 </button>
                             </div>
 
