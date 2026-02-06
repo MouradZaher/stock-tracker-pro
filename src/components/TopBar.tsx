@@ -1,103 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
-import { getMultipleQuotes } from '../services/stockDataService';
+import React, { useEffect, useRef } from 'react';
 
-const SYMBOLS = ['^DJI', 'AAPL', 'NVDA', 'TSLA', '^GSPC', '^IXIC', 'MSFT', 'AMZN', 'GOOGL'];
-
+// TradingView Ticker Tape Widget - REAL prices directly from TradingView
 const TopBar: React.FC = () => {
-    const { data: quotes, isLoading } = useQuery({
-        queryKey: ['topBarQuotes'],
-        queryFn: async () => {
-            const data = await getMultipleQuotes(SYMBOLS);
-            return data;
-        },
-        refetchInterval: 30000,
-    });
+    const containerRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        if (!containerRef.current) return;
 
-    const formatPrice = (price: number) => {
-        return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    };
+        // Clear any existing content
+        containerRef.current.innerHTML = '';
 
-    const formatChange = (change: number) => {
-        const sign = change > 0 ? '+' : '';
-        return `${sign}${change.toFixed(2)}%`;
-    };
+        // Create the TradingView widget container
+        const widgetContainer = document.createElement('div');
+        widgetContainer.className = 'tradingview-widget-container';
+        widgetContainer.style.height = '100%';
+        widgetContainer.style.width = '100%';
 
-    const getDisplayName = (symbol: string) => {
-        switch (symbol) {
-            case '^DJI': return 'DOWJ';
-            case '^GSPC': return 'S&P 500';
-            case '^IXIC': return 'NASDAQ';
-            default: return symbol;
-        }
-    };
+        const widgetInner = document.createElement('div');
+        widgetInner.className = 'tradingview-widget-container__widget';
+        widgetContainer.appendChild(widgetInner);
 
-    if (isLoading || !quotes) return <div className="h-8 bg-black w-full"></div>;
+        // Create and configure the TradingView script
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            symbols: [
+                { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
+                { proName: "FOREXCOM:NSXUSD", title: "NASDAQ" },
+                { proName: "INDEX:DJI", title: "DOW JONES" },
+                { proName: "NASDAQ:AAPL", title: "Apple" },
+                { proName: "NASDAQ:NVDA", title: "NVIDIA" },
+                { proName: "NASDAQ:TSLA", title: "Tesla" },
+                { proName: "NASDAQ:MSFT", title: "Microsoft" },
+                { proName: "NASDAQ:GOOGL", title: "Google" },
+                { proName: "NASDAQ:AMZN", title: "Amazon" },
+                { proName: "NASDAQ:META", title: "Meta" }
+            ],
+            showSymbolLogo: false,
+            isTransparent: true,
+            displayMode: "adaptive",
+            colorTheme: "dark",
+            locale: "en"
+        });
 
-    const tickerItems = SYMBOLS.map(sym => {
-        const quote = quotes.get(sym);
-        if (!quote) return null;
-        return {
-            symbol: getDisplayName(sym),
-            price: quote.price,
-            change: quote.changePercent,
-            isUp: quote.changePercent >= 0
+        widgetContainer.appendChild(script);
+        containerRef.current.appendChild(widgetContainer);
+
+        return () => {
+            if (containerRef.current) {
+                containerRef.current.innerHTML = '';
+            }
         };
-    }).filter(Boolean);
+    }, []);
 
     return (
-        <div className="top-bar glass-effect" style={{
-            width: '100%',
-            height: '32px',
-            borderBottom: '1px solid var(--glass-border)',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 1rem',
-            fontSize: '0.75rem',
-            background: 'rgba(0,0,0,0.3)',
-            zIndex: 50,
-            overflow: 'hidden',
-            whiteSpace: 'nowrap'
-        }}>
-
-
-            <div className="scrolling-content" style={{ display: 'flex', gap: '2rem' }}>
-                {[...tickerItems, ...tickerItems, ...tickerItems].map((item: any, idx) => (
-                    <div key={`${item.symbol}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontWeight: 700, color: 'var(--color-text-secondary)' }}>{item.symbol}</span>
-                        <span style={{ fontFamily: 'monospace' }}>{formatPrice(item.price)}</span>
-                        <span style={{
-                            color: item.isUp ? 'var(--color-success)' : 'var(--color-error)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '2px'
-                        }}>
-                            {item.isUp ? '+' : ''}{item.change.toFixed(2)}%
-                        </span>
-                    </div>
-                ))}
-            </div>
-
-            <style>{`
-                .scrolling-content {
-                    animation: scroll 120s linear infinite;
-                }
-                @media (max-width: 768px) {
-                    .scrolling-content {
-                        animation-duration: 180s !important; /* Extremely slow for mobile readability */
-                    }
-                }
-                @keyframes scroll {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .top-bar:hover .scrolling-content {
-                    animation-play-state: paused;
-                }
-            `}</style>
-        </div >
+        <div
+            ref={containerRef}
+            className="tradingview-topbar"
+            style={{
+                width: '100%',
+                height: '46px',
+                overflow: 'hidden',
+                borderBottom: '1px solid var(--color-border)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                zIndex: 50
+            }}
+        />
     );
 };
 
