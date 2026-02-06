@@ -2,49 +2,10 @@ import { yahooFinanceApi, YAHOO_ENDPOINT, getCachedData, setCachedData } from '.
 import type { Stock, CompanyProfile, Dividend } from '../types';
 import { getAllSymbols } from '../data/sectors';
 
-// Enhanced mock data generator with more realistic patterns
-const generateMockStock = (symbol: string): Stock => {
-    // Use symbol as seed for consistent mock data
-    const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const random = (seed: number) => {
-        const x = Math.sin(seed++) * 10000;
-        return x - Math.floor(x);
-    };
-
-    const basePrice = 50 + random(seed) * 450;
-    const volatility = 0.02 + random(seed + 1) * 0.03;
-    const change = (random(seed + 2) - 0.5) * basePrice * volatility;
-    const changePercent = (change / basePrice) * 100;
-
-    return {
-        symbol,
-        name: symbol,
-        price: parseFloat(basePrice.toFixed(2)),
-        change: parseFloat(change.toFixed(2)),
-        changePercent: parseFloat(changePercent.toFixed(2)),
-        previousClose: parseFloat((basePrice - change).toFixed(2)),
-        open: parseFloat((basePrice + (random(seed + 3) - 0.5) * basePrice * 0.01).toFixed(2)),
-        high: parseFloat((basePrice + random(seed + 4) * basePrice * 0.02).toFixed(2)),
-        low: parseFloat((basePrice - random(seed + 5) * basePrice * 0.02).toFixed(2)),
-        volume: Math.floor(random(seed + 6) * 100000000),
-        avgVolume: Math.floor(random(seed + 7) * 80000000),
-        marketCap: Math.floor(basePrice * random(seed + 8) * 10000000000),
-        peRatio: parseFloat((15 + random(seed + 9) * 30).toFixed(2)),
-        eps: parseFloat((basePrice / (15 + random(seed + 10) * 30)).toFixed(2)),
-        dividendYield: parseFloat((random(seed + 11) * 3).toFixed(2)),
-        fiftyTwoWeekHigh: parseFloat((basePrice * (1 + random(seed + 12) * 0.2)).toFixed(2)),
-        fiftyTwoWeekLow: parseFloat((basePrice * (1 - random(seed + 13) * 0.3)).toFixed(2)),
-        totalValue: 0,
-        totalBuy: 0,
-        totalSell: 0,
-        lastUpdated: new Date(),
-    };
-};
-
-// Get real-time quote from Yahoo Finance
+// Get real-time quote from Yahoo Finance - NO MOCK DATA
 const getQuoteFromYahoo = async (symbol: string): Promise<Partial<Stock> | null> => {
     try {
-        // Check cache first
+        // Check cache first (1 second cache for instant feel)
         const cacheKey = `quote_${symbol}`;
         const cached = getCachedData(cacheKey);
         if (cached) return cached;
@@ -55,14 +16,23 @@ const getQuoteFromYahoo = async (symbol: string): Promise<Partial<Stock> | null>
         });
 
         const quotes = response.data?.quoteResponse?.result;
-        if (!quotes || quotes.length === 0) return null;
+        if (!quotes || quotes.length === 0) {
+            console.error(`❌ No data returned for ${symbol}`);
+            return null;
+        }
 
         const quote = quotes[0];
 
+        // Get the best available price (post-market > pre-market > regular)
+        const price = quote.postMarketPrice || quote.preMarketPrice || quote.regularMarketPrice || quote.ask || 0;
+        const change = quote.postMarketChange ?? quote.preMarketChange ?? quote.regularMarketChange ?? 0;
+        const changePercent = quote.postMarketChangePercent ?? quote.preMarketChangePercent ?? quote.regularMarketChangePercent ?? 0;
+
         const stockData: Partial<Stock> = {
-            price: quote.postMarketPrice || quote.preMarketPrice || quote.regularMarketPrice || quote.ask || 0,
-            change: quote.postMarketChange || quote.preMarketChange || quote.regularMarketChange || 0,
-            changePercent: quote.postMarketChangePercent || quote.preMarketChangePercent || quote.regularMarketChangePercent || 0,
+            name: quote.longName || quote.shortName || symbol,
+            price: price,
+            change: change,
+            changePercent: changePercent,
             previousClose: quote.regularMarketPreviousClose || 0,
             open: quote.regularMarketOpen || 0,
             high: quote.regularMarketDayHigh || 0,
@@ -75,58 +45,89 @@ const getQuoteFromYahoo = async (symbol: string): Promise<Partial<Stock> | null>
             dividendYield: quote.dividendYield ? quote.dividendYield * 100 : 0,
             fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
             fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
-            totalValue: (quote.regularMarketPrice || 0) * (quote.regularMarketVolume || 0),
-            totalBuy: null, // Usually not available in standard quote
+            totalValue: (price) * (quote.regularMarketVolume || 0),
+            totalBuy: null,
             totalSell: null,
             lastUpdated: new Date(),
         };
 
-        setCachedData(cacheKey, stockData);
+        // Only cache if valid price
+        if (price > 0) {
+            setCachedData(cacheKey, stockData);
+            console.log(`✅ REAL: ${symbol} = $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)`);
+        }
+
         return stockData;
     } catch (error: any) {
-        console.warn(`⚠️ Yahoo Finance quote failed for ${symbol}:`, error.message);
+        console.error(`❌ Yahoo Finance failed for ${symbol}:`, error.message);
         return null;
     }
 };
 
-// Get stock quote - PRIORITIZE REAL DATA
+// Get stock quote - REAL DATA ONLY
 export const getStockQuote = async (symbol: string): Promise<Stock> => {
     const quote = await getQuoteFromYahoo(symbol);
 
     if (quote && quote.price && quote.price > 0) {
-        console.log(`✅ REAL DATA loaded for ${symbol}: $${quote.price}`);
-        const stock: Stock = {
-            ...generateMockStock(symbol), // Keep as base for fields not in quote
-            ...quote,
+        return {
             symbol,
-        } as Stock;
-
-        // Ensure price is valid
-        if (stock.price <= 0) {
-            console.error(`❌ ${symbol}: Invalid price from API (${stock.price}) - CHECK API CONNECTION`);
-            throw new Error(`Failed to get real price for ${symbol}. API returned invalid data.`);
-        }
-        return stock;
+            name: quote.name || symbol,
+            price: quote.price,
+            change: quote.change || 0,
+            changePercent: quote.changePercent || 0,
+            previousClose: quote.previousClose || 0,
+            open: quote.open || 0,
+            high: quote.high || 0,
+            low: quote.low || 0,
+            volume: quote.volume || 0,
+            avgVolume: quote.avgVolume || 0,
+            marketCap: quote.marketCap || 0,
+            peRatio: quote.peRatio || 0,
+            eps: quote.eps || 0,
+            dividendYield: quote.dividendYield || 0,
+            fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
+            fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
+            totalValue: quote.totalValue || 0,
+            totalBuy: quote.totalBuy || 0,
+            totalSell: quote.totalSell || 0,
+            lastUpdated: new Date(),
+        };
     }
 
-    // Instead of silently falling back, throw an error or log prominently
-    console.error(`❌ ${symbol}: Yahoo Finance API FAILED - No valid quote received`);
-    console.warn(`⚠️ Using MOCK DATA for ${symbol} as fallback`);
-
+    // Return error placeholder instead of mock data
+    console.error(`❌ Unable to fetch real data for ${symbol}`);
     return {
-        ...generateMockStock(symbol),
         symbol,
+        name: `${symbol} (Unavailable)`,
+        price: 0,
+        change: 0,
+        changePercent: 0,
+        previousClose: 0,
+        open: 0,
+        high: 0,
+        low: 0,
+        volume: 0,
+        avgVolume: 0,
+        marketCap: 0,
+        peRatio: 0,
+        eps: 0,
+        dividendYield: 0,
+        fiftyTwoWeekHigh: 0,
+        fiftyTwoWeekLow: 0,
+        totalValue: 0,
+        totalBuy: 0,
+        totalSell: 0,
+        lastUpdated: new Date(),
     };
 };
 
-// Get company profile and summary from Yahoo Finance
-const getProfileAndSummaryFromYahoo = async (symbol: string): Promise<CompanyProfile | null> => {
+// Get company profile from Yahoo Finance
+const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | null> => {
     try {
-        const cacheKey = `profile_v10_${symbol}`;
+        const cacheKey = `profile_${symbol}`;
         const cached = getCachedData(cacheKey);
         if (cached) return cached;
 
-        // Fetch detailed summary
         const response = await yahooFinanceApi.get(YAHOO_ENDPOINT, {
             params: {
                 symbols: symbol,
@@ -138,7 +139,6 @@ const getProfileAndSummaryFromYahoo = async (symbol: string): Promise<CompanyPro
         if (!result) return null;
 
         const summary = result.summaryProfile || result.assetProfile || {};
-        const financialData = result.financialData || {};
         const stats = result.defaultKeyStatistics || {};
         const calendar = result.calendarEvents || {};
 
@@ -165,7 +165,7 @@ const getProfileAndSummaryFromYahoo = async (symbol: string): Promise<CompanyPro
             name: summary.longName || symbol,
             description: summary.longBusinessSummary || `${symbol} is a publicly traded company.`,
             ceo: summary.companyOfficers?.[0]?.name || null,
-            founded: null, // Founding year is often missing in direct response, but we can try to extract from description or use placeholder
+            founded: null,
             sector: summary.sector || 'Unknown',
             industry: summary.industry || 'Unknown',
             logo: null,
@@ -173,44 +173,40 @@ const getProfileAndSummaryFromYahoo = async (symbol: string): Promise<CompanyPro
             dividends: dividends,
         };
 
-        setCachedData(cacheKey, profile);
+        setCachedData(cacheKey, profile, 300000); // 5 min cache for profiles
         return profile;
     } catch (error) {
-        console.warn(`Yahoo Finance profile failed for ${symbol}:`, error);
+        console.warn(`Profile fetch failed for ${symbol}:`, error);
         return null;
     }
 };
 
-// Get comprehensive stock data
+// Get stock data with profile
 export const getStockData = async (symbol: string): Promise<{ stock: Stock; profile: CompanyProfile | null }> => {
-    // Fetch both quote and profile/summary
-    const [stockQuote, profileData] = await Promise.all([
-        getQuoteFromYahoo(symbol),
-        getProfileAndSummaryFromYahoo(symbol)
+    const [stock, profile] = await Promise.all([
+        getStockQuote(symbol),
+        getProfileFromYahoo(symbol)
     ]);
 
-    const stock: Stock = {
-        ...generateMockStock(symbol),
-        ...(stockQuote || {}),
-        name: profileData?.name || symbol,
-        symbol,
-    } as Stock;
+    // Apply name from profile if available
+    if (profile?.name && stock.name === symbol) {
+        stock.name = profile.name;
+    }
 
-    return { stock, profile: profileData };
+    return { stock, profile };
 };
 
-// Search for symbols in static data
+// Search symbols from local data
 export const searchSymbols = async (query: string): Promise<any[]> => {
     if (!query || query.length < 1) return [];
     const allSymbols = getAllSymbols();
 
-    // Filter matching symbols
     const matches = allSymbols.filter(s =>
         s.symbol.toLowerCase().includes(query.toLowerCase()) ||
         s.name.toLowerCase().includes(query.toLowerCase())
     );
 
-    // Deduplicate by symbol using Map
+    // Deduplicate
     const uniqueMap = new Map();
     matches.forEach(item => {
         if (!uniqueMap.has(item.symbol)) {
@@ -218,15 +214,19 @@ export const searchSymbols = async (query: string): Promise<any[]> => {
         }
     });
 
-    // Convert back to array and limit to 20 results
     return Array.from(uniqueMap.values()).slice(0, 20);
 };
 
-// Get multiple quotes efficiently
+// Get multiple quotes efficiently - REAL DATA ONLY
 export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, Stock>> => {
     const stockMap = new Map<string, Stock>();
+
+    if (symbols.length === 0) return stockMap;
+
     try {
         const symbolsString = symbols.join(',');
+        console.log(`📊 Batch fetching: ${symbols.length} symbols...`);
+
         const response = await yahooFinanceApi.get(YAHOO_ENDPOINT, {
             params: { symbols: symbolsString },
         });
@@ -235,13 +235,14 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 
         for (const quote of quotes) {
             const sym = quote.symbol;
+            const price = quote.postMarketPrice || quote.preMarketPrice || quote.regularMarketPrice || 0;
+
             const stock: Stock = {
-                ...generateMockStock(sym),
                 symbol: sym,
                 name: quote.longName || quote.shortName || sym,
-                price: quote.postMarketPrice || quote.preMarketPrice || quote.regularMarketPrice || quote.ask || 0,
-                change: quote.postMarketChange || quote.preMarketChange || quote.regularMarketChange || 0,
-                changePercent: quote.postMarketChangePercent || quote.preMarketChangePercent || quote.regularMarketChangePercent || 0,
+                price: price,
+                change: quote.postMarketChange ?? quote.regularMarketChange ?? 0,
+                changePercent: quote.postMarketChangePercent ?? quote.regularMarketChangePercent ?? 0,
                 previousClose: quote.regularMarketPreviousClose || 0,
                 open: quote.regularMarketOpen || 0,
                 high: quote.regularMarketDayHigh || 0,
@@ -254,21 +255,45 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
                 dividendYield: quote.dividendYield ? quote.dividendYield * 100 : 0,
                 fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
                 fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
-                totalValue: (quote.regularMarketPrice || 0) * (quote.regularMarketVolume || 0),
+                totalValue: price * (quote.regularMarketVolume || 0),
                 totalBuy: null,
                 totalSell: null,
                 lastUpdated: new Date(),
             };
             stockMap.set(sym, stock);
         }
+
+        console.log(`✅ REAL DATA: Loaded ${stockMap.size}/${symbols.length} symbols`);
     } catch (error: any) {
-        console.warn(`⚠️ Yahoo Finance multi-quote failed:`, error.message);
+        console.error(`❌ Batch quote failed:`, error.message);
     }
 
-    // Fill in missing
+    // Mark missing symbols as unavailable (no mock data)
     for (const sym of symbols) {
         if (!stockMap.has(sym)) {
-            stockMap.set(sym, generateMockStock(sym));
+            stockMap.set(sym, {
+                symbol: sym,
+                name: `${sym} (Unavailable)`,
+                price: 0,
+                change: 0,
+                changePercent: 0,
+                previousClose: 0,
+                open: 0,
+                high: 0,
+                low: 0,
+                volume: 0,
+                avgVolume: 0,
+                marketCap: 0,
+                peRatio: 0,
+                eps: 0,
+                dividendYield: 0,
+                fiftyTwoWeekHigh: 0,
+                fiftyTwoWeekLow: 0,
+                totalValue: 0,
+                totalBuy: 0,
+                totalSell: 0,
+                lastUpdated: new Date(),
+            });
         }
     }
 

@@ -11,7 +11,7 @@ export const YAHOO_ENDPOINT = 'quote';
 
 // Simple in-memory cache
 const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 5000; // 5 seconds to ensure data freshness for "live" mode
+const CACHE_DURATION = 2000; // 2 seconds - near instant updates
 
 export const getCachedData = (key: string) => {
     const cached = cache.get(key);
