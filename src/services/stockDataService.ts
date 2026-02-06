@@ -173,7 +173,7 @@ const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | nul
             dividends: dividends,
         };
 
-        setCachedData(cacheKey, profile, 300000); // 5 min cache for profiles
+        setCachedData(cacheKey, profile); // Profile cache managed by global CACHE_DURATION
         return profile;
     } catch (error) {
         console.warn(`Profile fetch failed for ${symbol}:`, error);
