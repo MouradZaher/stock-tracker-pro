@@ -1,0 +1,374 @@
+/* =========================================
+   iOS MOBILE RESPONSIVE FIXES
+   iPhone 13 Pro (390x844) Optimized
+   ========================================= */
+
+/* iOS Safe Area Support */
+:root {
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+    --mobile-nav-height: 80px;
+}
+
+/* =========================================
+   iOS SCROLLING FIX
+   ========================================= */
+@supports (-webkit-touch-callout: none) {
+
+    /* iOS-specific scroll behavior */
+    .app {
+        height: 100vh;
+        height: -webkit-fill-available;
+        overflow: hidden;
+    }
+
+    /* Enable smooth scrolling on scrollable containers */
+    .tab-content:not(.home-tab-content),
+    .portfolio-container,
+    .watchlist-page,
+    .market-pulse-page,
+    .ai-recommendations {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        scroll-behavior: smooth;
+    }
+
+    /* Prevent rubber-banding on non-scrollable elements */
+    .home-tab-content {
+        touch-action: none;
+        overscroll-behavior: none;
+    }
+}
+
+/* =========================================
+   MOBILE LAYOUT (max-width: 768px)
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* Root scrolling control */
+    html,
+    body {
+        height: 100%;
+        height: -webkit-fill-available;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        touch-action: manipulation;
+    }
+
+    #root {
+        height: 100%;
+        height: -webkit-fill-available;
+        overflow: hidden;
+    }
+
+    .app {
+        height: 100vh;
+        height: -webkit-fill-available;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Header adjustments for mobile */
+    .header {
+        height: calc(60px + var(--safe-area-top));
+        padding-top: calc(0.5rem + var(--safe-area-top));
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+    }
+
+    /* Main content area */
+    .main-content {
+        flex: 1;
+        padding-top: calc(60px + var(--safe-area-top));
+        padding-bottom: var(--mobile-nav-height);
+        padding-left: var(--safe-area-left);
+        padding-right: var(--safe-area-right);
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Tab content with proper scrolling */
+    .tab-content {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        padding-bottom: calc(20px + var(--safe-area-bottom));
+    }
+
+    /* Home tab - NO scroll (heatmap fills screen) */
+    .home-tab-content {
+        overflow: hidden !important;
+        overscroll-behavior: none;
+        touch-action: pan-x pinch-zoom;
+    }
+
+    /* Other tabs - enable vertical scroll */
+    .tab-content:not(.home-tab-content) {
+        overflow-y: auto !important;
+        overscroll-behavior-y: contain;
+    }
+}
+
+/* =========================================
+   iPhone 13 Pro SPECIFIC (390x844)
+   ========================================= */
+@media (max-width: 390px) and (max-height: 844px) {
+    :root {
+        --spacing-md: 0.875rem;
+        --spacing-lg: 1.25rem;
+    }
+
+    .header {
+        height: calc(56px + var(--safe-area-top));
+    }
+
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .header-tab {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* =========================================
+   MOBILE NAV iOS FIXES
+   ========================================= */
+@media (max-width: 768px) {
+    .mobile-nav-container {
+        position: fixed;
+        bottom: 0 !important;
+        left: 0;
+        right: 0;
+        transform: none;
+        width: 100%;
+        padding-bottom: var(--safe-area-bottom);
+        z-index: 1001;
+        background: rgba(10, 10, 20, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-nav-pill {
+        width: 100%;
+        border-radius: 0;
+        padding: 8px 0;
+        justify-content: space-around;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .mobile-nav-btn {
+        min-width: auto;
+        flex: 1;
+        padding: 6px 4px;
+    }
+
+    .nav-icon-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* =========================================
+   SCROLLABLE PAGES (non-home tabs)
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* Portfolio page scrolling */
+    .portfolio-container {
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: var(--spacing-md);
+        padding-bottom: calc(100px + var(--safe-area-bottom));
+    }
+
+    /* Watchlist page scrolling */
+    .watchlist-page,
+    .watchlist-content {
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(100px + var(--safe-area-bottom));
+    }
+
+    /* AI Recommendations scrolling */
+    .ai-recommendations,
+    .search-section {
+        min-height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(100px + var(--safe-area-bottom));
+    }
+
+    /* Market Pulse scrolling */
+    .market-pulse-page {
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(100px + var(--safe-area-bottom));
+    }
+}
+
+/* =========================================
+   HEATMAP iOS OPTIMIZATION
+   ========================================= */
+@media (max-width: 768px) {
+
+    .stock-heatmap,
+    .heatmap-container {
+        height: calc(100vh - 180px - var(--safe-area-top) - var(--safe-area-bottom));
+        min-height: 400px;
+        overflow: hidden;
+    }
+
+    /* Allow pinch-zoom on heatmap */
+    .tradingview-widget-container {
+        touch-action: pan-x pan-y pinch-zoom;
+    }
+}
+
+/* =========================================
+   FORM INPUTS iOS FIXES
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* Prevent iOS zoom on input focus */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    .search-input {
+        font-size: 16px !important;
+        min-height: 48px;
+    }
+
+    /* Fix iOS tap highlight */
+    button,
+    a,
+    .mobile-nav-btn,
+    .header-tab {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Active states for touch feedback */
+    button:active,
+    .mobile-nav-btn:active,
+    .header-tab:active,
+    .glass-card:active {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+}
+
+/* =========================================
+   DROPDOWN / MODAL iOS FIXES
+   ========================================= */
+@media (max-width: 768px) {
+    .search-dropdown {
+        max-height: 50vh;
+        max-height: 50dvh;
+        border-radius: 16px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal {
+        max-height: 85vh;
+        max-height: 85dvh;
+        margin-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
+    }
+}
+
+/* =========================================
+   TYPOGRAPHY MOBILE SCALING
+   ========================================= */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1.125rem;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
+
+    .stock-symbol {
+        font-size: 1.125rem;
+    }
+
+    .stock-price {
+        font-size: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+    }
+}
+
+/* =========================================
+   LANDSCAPE MODE iOS
+   ========================================= */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header {
+        height: calc(48px + var(--safe-area-top));
+    }
+
+    .mobile-nav-container {
+        height: calc(50px + var(--safe-area-bottom));
+    }
+
+    .nav-label {
+        display: none;
+    }
+
+    .mobile-nav-btn {
+        padding: 4px;
+    }
+}
+
+/* =========================================
+   PULL-TO-REFRESH PREVENTION
+   ========================================= */
+@media (max-width: 768px) {
+    body {
+        overscroll-behavior-y: none;
+    }
+
+    .tab-content:not(.home-tab-content) {
+        overscroll-behavior-y: contain;
+    }
+}
+
+/* =========================================
+   iOS KEYBOARD ADJUSTMENTS
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* When keyboard is open, adjust viewport */
+    .keyboard-open .mobile-nav-container {
+        display: none;
+    }
+
+    .keyboard-open .main-content {
+        padding-bottom: 0;
+    }
+}

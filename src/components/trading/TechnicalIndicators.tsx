@@ -48,31 +48,31 @@ const TechnicalIndicators: React.FC<TechnicalIndicatorsProps> = ({ indicators })
                 </h4>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {/* RSI */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                    <span style={{ opacity: 0.7 }}>RSI (14)</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{indicators.rsi}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem' }}>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>RSI (14)</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 600 }}>{indicators.rsi}</span>
                         <span style={{
-                            fontSize: '0.65rem',
+                            fontSize: '0.7rem',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: indicators.rsiClamped > 70 ? 'rgba(239, 68, 68, 0.1)' : indicators.rsiClamped < 30 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.05)',
                             color: getRsiColor(indicators.rsiStatus),
-                            opacity: 0.8
+                            fontWeight: 600
                         }}>
-                            {indicators.rsiStatus === 'NEUTRAL' ? 'Neutral' : indicators.rsiStatus.toLowerCase()}
+                            {indicators.rsiStatus}
                         </span>
                     </div>
                 </div>
 
                 {/* MACD */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                    <span style={{ opacity: 0.7 }}>MACD</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        {indicators.macd === 'BULLISH' ? <TrendingUp size={12} style={{ color: 'var(--color-success)' }} /> :
-                            indicators.macd === 'BEARISH' ? <TrendingDown size={12} style={{ color: 'var(--color-error)' }} /> :
-                                <Minus size={12} style={{ color: 'var(--color-warning)' }} />}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem' }}>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>MACD Trend</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{
-                            fontWeight: 500,
+                            fontWeight: 600,
                             color: getMacdColor(indicators.macd)
                         }}>
                             {indicators.macd}
@@ -81,13 +81,14 @@ const TechnicalIndicators: React.FC<TechnicalIndicatorsProps> = ({ indicators })
                 </div>
 
                 {/* MA 50 */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                    <span style={{ opacity: 0.7 }}>MA 50</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>${indicators.ma50.toFixed(2)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem' }}>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>50-Day MA</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 600 }}>${indicators.ma50.toFixed(2)}</span>
                         <span style={{
-                            fontSize: '0.65rem',
-                            color: indicators.priceVsMa50 === 'ABOVE' ? 'var(--color-success)' : 'var(--color-error)'
+                            fontSize: '0.7rem',
+                            color: indicators.priceVsMa50 === 'ABOVE' ? 'var(--color-success)' : 'var(--color-error)',
+                            fontWeight: 600
                         }}>
                             {indicators.priceVsMa50}
                         </span>
@@ -95,13 +96,14 @@ const TechnicalIndicators: React.FC<TechnicalIndicatorsProps> = ({ indicators })
                 </div>
 
                 {/* MA 200 */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                    <span style={{ opacity: 0.7 }}>MA 200</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>${indicators.ma200.toFixed(2)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem' }}>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>200-Day MA</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 600 }}>${indicators.ma200.toFixed(2)}</span>
                         <span style={{
-                            fontSize: '0.65rem',
-                            color: indicators.priceVsMa200 === 'ABOVE' ? 'var(--color-success)' : 'var(--color-error)'
+                            fontSize: '0.7rem',
+                            color: indicators.priceVsMa200 === 'ABOVE' ? 'var(--color-success)' : 'var(--color-error)',
+                            fontWeight: 600
                         }}>
                             {indicators.priceVsMa200}
                         </span>

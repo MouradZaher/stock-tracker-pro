@@ -18,9 +18,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const { theme, toggleTheme } = useTheme();
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: HomeIcon, isCustomIcon: true },
+        { id: 'recommendations', label: 'AI', icon: BrainIconV2, isCustomIcon: true },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
-        { id: 'recommendations', label: 'AI', icon: BrainIconV2, isCustomIcon: true },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 

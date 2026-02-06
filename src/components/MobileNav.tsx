@@ -14,9 +14,9 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
 
     const navItems: { id: TabType; label: string; icon: React.ElementType }[] = [
         { id: 'search', label: 'Home', icon: LayoutDashboard },
+        { id: 'recommendations', label: 'AI', icon: Sparkles },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
-        { id: 'recommendations', label: 'AI', icon: Sparkles },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 
@@ -68,27 +68,29 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
             <style>{`
                 .mobile-nav-container {
                     position: fixed;
-                    bottom: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 1000;
-                    padding-bottom: env(safe-area-inset-bottom);
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    width: 100%;
+                    z-index: 1001;
+                    padding-bottom: env(safe-area-inset-bottom, 0px);
+                    background: rgba(10, 10, 20, 0.95);
+                    backdrop-filter: blur(24px);
+                    -webkit-backdrop-filter: blur(24px);
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
                 }
 
                 .mobile-nav-pill {
                     display: flex;
                     align-items: center;
-                    gap: 6px;
-                    padding: 8px 12px;
-                    background: rgba(20, 20, 35, 0.85);
-                    backdrop-filter: blur(24px);
-                    -webkit-backdrop-filter: blur(24px);
-                    border-radius: 40px;
-                    border: 1px solid rgba(255, 255, 255, 0.12);
-                    box-shadow: 
-                        0 8px 32px rgba(0, 0, 0, 0.4),
-                        0 0 0 1px rgba(255, 255, 255, 0.05),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                    justify-content: space-around;
+                    padding: 8px 0;
+                    width: 100%;
+                    background: transparent;
+                    border: none;
+                    border-radius: 0;
+                    box-shadow: none;
                 }
 
                 .mobile-nav-btn {

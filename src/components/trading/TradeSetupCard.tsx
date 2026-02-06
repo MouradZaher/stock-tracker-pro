@@ -7,155 +7,72 @@ interface TradeSetupCardProps {
 }
 
 const TradeSetupCard: React.FC<TradeSetupCardProps> = ({ setup }) => {
-    const getBiasColor = (bias: string) => {
-        switch (bias) {
-            case 'BULLISH': return 'var(--color-success)';
-            case 'BEARISH': return 'var(--color-error)';
-            default: return 'var(--color-warning)';
-        }
-    };
-
-    const getBiasBg = (bias: string) => {
-        switch (bias) {
-            case 'BULLISH': return 'rgba(16, 185, 129, 0.15)';
-            case 'BEARISH': return 'rgba(239, 68, 68, 0.15)';
-            default: return 'rgba(245, 158, 11, 0.15)';
-        }
-    };
-
     return (
         <div className="trade-setup-card glass-effect" style={{
             borderRadius: 'var(--radius-lg)',
             padding: '1.25rem',
             border: '1px solid var(--glass-border)',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            background: 'rgba(15, 15, 25, 0.4)'
         }}>
-            {/* Header */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                marginBottom: '1rem',
-                paddingBottom: '1rem',
-                borderBottom: '1px solid var(--color-border)'
-            }}>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>
-                            {setup.symbol}
-                        </h3>
-                        <span style={{
-                            fontSize: '0.7rem',
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '4px',
-                            background: getBiasBg(setup.bias),
-                            color: getBiasColor(setup.bias),
-                            fontWeight: 600
-                        }}>
-                            {setup.bias}
-                        </span>
-                    </div>
-                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', opacity: 0.7 }}>
-                        {setup.name} • {setup.sector}
-                    </p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'monospace' }}>
-                        ${setup.currentPrice.toFixed(2)}
-                    </div>
-                    <div style={{
-                        color: setup.dayChange >= 0 ? 'var(--color-success)' : 'var(--color-error)',
-                        fontSize: '0.875rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        gap: '0.25rem'
-                    }}>
-                        {setup.dayChange >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                        {setup.dayChange >= 0 ? '+' : ''}{setup.dayChangePercent.toFixed(2)}%
-                    </div>
-                </div>
+            <h3 style={{ margin: '0 0 1rem 0', fontSize: '0.875rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Detailed Trade Analysis
+            </h3>
+
+            <div className="table-container" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+                <table className="analysis-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                    <thead>
+                        <tr style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
+                            <th style={{ textAlign: 'left', padding: '10px 12px', color: 'var(--color-text-tertiary)', borderBottom: '1px solid var(--glass-border)' }}>Parameter</th>
+                            <th style={{ textAlign: 'left', padding: '10px 12px', color: 'var(--color-text-tertiary)', borderBottom: '1px solid var(--glass-border)' }}>Value</th>
+                            <th style={{ textAlign: 'left', padding: '10px 12px', color: 'var(--color-text-tertiary)', borderBottom: '1px solid var(--glass-border)' }}>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Bias</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: setup.bias === 'BULLISH' ? 'var(--color-success)' : setup.bias === 'BEARISH' ? 'var(--color-error)' : 'var(--color-warning)', fontWeight: 700 }}>{setup.bias}</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Primary sentiment for session</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Planned Entry</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontWeight: 600 }}>${setup.entry.toFixed(2)}</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Wait for 5m consolidation</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Stop Loss</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-error)', fontWeight: 600 }}>${setup.stopLoss.toFixed(2)}</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Hard stop - manual exit if violated</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Primary Target</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-success)', fontWeight: 600 }}>${setup.target1.toFixed(2)}</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Scaling out 50% here</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Runner Target</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-accent)', fontWeight: 600 }}>${setup.target2.toFixed(2)}</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Trailing stop for extra juice</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Share Count</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontWeight: 600 }}>{setup.shares.toLocaleString()}</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Based on 1% account risk</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', color: 'var(--color-text-secondary)' }}>Risk Amount</td>
+                            <td style={{ padding: '10px 12px', color: 'var(--color-error)', fontWeight: 600 }}>${setup.riskAmount.toLocaleString()}</td>
+                            <td style={{ padding: '10px 12px', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Reward Ratio: {setup.riskRewardRatio}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            {/* Trade Parameters Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '0.75rem'
-            }}>
-                {/* Entry */}
-                <div className="param-box" style={{
-                    background: 'rgba(6, 182, 212, 0.1)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    borderLeft: '3px solid var(--color-accent)'
-                }}>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Entry</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace' }}>${setup.entry.toFixed(2)}</div>
-                </div>
-
-                {/* Stop Loss */}
-                <div className="param-box" style={{
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    borderLeft: '3px solid var(--color-error)'
-                }}>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Stop Loss</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace' }}>${setup.stopLoss.toFixed(2)}</div>
-                </div>
-
-                {/* Target 1 */}
-                <div className="param-box" style={{
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    borderLeft: '3px solid var(--color-success)'
-                }}>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Target 1</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace' }}>${setup.target1.toFixed(2)}</div>
-                </div>
-
-                {/* Target 2 */}
-                <div className="param-box" style={{
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    borderLeft: '3px solid var(--color-success)'
-                }}>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.6, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Target 2</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace' }}>${setup.target2.toFixed(2)}</div>
-                </div>
-            </div>
-
-            {/* Bottom Stats */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginTop: '1rem',
-                paddingTop: '1rem',
-                borderTop: '1px solid var(--color-border)',
-                fontSize: '0.8rem'
-            }}>
-                <div>
-                    <span style={{ opacity: 0.6 }}>Shares: </span>
-                    <span style={{ fontWeight: 600 }}>{setup.shares.toLocaleString()}</span>
-                </div>
-                <div>
-                    <span style={{ opacity: 0.6 }}>Risk: </span>
-                    <span style={{ fontWeight: 600, color: 'var(--color-error)' }}>${setup.riskAmount.toLocaleString()}</span>
-                </div>
-                <div>
-                    <span style={{ opacity: 0.6 }}>R:R: </span>
-                    <span style={{ fontWeight: 600, color: 'var(--color-success)' }}>{setup.riskRewardRatio}</span>
-                </div>
-                {setup.volumeConfirm && (
-                    <div style={{ color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        <Target size={12} />
-                        Vol ✓
-                    </div>
-                )}
-            </div>
+            <style>{`
+                .analysis-table tr:hover {
+                    background: rgba(255, 255, 255, 0.02);
+                }
+            `}</style>
         </div>
     );
 };

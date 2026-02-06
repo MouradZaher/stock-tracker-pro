@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BrainIconV2: React.FC<{ size?: number; className?: string }> = ({ size = 24, className = "" }) => (
+const BrainIconReal: React.FC<{ size?: number; className?: string }> = ({ size = 24, className = "" }) => (
     <svg
         width={size}
         height={size}
@@ -12,9 +12,10 @@ const BrainIconV2: React.FC<{ size?: number; className?: string }> = ({ size = 2
         strokeLinejoin="round"
         className={className}
     >
-        <path d="M9.5 2a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5zM14.5 2a.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5zM12 5C8.13 5 5 7.69 5 11c0 2.21 1.41 4.09 3.4 5.16l-.4 1.84c-.06.28.16.5.43.5h7.14c.27 0 .49-.22.43-.5l-.4-1.84C17.59 15.09 19 13.21 19 11c0-3.31-3.13-6-7-6z"></path>
-        <path d="M9 11h6M12 8v6"></path>
+        <path d="M9.5 2C7.5 2 6 3.5 6 5.5c0 1.5.5 2.5 1.5 3s1 1.5 1 2.5c0 1.5-1 2.5-2.5 2.5S3.5 12 3.5 10.5M14.5 2c2 0 3.5 1.5 3.5 3.5 0 1.5-.5 2.5-1.5 3s-1 1.5-1 2.5c0 1.5 1 2.5 2.5 2.5S20.5 12 20.5 10.5" />
+        <path d="M12 22v-4m-3 4h6m-3-11c-2.5 0-4.5 2-4.5 4.5S6.5 20 9 20h6c2.5 0 4.5-2 4.5-4.5S17.5 11 15 11h-3z" />
+        <path d="M9 11c0-4 1.5-6 3-6s3 2 3 6M10 14h4" />
     </svg>
 );
 
-export default BrainIconV2;
+export default BrainIconReal;

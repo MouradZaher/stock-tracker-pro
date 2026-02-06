@@ -174,26 +174,6 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                     <Star size={24} fill="currentColor" className="text-warning" />
                     My Watchlist
                 </h2>
-
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            className={`glass-button ${activeCategory === cat ? 'active' : ''}`}
-                            onClick={() => setActiveCategory(cat)}
-                            style={{
-                                padding: '6px 16px',
-                                borderRadius: 'var(--radius-full)',
-                                fontSize: '0.875rem',
-                                border: activeCategory === cat ? '1px solid var(--color-accent)' : '1px solid var(--glass-border)',
-                                background: activeCategory === cat ? 'var(--color-accent-light)' : 'rgba(255,255,255,0.05)',
-                                color: activeCategory === cat ? 'var(--color-accent)' : 'var(--color-text-secondary)'
-                            }}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
             </div>
 
             {loading && Object.keys(stockData).length === 0 ? (

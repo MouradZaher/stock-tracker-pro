@@ -32,43 +32,42 @@ const PreTradeChecklist: React.FC<PreTradeChecklistProps> = ({ items, onItemTogg
     return (
         <div className="pre-trade-checklist glass-effect" style={{
             borderRadius: 'var(--radius-lg)',
-            padding: '1rem',
+            padding: '1.25rem',
             border: '1px solid var(--glass-border)',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            background: 'rgba(15, 15, 25, 0.4)'
         }}>
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '0.75rem'
+                marginBottom: '1rem'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <ClipboardCheck size={16} style={{ color: 'var(--color-accent)' }} />
-                    <h4 style={{
-                        margin: 0,
-                        fontSize: '0.9rem',
-                        color: 'var(--color-accent)',
-                        fontWeight: 600,
-                        textTransform: 'uppercase'
-                    }}>
-                        Pre-Trade Checklist
-                    </h4>
-                </div>
+                <h4 style={{
+                    margin: 0,
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text-secondary)',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                }}>
+                    Execution Checklist
+                </h4>
                 <span style={{
                     fontSize: '0.75rem',
-                    padding: '0.25rem 0.5rem',
+                    padding: '2px 8px',
                     borderRadius: '4px',
                     background: allChecked ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
                     color: allChecked ? 'var(--color-success)' : 'var(--color-warning)',
-                    fontWeight: 600
+                    fontWeight: 700
                 }}>
                     {checkedCount}/{checklistItems.length}
                 </span>
             </div>
 
             <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
+                display: 'flex',
+                flexDirection: 'column',
                 gap: '0.5rem'
             }}>
                 {checklistItems.map(item => (
@@ -78,23 +77,28 @@ const PreTradeChecklist: React.FC<PreTradeChecklistProps> = ({ items, onItemTogg
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.5rem',
-                            borderRadius: 'var(--radius-sm)',
-                            background: item.checked ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
+                            gap: '0.75rem',
+                            padding: '10px 12px',
+                            borderRadius: 'var(--radius-md)',
+                            background: item.checked ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                            border: `1px solid ${item.checked ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)'}`,
                             cursor: item.autoCheck ? 'default' : 'pointer',
-                            transition: 'background 0.2s ease',
-                            fontSize: '0.75rem'
+                            transition: 'all 0.2s ease',
+                            fontSize: '0.875rem'
                         }}
                     >
                         {item.checked ? (
-                            <CheckSquare size={16} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
+                            <div style={{ color: 'var(--color-success)', display: 'flex', alignItems: 'center' }}>
+                                <CheckSquare size={18} fill="rgba(16, 185, 129, 0.1)" />
+                            </div>
                         ) : (
-                            <Square size={16} style={{ opacity: 0.5, flexShrink: 0 }} />
+                            <div style={{ color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center' }}>
+                                <Square size={18} />
+                            </div>
                         )}
                         <span style={{
-                            opacity: item.checked ? 1 : 0.7,
-                            textDecoration: item.checked ? 'none' : 'none'
+                            color: item.checked ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                            fontWeight: item.checked ? 600 : 400
                         }}>
                             {item.label}
                         </span>
@@ -104,15 +108,17 @@ const PreTradeChecklist: React.FC<PreTradeChecklistProps> = ({ items, onItemTogg
 
             {allChecked && (
                 <div style={{
-                    marginTop: '0.75rem',
-                    paddingTop: '0.75rem',
-                    borderTop: '1px solid var(--color-border)',
+                    marginTop: '1rem',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(16, 185, 129, 0.1)',
+                    border: '1px solid rgba(16, 185, 129, 0.2)',
                     textAlign: 'center',
                     color: 'var(--color-success)',
-                    fontSize: '0.8rem',
-                    fontWeight: 600
+                    fontSize: '0.875rem',
+                    fontWeight: 700
                 }}>
-                    ✓ Ready to Execute Trade
+                    ✓ ANALYSIS CONFIRMED - READY
                 </div>
             )}
         </div>

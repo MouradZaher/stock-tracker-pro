@@ -39,6 +39,7 @@ export interface VolumeData {
 
 export interface TechnicalIndicators {
     rsi: number;
+    rsiClamped: number;
     rsiStatus: 'OVERBOUGHT' | 'NEUTRAL' | 'OVERSOLD';
     macd: 'BULLISH' | 'NEUTRAL' | 'BEARISH';
     macdNote: string;

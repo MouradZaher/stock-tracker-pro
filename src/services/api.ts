@@ -8,6 +8,7 @@ export const REFRESH_INTERVALS = {
 };
 
 export const YAHOO_ENDPOINT = 'quote';
+export const MULTI_QUOTE_ENDPOINT = 'multi-quote';
 
 // Simple in-memory cache
 const cache = new Map<string, { data: any; timestamp: number }>();
@@ -29,11 +30,19 @@ export const setCachedData = (key: string, data: any) => {
     cache.set(key, { data, timestamp: Date.now() });
 };
 
-// Create Axios instance pointing to local proxy or direct if CORS allowed (it won't be for Yahoo, so this expects a proxy or is the proxy wrapper)
-// Wait, the user had a CORS issue before. 
-// For now, I will point to '/api' which Vercel rewrites to yahoo, or use the previous configuration if I can recall it.
-// Assuming relative path for Vercel proxy.
+// API base URL - uses Vercel proxy in production, direct in dev
+const API_BASE_URL = import.meta.env.VITE_API_URL ||
+    (window.location.hostname === 'localhost' ? 'https://stock-tracker-pro.vercel.app/api' : '/api');
+
+// Create Axios instance for Yahoo Finance API calls
 export const yahooFinanceApi = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api', // Default to Vercel function path
+    baseURL: API_BASE_URL,
     timeout: 10000,
 });
+
+// Create Axios instance for multi-source API calls
+export const multiSourceApi = axios.create({
+    baseURL: API_BASE_URL,
+    timeout: 15000,
+});
+

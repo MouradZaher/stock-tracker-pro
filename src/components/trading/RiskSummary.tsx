@@ -19,104 +19,48 @@ const RiskSummary: React.FC<RiskSummaryProps> = ({ risk }) => {
     return (
         <div className="risk-summary glass-effect" style={{
             borderRadius: 'var(--radius-lg)',
-            padding: '1rem',
+            padding: '1.25rem',
             border: '1px solid var(--glass-border)',
-            marginBottom: '1rem'
+            background: 'rgba(15, 15, 25, 0.4)'
         }}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginBottom: '0.75rem'
+            <h4 style={{
+                margin: '0 0 1rem 0',
+                fontSize: '0.875rem',
+                color: 'var(--color-text-secondary)',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
             }}>
-                <Shield size={16} style={{ color: 'var(--color-accent)' }} />
-                <h4 style={{
-                    margin: 0,
-                    fontSize: '0.9rem',
-                    color: 'var(--color-accent)',
-                    fontWeight: 600,
-                    textTransform: 'uppercase'
-                }}>
-                    Risk Summary
-                </h4>
-            </div>
+                Risk Management
+            </h4>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '0.75rem'
-            }}>
-                {/* Position Value */}
-                <div style={{
-                    background: 'rgba(6, 182, 212, 0.08)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7, fontSize: '0.7rem' }}>
-                        <DollarSign size={12} />
-                        Position Value
-                    </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace' }}>
-                        {formatCurrency(risk.positionValue)}
-                    </div>
-                </div>
-
-                {/* Risk Amount */}
-                <div style={{
-                    background: 'rgba(239, 68, 68, 0.08)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7, fontSize: '0.7rem' }}>
-                        <AlertTriangle size={12} />
-                        Risk ({risk.accountRiskPercent}%)
-                    </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace', color: 'var(--color-error)' }}>
-                        {formatCurrency(risk.riskAmount)}
-                    </div>
-                </div>
-
-                {/* Reward Potential */}
-                <div style={{
-                    background: 'rgba(16, 185, 129, 0.08)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7, fontSize: '0.7rem' }}>
-                        <Target size={12} />
-                        Reward Potential
-                    </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace', color: 'var(--color-success)' }}>
-                        {formatCurrency(risk.rewardPotential)}
-                    </div>
-                </div>
-
-                {/* Max Daily Loss */}
-                <div style={{
-                    background: 'rgba(245, 158, 11, 0.08)',
-                    padding: '0.75rem',
-                    borderRadius: 'var(--radius-md)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7, fontSize: '0.7rem' }}>
-                        <Shield size={12} />
-                        Max Daily Loss (3%)
-                    </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, fontFamily: 'monospace', color: 'var(--color-warning)' }}>
-                        {formatCurrency(risk.maxDailyLoss)}
-                    </div>
-                </div>
+            <div className="table-container" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+                <table className="analysis-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                    <thead>
+                        <tr style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
+                            <th style={{ textAlign: 'left', padding: '10px 12px', color: 'var(--color-text-tertiary)', borderBottom: '1px solid var(--glass-border)' }}>Metric</th>
+                            <th style={{ textAlign: 'left', padding: '10px 12px', color: 'var(--color-text-tertiary)', borderBottom: '1px solid var(--glass-border)' }}>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Position Value</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', fontWeight: 600 }}>{formatCurrency(risk.positionValue)}</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Account Risk</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-error)', fontWeight: 600 }}>{risk.accountRiskPercent}% (${risk.riskAmount})</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)' }}>Max Daily Loss</td>
+                            <td style={{ padding: '10px 12px', borderBottom: '1px solid var(--glass-border)', color: 'var(--color-warning)', fontWeight: 600 }}>{formatCurrency(risk.maxDailyLoss)} (3%)</td>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '10px 12px', color: 'var(--color-text-secondary)' }}>Reward Potential</td>
+                            <td style={{ padding: '10px 12px', color: 'var(--color-success)', fontWeight: 700 }}>{formatCurrency(risk.rewardPotential)}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     );

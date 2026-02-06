@@ -7,6 +7,7 @@ import { formatCurrency } from '../utils/formatters';
 import { SECTORS } from '../data/sectors';
 import toast from 'react-hot-toast';
 import { soundService } from '../services/soundService';
+import SearchEngine from './SearchEngine';
 
 interface AIRecommendationsProps {
     onSelectStock?: (symbol: string) => void;
@@ -52,7 +53,12 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     };
 
     return (
-        <div className="portfolio-container">
+        <div className="portfolio-container" style={{ paddingTop: '0' }}>
+            {/* AI Search Engine at the absolute top */}
+            <div style={{ marginBottom: '1.5rem' }}>
+                <SearchEngine onSelectSymbol={onSelectStock || (() => { })} />
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
                 {/* Success Rate Card */}
                 <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
