@@ -225,9 +225,15 @@ const PinLoginPage: React.FC = () => {
                                         onClick={handleUsernameSubmit}
                                         disabled={isLoading || !username.trim()}
                                         className="btn btn-primary"
-                                        style={{ padding: '0 20px', borderRadius: 'var(--radius-lg)' }}
+                                        style={{
+                                            padding: '0.75rem 1.25rem',
+                                            borderRadius: '0.75rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}
                                     >
-                                        {isLoading ? '...' : <ArrowRight size={18} />}
+                                        {isLoading ? '...' : <><ArrowRight size={18} /> Next</>}
                                     </button>
                                 </div>
                             </div>
