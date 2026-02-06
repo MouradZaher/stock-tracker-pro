@@ -3,7 +3,6 @@ import { Plus, Trash2, X } from 'lucide-react';
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote } from '../services/stockDataService';
-import { getDividends } from '../services/dividendService';
 import { formatCurrency, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
 import { checkAllocationLimits, calculateAllocation } from '../utils/calculations';
 import { getSectorForSymbol } from '../data/sectors';
@@ -173,7 +172,143 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 </div>
             </div>
 
-            {/* ... allocations ... */}
+            {/* Portfolio Content - Main Table and Cards */}
+            <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    📊 My Positions
+                </h3>
+                {positions.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: 'var(--spacing-2xl)', color: 'var(--color-text-secondary)' }}>
+                        <p>No positions yet. Add your first position to start tracking your portfolio.</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* Desktop Table */}
+                        <div className="table-container glass-card desktop-only" style={{ padding: '0.5rem', marginBottom: '1.5rem' }}>
+                            <table className="portfolio-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th style={{ textAlign: 'right' }}>Units</th>
+                                        <th style={{ textAlign: 'right' }}>Avg Cost</th>
+                                        <th style={{ textAlign: 'right' }}>Current Price</th>
+                                        <th style={{ textAlign: 'right' }}>Market Value</th>
+                                        <th style={{ textAlign: 'right' }}>P/L ($)</th>
+                                        <th style={{ textAlign: 'right' }}>P/L (%)</th>
+                                        <th style={{ textAlign: 'right' }}>Allocation</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {positions.map((position) => {
+                                        const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                        const allocationCheck = checkAllocationLimits(allocation, 'stock');
+
+                                        return (
+                                            <tr key={position.id} onClick={() => handleRowClick(position.symbol)} style={{ cursor: 'pointer' }}>
+                                                <td><strong>{position.symbol}</strong></td>
+                                                <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {position.name}
+                                                </td>
+                                                <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
+                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
+                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
+                                                <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
+                                                <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
+                                                    {formatCurrency(position.profitLoss)}
+                                                </td>
+                                                <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
+                                                    {formatPercent(position.profitLossPercent)}
+                                                </td>
+                                                <td style={{ textAlign: 'right' }}>
+                                                    <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
+                                                        {allocation.toFixed(1)}%
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-icon btn-small text-error"
+                                                        onClick={(e) => handleRemove(position.id, e)}
+                                                        style={{
+                                                            background: 'rgba(239, 68, 68, 0.1)',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '4px',
+                                                            padding: '4px 8px',
+                                                            borderRadius: '6px'
+                                                        }}
+                                                    >
+                                                        <Trash2 size={14} />
+                                                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                            {positions.map((position) => {
+                                const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                return (
+                                    <div key={position.id} className="glass-card" style={{ padding: '1rem' }} onClick={() => handleRowClick(position.symbol)}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                            <div>
+                                                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{position.symbol}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontWeight: 600 }}>{formatCurrency(position.currentPrice)}</div>
+                                                <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                                    {formatPercent(position.profitLossPercent)}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                                            <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
+                                            <div style={{ textAlign: 'right' }}>{position.units}</div>
+
+                                            <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
+                                            <div style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</div>
+
+                                            <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
+                                            <div style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(position.marketValue)}</div>
+
+                                            <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
+                                            <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{formatCurrency(position.profitLoss)}</div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
+                                            <button
+                                                className="btn btn-icon btn-small text-error"
+                                                onClick={(e) => handleRemove(position.id, e)}
+                                                style={{
+                                                    background: 'rgba(239, 68, 68, 0.1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    padding: '6px 12px',
+                                                    borderRadius: '8px'
+                                                }}
+                                            >
+                                                <Trash2 size={16} />
+                                                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete Position</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </>
+                )}
+            </div>
+
+            {/* Allocation & Risk Intelligence (Moved down to emphasize main portfolio) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
                 {/* Sector Allocation View */}
                 <div className="glass-card" style={{ padding: '1.5rem' }}>
@@ -235,249 +370,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 }}>
                     ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
                 </div>
-            )}
-
-            {/* Dividend Calendar Section */}
-            <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    📅 Upcoming Dividends
-                </h3>
-                {positions.length === 0 ? (
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>Add positions to see your dividend schedule.</p>
-                ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                        {positions.slice(0, 4).map(pos => (
-                            <div key={pos.symbol} className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)' }} onClick={() => handleRowClick(pos.symbol)}>
-                                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-text-primary)' }}>{pos.symbol}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>Ex-Date: March 12, 2026</div>
-                                <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '0.875rem', color: 'var(--color-success)', fontWeight: 600 }}>+$42.50</span>
-                                    <span style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: '4px', color: 'var(--color-success)' }}>3.2% Yield</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Famous Portfolios Section */}
-            <div className="section" style={{ marginBottom: '2rem' }}>
-                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
-                    Famous Portfolio Holdings
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
-                    {[
-                        {
-                            name: "Warren Buffett", firm: "Berkshire Hathaway", holdings: [
-                                { symbol: 'AAPL', name: 'Apple Inc.', portPercent: 43.5, change: 1.2, currentPrice: 185.92 },
-                                { symbol: 'BAC', name: 'Bank of America', portPercent: 9.1, change: -0.5, currentPrice: 34.12 },
-                                { symbol: 'AXP', name: 'American Express', portPercent: 7.2, change: 0.8, currentPrice: 212.45 }
-                            ]
-                        },
-                        {
-                            name: "Nancy Pelosi", firm: "Congress", holdings: [
-                                { symbol: 'NVDA', name: 'NVIDIA Corp', portPercent: 12.5, change: 4.8, currentPrice: 726.13 },
-                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 10.1, change: 1.5, currentPrice: 410.22 },
-                                { symbol: 'PANW', name: 'Palo Alto Networks', portPercent: 4.2, change: 0.8, currentPrice: 312.45 }
-                            ]
-                        },
-                        {
-                            name: "Michael Burry", firm: "Scion Asset Mgmt", holdings: [
-                                { symbol: 'JD', name: 'JD.com', portPercent: 8.2, change: 2.4, currentPrice: 24.15 },
-                                { symbol: 'BABA', name: 'Alibaba Group', portPercent: 7.5, change: 1.8, currentPrice: 74.52 },
-                                { symbol: 'HCA', name: 'HCA Healthcare', portPercent: 5.9, change: -0.3, currentPrice: 305.12 }
-                            ]
-                        },
-                        {
-                            name: "Cathie Wood", firm: "ARK Invest", holdings: [
-                                { symbol: 'TSLA', name: 'Tesla Inc.', portPercent: 9.8, change: 3.2, currentPrice: 202.64 },
-                                { symbol: 'COIN', name: 'Coinbase Global', portPercent: 8.4, change: 5.1, currentPrice: 165.34 },
-                                { symbol: 'ROKU', name: 'Roku Inc.', portPercent: 6.2, change: -1.4, currentPrice: 85.12 }
-                            ]
-                        }
-                    ].map((guru, idx) => (
-                        <div key={idx} className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s ease', cursor: 'default' }}>
-                            <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.75rem' }}>
-                                <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>{guru.name}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600, letterSpacing: '0.02em' }}>{guru.firm.toUpperCase()}</div>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', flex: 1 }}>
-                                {guru.holdings.map(h => (
-                                    <div key={h.symbol} className="guru-holding-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <span
-                                                    style={{ fontWeight: 700, cursor: 'pointer', color: 'var(--color-accent)' }}
-                                                    onClick={() => onSelectSymbol?.(h.symbol)}
-                                                >
-                                                    {h.symbol}
-                                                </span>
-                                                <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>• {h.portPercent}%</span>
-                                            </div>
-                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.name}</div>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: '0.8rem', fontWeight: 600 }}>{formatCurrency(h.currentPrice)}</div>
-                                                <div style={{ fontSize: '0.7rem', color: h.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                    {h.change > 0 ? '+' : ''}{h.change}%
-                                                </div>
-                                            </div>
-                                            <button
-                                                className="btn-icon"
-                                                onClick={() => handleQuickAdd(h.symbol, h.name, h.currentPrice)}
-                                                style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', border: '1px solid var(--glass-border)' }}
-                                                title="Quick add to portfolio"
-                                            >
-                                                <Plus size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Portfolio Content */}
-            {positions.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: 'var(--spacing-2xl)', color: 'var(--color-text-secondary)' }}>
-                    <p>No positions yet. Add your first position to start tracking your portfolio.</p>
-                </div>
-            ) : (
-                <>
-                    {/* Desktop Table */}
-                    <div className="table-container glass-card desktop-only" style={{ padding: '0.5rem' }}>
-                        <table className="portfolio-table">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Name</th>
-                                    <th style={{ textAlign: 'right' }}>Units</th>
-                                    <th style={{ textAlign: 'right' }}>Avg Cost</th>
-                                    <th style={{ textAlign: 'right' }}>Current Price</th>
-                                    <th style={{ textAlign: 'right' }}>Market Value</th>
-                                    <th style={{ textAlign: 'right' }}>P/L ($)</th>
-                                    <th style={{ textAlign: 'right' }}>P/L (%)</th>
-                                    <th style={{ textAlign: 'right' }}>Allocation</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {positions.map((position) => {
-                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                    const allocationCheck = checkAllocationLimits(allocation, 'stock');
-                                    const upcomingDividend = position.dividends?.find(d => d.type === 'upcoming');
-
-                                    return (
-                                        <tr key={position.id} onClick={() => handleRowClick(position.symbol)} style={{ cursor: 'pointer' }}>
-                                            <td>
-                                                <strong>{position.symbol}</strong>
-                                                {upcomingDividend && (
-                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', marginTop: '0.25rem' }}>
-                                                        💰 Div: {formatCurrency(upcomingDividend.amount)} on {formatDate(new Date(upcomingDividend.paymentDate))}
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                {position.name}
-                                            </td>
-                                            <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
-                                            <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
-                                            <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
-                                            <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
-                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
-                                                {formatCurrency(position.profitLoss)}
-                                            </td>
-                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
-                                                {formatPercent(position.profitLossPercent)}
-                                            </td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
-                                                    {allocation.toFixed(1)}%
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-icon btn-small text-error"
-                                                    onClick={(e) => handleRemove(position.id, e)}
-                                                    style={{
-                                                        background: 'rgba(239, 68, 68, 0.1)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                        padding: '4px 8px',
-                                                        borderRadius: '6px'
-                                                    }}
-                                                >
-                                                    <Trash2 size={14} />
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Mobile Card View */}
-                    <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {positions.map((position) => {
-                            const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                            return (
-                                <div key={position.id} className="glass-card" style={{ padding: '1rem' }} onClick={() => handleRowClick(position.symbol)}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <div>
-                                            <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{position.symbol}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <div style={{ fontWeight: 600 }}>{formatCurrency(position.currentPrice)}</div>
-                                            <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                {formatPercent(position.profitLossPercent)}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
-                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
-                                        <div style={{ textAlign: 'right' }}>{position.units}</div>
-
-                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
-                                        <div style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</div>
-
-                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
-                                        <div style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(position.marketValue)}</div>
-
-                                        <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
-                                        <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{formatCurrency(position.profitLoss)}</div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
-                                        <button
-                                            className="btn btn-icon btn-small text-error"
-                                            onClick={(e) => handleRemove(position.id, e)}
-                                            style={{
-                                                background: 'rgba(239, 68, 68, 0.1)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '6px',
-                                                padding: '6px 12px',
-                                                borderRadius: '8px'
-                                            }}
-                                        >
-                                            <Trash2 size={16} />
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete Position</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </>
             )}
 
             {/* Add Position Modal */}
