@@ -194,7 +194,7 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div className="login-form" style={{ marginTop: '1rem' }}>
+                    <div className="login-form" style={{ marginTop: '0.5rem' }}>
                         {/* Step 1: Username Input */}
                         {mode === 'username' && (
                             <div style={{ marginBottom: '1rem' }}>
