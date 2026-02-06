@@ -1,0 +1,72 @@
+/* =========================================
+   CONTENT PROTECTION STYLES
+   Prevent text selection and image saving
+   ========================================= */
+
+/* Disable text selection globally */
+body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Allow selection in form inputs */
+input,
+textarea,
+[contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Disable image dragging and saving */
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+}
+
+/* Re-enable pointer events for interactive images */
+img.interactive,
+button img,
+a img {
+    pointer-events: auto;
+}
+
+/* Disable print styles */
+@media print {
+    body {
+        display: none !important;
+    }
+
+    html::after {
+        content: "Printing is disabled for security reasons.";
+        display: block;
+        text-align: center;
+        padding: 50px;
+        font-size: 24px;
+    }
+}
+
+/* Hide content when dev tools detected */
+.dev-tools-detected body {
+    visibility: hidden;
+}
+
+.dev-tools-detected::after {
+    content: "Developer tools are not allowed.";
+    visibility: visible;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #ff4444;
+    z-index: 99999;
+}
