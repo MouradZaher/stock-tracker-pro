@@ -192,14 +192,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Modern Buildings Faded Look */
-  background-image:
-    linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.92)),
-    url('/modern-buildings-bg.png');
-  background-size: cover;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Clean Modern Gradient Background */
+  background: linear-gradient(135deg, #0a0a0f 0%, #13141b 50%, #1a1b24 100%);
 }
 
 /* Typography */
