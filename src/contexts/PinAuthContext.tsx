@@ -24,25 +24,12 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [user, setUser] = useState<User | null>(null);
     const { setCustomUser, signOut } = useAuth();
 
-    // Load user from localStorage on mount
+    // Don't auto-login from localStorage - always show login page
+    // This ensures consistent behavior where users see username entry first
     useEffect(() => {
-        const savedUser = localStorage.getItem('pin_auth_user');
-        if (savedUser) {
-            try {
-                const parsed = JSON.parse(savedUser);
-                setUser(parsed);
-                // Sync with main AuthContext
-                setCustomUser({
-                    id: parsed.id,
-                    email: parsed.email || `${parsed.username}@stocktracker.local`,
-                    role: parsed.role,
-                    name: parsed.username
-                });
-            } catch {
-                localStorage.removeItem('pin_auth_user');
-            }
-        }
-    }, [setCustomUser]);
+        // Clear any stale sessions on mount to force fresh login
+        localStorage.removeItem('pin_auth_user');
+    }, []);
 
     // Check if username exists in Supabase
     const checkUser = async (username: string): Promise<{ exists: boolean; user?: User }> => {
