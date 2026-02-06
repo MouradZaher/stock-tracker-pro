@@ -44,7 +44,7 @@ const LiveTicker: React.FC = () => {
 
     return (
         <div className="ticker-wrapper" style={{ overflow: 'hidden', whiteSpace: 'nowrap', width: '100%', background: 'rgba(0,0,0,0.2)', padding: '6px 0', borderBottom: '1px solid var(--color-border)' }}>
-            <div className="ticker-content" style={{ display: 'inline-block', animation: `ticker ${Math.max(30, displayData.length * 3)}s linear infinite` }}>
+            <div className="ticker-content" style={{ display: 'inline-block', animation: `ticker ${Math.max(60, displayData.length * 6)}s linear infinite` }}>
                 {displayData.map((item: any, index: number) => (
                     <div key={`${item.symbol}-${index}`} className="ticker-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', margin: '0 2rem' }}>
                         <span className="ticker-symbol" style={{ fontWeight: 700, color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>{item.symbol}</span>

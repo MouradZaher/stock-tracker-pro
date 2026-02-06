@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 interface User {
     id: string;
     pin: string;
     role: 'admin' | 'user';
     name: string;
+    email: string;
 }
 
 interface PinAuthContextType {
@@ -22,30 +24,35 @@ const PIN_USERS: Record<string, User> = {
         id: 'admin-1',
         pin: '1927',
         role: 'admin',
-        name: 'Admin User'
+        name: 'Admin User',
+        email: 'admin@stocktracker.pro'
     },
     '7777': {
         id: 'user-1',
         pin: '7777',
         role: 'user',
-        name: 'User 1'
+        name: 'User 1',
+        email: 'user1@example.com'
     },
     '7778': {
         id: 'user-2',
         pin: '7778',
         role: 'user',
-        name: 'User 2'
+        name: 'User 2',
+        email: 'user2@example.com'
     },
     '7779': {
         id: 'user-3',
         pin: '7779',
         role: 'user',
-        name: 'User 3'
+        name: 'User 3',
+        email: 'user3@example.com'
     }
 };
 
 export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
+    const { setCustomUser, signOut } = useAuth();
 
     // Load user from localStorage on mount
     useEffect(() => {
@@ -56,6 +63,13 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 // Verify the PIN still exists in our mapping
                 if (PIN_USERS[parsed.pin]) {
                     setUser(parsed);
+                    // Sync with main AuthContext
+                    setCustomUser({
+                        id: parsed.id,
+                        email: parsed.email,
+                        role: parsed.role,
+                        name: parsed.name
+                    });
                 } else {
                     localStorage.removeItem('pin_auth_user');
                 }
@@ -63,7 +77,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 localStorage.removeItem('pin_auth_user');
             }
         }
-    }, []);
+    }, [setCustomUser]);
 
     const login = (pin: string): { success: boolean; error?: string } => {
         const user = PIN_USERS[pin];
@@ -74,12 +88,22 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
         setUser(user);
         localStorage.setItem('pin_auth_user', JSON.stringify(user));
+
+        // Sync with main AuthContext
+        setCustomUser({
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            name: user.name
+        });
+
         return { success: true };
     };
 
     const logout = () => {
         setUser(null);
         localStorage.removeItem('pin_auth_user');
+        signOut();
     };
 
     return (

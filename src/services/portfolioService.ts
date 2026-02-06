@@ -44,15 +44,6 @@ export async function fetchUserPortfolios(userId: string): Promise<PortfolioPosi
  */
 export async function savePosition(userId: string, position: PortfolioPosition): Promise<boolean> {
     try {
-        // Check if position exists
-        const { data: existing } = await supabase
-            .from('portfolios')
-            .select('id')
-            .eq('user_id', userId)
-            .eq('symbol', position.symbol)
-            .eq('created_at', position.id.split('-')[1] || new Date().toISOString())
-            .single();
-
         const portfolioData = {
             user_id: userId,
             symbol: position.symbol,
@@ -62,23 +53,21 @@ export async function savePosition(userId: string, position: PortfolioPosition):
             current_price: position.currentPrice,
             sector: position.sector,
             dividends: position.dividends || [],
+            updated_at: new Date().toISOString()
         };
 
-        if (existing) {
-            // Update existing position
-            const { error } = await supabase
-                .from('portfolios')
-                .update(portfolioData)
-                .eq('id', existing.id);
+        // Use Supabase upsert with symbolic conflict resolution
+        // Based on the UNIQUE(user_id, symbol) constraint in supabase-migration.sql
+        const { error } = await supabase
+            .from('portfolios')
+            .upsert(portfolioData, {
+                onConflict: 'user_id,symbol',
+                ignoreDuplicates: false
+            });
 
-            if (error) throw error;
-        } else {
-            // Insert new position
-            const { error } = await supabase
-                .from('portfolios')
-                .insert(portfolioData);
-
-            if (error) throw error;
+        if (error) {
+            console.error('Supabase upsert error:', error);
+            throw error;
         }
 
         return true;
@@ -93,8 +82,8 @@ export async function savePosition(userId: string, position: PortfolioPosition):
  */
 export async function deletePosition(userId: string, positionId: string): Promise<boolean> {
     try {
-        // Extract symbol and timestamp from position ID (format: SYMBOL-TIMESTAMP)
-        const [symbol, timestamp] = positionId.split('-');
+        // Extract symbol from position ID (format: SYMBOL-TIMESTAMP)
+        const [symbol] = positionId.split('-');
 
         const { error } = await supabase
             .from('portfolios')
@@ -102,7 +91,10 @@ export async function deletePosition(userId: string, positionId: string): Promis
             .eq('user_id', userId)
             .eq('symbol', symbol);
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase delete error:', error);
+            throw error;
+        }
         return true;
     } catch (error) {
         console.error('Failed to delete position:', error);
@@ -134,20 +126,14 @@ export async function updatePriceForSymbol(userId: string, symbol: string, price
  */
 export async function syncLocalToSupabase(userId: string, localPositions: PortfolioPosition[]): Promise<void> {
     try {
-        // Fetch existing positions from Supabase
-        const existingPositions = await fetchUserPortfolios(userId);
-        const existingSymbols = new Set(existingPositions.map(p => p.symbol));
-
-        // Only sync positions that don't exist in Supabase
-        const positionsToSync = localPositions.filter(p => !existingSymbols.has(p.symbol));
-
-        if (positionsToSync.length === 0) {
-            console.log('No new positions to sync');
+        if (localPositions.length === 0) {
+            console.log('No local positions to sync');
             return;
         }
 
-        // Batch insert new positions
-        const portfolioData = positionsToSync.map(position => ({
+        // Use upsert to handle both new and existing positions gracefully
+        // This prevents 409 conflicts when positions already exist
+        const portfolioData = localPositions.map(position => ({
             user_id: userId,
             symbol: position.symbol,
             name: position.name,
@@ -156,18 +142,26 @@ export async function syncLocalToSupabase(userId: string, localPositions: Portfo
             current_price: position.currentPrice,
             sector: position.sector,
             dividends: position.dividends || [],
+            updated_at: new Date().toISOString(),
         }));
 
         const { error } = await supabase
             .from('portfolios')
-            .insert(portfolioData);
+            .upsert(portfolioData, {
+                onConflict: 'user_id,symbol',
+                ignoreDuplicates: true  // Skip duplicates instead of throwing error
+            });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase sync error:', error);
+            // Don't throw - just log and continue
+            return;
+        }
 
-        console.log(`✅ Synced ${positionsToSync.length} positions to Supabase`);
+        console.log(`✅ Synced ${localPositions.length} positions to Supabase`);
     } catch (error) {
         console.error('Failed to sync local positions to Supabase:', error);
-        throw error;
+        // Don't throw - let the app continue working
     }
 }
 

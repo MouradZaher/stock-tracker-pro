@@ -209,6 +209,13 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
             syncWithSupabase: async (userId: string) => {
                 if (!userId || userId.startsWith('bypass-')) return;
+
+                // Guard against multiple simultaneous syncs
+                if (get().isSyncing) {
+                    console.log('🔒 Portfolio sync already in progress, skipping...');
+                    return;
+                }
+
                 set({ isSyncing: true, error: null });
                 try {
                     const localPositions = get().positions;

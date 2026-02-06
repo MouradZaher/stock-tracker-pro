@@ -1,7 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, List, Briefcase, Activity, Sparkles } from 'lucide-react';
+import { LayoutDashboard, List, Briefcase, Activity } from 'lucide-react';
 import { soundService } from '../services/soundService';
 import { useHaptics } from '../hooks/useHaptics';
+import BrainIcon from './icons/BrainIcon';
 import type { TabType } from '../types';
 
 interface MobileNavProps {
@@ -12,11 +13,11 @@ interface MobileNavProps {
 const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const { triggerLight } = useHaptics();
 
-    const navItems: { id: TabType; label: string; icon: any }[] = [
+    const navItems: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: LayoutDashboard },
         { id: 'watchlist', label: 'Watch', icon: List },
-        { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
-        { id: 'recommendations', label: 'AI', icon: Sparkles },
+        { id: 'portfolio', label: 'Port', icon: Briefcase },
+        { id: 'recommendations', label: 'AI', icon: BrainIcon, isCustomIcon: true },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 
@@ -40,86 +41,97 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     if (isDesktop) return null;
 
     return (
-        <nav className="mobile-nav" role="navigation" aria-label="Main navigation" style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '80px', // Slightly taller to accommodate floating buttons
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            zIndex: 100,
-            background: 'transparent', // Transparent container
-            pointerEvents: 'none', // Let clicks pass through empty areas
-            paddingLeft: '1rem',
-            paddingRight: '1rem',
-        }}>
-            <div style={{
-                display: 'flex',
-                gap: '12px',
-                pointerEvents: 'auto', // Re-enable clicks for buttons
-                padding: '0 1rem',
-                overflowX: 'auto',
-                maxWidth: '100%',
-                scrollbarWidth: 'none', // Hide scrollbar
-                msOverflowStyle: 'none',
-            }}>
-                {navItems.map((item) => {
-                    const isActive = activeTab === item.id;
-                    return (
-                        <button
-                            key={item.id}
-                            className={`mobile-nav-item ${isActive ? 'active' : ''}`}
-                            onClick={() => handleTabClick(item.id)}
-                            aria-label={item.label}
-                            aria-current={isActive ? 'page' : undefined}
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '4px',
-                                minWidth: '70px',
-                                height: '60px',
-                                background: isActive
-                                    ? 'rgba(99, 102, 241, 0.2)' // Accent color bg when active
-                                    : 'rgba(20, 20, 30, 0.6)', // Glass bg when inactive
-                                backdropFilter: 'blur(12px)',
-                                border: isActive
-                                    ? '1px solid var(--color-accent)'
-                                    : '1px solid var(--glass-border)',
-                                borderRadius: '16px', // Rounded corners for "box" look
-                                color: isActive ? 'white' : 'var(--color-text-secondary)',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: isActive
-                                    ? '0 0 15px rgba(99, 102, 241, 0.3)'
-                                    : '0 4px 6px rgba(0,0,0,0.1)',
-                                transform: isActive ? 'translateY(-2px)' : 'none',
-                            }}
-                        >
-                            <item.icon
-                                aria-hidden="true"
-                                size={isActive ? 22 : 20}
-                                style={{
-                                    filter: isActive ? 'drop-shadow(0 0 8px var(--color-accent))' : 'none',
-                                    transition: 'all 0.3s ease',
-                                    marginBottom: '2px'
-                                }}
-                            />
-                            <span style={{
-                                fontSize: '0.65rem',
-                                fontWeight: isActive ? 600 : 500,
-                                letterSpacing: '0.02em',
-                                opacity: isActive ? 1 : 0.8
-                            }}>
-                                {item.label}
-                            </span>
-                        </button>
-                    );
-                })}
-            </div>
+        <nav className="mobile-nav" role="navigation" aria-label="Main navigation">
+            {navItems.map((item) => {
+                const isActive = activeTab === item.id;
+                const IconComponent = item.icon;
+
+                return (
+                    <button
+                        key={item.id}
+                        className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+                        onClick={() => handleTabClick(item.id)}
+                        aria-label={item.label}
+                        aria-current={isActive ? 'page' : undefined}
+                    >
+                        {/* Active indicator line at top */}
+                        {isActive && <div className="active-indicator" />}
+
+                        {item.isCustomIcon ? (
+                            <IconComponent size={20} />
+                        ) : (
+                            <IconComponent aria-hidden="true" size={20} />
+                        )}
+                        <span className="nav-label">{item.label}</span>
+                    </button>
+                );
+            })}
+
+            <style>{`
+                .mobile-nav {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: center;
+                    background: rgba(15, 15, 25, 0.95);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    padding: 8px 0;
+                    padding-bottom: max(8px, env(safe-area-inset-bottom));
+                    z-index: 100;
+                }
+
+                .mobile-nav-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 4px;
+                    padding: 8px 16px;
+                    background: transparent;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.5);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    position: relative;
+                    min-width: 60px;
+                }
+
+                .mobile-nav-item:hover {
+                    color: rgba(255, 255, 255, 0.7);
+                }
+
+                .mobile-nav-item.active {
+                    color: var(--color-primary, #6366f1);
+                }
+
+                .mobile-nav-item .active-indicator {
+                    position: absolute;
+                    top: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 24px;
+                    height: 3px;
+                    background: var(--color-primary, #6366f1);
+                    border-radius: 0 0 3px 3px;
+                }
+
+                .mobile-nav-item .nav-label {
+                    font-size: 11px;
+                    font-weight: 500;
+                    letter-spacing: 0.3px;
+                }
+
+                @media (min-width: 768px) {
+                    .mobile-nav {
+                        display: none !important;
+                    }
+                }
+            `}</style>
         </nav>
     );
 };

@@ -17,6 +17,9 @@ export interface Stock {
   dividendYield: number | null;
   fiftyTwoWeekHigh: number | null;
   fiftyTwoWeekLow: number | null;
+  totalValue: number | null;
+  totalBuy: number | null;
+  totalSell: number | null;
   lastUpdated: Date;
 }
 
@@ -30,6 +33,7 @@ export interface CompanyProfile {
   industry: string;
   logo: string | null;
   website: string | null;
+  dividends: Dividend[];
 }
 
 export interface NewsArticle {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
@@ -31,25 +31,37 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
     const summary = getSummary();
 
-    // Update prices periodically
+    // Use ref to track symbols for price updates without causing re-renders
+    const positionSymbolsRef = useRef<string[]>([]);
+
+    // Update the ref when positions change (but don't trigger effect)
     useEffect(() => {
-        // ... existing effect logic ...
+        positionSymbolsRef.current = positions.map(p => p.symbol);
+    }, [positions]);
+
+    // Update prices periodically - only depends on user?.id to avoid infinite loop
+    useEffect(() => {
         const updatePrices = async () => {
-            for (const position of positions) {
+            const symbols = positionSymbolsRef.current;
+            for (const symbol of symbols) {
                 try {
-                    const quote = await getStockQuote(position.symbol);
-                    updatePrice(position.symbol, quote.price, user?.id);
+                    const quote = await getStockQuote(symbol);
+                    updatePrice(symbol, quote.price, user?.id);
                 } catch (error) {
-                    console.error(`Failed to update price for ${position.symbol}:`, error);
+                    console.error(`Failed to update price for ${symbol}:`, error);
                 }
             }
         };
 
-        updatePrices();
+        // Initial update
+        if (positionSymbolsRef.current.length > 0) {
+            updatePrices();
+        }
+
         const interval = setInterval(updatePrices, 15000); // Update every 15 seconds
 
         return () => clearInterval(interval);
-    }, [positions, user?.id]);
+    }, [user?.id, updatePrice]);
 
     const handleAddPosition = async () => {
         // ... existing add logic ...
@@ -246,7 +258,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
                     Famous Portfolio Holdings
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
                     {[
                         {
                             name: "Warren Buffett", firm: "Berkshire Hathaway", holdings: [
@@ -268,6 +280,69 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                 { symbol: 'TSLA', name: 'Tesla Inc.', portPercent: 9.8, change: 3.2 },
                                 { symbol: 'COIN', name: 'Coinbase Global', portPercent: 8.4, change: 5.1 },
                                 { symbol: 'ROKU', name: 'Roku Inc.', portPercent: 6.2, change: -1.4 }
+                            ]
+                        },
+                        {
+                            name: "Nancy Pelosi", firm: "Congress", holdings: [
+                                { symbol: 'NVDA', name: 'NVIDIA Corp', portPercent: 12.5, change: 4.8 },
+                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 10.1, change: 1.5 },
+                                { symbol: 'CRWD', name: 'CrowdStrike', portPercent: 6.5, change: -2.1 }
+                            ]
+                        },
+                        {
+                            name: "Ray Dalio", firm: "Bridgewater", holdings: [
+                                { symbol: 'IEMG', name: 'Emerging Markets', portPercent: 5.4, change: 0.8 },
+                                { symbol: 'GOOGL', name: 'Alphabet Inc.', portPercent: 4.2, change: 1.2 },
+                                { symbol: 'META', name: 'Meta Platforms', portPercent: 3.8, change: 2.5 }
+                            ]
+                        },
+                        {
+                            name: "Bill Ackman", firm: "Pershing Square", holdings: [
+                                { symbol: 'CMG', name: 'Chipotle', portPercent: 18.2, change: 0.5 },
+                                { symbol: 'QSR', name: 'Restaurant Brands', portPercent: 15.4, change: 1.1 },
+                                { symbol: 'HILT', name: 'Hilton Worldwide', portPercent: 12.8, change: -0.2 }
+                            ]
+                        },
+                        {
+                            name: "George Soros", firm: "Soros Fund Mgmt", holdings: [
+                                { symbol: 'GOOGL', name: 'Alphabet Inc.', portPercent: 5.8, change: 1.2 },
+                                { symbol: 'AMZN', name: 'Amazon.com', portPercent: 4.5, change: 0.9 },
+                                { symbol: 'RIVN', name: 'Rivian', portPercent: 3.2, change: -2.5 }
+                            ]
+                        },
+                        {
+                            name: "Carl Icahn", firm: "Icahn Enterprises", holdings: [
+                                { symbol: 'IEP', name: 'Icahn Enterprises', portPercent: 85.2, change: -1.2 },
+                                { symbol: 'CVI', name: 'CVR Energy', portPercent: 8.5, change: 0.5 },
+                                { symbol: 'UAL', name: 'United Airlines', portPercent: 3.1, change: 1.8 }
+                            ]
+                        },
+                        {
+                            name: "David Tepper", firm: "Appaloosa Mgmt", holdings: [
+                                { symbol: 'AMZN', name: 'Amazon.com', portPercent: 11.5, change: 0.9 },
+                                { symbol: 'META', name: 'Meta Platforms', portPercent: 9.8, change: 2.5 },
+                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 8.5, change: 1.5 }
+                            ]
+                        },
+                        {
+                            name: "Stanley Druckenmiller", firm: "Duquesne Family", holdings: [
+                                { symbol: 'NVDA', name: 'NVIDIA Corp', portPercent: 15.2, change: 4.8 },
+                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 12.5, change: 1.5 },
+                                { symbol: 'CPNG', name: 'Coupang', portPercent: 8.8, change: -0.5 }
+                            ]
+                        },
+                        {
+                            name: "Chase Coleman", firm: "Tiger Global", holdings: [
+                                { symbol: 'META', name: 'Meta Platforms', portPercent: 18.5, change: 2.5 },
+                                { symbol: 'MSFT', name: 'Microsoft', portPercent: 14.2, change: 1.5 },
+                                { symbol: 'JD', name: 'JD.com', portPercent: 6.5, change: 2.4 }
+                            ]
+                        },
+                        {
+                            name: "Daniel Loeb", firm: "Third Point", holdings: [
+                                { symbol: 'PFE', name: 'Pfizer Inc.', portPercent: 7.2, change: 0.3 },
+                                { symbol: 'DHR', name: 'Danaher Corp', portPercent: 6.8, change: 1.1 },
+                                { symbol: 'AMZN', name: 'Amazon.com', portPercent: 6.5, change: 0.9 }
                             ]
                         }
                     ].map((guru, idx) => (

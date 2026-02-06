@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Shield, Lock } from 'lucide-react';
+import { Shield, Lock, Sun, Moon } from 'lucide-react';
 import { usePinAuth } from '../contexts/PinAuthContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
-import LiveTicker from '../components/LiveTicker';
 import BenefitsGrid from '../components/BenefitsGrid';
 import TopBar from '../components/TopBar';
 import './LandingPage.css';
@@ -12,6 +12,7 @@ import './LandingPage.css';
 const PinLoginPage: React.FC = () => {
     const { login } = usePinAuth();
     const { setManualSession } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const [pin, setPin] = useState(['', '', '', '']);
     const inputRefs = [
         useRef<HTMLInputElement>(null),
@@ -95,6 +96,29 @@ const PinLoginPage: React.FC = () => {
                             Private Access Only
                         </span>
                     </div>
+
+                    <button
+                        className="glass-button icon-btn"
+                        onClick={() => {
+                            soundService.playTap();
+                            toggleTheme();
+                        }}
+                        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            color: 'var(--color-text-primary)'
+                        }}
+                    >
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
                 </div>
             </nav>
 

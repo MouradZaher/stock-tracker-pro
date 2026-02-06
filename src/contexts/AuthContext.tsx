@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '../services/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import { usePortfolioStore } from '../hooks/usePortfolio';
@@ -29,6 +29,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [role, setRole] = useState<'admin' | 'user' | null>(null);
     const [isApproved, setIsApproved] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Sync guard to prevent multiple simultaneous syncs and infinite loops
+    const syncInProgressRef = useRef(false);
+    const lastSyncedUserIdRef = useRef<string | null>(null);
 
     const getFakeAdminUser = (): User => ({
         id: 'bypass-admin-id',
@@ -89,8 +93,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const syncUserData = async (userId: string) => {
+    const syncUserData = useCallback(async (userId: string, force = false) => {
+        // Guard against multiple simultaneous syncs and redundant re-syncs
+        if (syncInProgressRef.current) {
+            console.log('🔒 Sync already in progress, skipping...');
+            return;
+        }
+
+        // Skip if we already synced this user (unless forced)
+        if (!force && lastSyncedUserIdRef.current === userId) {
+            console.log('✅ Already synced for this user, skipping...');
+            return;
+        }
+
+        syncInProgressRef.current = true;
         console.log('🔄 Syncing user data...');
+
         try {
             // Sync portfolio data
             const portfolioStore = usePortfolioStore.getState();
@@ -100,11 +118,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const watchlistStore = useWatchlist.getState();
             await watchlistStore.syncWithSupabase(userId);
 
+            lastSyncedUserIdRef.current = userId;
             console.log('✅ User data sync completed');
         } catch (error) {
             console.error('❌ Error syncing user data:', error);
+        } finally {
+            syncInProgressRef.current = false;
         }
-    };
+    }, []);
 
     useEffect(() => {
         // 1. Check for bypass in localStorage (only in development mode)
@@ -220,7 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const setManualSession = (role: 'admin' | 'user') => {
+    const setManualSession = useCallback((role: 'admin' | 'user') => {
         const fakeUser = getFakeAdminUser();
         fakeUser.id = role === 'admin' ? 'bypass-admin-id' : 'bypass-user-id';
 
@@ -228,10 +249,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setRole(role);
         setIsApproved(true);
         setSession(getFakeSession(fakeUser));
-    };
+    }, []);
 
     // New bridge function for PIN Auth
-    const setCustomUser = (customUser: { id: string; email: string; role: 'admin' | 'user'; name: string }) => {
+    const setCustomUser = useCallback((customUser: { id: string; email: string; role: 'admin' | 'user'; name: string }) => {
         const userObj: User = {
             id: customUser.id,
             email: customUser.email,
@@ -256,16 +277,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Trigger initial sync
         syncUserData(userObj.id);
-    };
+    }, [syncUserData]);
 
-    const signOut = async () => {
+    const signOut = useCallback(async () => {
         localStorage.removeItem(BYPASS_STORAGE_KEY);
+        // Reset sync tracking
+        lastSyncedUserIdRef.current = null;
         await supabase.auth.signOut();
         setRole(null);
         setIsApproved(false);
         setUser(null);
         setSession(null);
-    };
+    }, []);
 
     return (
         <AuthContext.Provider value={{ user, session, role, isApproved, isLoading, signInWithEmail, signOut, setManualSession, setCustomUser }}>

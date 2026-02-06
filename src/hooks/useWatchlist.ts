@@ -122,6 +122,12 @@ export const useWatchlist = create<WatchlistState>()(
             },
 
             syncWithSupabase: async (userId: string) => {
+                // Guard against multiple simultaneous syncs
+                if (get().isSyncing) {
+                    console.log('🔒 Watchlist sync already in progress, skipping...');
+                    return;
+                }
+
                 set({ isSyncing: true, error: null });
                 try {
                     const localWatchlist = get().watchlist;

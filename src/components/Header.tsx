@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { soundService } from '../services/soundService';
 import { useTheme } from '../contexts/ThemeContext';
-import { LogOut, Sun, Moon, Shield, LayoutDashboard, List, Briefcase, Activity, Sparkles } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, LayoutDashboard, List, Briefcase, Activity } from 'lucide-react';
+import BrainIcon from './icons/BrainIcon';
 import type { TabType } from '../types';
 
 interface HeaderProps {
@@ -14,59 +15,15 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick }) => {
     const { theme, toggleTheme } = useTheme();
-    const tabs: { id: TabType; label: string; icon: any }[] = [
+    const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: LayoutDashboard },
         { id: 'watchlist', label: 'Watch', icon: List },
-        { id: 'portfolio', label: 'Port', icon: Briefcase },
-        { id: 'recommendations', label: 'AI', icon: Sparkles },
+        { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
+        { id: 'recommendations', label: 'AI', icon: BrainIcon, isCustomIcon: true },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 
-    const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({});
-    const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-
-    // Use useLayoutEffect with ResizeObserver for robust sizing
-    React.useLayoutEffect(() => {
-        const updateIndicator = () => {
-            const activeTabElement = tabRefs.current[activeTab];
-            if (activeTabElement) {
-                setIndicatorStyle({
-                    left: `${activeTabElement.offsetLeft}px`,
-                    width: `${activeTabElement.offsetWidth}px`,
-                    height: `${activeTabElement.offsetHeight}px`,
-                    top: `${activeTabElement.offsetTop}px`,
-                });
-            }
-        };
-
-        // Update immediately
-        updateIndicator();
-
-        // Observe the nav container for any size changes (robust against font loads, layout shifts)
-        // Find the nav container via the active tab's parent
-        const activeTabElement = tabRefs.current[activeTab];
-        const navContainer = activeTabElement?.parentElement;
-
-        if (navContainer) {
-            const resizeObserver = new ResizeObserver(() => {
-                updateIndicator();
-            });
-            resizeObserver.observe(navContainer);
-
-            // Also observe the active tab itself
-            if (activeTabElement) {
-                resizeObserver.observe(activeTabElement);
-            }
-
-            return () => {
-                resizeObserver.disconnect();
-            };
-        } else {
-            // Fallback if ref not yet attached
-            const timeoutId = setTimeout(updateIndicator, 50);
-            return () => clearTimeout(timeoutId);
-        }
-    }, [activeTab, theme]);
+    // Indicator logic removed for separate boxes
 
     const handleTabClick = (tabId: TabType) => {
         soundService.playTap();
@@ -91,25 +48,20 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
             {/* Center Section: Nav + Ticker - Hidden on Mobile */}
             <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, overflow: 'hidden' }}>
-                <nav className="header-nav glass-card" style={{ padding: '4px', display: 'flex', justifyContent: 'center' }} role="navigation" aria-label="Main navigation">
-                    <div className="tab-indicator" style={{ ...indicatorStyle, background: 'var(--color-accent)' }} aria-hidden="true" />
+                <nav className="header-nav" style={{ padding: '4px', display: 'flex', justifyContent: 'center', gap: '8px' }} role="navigation" aria-label="Main navigation">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
-                            ref={(el) => { tabRefs.current[tab.id] = el; }}
                             className={`header-tab ${activeTab === tab.id ? 'active' : ''}`}
                             onClick={() => handleTabClick(tab.id)}
-                            style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '6px' }}
                             aria-label={`Navigate to ${tab.label}`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
-                            <tab.icon size={16} />
+                            {tab.isCustomIcon ? <tab.icon size={16} /> : <tab.icon size={16} />}
                             {tab.label}
                         </button>
                     ))}
                 </nav>
-
-
             </div>
 
             {/* Actions Section */}

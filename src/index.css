@@ -183,6 +183,27 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Faded cityscape background */
+  background-image:
+    /* Top gradient overlay for depth */
+    radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    /* City buildings silhouette using gradient blocks */
+    linear-gradient(to bottom,
+      transparent 60%,
+      rgba(20, 20, 35, 0.3) 60%,
+      rgba(20, 20, 35, 0.4) 65%,
+      rgba(15, 15, 25, 0.5) 70%,
+      rgba(10, 10, 20, 0.6) 80%,
+      rgba(10, 10, 15, 0.8) 100%),
+    /* Subtle grid lines for city feel */
+    repeating-linear-gradient(90deg,
+      transparent,
+      transparent 80px,
+      rgba(99, 102, 241, 0.02) 80px,
+      rgba(99, 102, 241, 0.02) 81px),
+    /* Base dark gradient */
+    linear-gradient(180deg, #0a0a12 0%, #0d0d18 50%, #08080f 100%);
+  background-attachment: fixed;
 }
 
 /* Typography */
@@ -301,15 +322,69 @@ h6 {
   background: var(--glass-bg-hover);
   border-color: var(--glass-border);
   color: var(--color-text-primary);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .header-tab.active {
   color: white;
-  background: var(--color-accent);
+  background: var(--gradient-primary);
   border-color: var(--color-accent);
   font-weight: 600;
-  box-shadow: 0 0 15px var(--color-accent-light);
+  box-shadow: 0 0 20px var(--color-accent-light), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* AI Tab Special Styling */
+.header-tab:nth-child(4) {
+  position: relative;
+}
+
+.header-tab:nth-child(4)::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius-md) + 2px);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7, #6366f1);
+  background-size: 300% 300%;
+  animation: gradientShift 4s ease infinite;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.header-tab:nth-child(4):hover::before,
+.header-tab:nth-child(4).active::before {
+  opacity: 0.5;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Pulse animation for AI tab when active */
+@keyframes aiPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
+  }
+}
+
+.header-tab:nth-child(4).active {
+  animation: aiPulse 2s ease-in-out infinite;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
 }
 
 /* tab-indicator removed */
@@ -1348,22 +1423,29 @@ h6 {
 
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-lg);
-  padding: var(--spacing-xl);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
   background: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
 }
 
 .admin-stat-card {
   background: var(--color-bg-elevated);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.admin-stat-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
 }
 
 .stat-value {

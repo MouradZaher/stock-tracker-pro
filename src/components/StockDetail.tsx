@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Clock, TrendingUp, TrendingDown, ArrowLeft } from 'lucide-react';
+import { Clock, TrendingUp, TrendingDown, ArrowLeft, Info, Briefcase, DollarSign, PieChart, Users } from 'lucide-react';
 
 import { getStockData } from '../services/stockDataService';
-import { REFRESH_INTERVALS } from '../services/api'; // re-trigger fix
+import { REFRESH_INTERVALS } from '../services/api';
 import { formatCurrency, formatPercent, formatNumber, formatNumberPlain, formatTimeAgo, getChangeClass } from '../utils/formatters';
 import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
 import LiveBadge from './LiveBadge';
 import { useWatchlist } from '../hooks/useWatchlist';
+import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -23,13 +24,14 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
     const { user } = useAuth();
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
+    const { positions } = usePortfolioStore();
 
     const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
         queryKey: ['stock', symbol],
         queryFn: () => getStockData(symbol),
-        refetchInterval: REFRESH_INTERVALS.STOCK_PRICE, // 10 seconds
+        refetchInterval: REFRESH_INTERVALS.STOCK_PRICE,
         refetchIntervalInBackground: true,
-        staleTime: 5000,
+        staleTime: 2000,
     });
 
     useEffect(() => {
@@ -42,7 +44,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
         return (
             <div className="stock-detail" style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <div className="spinner" style={{ width: '40px', height: '40px' }} />
-                <p style={{ marginTop: '1rem', color: 'var(--color-text-secondary)' }}>Loading {symbol}...</p>
+                <p style={{ marginTop: '1rem', color: 'var(--color-text-secondary)' }}>Loading {symbol} data...</p>
             </div>
         );
     }
@@ -60,6 +62,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
     const { stock, profile } = data;
     const inWatchlist = isInWatchlist(stock.symbol);
+    const portfolioPosition = positions.find(p => p.symbol === stock.symbol);
 
     const toggleWatchlist = () => {
         if (inWatchlist) {
@@ -98,54 +101,76 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                             <Star size={24} fill={inWatchlist ? "currentColor" : "none"} />
                         </button>
                     </div>
-                    <div className="stock-name">{stock.name}</div>
-                    {profile?.ceo && (
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>
-                            CEO: {profile.ceo} {profile?.founded && `• Founded: ${profile.founded}`}
-                        </div>
-                    )}
-                    {!profile?.ceo && profile?.founded && (
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>
-                            Founded: {profile.founded}
-                        </div>
-                    )}
+                    <div className="stock-name" style={{ fontSize: '1.25rem', fontWeight: 600 }}>{stock.name}</div>
+
+                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem' }}>
+                        {profile?.ceo && (
+                            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                <Users size={14} /> CEO: <span style={{ color: 'var(--color-text-primary)' }}>{profile.ceo}</span>
+                            </div>
+                        )}
+                        {profile?.sector && (
+                            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                <Briefcase size={14} /> {profile.sector}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="stock-price-section">
-                    <div className="stock-price">{formatCurrency(stock.price)}</div>
-                    <div className={`stock-change ${getChangeClass(stock.change)}`}>
-                        {stock.change >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                        {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
+                    <div className="stock-price" style={{ fontSize: '2.5rem' }}>{formatCurrency(stock.price)}</div>
+                    <div className={`stock-change ${getChangeClass(stock.change)}`} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
+                        {stock.change >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+                        <span style={{ fontSize: '1.1rem', fontWeight: 700 }}>
+                            {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
+                        </span>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
-                        <div className="last-updated">
-                            <Clock size={12} />
-                            Updated {formatTimeAgo(lastUpdate)}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', marginTop: '0.75rem' }}>
+                        <div className="last-updated" style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
+                            <Clock size={12} /> Live Updates: {formatTimeAgo(lastUpdate)}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <MarketStatus />
-                        </div>
+                        <MarketStatus />
                     </div>
                 </div>
             </div>
+
+            {/* Portfolio Section (If position exists) */}
+            {portfolioPosition && (
+                <div className="section glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--color-accent)' }}>
+                    <h3 className="section-title" style={{ color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                        <PieChart size={20} /> Your Position
+                    </h3>
+                    <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+                        <div className="stat-card" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+                            <div className="stat-label">Units Purchased</div>
+                            <div className="stat-value">{formatNumberPlain(portfolioPosition.units)}</div>
+                        </div>
+                        <div className="stat-card" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+                            <div className="stat-label">Avg Cost / Unit</div>
+                            <div className="stat-value">{formatCurrency(portfolioPosition.avgCost)}</div>
+                        </div>
+                        <div className="stat-card" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+                            <div className="stat-label">Market Value</div>
+                            <div className="stat-value">{formatCurrency(portfolioPosition.marketValue)}</div>
+                        </div>
+                        <div className="stat-card" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+                            <div className="stat-label">Profit / Loss</div>
+                            <div className={`stat-value ${getChangeClass(portfolioPosition.profitLoss)}`}>
+                                {portfolioPosition.profitLoss >= 0 ? '+' : ''}{formatCurrency(portfolioPosition.profitLoss)} ({formatPercent(portfolioPosition.profitLossPercent)})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Chart */}
             <TradingViewChart symbol={symbol} />
 
-            {/* Related Insights */}
-            <div className="section" style={{ marginTop: '2rem' }}>
-                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
-                    AI Market Insights
-                </h3>
-                <div style={{ marginTop: '1rem' }}>
-                    <AIRecommendations />
-                </div>
-            </div>
-
-            {/* Stats Grid */}
+            {/* Stats Grid - Comprehensive Statistics */}
             <div className="section">
-                <h3 className="section-title">Market Statistics</h3>
+                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Info size={20} /> Market Statistics
+                </h3>
                 <div className="stats-grid">
                     <div className="stat-card glass-card">
                         <div className="stat-label">Open</div>
@@ -172,6 +197,10 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         <div className="stat-value">{formatNumberPlain(stock.avgVolume)}</div>
                     </div>
                     <div className="stat-card glass-card">
+                        <div className="stat-label">Total Value Traded</div>
+                        <div className="stat-value">{stock.totalValue ? formatNumber(stock.totalValue) : 'N/A'}</div>
+                    </div>
+                    <div className="stat-card glass-card">
                         <div className="stat-label">Market Cap</div>
                         <div className="stat-value">{formatNumber(stock.marketCap)}</div>
                     </div>
@@ -188,37 +217,102 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         <div className="stat-value">{stock.dividendYield ? `${stock.dividendYield.toFixed(2)}%` : 'N/A'}</div>
                     </div>
                     <div className="stat-card glass-card">
-                        <div className="stat-label">52W High</div>
-                        <div className="stat-value">{stock.fiftyTwoWeekHigh ? formatCurrency(stock.fiftyTwoWeekHigh) : 'N/A'}</div>
-                    </div>
-                    <div className="stat-card glass-card">
-                        <div className="stat-label">52W Low</div>
-                        <div className="stat-value">{stock.fiftyTwoWeekLow ? formatCurrency(stock.fiftyTwoWeekLow) : 'N/A'}</div>
+                        <div className="stat-label">52W Range</div>
+                        <div className="stat-value" style={{ fontSize: '1rem' }}>
+                            {stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh ?
+                                `${formatCurrency(stock.fiftyTwoWeekLow)} - ${formatCurrency(stock.fiftyTwoWeekHigh)}` : 'N/A'
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* About */}
-            {profile?.description && (
+            {/* Dividend History Section */}
+            {profile?.dividends && profile.dividends.length > 0 && (
                 <div className="section">
-                    <h3 className="section-title">About {stock.name}</h3>
-                    <div className="section-content">
-                        {profile.description}
-                        {profile.sector && (
-                            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                                <span>
-                                    <strong>Sector:</strong> {profile.sector}
-                                </span>
-                                {profile.industry && (
-                                    <span>
-                                        <strong>Industry:</strong> {profile.industry}
-                                    </span>
-                                )}
-                            </div>
-                        )}
+                    <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <DollarSign size={20} /> Dividend History
+                    </h3>
+                    <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                        <table className="portfolio-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Ex-Date</th>
+                                    <th>Payment Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {profile.dividends.map((div, idx) => (
+                                    <tr key={idx}>
+                                        <td>
+                                            <span style={{
+                                                padding: '2px 8px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.7rem',
+                                                background: div.type === 'upcoming' ? 'var(--color-accent-light)' : 'var(--color-bg-tertiary)',
+                                                color: div.type === 'upcoming' ? 'var(--color-accent)' : 'var(--color-text-secondary)'
+                                            }}>
+                                                {div.type.toUpperCase()}
+                                            </span>
+                                        </td>
+                                        <td style={{ fontWeight: 600 }}>{formatCurrency(div.amount)}</td>
+                                        <td>{div.exDate}</td>
+                                        <td>{div.paymentDate}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}
+
+            {/* About Company Section */}
+            {profile?.description && (
+                <div className="section">
+                    <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Info size={20} /> About {stock.name}
+                    </h3>
+                    <div className="section-content glass-card" style={{ padding: '1.5rem', background: 'var(--glass-bg)' }}>
+                        <p style={{ marginBottom: '1.5rem', fontSize: '1rem', color: 'var(--color-text-secondary)' }}>
+                            {profile.description}
+                        </p>
+
+                        <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', background: 'rgba(0,0,0,0.1)', padding: '1rem', borderRadius: '8px' }}>
+                            <div>
+                                <div className="stat-label" style={{ marginBottom: '0.25rem' }}>CEO</div>
+                                <div style={{ fontSize: '1rem', fontWeight: 600 }}>{profile.ceo || 'N/A'}</div>
+                            </div>
+                            <div>
+                                <div className="stat-label" style={{ marginBottom: '0.25rem' }}>Headquarters</div>
+                                <div style={{ fontSize: '1rem', fontWeight: 600 }}>{profile.sector} • {profile.industry}</div>
+                            </div>
+                            <div>
+                                <div className="stat-label" style={{ marginBottom: '0.25rem' }}>Website</div>
+                                <div style={{ fontSize: '1rem', fontWeight: 600 }}>
+                                    {profile.website ? (
+                                        <a href={profile.website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>
+                                            Visit Site
+                                        </a>
+                                    ) : 'N/A'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* AI Insights */}
+            <div className="section" style={{ marginTop: '1rem' }}>
+                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
+                    AI Market Analysis
+                </h3>
+                <div style={{ marginTop: '0.5rem' }}>
+                    <AIRecommendations />
+                </div>
+            </div>
         </div>
     );
 };

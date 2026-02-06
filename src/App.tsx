@@ -23,7 +23,7 @@ import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
 import { LogOut, Shield } from 'lucide-react';
-import TopBar from './components/TopBar';
+
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -88,7 +88,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
 
   return (
     <div className="app">
-      <TopBar />
+
       <Header
         activeTab={activeTab}
 
@@ -109,7 +109,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         onClose={() => setIsAdminOpen(false)}
       />
 
-      <main className="main-content" style={{ overflowY: 'auto', flex: 1, position: 'relative', paddingTop: '1rem' }}>
+      <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: '1rem' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={

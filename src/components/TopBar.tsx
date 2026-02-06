@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, TrendingDown, Percent, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { getMultipleQuotes } from '../services/stockDataService';
 
 const SYMBOLS = ['^DJI', 'AAPL', 'NVDA', 'TSLA', '^GSPC', '^IXIC', 'MSFT', 'AMZN', 'GOOGL'];
@@ -61,11 +61,9 @@ const TopBar: React.FC = () => {
             overflow: 'hidden',
             whiteSpace: 'nowrap'
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginRight: '1rem', color: 'var(--color-accent)' }}>
-                <Activity size={14} />
-            </div>
 
-            <div className="scrolling-content" style={{ display: 'flex', gap: '2rem', animation: 'scroll 40s linear infinite' }}>
+
+            <div className="scrolling-content" style={{ display: 'flex', gap: '2rem' }}>
                 {[...tickerItems, ...tickerItems, ...tickerItems].map((item: any, idx) => (
                     <div key={`${item.symbol}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span style={{ fontWeight: 700, color: 'var(--color-text-secondary)' }}>{item.symbol}</span>
@@ -83,6 +81,14 @@ const TopBar: React.FC = () => {
             </div>
 
             <style>{`
+                .scrolling-content {
+                    animation: scroll 120s linear infinite;
+                }
+                @media (max-width: 768px) {
+                    .scrolling-content {
+                        animation-duration: 180s !important; /* Extremely slow for mobile readability */
+                    }
+                }
                 @keyframes scroll {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
@@ -91,7 +97,7 @@ const TopBar: React.FC = () => {
                     animation-play-state: paused;
                 }
             `}</style>
-        </div>
+        </div >
     );
 };
 
