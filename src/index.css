@@ -195,7 +195,7 @@ body {
   /* Modern Buildings Faded Look */
   background-image:
     linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.92)),
-    url('C:/Users/Mourad.Zaher/.gemini/antigravity/brain/db6397aa-13ad-41d6-a9fc-9595e7fb3dae/modern_skyscraper_faded_bg_1770374110976.png');
+    url('/modern-buildings-bg.png');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
