@@ -30,7 +30,21 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         currentPrice: 0 as number
     });
 
-    const summary = getSummary();
+    // Safety: Ensure getSummary never crashes
+    const summary = React.useMemo(() => {
+        try {
+            return getSummary();
+        } catch (error) {
+            console.error('Error getting portfolio summary:', error);
+            return {
+                totalValue: 0,
+                totalCost: 0,
+                totalProfitLoss: 0,
+                totalProfitLossPercent: 0,
+                positions: []
+            };
+        }
+    }, [getSummary, positions]); // Recompute when positions change
 
     // Use ref to track symbols for price updates without causing re-renders
     const positionSymbolsRef = useRef<string[]>([]);
