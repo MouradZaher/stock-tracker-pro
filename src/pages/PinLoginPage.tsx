@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Shield, Lock, Sun, Moon } from 'lucide-react';
+import { Shield, Lock, Sun, Moon, User, ArrowRight, UserPlus } from 'lucide-react';
 import { usePinAuth } from '../contexts/PinAuthContext';
-import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
@@ -10,19 +9,15 @@ import TopBar from '../components/TopBar';
 import './LandingPage.css';
 
 const PinLoginPage: React.FC = () => {
-    const { login } = usePinAuth();
-    const { setManualSession } = useAuth();
+    const { checkUser, login, register } = usePinAuth();
     const { theme, toggleTheme } = useTheme();
-    const [pin, setPin] = useState(['', '', '', '']);
-    const [selectedUser, setSelectedUser] = useState('');
 
-    // Predefined users - Admin and regular users
-    const users = [
-        { id: 'admin-1', name: 'Admin', email: 'admin@stocktracker.pro' },
-        { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
-        { id: 'user-2', name: 'User 2', email: 'user2@example.com' },
-        { id: 'user-3', name: 'User 3', email: 'user3@example.com' },
-    ];
+    // Form state
+    const [username, setUsername] = useState('');
+    const [pin, setPin] = useState(['', '', '', '']);
+    const [mode, setMode] = useState<'username' | 'login' | 'signup'>('username');
+    const [isLoading, setIsLoading] = useState(false);
+    const [userExists, setUserExists] = useState(false);
 
     const inputRefs = [
         useRef<HTMLInputElement>(null),
@@ -30,11 +25,43 @@ const PinLoginPage: React.FC = () => {
         useRef<HTMLInputElement>(null),
         useRef<HTMLInputElement>(null)
     ];
+    const usernameRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Focus first input on mount
-        inputRefs[0].current?.focus();
+        // Focus username input on mount
+        usernameRef.current?.focus();
     }, []);
+
+    // Check if username exists when user submits
+    const handleUsernameSubmit = async () => {
+        if (!username.trim()) {
+            toast.error('Please enter a username');
+            return;
+        }
+
+        setIsLoading(true);
+        soundService.playTap();
+
+        try {
+            const result = await checkUser(username.trim());
+            setUserExists(result.exists);
+
+            if (result.exists) {
+                setMode('login');
+                toast.success(`Welcome back, ${username}!`);
+            } else {
+                setMode('signup');
+                toast(`New user! Create a 4-digit PIN to register.`, { icon: '👋' });
+            }
+
+            // Focus first PIN input
+            setTimeout(() => inputRefs[0].current?.focus(), 100);
+        } catch (err) {
+            toast.error('Error checking username. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handlePinChange = (index: number, value: string) => {
         // Only allow digits
@@ -52,7 +79,7 @@ const PinLoginPage: React.FC = () => {
         // Auto-submit when all 4 digits entered
         if (index === 3 && value) {
             const fullPin = newPin.join('');
-            handleSubmit(fullPin);
+            handlePinSubmit(fullPin);
         }
     };
 
@@ -62,29 +89,54 @@ const PinLoginPage: React.FC = () => {
         }
     };
 
-    const handleSubmit = (fullPin: string) => {
-        const result = login(fullPin);
+    const handlePinSubmit = async (fullPin: string) => {
+        if (fullPin.length !== 4) return;
 
-        if (result.success) {
-            soundService.playSuccess();
-            toast.success('Welcome! Access granted.');
+        setIsLoading(true);
 
-            // 🚀 BRIDGE: Sync PIN role to AuthContext to enable Admin Panel
-            // Determining role based on PIN is done inside login(), but we know '1927' is admin
-            // Ideally usePinAuth should return the user object, let's assume it does or we check pin
-            if (fullPin === '1927') {
-                setManualSession('admin');
+        try {
+            if (mode === 'signup') {
+                // Register new user
+                const result = await register(username.trim(), fullPin);
+                if (result.success) {
+                    soundService.playSuccess();
+                    toast.success('Account created! Welcome to StockTracker Pro.');
+                } else {
+                    soundService.playError();
+                    toast.error(result.error || 'Registration failed');
+                    resetPin();
+                }
             } else {
-                setManualSession('user');
+                // Login existing user
+                const result = await login(username.trim(), fullPin);
+                if (result.success) {
+                    soundService.playSuccess();
+                    toast.success('Welcome back! Access granted.');
+                } else {
+                    soundService.playError();
+                    toast.error(result.error || 'Invalid PIN');
+                    resetPin();
+                }
             }
-
-        } else {
+        } catch (err) {
             soundService.playError();
-            toast.error(result.error || 'Invalid PIN');
-            // Clear PIN on error
-            setPin(['', '', '', '']);
-            inputRefs[0].current?.focus();
+            toast.error('Authentication failed. Please try again.');
+            resetPin();
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const resetPin = () => {
+        setPin(['', '', '', '']);
+        inputRefs[0].current?.focus();
+    };
+
+    const goBack = () => {
+        setMode('username');
+        setPin(['', '', '', '']);
+        setUsername('');
+        usernameRef.current?.focus();
     };
 
     return (
@@ -142,58 +194,94 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-
-
                     <div className="login-form" style={{ marginTop: '1rem' }}>
-                        {/* User Selection */}
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
-                                Select User
-                            </label>
-                            <select
-                                value={selectedUser}
-                                onChange={(e) => {
-                                    setSelectedUser(e.target.value);
-                                    soundService.playTap();
-                                    // Focus first PIN input when user selected
-                                    if (e.target.value) {
-                                        setTimeout(() => inputRefs[0].current?.focus(), 100);
-                                    }
-                                }}
-                                style={{
-                                    width: '100%',
-                                    maxWidth: '280px',
-                                    padding: '12px 16px',
-                                    fontSize: '0.95rem',
-                                    fontWeight: 500,
-                                    background: 'var(--color-bg-secondary)',
-                                    border: `2px solid ${selectedUser ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                                    borderRadius: 'var(--radius-lg)',
-                                    color: 'var(--color-text-primary)',
-                                    outline: 'none',
-                                    cursor: 'pointer',
-                                    appearance: 'none',
-                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: 'right 12px center',
-                                    paddingRight: '40px',
-                                    transition: 'all 0.2s ease'
-                                }}
-                            >
-                                <option value="">Choose a user...</option>
-                                {users.map(user => (
-                                    <option key={user.id} value={user.id}>
-                                        {user.name} ({user.email})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* PIN Entry - only show when user selected */}
-                        {selectedUser && (
+                        {/* Step 1: Username Input */}
+                        {mode === 'username' && (
                             <div style={{ marginBottom: '1rem' }}>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
-                                    Enter Your 4-Digit PIN
+                                    Enter Username
+                                </label>
+                                <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '320px' }}>
+                                    <div style={{ flex: 1, position: 'relative' }}>
+                                        <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                                        <input
+                                            ref={usernameRef}
+                                            type="text"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
+                                            placeholder="Your username..."
+                                            style={{
+                                                width: '100%',
+                                                padding: '14px 14px 14px 42px',
+                                                fontSize: '1rem',
+                                                fontWeight: 500,
+                                                background: 'var(--color-bg-secondary)',
+                                                border: `2px solid ${username ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                                                borderRadius: 'var(--radius-lg)',
+                                                color: 'var(--color-text-primary)',
+                                                outline: 'none',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handleUsernameSubmit}
+                                        disabled={isLoading || !username.trim()}
+                                        style={{
+                                            padding: '14px 20px',
+                                            background: 'var(--gradient-primary)',
+                                            border: 'none',
+                                            borderRadius: 'var(--radius-lg)',
+                                            color: 'white',
+                                            fontWeight: 600,
+                                            cursor: isLoading || !username.trim() ? 'not-allowed' : 'pointer',
+                                            opacity: isLoading || !username.trim() ? 0.6 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        {isLoading ? '...' : <ArrowRight size={18} />}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 2: PIN Input (Login or Signup) */}
+                        {(mode === 'login' || mode === 'signup') && (
+                            <div style={{ marginBottom: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    <button
+                                        onClick={goBack}
+                                        style={{
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid var(--glass-border)',
+                                            borderRadius: '8px',
+                                            padding: '6px 10px',
+                                            color: 'var(--color-text-secondary)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.8rem'
+                                        }}
+                                    >
+                                        ← Back
+                                    </button>
+                                    <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+                                        {mode === 'signup' ? (
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <UserPlus size={16} color="var(--color-success)" />
+                                                Creating account for <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                            </span>
+                                        ) : (
+                                            <span>
+                                                Logging in as <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                            </span>
+                                        )}
+                                    </span>
+                                </div>
+
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
+                                    {mode === 'signup' ? 'Create a 4-Digit PIN' : 'Enter Your PIN'}
                                 </label>
                                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-start', maxWidth: '280px' }}>
                                     {pin.map((digit, index) => (
@@ -206,6 +294,7 @@ const PinLoginPage: React.FC = () => {
                                             value={digit}
                                             onChange={(e) => handlePinChange(index, e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(index, e)}
+                                            disabled={isLoading}
                                             style={{
                                                 width: '55px',
                                                 height: '60px',
@@ -217,15 +306,18 @@ const PinLoginPage: React.FC = () => {
                                                 borderRadius: 'var(--radius-lg)',
                                                 color: 'var(--color-text-primary)',
                                                 outline: 'none',
-                                                transition: 'all 0.2s ease'
+                                                transition: 'all 0.2s ease',
+                                                opacity: isLoading ? 0.6 : 1
                                             }}
                                             onFocus={(e) => e.target.select()}
                                         />
                                     ))}
                                 </div>
-                                <p style={{ marginTop: '0.5rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
-                                    Hint: Admin PIN is 1927
-                                </p>
+                                {mode === 'signup' && (
+                                    <p style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
+                                        Remember this PIN - you'll use it to log in next time.
+                                    </p>
+                                )}
                             </div>
                         )}
 
