@@ -207,12 +207,18 @@ const PinLoginPage: React.FC = () => {
                                         <input
                                             ref={usernameRef}
                                             type="text"
+                                            className="form-input"
+                                            placeholder="Enter Username"
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
                                             onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
-                                            placeholder="Your username..."
-                                            className="landing-input"
-                                            style={{ paddingLeft: '42px' }}
+                                            disabled={isLoading}
+                                            autoFocus
+                                            style={{
+                                                paddingLeft: '42px',
+                                                color: 'var(--color-text-primary)', // Theme-aware text color
+                                                caretColor: 'var(--color-text-primary)' // Cursor color
+                                            }}
                                         />
                                     </div>
                                     <button
