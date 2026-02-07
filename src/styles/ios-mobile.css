@@ -230,14 +230,17 @@
 @media (max-width: 768px) {
 
     /* Force heatmap container to fill most of the screen */
+    /* Force heatmap container to fill most of the screen */
     .stock-heatmap,
     .heatmap-container {
-        height: 70vh !important;
+        /* Remove rigid viewport alignment, rely on flex and min-height */
+        height: auto !important;
         min-height: 550px !important;
-        max-height: calc(100vh - 180px) !important;
-        overflow: hidden;
+        max-height: none !important;
+        overflow: visible !important;
         display: flex !important;
         flex-direction: column !important;
+        flex: 1 0 auto !important;
     }
 
     /* Force TradingView widget containers to fill parent */
@@ -249,8 +252,9 @@
 
     .heatmap-container .tradingview-widget-container__widget,
     .heatmap-container .tradingview-widget-container__widget iframe {
-        height: 100% !important;
-        min-height: 500px !important;
+        height: 550px !important;
+        /* Force a minimum rendered height for the iframe */
+        min-height: 550px !important;
         display: block !important;
     }
 

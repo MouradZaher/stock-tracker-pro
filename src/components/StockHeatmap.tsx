@@ -61,17 +61,12 @@ const StockHeatmap: React.FC = () => {
     return (
         <div className="heatmap-container glass-card" style={{
             width: '100%',
-            flex: 1,
-            minHeight: '400px', /* Ensure minimum height on mobile */
-            padding: '4px',
-            overflow: 'hidden',
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            marginTop: '0',
-            marginBottom: '0',
             position: 'relative',
-            border: 'none',
-            background: 'transparent'
+            background: 'transparent',
+            padding: '4px'
         }}>
             {error ? (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--color-text-secondary)' }}>
