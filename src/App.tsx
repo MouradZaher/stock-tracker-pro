@@ -115,16 +115,16 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
           <Route path="/search" element={
             <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--header-height))', overflow: 'hidden' }}>
               {!selectedSymbol ? (
-                <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '0 1rem 0.5rem' }}>
-                  <div style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0.5rem 0 0.25rem' }}>
+                <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '0 0.5rem 0' }}>
+                  <div style={{ marginBottom: '0.25rem', textAlign: 'center' }}>
+                    <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.25rem 0' }}>
                       Market <span className="gradient-text">Overview</span>
                     </h2>
-                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem', margin: 0 }}>
+                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.65rem', margin: 0 }}>
                       S&P 500 Performance Heatmap • Real-time Sector Breakdown
                     </p>
                   </div>
-                  <div style={{ flex: 1, minHeight: 0 }}>
+                  <div style={{ flex: 1, minHeight: 0, paddingBottom: 'calc(var(--mobile-nav-height) + 10px)' }}>
                     <StockHeatmap />
                   </div>
                 </div>
