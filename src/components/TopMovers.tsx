@@ -134,10 +134,11 @@ const TopMovers: React.FC = () => {
                 style={{
                     flex: 1,
                     overflow: 'auto',
-                    minHeight: 0 // Important for flex scroll to work
+                    minHeight: 0, // Important for flex scroll to work
+                    background: 'transparent'
                 }}
             >
-                <div className="tradingview-widget-container__widget"></div>
+                <div className="tradingview-widget-container__widget" style={{ minHeight: '400px' }}></div>
             </div>
 
             {/* Hide scrollbar CSS */}

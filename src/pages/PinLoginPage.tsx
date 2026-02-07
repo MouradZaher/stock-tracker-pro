@@ -320,18 +320,20 @@ const PinLoginPage: React.FC = () => {
                     </div>
                 </div>
 
-                <BenefitsGrid />
-            </div>
-
-            {/* Footer - Restored */}
-            <div className="landing-footer">
-                <p>© 2026 StockTracker Pro. Enterprise Grade Security.</p>
-                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem', justifyContent: 'center' }}>
-                    <span style={{ cursor: 'pointer', opacity: 0.7 }}>Privacy Policy</span>
-                    <span style={{ cursor: 'pointer', opacity: 0.7 }}>Terms of Service</span>
-                    <span style={{ cursor: 'pointer', opacity: 0.7 }}>Support</span>
+                <div className="hero-visual">
+                    <BenefitsGrid />
                 </div>
             </div>
+
+            <footer className="landing-footer">
+                <p>&copy; {new Date().getFullYear()} StockTracker Pro. Institutional-grade analytics & security.</p>
+                <div className="footer-links">
+                    <span className="footer-link">Privacy Policy</span>
+                    <span className="footer-link">Terms of Service</span>
+                    <span className="footer-link">Support</span>
+                    <span className="footer-link">Compliance</span>
+                </div>
+            </footer>
         </div>
     );
 };

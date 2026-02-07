@@ -105,7 +105,7 @@ const LandingPage: React.FC = () => {
 
             <div className="hero-section">
                 <div className="hero-content">
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                         <span style={{ width: '6px', height: '6px', background: 'var(--color-accent)', borderRadius: '50%' }}></span>
                         New: Advanced AI Recommendations
                     </div>
@@ -131,18 +131,26 @@ const LandingPage: React.FC = () => {
                                 {loading ? 'Sending...' : <>Get Access <ArrowRight size={18} /></>}
                             </button>
                         </div>
-                        <p className="form-note" style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <p className="form-note" style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <Shield size={14} color="var(--color-success)" />
                             Enterprise-grade security. No password required.
                         </p>
                     </form>
                 </div>
 
-                <BenefitsGrid />
+                <div className="hero-visual">
+                    <BenefitsGrid />
+                </div>
             </div>
 
-            <footer className="landing-footer" style={{ padding: '2rem', textAlign: 'center', fontSize: '0.8rem', color: 'var(--color-text-tertiary)', borderTop: '1px solid var(--color-border)' }}>
-                &copy; {new Date().getFullYear()} StockTracker Pro. Designed for high-frequency insights.
+            <footer className="landing-footer">
+                <p>&copy; {new Date().getFullYear()} StockTracker Pro. Institutional-grade analytics & security.</p>
+                <div className="footer-links">
+                    <span className="footer-link">Privacy Policy</span>
+                    <span className="footer-link">Terms of Service</span>
+                    <span className="footer-link">Support</span>
+                    <span className="footer-link">Compliance</span>
+                </div>
             </footer>
         </div>
     );

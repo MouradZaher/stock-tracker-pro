@@ -9,8 +9,7 @@ import { getAllSymbols } from '../data/sectors';
 // ============================================
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL ||
-    (window.location.hostname === 'localhost' ? 'https://stock-tracker-pro.vercel.app/api' : '/api');
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,

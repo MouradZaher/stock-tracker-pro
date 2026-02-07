@@ -2,16 +2,19 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMultipleQuotes } from '../services/stockDataService';
 
-const SYMBOLS = ['MSFT', 'TSLA', 'AMZN', 'GOOGL', 'META', '^GSPC'];
+const SYMBOLS = ['TSLA', 'AMZN', 'GOOGL', 'META', '^GSPC', 'AAPL', 'NVDA', 'MSFT', 'NFLX'];
 
 // Fallback data when API is unavailable - shows last known approximate prices
 const FALLBACK_DATA = [
-    { symbol: 'MSFT', price: 410.23, change: 0.56, isUp: true },
-    { symbol: 'TSLA', price: 361.62, change: 2.15, isUp: true },
-    { symbol: 'AMZN', price: 235.42, change: -0.32, isUp: false },
-    { symbol: 'GOOGL', price: 196.89, change: 1.12, isUp: true },
-    { symbol: 'META', price: 475.32, change: 1.54, isUp: true },
-    { symbol: 'S&P 500', price: 6061.48, change: 0.42, isUp: true }
+    { symbol: 'TSLA', price: 185.10, change: -0.85, isUp: false },
+    { symbol: 'AMZN', price: 178.35, change: 0.32, isUp: true },
+    { symbol: 'GOOGL', price: 146.40, change: -0.15, isUp: false },
+    { symbol: 'META', price: 478.15, change: 0.75, isUp: true },
+    { symbol: 'S&P 500', price: 5085.60, change: 0.12, isUp: true },
+    { symbol: 'AAPL', price: 188.45, change: 0.25, isUp: true },
+    { symbol: 'NVDA', price: 785.30, change: 1.15, isUp: true },
+    { symbol: 'MSFT', price: 412.50, change: 0.45, isUp: true },
+    { symbol: 'NFLX', price: 635.00, change: 1.50, isUp: true }
 ];
 
 const TopBar: React.FC = () => {
@@ -51,7 +54,9 @@ const TopBar: React.FC = () => {
         // 1. Try Live API Data
         if (quotes && quotes.has(sym)) {
             const quote = quotes.get(sym);
-            if (quote && quote.price > 0) {
+            // Sanity check: Ensure price is valid and change percent is not "insane" (e.g. > 20% or < -20%)
+            // This filters out bad API data or glitches like +1700%
+            if (quote && quote.price > 0 && Math.abs(quote.changePercent) < 20) {
                 return {
                     symbol: displayName,
                     price: quote.price,

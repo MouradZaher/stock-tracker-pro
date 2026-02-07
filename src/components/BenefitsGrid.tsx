@@ -4,6 +4,18 @@ import { TrendingUp, Shield, Zap, PieChart, Bell, BarChart3 } from 'lucide-react
 const BenefitsGrid: React.FC = () => {
     const benefits = [
         {
+            icon: Bell,
+            title: 'Custom Watchlists',
+            description: 'Create personalized watchlists and stay updated on your favorite stocks.',
+            gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(219, 39, 119, 0.05) 100%)'
+        },
+        {
+            icon: Shield,
+            title: 'Secure PIN Access',
+            description: 'Fast and secure authentication with 4-digit PIN. No passwords, no emails, instant access.',
+            gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.05) 100%)'
+        },
+        {
             icon: TrendingUp,
             title: 'Real-Time Market Data',
             description: 'Track S&P 500 stocks with live prices, charts, and comprehensive financial metrics.',
@@ -26,18 +38,6 @@ const BenefitsGrid: React.FC = () => {
             title: 'Advanced Analytics',
             description: 'Deep dive into company financials, ratios, and historical performance data.',
             gradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.05) 100%)'
-        },
-        {
-            icon: Bell,
-            title: 'Custom Watchlists',
-            description: 'Create personalized watchlists and stay updated on your favorite stocks.',
-            gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(219, 39, 119, 0.05) 100%)'
-        },
-        {
-            icon: Shield,
-            title: 'Secure PIN Access',
-            description: 'Fast and secure authentication with 4-digit PIN. No passwords, no emails, instant access.',
-            gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.05) 100%)'
         }
     ];
 

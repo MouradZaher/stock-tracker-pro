@@ -1,115 +1,146 @@
-import React from 'react';
-import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency, formatPercent } from '../utils/formatters';
+import React, { useState } from 'react';
+import { User, Briefcase, Plus, ExternalLink, Calendar } from 'lucide-react';
+import { formatCurrency } from '../utils/formatters';
+import { soundService } from '../services/soundService';
+import toast from 'react-hot-toast';
 
-interface FamousHolding {
-    symbol: string;
-    name: string;
-    price: number;
-    change: number;
-    changePercent: number;
-    sector: string;
-}
-
-// Mock data for display - in a real app, these would fetch live prices
-// For now, we'll just use static data or we could fetch them if we want to be fancy later
-// but the requirement is just "bring back the 12 famous portfolio holdings"
-const FAMOUS_STOCKS: FamousHolding[] = [
-    { symbol: 'AAPL', name: 'Apple Inc.', price: 185.92, change: 1.25, changePercent: 0.68, sector: 'Technology' },
-    { symbol: 'MSFT', name: 'Microsoft Corp.', price: 420.55, change: 3.45, changePercent: 0.82, sector: 'Technology' },
-    { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 178.22, change: -1.10, changePercent: -0.61, sector: 'Consumer Cyclical' },
-    { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 147.14, change: 2.15, changePercent: 1.48, sector: 'Communication Services' },
-    { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 788.17, change: 15.22, changePercent: 1.97, sector: 'Technology' },
-    { symbol: 'META', name: 'Meta Platforms', price: 484.03, change: -0.55, changePercent: -0.11, sector: 'Communication Services' },
-    { symbol: 'TSLA', name: 'Tesla Inc.', price: 199.95, change: -2.35, changePercent: -1.16, sector: 'Consumer Cyclical' },
-    { symbol: 'BRK.B', name: 'Berkshire Hathaway', price: 417.22, change: 4.12, changePercent: 1.00, sector: 'Financial Services' },
-    { symbol: 'LLY', name: 'Eli Lilly & Co.', price: 782.10, change: 8.50, changePercent: 1.10, sector: 'Healthcare' },
-    { symbol: 'AVGO', name: 'Broadcom Inc.', price: 1296.25, change: 12.45, changePercent: 0.97, sector: 'Technology' },
-    { symbol: 'JPM', name: 'JPMorgan Chase', price: 183.45, change: 1.15, changePercent: 0.63, sector: 'Financial Services' },
-    { symbol: 'V', name: 'Visa Inc.', price: 285.33, change: 0.85, changePercent: 0.30, sector: 'Financial Services' }
+// Data for Famous Portfolios
+const FAMOUS_PORTFOLIOS = [
+    {
+        id: 'nancy',
+        name: "Nancy Pelosi's Picks",
+        owner: "Nancy Pelosi",
+        description: "High-conviction tech & semi-conductor plays.",
+        holdings: [
+            { symbol: 'NVDA', name: 'NVIDIA Corp', price: 887.00, change: 4.5, allocation: '28%', type: 'Tech', lastUpdated: '2024-02-15' },
+            { symbol: 'MSFT', name: 'Microsoft Corp', price: 415.50, change: 1.2, allocation: '18%', type: 'Tech', lastUpdated: '2024-02-15' },
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '15%', type: 'Tech', lastUpdated: '2024-01-20' },
+            { symbol: 'PANW', name: 'Palo Alto Networks', price: 285.30, change: -0.8, allocation: '12%', type: 'Cyber', lastUpdated: '2024-02-10' },
+            { symbol: 'CRWD', name: 'CrowdStrike', price: 320.10, change: 2.1, allocation: '10%', type: 'Cyber', lastUpdated: '2024-02-12' },
+        ]
+    },
+    {
+        id: 'warren',
+        name: "Buffett's Core",
+        owner: "Warren Buffett",
+        description: "Value investing staples with strong moats.",
+        holdings: [
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '45%', type: 'Tech', lastUpdated: '2023-12-30' },
+            { symbol: 'BAC', name: 'Bank of America', price: 36.80, change: 1.1, allocation: '10%', type: 'Finance', lastUpdated: '2023-12-30' },
+            { symbol: 'AXP', name: 'American Express', price: 225.40, change: 0.9, allocation: '9%', type: 'Finance', lastUpdated: '2023-12-30' },
+            { symbol: 'KO', name: 'Coca-Cola', price: 60.20, change: -0.1, allocation: '8%', type: 'Consumer', lastUpdated: '2023-12-30' },
+            { symbol: 'CVX', name: 'Chevron Corp', price: 155.10, change: 0.4, allocation: '6%', type: 'Energy', lastUpdated: '2023-12-30' },
+        ]
+    },
+    {
+        id: 'ackman',
+        name: "Ackman's Alpha",
+        owner: "Bill Ackman",
+        description: "Concentrated bets on consumer staples.",
+        holdings: [
+            { symbol: 'CMG', name: 'Chipotle Mexican Grill', price: 2900.50, change: 2.1, allocation: '18%', type: 'Consumer', lastUpdated: '2024-01-15' },
+            { symbol: 'QSR', name: 'Restaurant Brands', price: 82.30, change: -0.2, allocation: '14%', type: 'Consumer', lastUpdated: '2024-01-15' },
+            { symbol: 'HLT', name: 'Hilton Worldwide', price: 205.10, change: 0.4, allocation: '12%', type: 'Hospitality', lastUpdated: '2024-01-15' },
+            { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 145.20, change: 1.5, allocation: '10%', type: 'Tech', lastUpdated: '2024-01-15' },
+        ]
+    }
 ];
 
-interface FamousHoldingsProps {
-    onQuickAdd: (symbol: string, name: string, price: number) => void;
-}
+const FamousHoldings: React.FC = () => {
+    const [activeTab, setActiveTab] = useState('nancy');
 
-const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
+    const activePortfolio = FAMOUS_PORTFOLIOS.find(p => p.id === activeTab) || FAMOUS_PORTFOLIOS[0];
+
+    const handleCopyTrade = (symbol: string) => {
+        soundService.playTap();
+        toast.success(`Copied ${symbol} trade setup`);
+    };
+
     return (
-        <div style={{ marginTop: '3rem', marginBottom: '2rem' }}>
-            <h3 style={{
-                fontSize: '1.25rem',
-                fontWeight: 700,
-                marginBottom: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem'
-            }}>
-                <span className="logo-icon" style={{ width: '32px', height: '32px', padding: '6px' }}>
-                    <TrendingUp size={18} color="white" />
-                </span>
-                Popular Holdings
-                <span style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    color: 'var(--color-text-tertiary)',
-                    background: 'var(--color-bg-tertiary)',
-                    padding: '4px 10px',
-                    borderRadius: '20px',
-                    marginLeft: 'auto'
-                }}>
-                    Quick Add
-                </span>
-            </h3>
+        <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+            <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--glass-border)' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Briefcase size={18} color="var(--color-accent)" /> Famous Portfolio Holdings
+                </h3>
+            </div>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '1rem'
-            }}>
-                {FAMOUS_STOCKS.map((stock) => (
-                    <div
-                        key={stock.symbol}
-                        className="glass-card"
+            {/* Tabs */}
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', overflowX: 'auto' }}>
+                {FAMOUS_PORTFOLIOS.map(portfolio => (
+                    <button
+                        key={portfolio.id}
+                        onClick={() => setActiveTab(portfolio.id)}
                         style={{
-                            padding: '1.25rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '1rem',
-                            cursor: 'default',
-                            transition: 'all 0.2s ease'
+                            flex: 1,
+                            padding: '1rem',
+                            background: activeTab === portfolio.id ? 'rgba(255,255,255,0.05)' : 'transparent',
+                            border: 'none',
+                            borderBottom: activeTab === portfolio.id ? '2px solid var(--color-accent)' : '2px solid transparent',
+                            color: activeTab === portfolio.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                            fontWeight: activeTab === portfolio.id ? 600 : 400,
+                            cursor: 'pointer',
+                            minWidth: '120px',
+                            transition: 'all 0.2s'
                         }}
                     >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{stock.symbol}</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{stock.name}</div>
-                            </div>
-                            <button
-                                className="btn btn-icon btn-small glass-button"
-                                onClick={() => onQuickAdd(stock.symbol, stock.name, stock.price)}
-                                title="Add to Portfolio"
-                                style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '8px',
-                                    color: 'var(--color-accent)'
-                                }}
-                            >
-                                <Plus size={18} />
-                            </button>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                            <User size={14} /> {portfolio.owner}
                         </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
-                            <div style={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                                {formatCurrency(stock.price)}
-                            </div>
-                            <div className={stock.change >= 0 ? 'text-success' : 'text-error'} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', fontWeight: 500 }}>
-                                {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                {formatPercent(stock.changePercent)}
-                            </div>
-                        </div>
-                    </div>
+                    </button>
                 ))}
+            </div>
+
+            <div style={{ padding: '1.25rem' }}>
+                <div style={{ marginBottom: '1.25rem' }}>
+                    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem' }}>{activePortfolio.name}</h4>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>{activePortfolio.description}</div>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                        <thead>
+                            <tr style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem', textAlign: 'left' }}>
+                                <th style={{ paddingBottom: '0.75rem' }}>Asset</th>
+                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Price</th>
+                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Alloc</th>
+                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Last Updated</th>
+                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {activePortfolio.holdings.map((stock, i) => (
+                                <tr key={stock.symbol} style={{ borderTop: '1px solid var(--glass-border)' }}>
+                                    <td style={{ padding: '0.75rem 0' }}>
+                                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{stock.symbol}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{stock.type}</div>
+                                    </td>
+                                    <td style={{ padding: '0.75rem 0', textAlign: 'right' }}>
+                                        <div style={{ fontWeight: 500 }}>{formatCurrency(stock.price)}</div>
+                                        <div style={{ fontSize: '0.75rem', color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                            {stock.change > 0 ? '+' : ''}{stock.change}%
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 500 }}>
+                                        {stock.allocation}
+                                    </td>
+                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+                                        {stock.lastUpdated}
+                                    </td>
+                                    <td style={{ padding: '0.75rem 0', textAlign: 'right' }}>
+                                        <button
+                                            className="glass-button"
+                                            style={{ padding: '4px 8px', borderRadius: '4px' }}
+                                            onClick={() => handleCopyTrade(stock.symbol)}
+                                            title="Copy Trade"
+                                        >
+                                            <Plus size={16} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

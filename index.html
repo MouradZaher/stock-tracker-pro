@@ -5,9 +5,13 @@
   <!-- Inline script to prevent theme flash - runs before anything else -->
   <script>
     (function () {
-      // Check localStorage for saved theme, default to dark
+      // Force dark theme as default on every load to fix accidental toggles
+      // The user can still switch it manually, but this ensures a dark start.
       const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.documentElement.setAttribute('data-theme', 'dark');
+      if (!localStorage.getItem('theme')) {
+        localStorage.setItem('theme', 'dark');
+      }
     })();
   </script>
 
@@ -99,7 +103,7 @@
 
 <body>
   <!-- Skip to main content for accessibility -->
-  <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
 
   <div id="root"></div>
 

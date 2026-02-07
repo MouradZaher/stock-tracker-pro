@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Check, X, Shield, Users, Clock, LogOut, Activity, Eye, Wallet } from 'lucide-react';
+import { Check, X, Shield, Users, LogOut, Activity, Eye, Wallet, Database, Server, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { yahooFinanceApi } from '../services/api';
 import AdminPortfolioView from './AdminPortfolioView';
@@ -26,28 +26,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     const { user, signOut } = useAuth();
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
-    const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'checking'>('checking');
     const [inspectingUser, setInspectingUser] = useState<{ id: string; email: string } | null>(null);
 
-    // Test API connection silently
-    const testApiConnection = async () => {
-        setApiStatus('checking');
+    // Detailed System Status
+    const [systemStatus, setSystemStatus] = useState({
+        api: { status: 'checking', latency: 0 },
+        db: { status: 'checking', latency: 0 }
+    });
+
+    const checkSystemHealth = async () => {
+        // Check API
+        const apiStart = performance.now();
         try {
-            // Test with a simple endpoint - don't show loading toast
-            await yahooFinanceApi.get('', { params: { symbols: 'AAPL' }, timeout: 3000 });
-            setApiStatus('online');
-            // Only show success toast on manual click, not on auto-load
-        } catch (error) {
-            console.log('API health check: Yahoo Finance API currently unreachable (normal on localhost)');
-            setApiStatus('offline');
-            // Don't show error toast - this is expected on localhost
+            await yahooFinanceApi.get('', { params: { symbols: 'SPY' }, timeout: 5000 });
+            const apiLatency = Math.round(performance.now() - apiStart);
+            setSystemStatus(prev => ({ ...prev, api: { status: 'online', latency: apiLatency } }));
+        } catch (e) {
+            setSystemStatus(prev => ({ ...prev, api: { status: 'offline', latency: 0 } }));
+        }
+
+        // Check Database
+        const dbStart = performance.now();
+        try {
+            const { count, error } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+            if (error) throw error;
+            const dbLatency = Math.round(performance.now() - dbStart);
+            setSystemStatus(prev => ({ ...prev, db: { status: 'online', latency: dbLatency } }));
+        } catch (e) {
+            setSystemStatus(prev => ({ ...prev, db: { status: 'error', latency: 0 } }));
         }
     };
 
     const fetchProfiles = async () => {
         setLoading(true);
-        // Check health on load
-        testApiConnection();
+        checkSystemHealth();
 
         try {
             const { data, error } = await supabase
@@ -55,11 +67,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Supabase profiles error:', error);
-                toast.error('Failed to load real profile data');
-                setProfiles([]);
-            } else {
+            if (data) {
                 // Fetch portfolio values for each user
                 const profilesWithValues = await Promise.all((data as Profile[]).map(async (profile) => {
                     try {
@@ -74,7 +82,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
             }
         } catch (err) {
             console.error('Exception fetching profiles:', err);
-            setProfiles([]);
         } finally {
             setLoading(false);
         }
@@ -87,8 +94,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     }, [isOpen]);
 
     const handleReject = async (id: string, email: string) => {
-        // In a real app, you might want to soft-delete or just block
-        // For now, we'll set approved to false (or keep it false)
         const { error } = await supabase
             .from('profiles')
             .update({ is_approved: false })
@@ -124,10 +129,44 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         </div>
                         <div>
                             <h2>Admin Dashboard</h2>
-                            <p className="admin-subtitle">Manage user access and permissions</p>
+                            <p className="admin-subtitle">System Overview & User Management</p>
                         </div>
                     </div>
                     <button className="btn-icon" onClick={onClose}><X size={24} /></button>
+                </div>
+
+                {/* System Status Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                    {/* API Status */}
+                    <div className="admin-stat-card">
+                        <Server size={20} className={systemStatus.api.status === 'online' ? "text-success" : "text-error"} />
+                        <div>
+                            <div className="stat-value" style={{ fontSize: '1rem' }}>
+                                {systemStatus.api.status === 'online' ? 'Online' : 'Offline'}
+                            </div>
+                            <div className="stat-label">Market Data API</div>
+                        </div>
+                    </div>
+                    {/* DB Status */}
+                    <div className="admin-stat-card">
+                        <Database size={20} className={systemStatus.db.status === 'online' ? "text-success" : "text-error"} />
+                        <div>
+                            <div className="stat-value" style={{ fontSize: '1rem' }}>
+                                {systemStatus.db.status === 'online' ? 'Connected' : 'Error'}
+                            </div>
+                            <div className="stat-label">User Database</div>
+                        </div>
+                    </div>
+                    {/* Latency */}
+                    <div className="admin-stat-card">
+                        <Clock size={20} className="text-accent" />
+                        <div>
+                            <div className="stat-value" style={{ fontSize: '1rem' }}>
+                                {systemStatus.api.latency > 0 ? `${systemStatus.api.latency}ms` : '--'}
+                            </div>
+                            <div className="stat-label">Avg. Latency</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="admin-stats">
@@ -147,26 +186,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                             {formatCurrency(profiles.reduce((sum, p) => sum + (p.portfolioValue || 0), 0))}
                         </span>
                         <span className="stat-label">Total AUM</span>
-                    </div>
-                    <div className="admin-stat-card"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => {
-                            toast.promise(
-                                testApiConnection(),
-                                {
-                                    loading: 'Testing API connection...',
-                                    success: 'API is online and reachable',
-                                    error: 'API unreachable (normal on localhost)'
-                                }
-                            );
-                        }}
-                        title="Click to test API connection"
-                    >
-                        <Activity size={20} className={apiStatus === 'online' ? "text-success" : apiStatus === 'offline' ? "text-warning" : "text-muted"} />
-                        <span className="stat-value" style={{ fontSize: '1rem' }}>
-                            {apiStatus === 'online' ? 'Online' : apiStatus === 'offline' ? 'Offline' : 'Unknown'}
-                        </span>
-                        <span className="stat-label">System Status{apiStatus === 'offline' ? ' (click to retry)' : ''}</span>
                     </div>
                 </div>
 

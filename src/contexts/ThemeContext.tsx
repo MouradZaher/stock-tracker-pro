@@ -14,11 +14,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [theme, setThemeState] = useState<Theme>(() => {
         // 1. Check local storage
         const savedTheme = localStorage.getItem('theme') as Theme;
-        if (savedTheme) return savedTheme;
+        if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
 
-
-
-        // 3. Default fallback
+        // 2. Default fallback - always dark for new visitors or reset
         return 'dark';
     });
 

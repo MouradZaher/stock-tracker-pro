@@ -42,7 +42,7 @@ export default defineConfig({
     open: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://stock-tracker-pro.vercel.app',
         changeOrigin: true,
         secure: false,
       },
