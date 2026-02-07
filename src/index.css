@@ -135,6 +135,8 @@ html[data-theme='light'] {
     overflow: hidden !important;
     height: calc(100vh - var(--header-height)) !important;
     min-height: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
     /* Override any min-height that forces scroll */
   }
 }
@@ -2727,9 +2729,15 @@ body {
   }
 }
 
-@media (min-width: 769px) {
-  .mobile-only {
-    display: none !important;
+.mobile-only {
+  display: none !important;
+}
+}
+
+/* Mobile-specific adjustments moved here to ensure precedence */
+@media (max-width: 768px) {
+  .home-tab-content {
+    padding-bottom: calc(var(--mobile-nav-height) + 20px) !important;
   }
 }
 
