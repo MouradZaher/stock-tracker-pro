@@ -144,13 +144,13 @@ const LandingPage: React.FC = () => {
             </div>
 
             <footer className="landing-footer">
-                <p>&copy; {new Date().getFullYear()} StockTracker Pro. Institutional-grade analytics & security.</p>
-                <div className="footer-links">
+                <div className="footer-links" style={{ marginBottom: '1rem' }}>
                     <span className="footer-link">Privacy Policy</span>
                     <span className="footer-link">Terms of Service</span>
                     <span className="footer-link">Support</span>
                     <span className="footer-link">Compliance</span>
                 </div>
+                <p>&copy; {new Date().getFullYear()} StockTracker Pro. Institutional-grade analytics & security.</p>
             </footer>
         </div>
     );
