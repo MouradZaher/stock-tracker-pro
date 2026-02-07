@@ -99,6 +99,65 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     </div>
                 </div>
 
+                {/* Daily Strategy Reports */}
+                <div className="glass-card" style={{ padding: '1.5rem', gridColumn: '1 / -1' }}>
+                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <BarChart3 size={16} /> Daily Strategy Intelligence
+                    </h3>
+                    <div style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        overflowX: 'auto',
+                        paddingBottom: '0.5rem',
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none'
+                    }}>
+                        <img
+                            src="/ai-reports/ai_strategy_1.png"
+                            alt="Market Context"
+                            style={{
+                                height: '250px',
+                                width: 'auto',
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--glass-border)',
+                                cursor: 'pointer'
+                            }}
+                            onClick={(e) => {
+                                // Simple interactions
+                                const img = e.target as HTMLImageElement;
+                                if (img.style.height === '250px') {
+                                    img.style.height = 'auto';
+                                    img.style.width = '100%';
+                                } else {
+                                    img.style.height = '250px';
+                                    img.style.width = 'auto';
+                                }
+                            }}
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                // Show placeholder text if image missing
+                                const parent = target.parentElement;
+                                if (parent) {
+                                    parent.innerHTML = '<div style="padding:1rem; color:var(--color-text-secondary); font-style:italic">Daily reports pending upload to public/ai-reports/</div>';
+                                }
+                            }}
+                        />
+                        <img
+                            src="/ai-reports/ai_strategy_2.png"
+                            alt="Trade Setups"
+                            style={{
+                                height: '250px',
+                                width: 'auto',
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--glass-border)',
+                                cursor: 'pointer'
+                            }}
+                            onError={(e) => (e.target as HTMLImageElement).style.display = 'none'}
+                        />
+                    </div>
+                </div>
+
                 {/* Strategy Simulator - Innovation */}
                 <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
                     <h3 style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
