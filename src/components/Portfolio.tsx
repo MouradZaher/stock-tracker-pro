@@ -9,6 +9,7 @@ import { getSectorForSymbol } from '../data/sectors';
 import SymbolSearchInput from './SymbolSearchInput';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
+import FamousHoldings from './FamousHoldings';
 
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
@@ -452,6 +453,11 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     </div>
                 </div>
             )}
+            {/* Famous Holdings Quick Add */}
+            <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>
+                <FamousHoldings onQuickAdd={handleQuickAdd} />
+            </div>
+
         </div>
     );
 };
