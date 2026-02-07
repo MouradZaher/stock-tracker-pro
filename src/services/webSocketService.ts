@@ -23,7 +23,7 @@ class WebSocketService {
     private reconnectDelay = 1000;
     private isConnecting = false;
     private lastPrices: Map<string, { price: number; previousClose: number }> = new Map();
-    private heartbeatInterval: NodeJS.Timeout | null = null;
+    private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
 
     constructor() {
         this.apiKey = import.meta.env.VITE_FINNHUB_API_KEY || '';
