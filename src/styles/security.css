@@ -7,6 +7,11 @@
 /* Body selection allowed */
 body {
     -webkit-touch-callout: default;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+    pointer-events: auto !important;
 }
 
 /* Allow selection in form inputs */
@@ -21,12 +26,12 @@ textarea,
 
 /* Disable image dragging and saving */
 img {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-    pointer-events: none;
+    -webkit-user-drag: auto;
+    -khtml-user-drag: auto;
+    -moz-user-drag: auto;
+    -o-user-drag: auto;
+    user-drag: auto;
+    pointer-events: auto;
 }
 
 /* Re-enable pointer events for interactive images */
