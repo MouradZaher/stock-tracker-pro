@@ -47,21 +47,22 @@
    ========================================= */
 @media (max-width: 768px) {
 
-    /* Root scrolling control */
+    /* Root scrolling control - ALLOW SCROLLING */
     html,
     body {
-        height: 100%;
-        height: -webkit-fill-available;
-        overflow: hidden;
-        position: fixed;
+        height: auto;
+        min-height: 100%;
+        min-height: -webkit-fill-available;
+        overflow-x: hidden;
+        overflow-y: auto;
+        position: relative;
         width: 100%;
         touch-action: manipulation;
     }
 
     #root {
-        height: 100%;
-        height: -webkit-fill-available;
-        overflow: hidden;
+        min-height: 100%;
+        min-height: -webkit-fill-available;
     }
 
     .app {
@@ -101,16 +102,19 @@
         padding-bottom: calc(20px + var(--safe-area-bottom));
     }
 
-    /* Home tab - NO scroll (heatmap fills screen) */
+    /* Home tab - ALLOW vertical scroll */
     .home-tab-content {
-        overflow: hidden !important;
-        overscroll-behavior: none;
-        touch-action: pan-x pinch-zoom;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        touch-action: pan-y pinch-zoom;
     }
 
     /* Other tabs - enable vertical scroll */
     .tab-content:not(.home-tab-content) {
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
         overscroll-behavior-y: contain;
     }
 }

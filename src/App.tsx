@@ -113,7 +113,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={
-            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--header-height))', overflow: 'hidden' }}>
+            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', paddingBottom: 'calc(var(--mobile-nav-height) + 20px)' }}>
               {!selectedSymbol ? (
                 <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '0 0.5rem 0' }}>
                   <div style={{ marginBottom: '0.25rem', textAlign: 'center' }}>

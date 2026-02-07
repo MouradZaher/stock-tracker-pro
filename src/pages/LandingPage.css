@@ -1,13 +1,13 @@
-/* Landing Page - Strict No Vertical Scroll Layout */
+/* Landing Page - Allow scrolling on mobile */
 .landing-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-height: 100vh;
   width: 100%;
   position: relative;
   background: radial-gradient(circle at top right, #1e1b4b 0%, #0a0a0f 40%);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Live Ticker - Minimal Height */
