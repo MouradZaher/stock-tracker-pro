@@ -2,7 +2,7 @@ import React from 'react';
 import { soundService } from '../services/soundService';
 import { useTheme } from '../contexts/ThemeContext';
 import { LogOut, Sun, Moon, Shield, LayoutDashboard, List, Briefcase, Activity } from 'lucide-react';
-import BrainIconV2 from './icons/BrainIconV2';
+import BrainIcon from './icons/BrainIcon';
 import HomeIcon from './icons/HomeIcon';
 import type { TabType } from '../types';
 
@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const { theme, toggleTheme } = useTheme();
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: HomeIcon, isCustomIcon: true },
-        { id: 'recommendations', label: 'AI', icon: BrainIconV2, isCustomIcon: true },
+        { id: 'recommendations', label: 'AI', icon: BrainIcon, isCustomIcon: true },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
         { id: 'pulse', label: 'Pulse', icon: Activity },
