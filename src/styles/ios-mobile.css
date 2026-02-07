@@ -225,18 +225,29 @@
    ========================================= */
 @media (max-width: 768px) {
 
+    /* Force heatmap container to fill most of the screen */
     .stock-heatmap,
     .heatmap-container {
-        height: calc(100vh - 160px) !important;
-        min-height: 500px !important;
-        max-height: none !important;
+        height: 70vh !important;
+        min-height: 550px !important;
+        max-height: calc(100vh - 180px) !important;
         overflow: hidden;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
-    .heatmap-container .tradingview-widget-container,
-    .heatmap-container .tradingview-widget-container__widget {
+    /* Force TradingView widget containers to fill parent */
+    .heatmap-container .tradingview-widget-container {
+        flex: 1 !important;
         height: 100% !important;
-        min-height: 480px !important;
+        min-height: 500px !important;
+    }
+
+    .heatmap-container .tradingview-widget-container__widget,
+    .heatmap-container .tradingview-widget-container__widget iframe {
+        height: 100% !important;
+        min-height: 500px !important;
+        display: block !important;
     }
 
     /* Allow pinch-zoom on heatmap */
@@ -244,15 +255,21 @@
         touch-action: pan-x pan-y pinch-zoom;
     }
 
-    /* Reduce title spacing on mobile */
+    /* Reduce title spacing on mobile to maximize heatmap space */
     .home-tab-content h2 {
-        font-size: 1rem !important;
-        margin: 0.25rem 0 !important;
+        font-size: 0.95rem !important;
+        margin: 0.15rem 0 !important;
+        line-height: 1.2;
     }
 
     .home-tab-content p {
-        font-size: 0.7rem !important;
-        margin: 0 !important;
+        font-size: 0.65rem !important;
+        margin: 0 0 0.25rem 0 !important;
+    }
+
+    /* Reduce container padding */
+    .home-tab-content>div {
+        padding: 0 0.5rem 0.25rem !important;
     }
 }
 
