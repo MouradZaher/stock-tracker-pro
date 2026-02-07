@@ -48,26 +48,36 @@ const TopBar: React.FC = () => {
         }
     };
 
-    // Build ticker items from API data or use fallback
-    let tickerItems: { symbol: string; price: number; change: number; isUp: boolean }[] = [];
+    // Robust Merge: Iterate through desired symbols. Try API first, then Fallback.
+    const tickerItems = SYMBOLS.map(sym => {
+        const displayName = getDisplayName(sym);
 
-    if (quotes && quotes.size > 0) {
-        tickerItems = SYMBOLS.map(sym => {
+        // 1. Try Live API Data
+        if (quotes && quotes.has(sym)) {
             const quote = quotes.get(sym);
-            if (!quote || quote.price === 0) return null;
-            return {
-                symbol: getDisplayName(sym),
-                price: quote.price,
-                change: quote.changePercent,
-                isUp: quote.changePercent >= 0
-            };
-        }).filter(Boolean) as typeof tickerItems;
-    }
+            if (quote && quote.price > 0) {
+                return {
+                    symbol: displayName,
+                    price: quote.price,
+                    change: quote.changePercent,
+                    isUp: quote.changePercent >= 0
+                };
+            }
+        }
 
-    // Use fallback if no real data available
-    if (tickerItems.length === 0) {
-        tickerItems = FALLBACK_DATA;
-    }
+        // 2. Try Fallback Data
+        const fallbackItem = FALLBACK_DATA.find(f => f.symbol === displayName || f.symbol === sym);
+        if (fallbackItem) {
+            return {
+                symbol: fallbackItem.symbol,
+                price: fallbackItem.price,
+                change: fallbackItem.change,
+                isUp: fallbackItem.isUp
+            };
+        }
+
+        return null;
+    }).filter(Boolean) as { symbol: string; price: number; change: number; isUp: boolean }[];
 
     return (
         <div className="top-bar glass-effect" style={{
