@@ -227,14 +227,32 @@
 
     .stock-heatmap,
     .heatmap-container {
-        height: calc(100vh - 180px - var(--safe-area-top) - var(--safe-area-bottom));
-        min-height: 400px;
+        height: calc(100vh - 160px) !important;
+        min-height: 500px !important;
+        max-height: none !important;
         overflow: hidden;
+    }
+
+    .heatmap-container .tradingview-widget-container,
+    .heatmap-container .tradingview-widget-container__widget {
+        height: 100% !important;
+        min-height: 480px !important;
     }
 
     /* Allow pinch-zoom on heatmap */
     .tradingview-widget-container {
         touch-action: pan-x pan-y pinch-zoom;
+    }
+
+    /* Reduce title spacing on mobile */
+    .home-tab-content h2 {
+        font-size: 1rem !important;
+        margin: 0.25rem 0 !important;
+    }
+
+    .home-tab-content p {
+        font-size: 0.7rem !important;
+        margin: 0 !important;
     }
 }
 
