@@ -65,6 +65,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
+                .neq('is_approved', false) // Exclude revoked users
                 .order('created_at', { ascending: false });
 
             if (data) {

@@ -5,6 +5,7 @@ import { formatCurrency } from '../utils/formatters';
 import toast from 'react-hot-toast';
 import { soundService } from '../services/soundService';
 import SearchEngine from './SearchEngine';
+import FamousHoldings from './FamousHoldings';
 
 interface AIRecommendationsProps {
     onSelectStock?: (symbol: string) => void;
@@ -18,10 +19,18 @@ const MOCK_RECOMMENDATIONS = [
     { symbol: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', price: 240.94, score: 100, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 67.8 shows neutral momentum', 'Bullish trend: 50-day MA above 200-day MA'] },
     { symbol: 'UNH', name: 'UnitedHealth Group', sector: 'Healthcare', price: 277.81, score: 94, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 52.9 shows neutral momentum', 'Bullish trend: 50-day MA above 200-day MA'] },
     { symbol: 'LLY', name: 'Eli Lilly and Company', sector: 'Healthcare', price: 1060.02, score: 89, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 18.3 indicates oversold conditions', 'Bullish trend: 50-day MA above 200-day MA'] },
+    { symbol: 'AMD', name: 'Advanced Micro Devices', sector: 'Technology', price: 178.20, score: 88, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['Breaking out of consolidation pattern', 'Analysts upgrade price target'] },
+    { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', price: 142.50, score: 87, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['Undervalued relative to sector', 'Strong ad revenue growth'] },
+    { symbol: 'AMZN', name: 'Amazon.com Inc.', sector: 'Cons. Cyclical', price: 175.30, score: 85, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['AWS growth accelerating', 'Operating margins improving'] },
+    { symbol: 'MSFT', name: 'Microsoft Corp', sector: 'Technology', price: 415.50, score: 85, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['AI integration driving cloud growth', 'Solid automated checklist score'] },
+    { symbol: 'PLTR', name: 'Palantir Technologies', sector: 'Technology', price: 25.40, score: 82, recommendation: 'Buy', suggestedAllocation: 3, reasoning: ['Momentum signal triggered', 'High institutional volume'] },
 ];
 
 const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) => {
     const [detailSymbol, setDetailSymbol] = useState<string | null>(null);
+    const [showReportModal, setShowReportModal] = useState<number | null>(null);
+    const [showBacktestModal, setShowBacktestModal] = useState(false);
+
     const [checklist, setChecklist] = useState({
         positiveBreadth: true,
         volumeHigh: true,
@@ -50,6 +59,16 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     const handleWatchlistToggle = () => {
         soundService.playTap();
         toast.success(`Added ${detailSymbol} to Watchlist`);
+    };
+
+    const handleReadReport = (id: number) => {
+        soundService.playTap();
+        setShowReportModal(id);
+    };
+
+    const handleRunBacktest = () => {
+        soundService.playSuccess();
+        setShowBacktestModal(true);
     };
 
     const getScoreColor = (score: number) => {
@@ -93,9 +112,9 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     <div style={{ display: 'flex', gap: '1rem', fontSize: '0.7rem', textAlign: 'center' }}>
                         {[
                             { code: 'EGX', time: '10:00AM - 2:30PM', active: false },
-                            { code: 'LND', time: '8:00AM - 4:30PM', active: false },
-                            { code: 'NYC', time: '9:30AM - 4:00PM', active: true },
-                            { code: 'TKY', time: '9:00AM - 3:00PM', active: false },
+                            { code: 'LND', time: '10:00AM - 6:30PM', active: false },
+                            { code: 'NYC', time: '4:30PM - 11:00PM', active: true },
+                            { code: 'TKY', time: '2:00AM - 8:00AM', active: false },
                         ].map(session => (
                             <div key={session.code} style={{ opacity: session.active ? 1 : 0.4 }}>
                                 <div style={{ fontWeight: 700, marginBottom: '2px', color: session.active ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
@@ -295,7 +314,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
                         Test AI performance against S&P 500 over the last 12 months.
                     </p>
-                    <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => soundService.playSuccess()}>Run Backtest</button>
+                    <button className="btn btn-primary" style={{ width: '100%' }} onClick={handleRunBacktest}>Run Backtest</button>
                 </div>
             </div>
 
@@ -317,7 +336,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                     <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>Key levels for SPY, QQQ, and NVDA.</div>
                                 </div>
                             </div>
-                            <button className="btn btn-secondary btn-small">Read</button>
+                            <button className="btn btn-secondary btn-small" onClick={() => handleReadReport(i)}>Read</button>
                         </div>
                     ))}
                 </div>
@@ -337,8 +356,9 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             </div>
 
-            <div className="table-container" style={{ overflowX: 'auto' }}>
-                <table className="portfolio-table">
+            {/* Vertical Scroll List instead of Horizontal Table */}
+            <div className="glass-card" style={{ padding: '0.5rem', marginBottom: '2rem', maxHeight: '500px', overflowY: 'auto' }}>
+                <table className="portfolio-table" style={{ minWidth: '100%' }}>
                     <thead>
                         <tr>
                             <th>Symbol</th>
@@ -379,6 +399,77 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     </tbody>
                 </table>
             </div>
+
+            {/* Famous Holdings */}
+            <div style={{ marginBottom: '2rem' }}>
+                <FamousHoldings />
+            </div>
+
+            {/* Models */}
+            {showReportModal !== null && (
+                <div className="modal-overlay glass-blur" onClick={() => setShowReportModal(null)}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                        <div className="modal-header">
+                            <h3 className="modal-title">Pre-Market Analysis</h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setShowReportModal(null)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                            <p style={{ marginBottom: '1rem' }}><strong>Key Levels for Feb {7 + showReportModal}:</strong></p>
+                            <p>SPY Support: $492.50, Resistance: $505.00</p>
+                            <p>QQQ Support: $425.00, Resistance: $440.00</p>
+                            <p>NVDA Pivot: $700.00. Look for volume confirmation above $710.</p>
+                            <p style={{ marginTop: '1rem', color: 'var(--color-text-secondary)' }}>
+                                Overall market sentiment remains bullish but cautious ahead of CPI data. Tech sector leading momentum.
+                            </p>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={() => setShowReportModal(null)}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showBacktestModal && (
+                <div className="modal-overlay glass-blur" onClick={() => setShowBacktestModal(false)}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+                        <div className="modal-header">
+                            <h3 className="modal-title">Strategy Simulator Results</h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setShowBacktestModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', marginBottom: '1.5rem' }}>
+                                <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--color-success)' }}>+24.8%</div>
+                                <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Annualized Return (Adjusted)</div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.9rem' }}>
+                                <div className="flex justify-between">
+                                    <span style={{ color: 'var(--color-text-secondary)' }}>vs S&P 500</span>
+                                    <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>+12.4%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span style={{ color: 'var(--color-text-secondary)' }}>Max Drawdown</span>
+                                    <span>-8.5%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span style={{ color: 'var(--color-text-secondary)' }}>Win Rate</span>
+                                    <span>68%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span style={{ color: 'var(--color-text-secondary)' }}>Sharpe Ratio</span>
+                                    <span>1.85</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-primary" onClick={() => setShowBacktestModal(false)}>Done</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

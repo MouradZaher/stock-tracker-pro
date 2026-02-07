@@ -173,12 +173,23 @@ const PROVIDERS = [
                 provider: 'stooq'
             };
         },
-        buildParams: (symbols) => ({
-            s: symbols.split(',')[0].toLowerCase() + '.us',
-            f: 'sd2t2ohlcv',
-            h: '',
-            e: 'csv'
-        }),
+        buildParams: (symbols) => {
+            let symbol = symbols.split(',')[0].toLowerCase();
+            // Stooq symbol mapping for indices
+            if (symbol === '^gspc') symbol = '^spx';
+            else if (symbol === '^dji') symbol = '^dji';
+            else if (symbol === '^ixic') symbol = '^icic';
+            else if (symbol === '^rut') symbol = '^rut';
+            else if (symbol === '^vix') symbol = '^vix';
+            else if (!symbol.includes('.')) symbol += '.us'; // Default to US stocks if no suffix
+
+            return {
+                s: symbol,
+                f: 'sd2t2ohlcv',
+                h: '',
+                e: 'csv'
+            };
+        },
     }
 ];
 
@@ -263,7 +274,8 @@ export default async function handler(req, res) {
 
     // All providers failed
     console.error(`💥 ALL PROVIDERS FAILED for ${symbols}`);
-    return res.status(500).json({
+    // Return 200 with error flag to prevent frontend crash
+    return res.status(200).json({
         error: 'All data providers failed',
         details: lastError?.message || 'Unknown error',
         quoteResponse: {
@@ -271,6 +283,7 @@ export default async function handler(req, res) {
                 symbol: symbols.split(',')[0],
                 regularMarketPrice: 0,
                 longName: `${symbols} (Unavailable)`,
+                shortName: `${symbols} (Unavailable)`,
                 _error: true
             }],
             error: { description: 'All providers failed' }

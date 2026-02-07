@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, ArrowRight, Mail, Lock } from 'lucide-react';
+import { Shield, ArrowRight, Mail, Lock, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LiveTicker from '../components/LiveTicker';
 import BenefitsGrid from '../components/BenefitsGrid';
 import { soundService } from '../services/soundService';
 import './LandingPage.css';
 
+const FOOTER_CONTENT = {
+    privacy: {
+        title: "Privacy Policy",
+        content: "At StockTracker Pro, we prioritize the protection of your personal and financial data. We employ industry-standard encryption and security protocols to ensure your information remains confidential. We do not sell your data to third parties.\n\nStockTracker Pro adheres to all relevant financial regulations and data protection laws. We maintain strict compliance standards to ensure a safe and transparent trading environment for all users."
+    },
+    terms: {
+        title: "Terms of Service",
+        content: "By using StockTracker Pro, you agree to our terms. Our platform provides financial data for informational purposes only. We are not responsible for investment decisions made based on this data. Trading involves risk."
+    },
+    support: {
+        title: "Support",
+        content: "Our dedicated support team is available 24/7 to assist you. Whether you have technical issues or questions about our features, we are here to help. Contact us at support@stocktracker.pro."
+    }
+};
+
 const LandingPage: React.FC = () => {
     const { signInWithEmail } = useAuth();
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [linkSent, setLinkSent] = useState(false);
+    const [activeModal, setActiveModal] = useState<keyof typeof FOOTER_CONTENT | null>(null);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -145,13 +161,32 @@ const LandingPage: React.FC = () => {
 
             <footer className="landing-footer">
                 <div className="footer-links" style={{ marginBottom: '1rem' }}>
-                    <span className="footer-link">Privacy Policy</span>
-                    <span className="footer-link">Terms of Service</span>
-                    <span className="footer-link">Support</span>
-                    <span className="footer-link">Compliance</span>
+                    <span className="footer-link" onClick={() => setActiveModal('privacy')} style={{ cursor: 'pointer' }}>Privacy Policy</span>
+                    <span className="footer-link" onClick={() => setActiveModal('terms')} style={{ cursor: 'pointer' }}>Terms of Service</span>
+                    <span className="footer-link" onClick={() => setActiveModal('support')} style={{ cursor: 'pointer' }}>Support</span>
                 </div>
-                <p>&copy; {new Date().getFullYear()} StockTracker Pro. Institutional-grade analytics & security.</p>
+                <p>&copy; {new Date().getFullYear()} StockTracker Pro</p>
             </footer>
+
+            {/* Footer Modal */}
+            {activeModal && (
+                <div className="modal-overlay glass-blur" onClick={() => setActiveModal(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)', padding: '0', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+                        <div className="modal-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 className="modal-title" style={{ margin: 0, fontSize: '1.25rem', color: 'var(--color-text-primary)' }}>{FOOTER_CONTENT[activeModal].title}</h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setActiveModal(null)} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-tertiary)', cursor: 'pointer' }}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body" style={{ padding: '1.5rem', fontSize: '1rem', lineHeight: '1.6', color: 'var(--color-text-secondary)' }}>
+                            {FOOTER_CONTENT[activeModal].content}
+                        </div>
+                        <div className="modal-footer" style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.2)' }}>
+                            <button className="btn btn-primary" onClick={() => setActiveModal(null)}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

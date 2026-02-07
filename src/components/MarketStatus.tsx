@@ -24,7 +24,7 @@ const MarketStatus: React.FC = () => {
             setCairoTime(cairoFormatter.format(now));
 
             // Helper to check session status
-            const getSessionStatus = (tz: string, openH: number, openM: number, closeH: number, closeM: number, isEgypt = false) => {
+            const getSessionStatus = (tz: string, openH: number, openM: number, closeH: number, closeM: number, isEgypt = false, manualRange = '') => {
                 const formatter = new Intl.DateTimeFormat('en-US', {
                     timeZone: tz,
                     hour: 'numeric',
@@ -50,34 +50,18 @@ const MarketStatus: React.FC = () => {
 
                 const isOpen = !isWeekend && timeInMinutes >= openMinutes && timeInMinutes < closeMinutes;
 
-                // Calculate EGP Range - Fixed timezone conversion
-                const getEGPTime = (h: number, m: number) => {
-                    const tzHours = new Date(now.toLocaleString('en-US', { timeZone: tz }));
-                    tzHours.setHours(h, m, 0, 0);
-
-                    const cairoTime = new Date(tzHours.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));
-
-                    const cairoHour = cairoTime.getHours();
-                    const cairoMinute = cairoTime.getMinutes();
-
-                    const period = cairoHour >= 12 ? 'PM' : 'AM';
-                    const h12 = cairoHour % 12 || 12;
-
-                    return `${h12}:${cairoMinute.toString().padStart(2, '0')}${period}`;
-                };
-
                 return {
                     isOpen,
-                    rangeEGP: `${getEGPTime(openH, openM)} - ${getEGPTime(closeH, closeM)}`
+                    rangeEGP: manualRange || "09:00AM - 05:00PM" // Fallback
                 };
             };
 
-            setNyStatus(getSessionStatus('America/New_York', 9, 30, 16, 0));
-            setTokyoStatus(getSessionStatus('Asia/Tokyo', 9, 0, 15, 0));
-            setHongkongStatus(getSessionStatus('Asia/Hong_Kong', 9, 30, 16, 0));
-            setShanghaiStatus(getSessionStatus('Asia/Shanghai', 9, 30, 15, 0));
-            setLondonStatus(getSessionStatus('Europe/London', 8, 0, 16, 30));
-            setEgyptStatus(getSessionStatus('Africa/Cairo', 10, 0, 14, 30, true));
+            setNyStatus(getSessionStatus('America/New_York', 9, 30, 16, 0, false, "04:30PM - 11:00PM"));
+            setTokyoStatus(getSessionStatus('Asia/Tokyo', 9, 0, 15, 0, false, "02:00AM - 08:00AM"));
+            setHongkongStatus(getSessionStatus('Asia/Hong_Kong', 9, 30, 16, 0, false, "04:30AM - 11:00AM"));
+            setShanghaiStatus(getSessionStatus('Asia/Shanghai', 9, 30, 15, 0, false, "04:30AM - 10:00AM"));
+            setLondonStatus(getSessionStatus('Europe/London', 8, 0, 16, 30, false, "10:00AM - 06:30PM"));
+            setEgyptStatus(getSessionStatus('Africa/Cairo', 10, 0, 14, 30, true, "10:00AM - 02:30PM"));
         };
 
         updateTime();

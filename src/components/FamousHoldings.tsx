@@ -46,14 +46,22 @@ const FAMOUS_PORTFOLIOS = [
     }
 ];
 
-const FamousHoldings: React.FC = () => {
+interface FamousHoldingsProps {
+    onQuickAdd?: (symbol: string, name: string, price: number) => void;
+}
+
+const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
     const [activeTab, setActiveTab] = useState('nancy');
 
     const activePortfolio = FAMOUS_PORTFOLIOS.find(p => p.id === activeTab) || FAMOUS_PORTFOLIOS[0];
 
-    const handleCopyTrade = (symbol: string) => {
+    const handleCopyTrade = (symbol: string, name: string, price: number) => {
         soundService.playTap();
-        toast.success(`Copied ${symbol} trade setup`);
+        if (onQuickAdd) {
+            onQuickAdd(symbol, name, price);
+        } else {
+            toast.success(`Copied ${symbol} trade setup`);
+        }
     };
 
     return (
@@ -130,7 +138,7 @@ const FamousHoldings: React.FC = () => {
                                         <button
                                             className="glass-button"
                                             style={{ padding: '4px 8px', borderRadius: '4px' }}
-                                            onClick={() => handleCopyTrade(stock.symbol)}
+                                            onClick={() => handleCopyTrade(stock.symbol, stock.name, stock.price)}
                                             title="Copy Trade"
                                         >
                                             <Plus size={16} />

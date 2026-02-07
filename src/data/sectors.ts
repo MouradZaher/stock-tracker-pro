@@ -136,6 +136,10 @@ export const POPULAR_ETFS = [
     { symbol: 'XLV', name: 'Health Care Select Sector SPDR Fund', sector: 'Healthcare' },
     { symbol: 'XLF', name: 'Financial Select Sector SPDR Fund', sector: 'Financial Services' },
     { symbol: 'PHO', name: 'Invesco Water Resources ETF', sector: 'Utilities' },
+    { symbol: 'SLV', name: 'iShares Silver Trust', sector: 'Commodities' },
+    { symbol: 'GLD', name: 'SPDR Gold Shares', sector: 'Commodities' },
+    { symbol: 'USO', name: 'United States Oil Fund', sector: 'Commodities' },
+    { symbol: 'TLT', name: 'iShares 20+ Year Treasury Bond ETF', sector: 'Fixed Income' },
 ];
 
 // Get sector for a symbol
