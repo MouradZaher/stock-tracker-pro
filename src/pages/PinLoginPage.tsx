@@ -323,6 +323,15 @@ const PinLoginPage: React.FC = () => {
                 <BenefitsGrid />
             </div>
 
+            {/* Footer - Restored */}
+            <div className="login-footer">
+                <p>© 2026 StockTracker Pro. Enterprise Grade Security.</p>
+                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem' }}>
+                    <span style={{ cursor: 'pointer', opacity: 0.7 }}>Privacy Policy</span>
+                    <span style={{ cursor: 'pointer', opacity: 0.7 }}>Terms of Service</span>
+                    <span style={{ cursor: 'pointer', opacity: 0.7 }}>Support</span>
+                </div>
+            </div>
         </div>
     );
 };
