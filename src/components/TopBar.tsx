@@ -2,20 +2,16 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMultipleQuotes } from '../services/stockDataService';
 
-const SYMBOLS = ['^GSPC', '^DJI', '^IXIC', 'AAPL', 'NVDA', 'MSFT', 'TSLA', 'AMZN', 'GOOGL', 'META'];
+const SYMBOLS = ['MSFT', 'TSLA', 'AMZN', 'GOOGL', 'META', '^GSPC'];
 
 // Fallback data when API is unavailable - shows last known approximate prices
 const FALLBACK_DATA = [
-    { symbol: 'S&P 500', price: 6061.48, change: 0.42, isUp: true },
-    { symbol: 'DOWJ', price: 44298.46, change: 0.35, isUp: true },
-    { symbol: 'NASDAQ', price: 19791.99, change: 0.78, isUp: true },
-    { symbol: 'AAPL', price: 232.47, change: 1.24, isUp: true },
-    { symbol: 'NVDA', price: 118.42, change: -0.89, isUp: false },
     { symbol: 'MSFT', price: 410.23, change: 0.56, isUp: true },
     { symbol: 'TSLA', price: 361.62, change: 2.15, isUp: true },
     { symbol: 'AMZN', price: 235.42, change: -0.32, isUp: false },
     { symbol: 'GOOGL', price: 196.89, change: 1.12, isUp: true },
-    { symbol: 'META', price: 475.32, change: 1.54, isUp: true }
+    { symbol: 'META', price: 475.32, change: 1.54, isUp: true },
+    { symbol: 'S&P 500', price: 6061.48, change: 0.42, isUp: true }
 ];
 
 const TopBar: React.FC = () => {
