@@ -2709,9 +2709,11 @@ html,
 body {
   overflow: hidden !important;
   /* STRICTLY NO SCROLL */
-  height: 100vh;
+  height: 100vh !important;
+  width: 100vw !important;
   margin: 0;
   padding: 0;
+  overscroll-behavior: none;
 }
 
 /* Mobile Responsiveness Utilities */

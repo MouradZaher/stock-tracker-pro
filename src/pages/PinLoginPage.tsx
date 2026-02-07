@@ -323,9 +323,6 @@ const PinLoginPage: React.FC = () => {
                 <BenefitsGrid />
             </div>
 
-            <footer className="landing-footer" style={{ padding: '2rem', textAlign: 'center', fontSize: '0.8rem', color: 'var(--color-text-tertiary)', borderTop: '1px solid var(--color-border)' }}>
-                &copy; {new Date().getFullYear()} StockTracker Pro. Designed for high-frequency insights.
-            </footer>
         </div>
     );
 };

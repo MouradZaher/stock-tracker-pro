@@ -4,12 +4,9 @@
    ========================================= */
 
 /* Disable text selection globally */
+/* Body selection allowed */
 body {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
+    -webkit-touch-callout: default;
 }
 
 /* Allow selection in form inputs */
