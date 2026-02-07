@@ -2729,9 +2729,10 @@ body {
   }
 }
 
-.mobile-only {
-  display: none !important;
-}
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
 }
 
 /* Mobile-specific adjustments moved here to ensure precedence */
