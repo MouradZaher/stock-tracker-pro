@@ -31,7 +31,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 return await getRecommendationsForSector(selectedSector, 3);
             }
         },
-        staleTime: 60000, // 1 minute
+        staleTime: 10000, // 10 seconds for fresher prices to match charts
     });
 
     const getRecommendationIcon = (rec: 'Buy' | 'Hold' | 'Sell') => {
