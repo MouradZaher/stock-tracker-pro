@@ -65,7 +65,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .neq('is_approved', false) // Exclude revoked users
                 .order('created_at', { ascending: false });
 
             if (data) {
@@ -105,6 +104,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
         } else {
             toast.success(`Revoked access for ${email}`);
             setProfiles(prev => prev.map(p => p.id === id ? { ...p, is_approved: false } : p));
+        }
+    };
+
+
+
+    const handleApprove = async (id: string, email: string) => {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ is_approved: true })
+            .eq('id', id);
+
+        if (error) {
+            toast.error('Failed to approve user');
+        } else {
+            toast.success(`Approved access for ${email}`);
+            setProfiles(prev => prev.map(p => p.id === id ? { ...p, is_approved: true } : p));
         }
     };
 
@@ -243,11 +258,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                                                 className="btn-icon btn-reject"
                                                                 onClick={() => handleReject(profile.id, profile.email)}
                                                                 title="Revoke Access"
+                                                                style={{ color: 'var(--color-error)' }}
                                                             >
                                                                 <X size={18} />
                                                             </button>
                                                         ) : (
-                                                            <span className="text-muted" style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>Auto-approving...</span>
+                                                            <button
+                                                                className="btn-icon btn-approve"
+                                                                onClick={() => handleApprove(profile.id, profile.email)}
+                                                                title="Approve Access"
+                                                                style={{ color: 'var(--color-success)' }}
+                                                            >
+                                                                <Check size={18} />
+                                                            </button>
                                                         )}
                                                     </>
                                                 )}

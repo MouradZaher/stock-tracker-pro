@@ -206,13 +206,18 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
     const quote = await fetchWithFallbacks(symbol);
 
     if (quote && quote.price > 0) {
+        const price = quote.price;
+        const previousClose = quote.previousClose || 0;
+        const change = quote.change || (previousClose ? price - previousClose : 0);
+        const changePercent = quote.changePercent || (previousClose ? (change / previousClose) * 100 : 0);
+
         return {
             symbol,
             name: quote.name || symbol,
-            price: quote.price,
-            change: quote.change || 0,
-            changePercent: quote.changePercent || 0,
-            previousClose: quote.previousClose || 0,
+            price,
+            change,
+            changePercent,
+            previousClose,
             open: quote.open || 0,
             high: quote.high || 0,
             low: quote.low || 0,

@@ -115,4 +115,28 @@ export interface SearchResult {
 }
 
 // Tab types
-export type TabType = 'search' | 'portfolio' | 'recommendations' | 'watchlist' | 'pulse';
+export type TabType = 'search' | 'portfolio' | 'recommendations' | 'watchlist' | 'pulse' | 'notifications';
+
+// Social & Notifications
+export interface SocialPost {
+  id: string;
+  author: string;
+  handle: string;
+  content: string;
+  timestamp: string;
+  sentiment: 'positive' | 'neutral' | 'negative';
+  weight: number; // Institutional weight 1-10
+  symbol?: string;
+  isVerified: boolean;
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'alert' | 'news' | 'ai' | 'social';
+  timestamp: number;
+  read: boolean;
+  link?: string;
+  symbol?: string;
+}

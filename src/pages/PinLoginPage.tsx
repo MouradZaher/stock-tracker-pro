@@ -116,7 +116,10 @@ const PinLoginPage: React.FC = () => {
                 const result = await register(username.trim(), fullPin);
                 if (result.success) {
                     soundService.playSuccess();
-                    toast.success('Account created! Welcome to StockTracker Pro.');
+                    toast.success('Registration successful! Please wait for Admin approval.', { duration: 5000 });
+                    setMode('username');
+                    setUsername('');
+                    if (usernameRef.current) usernameRef.current.focus();
                 } else {
                     soundService.playError();
                     toast.error(result.error || 'Registration failed');

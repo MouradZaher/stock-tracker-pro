@@ -4,7 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
-import { TrendingUp, TrendingDown, Trash2, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, Trash2, Star, Bell } from 'lucide-react';
+import { usePriceAlerts } from '../hooks/usePriceAlerts';
+import PriceAlertsModal from './PriceAlertsModal';
 
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
@@ -107,6 +109,9 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     const [activeCategory, setActiveCategory] = useState('All');
     const categories = ['All', 'Tech', 'Growth', 'Dividends'];
 
+    const [alertConfig, setAlertConfig] = useState<{ symbol: string; price: number } | null>(null);
+    const { checkPrice } = usePriceAlerts();
+
     useEffect(() => {
         const fetchWatchlistData = async () => {
             if (watchlist.length === 0) {
@@ -121,6 +126,8 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                 const newData: Record<string, Stock> = {};
                 quotesMap.forEach((value, key) => {
                     newData[key] = value;
+                    // Check price alerts
+                    checkPrice(key, value.price);
                 });
                 setStockData(newData);
             } catch (error) {
@@ -208,9 +215,20 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                 onClick={() => onSelectSymbol(symbol)}
                             >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                    <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{symbol}</h3>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>{stock.name}</p>
+                                        <button
+                                            className="btn-icon glass-button"
+                                            style={{ padding: '2px', borderRadius: '50%', color: 'var(--color-text-tertiary)' }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setAlertConfig({ symbol, price: stock.price });
+                                            }}
+                                            title="Set Price Alert"
+                                        >
+                                            <Bell size={14} />
+                                        </button>
+                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', marginLeft: 'auto' }}>{stock.name}</p>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
                                         <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
@@ -244,6 +262,14 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                         );
                     })}
                 </div>
+            )}
+
+            {alertConfig && (
+                <PriceAlertsModal
+                    symbol={alertConfig.symbol}
+                    currentPrice={alertConfig.price}
+                    onClose={() => setAlertConfig(null)}
+                />
             )}
         </div>
     );

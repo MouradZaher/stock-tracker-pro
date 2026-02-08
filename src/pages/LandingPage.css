@@ -326,7 +326,7 @@
 @media (min-width: 1025px) and (min-height: 700px) {
   .landing-page {
     height: 100vh !important;
-    overflow: hidden !important;
+    overflow-y: auto !important;
   }
 
   .landing-nav {

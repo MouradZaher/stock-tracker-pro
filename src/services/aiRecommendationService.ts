@@ -3,6 +3,7 @@ import { getStockNews } from './newsService';
 import type { StockRecommendation, NewsArticle } from '../types';
 import { STOCKS_BY_SECTOR, SECTORS } from '../data/sectors';
 import { calculateRSI, calculateSMA } from '../utils/calculations';
+import { socialFeedService } from './SocialFeedService';
 
 // Generate recommendations for a sector
 export const getRecommendationsForSector = async (
@@ -31,6 +32,9 @@ export const getRecommendationsForSector = async (
             const ma50 = calculateSMA(mockPrices, 50);
             const ma200 = calculateSMA(mockPrices, 200);
 
+            // Get social sentiment
+            const socialSentiment = socialFeedService.getSentimentScore(stock.symbol);
+
             // Calculate score
             const score = calculateRecommendationScore({
                 price: stockData.price,
@@ -42,6 +46,7 @@ export const getRecommendationsForSector = async (
                 peRatio: stockData.peRatio,
                 eps: stockData.eps,
                 news,
+                socialSentiment,
             });
 
             // Determine recommendation
@@ -57,6 +62,7 @@ export const getRecommendationsForSector = async (
                 peRatio: stockData.peRatio,
                 changePercent: stockData.changePercent,
                 news,
+                socialSentiment,
             });
 
             recommendations.push({
@@ -143,6 +149,7 @@ const calculateRecommendationScore = (params: {
     peRatio: number | null;
     eps: number | null;
     news: NewsArticle[];
+    socialSentiment: number;
 }): number => {
     let score = 50; // Base score
 
@@ -196,6 +203,10 @@ const calculateRecommendationScore = (params: {
     score += positiveNews * 8;
     score -= negativeNews * 8;
 
+    // Social Pulse (15 points max)
+    // socialSentiment is -100 to 100
+    score += (params.socialSentiment / 100) * 15;
+
     // Clamp between 0-100
     return Math.max(0, Math.min(100, score));
 };
@@ -219,6 +230,7 @@ const generateReasoning = (params: {
     peRatio: number | null;
     changePercent: number;
     news: NewsArticle[];
+    socialSentiment: number;
 }): string[] => {
     const reasons: string[] = [];
 
@@ -265,6 +277,13 @@ const generateReasoning = (params: {
         reasons.push(`Positive news sentiment with ${positiveNews} favorable headlines`);
     } else if (negativeNews > positiveNews) {
         reasons.push(`Negative news sentiment with ${negativeNews} concerning headlines`);
+    }
+
+    // Social insight
+    if (params.socialSentiment > 30) {
+        reasons.push(`High institutional social volume (X Pulse) indicates strong bullish accumulation`);
+    } else if (params.socialSentiment < -30) {
+        reasons.push(`Negative social divergence detected; high volume of bearish sentiment on X`);
     }
 
     // Overall score reasoning

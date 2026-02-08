@@ -4,8 +4,9 @@ import TopMovers from './TopMovers';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
-import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers } from 'lucide-react';
-import type { NewsArticle } from '../types';
+import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck } from 'lucide-react';
+import type { NewsArticle, SocialPost } from '../types';
+import { socialFeedService } from '../services/SocialFeedService';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -102,13 +103,30 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const overallSentiment = sentimentScore >= 60 ? 'Bullish' : sentimentScore <= 40 ? 'Bearish' : 'Neutral';
     const sentimentColor = overallSentiment === 'Bullish' ? '#10B981' : overallSentiment === 'Bearish' ? '#EF4444' : '#F59E0B';
 
+    const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
+
+    useEffect(() => {
+        const fetchSocial = async () => {
+            const posts = await socialFeedService.getGlobalFeed();
+            setSocialPosts(posts);
+        };
+        fetchSocial();
+
+        const interval = setInterval(() => {
+            socialFeedService.generateLivePost();
+            fetchSocial();
+        }, 15000); // New post every 15s
+
+        return () => clearInterval(interval);
+    }, []);
+
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div style={{ padding: 'var(--spacing-xl)', maxWidth: '100%', margin: '0 auto', height: '100%', boxSizing: 'border-box', overflowY: 'auto', background: 'linear-gradient(to bottom, #050505, #0a0a0a)' }}>
+        <div style={{ padding: 'var(--spacing-md) var(--spacing-xl)', maxWidth: '100%', margin: '0 auto', height: '100%', boxSizing: 'border-box', overflowY: 'auto', background: 'var(--color-bg-primary)' }}>
 
             {/* Header Area */}
-            <div style={{ marginBottom: '2rem' }}>
+            <div style={{ marginBottom: '1rem' }}>
                 <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #fff, #888)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
                     Market Pulse
                 </h1>
@@ -129,7 +147,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 background: 'rgba(239, 68, 68, 0.05)'
             }}>
                 <div style={{
-                    background: '#EF4444',
+                    background: 'var(--color-error)',
                     color: '#fff',
                     padding: '4px 8px',
                     borderRadius: '4px',
@@ -186,12 +204,16 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 {/* Next Event Timer */}
-                <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(145deg, rgba(30,30,30,0.5) 0%, rgba(10,10,10,0.8) 100%)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="glass-card" style={{
+                    padding: '1.5rem',
+                    background: 'var(--glass-bg)',
+                    border: '1px solid var(--glass-borderShadow)'
+                }}>
                     <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Timer size={16} /> Next Major Event
                     </h3>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#fff', marginBottom: '1rem' }}>{nextEventData.name}</div>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '1rem' }}>{nextEventData.name}</div>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                             {['hours', 'minutes', 'seconds'].map(unit => (
                                 <div key={unit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -279,6 +301,61 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                 <div style={{ color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 600 }}>
                                     {stock.change > 0 ? '+' : ''}{stock.change}%
                                 </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* X Pulse / Social Feed */}
+                <div className="glass-card x-pulse-card" style={{ padding: '1.5rem', gridColumn: 'span 2' }}>
+                    <style>{`
+                        @media (max-width: 1024px) {
+                            .x-pulse-card { grid-column: span 1 !important; }
+                        }
+                    `}</style>
+                    <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <MessageSquare size={16} color="#1DA1F2" /> X Market Pulse
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                        {socialPosts.map(post => (
+                            <div key={post.id} style={{
+                                padding: '1rem',
+                                background: 'rgba(255,255,255,0.02)',
+                                borderRadius: '12px',
+                                borderLeft: `3px solid ${post.sentiment === 'positive' ? 'var(--color-success)' : post.sentiment === 'negative' ? 'var(--color-error)' : 'var(--glass-border)'}`
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{post.author}</span>
+                                        <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>{post.handle}</span>
+                                        {post.isVerified && <ShieldCheck size={14} color="#1DA1F2" />}
+                                    </div>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
+                                        {new Date(post.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                                <p style={{ fontSize: '0.85rem', lineHeight: '1.4', margin: '0 0 0.5rem 0', color: 'var(--color-text-secondary)' }}>
+                                    {post.content}
+                                </p>
+                                {post.symbol && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span
+                                            onClick={() => handleAction(post.symbol!)}
+                                            style={{
+                                                fontSize: '0.75rem',
+                                                fontWeight: 800,
+                                                color: 'var(--color-accent)',
+                                                cursor: 'pointer',
+                                                background: 'rgba(99, 102, 241, 0.1)',
+                                                padding: '2px 6px',
+                                                borderRadius: '4px'
+                                            }}
+                                        >
+                                            ${post.symbol}
+                                        </span>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Weight: {post.weight}/10</span>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

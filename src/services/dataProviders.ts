@@ -228,13 +228,18 @@ export const parsers = {
 
     twelveData: (data: any, symbol: string): StockQuote | null => {
         if (!data || data.price === undefined) return null;
+        const price = parseFloat(data.price) || 0;
+        const prevClose = parseFloat(data.previous_close) || 0;
+        const change = parseFloat(data.change) || (prevClose ? price - prevClose : 0);
+        const changePercent = parseFloat(data.percent_change) || (prevClose ? (change / prevClose) * 100 : 0);
+
         return {
             symbol: data.symbol || symbol,
             name: data.name || symbol,
-            price: parseFloat(data.price) || 0,
-            change: parseFloat(data.change) || 0,
-            changePercent: parseFloat(data.percent_change) || 0,
-            previousClose: parseFloat(data.previous_close) || 0,
+            price,
+            change,
+            changePercent,
+            previousClose: prevClose,
             open: parseFloat(data.open) || 0,
             high: parseFloat(data.high) || 0,
             low: parseFloat(data.low) || 0,
@@ -350,13 +355,19 @@ export const parsers = {
     marketstack: (data: any, symbol: string): StockQuote | null => {
         const quote = data?.data?.[0];
         if (!quote) return null;
+        const price = quote.last || quote.close || 0;
+        const prevClose = quote.prev_close || quote.previous_close || 0;
+        // Standardize: change should be from previous close, not day's open
+        const change = prevClose ? price - prevClose : (quote.open ? price - quote.open : 0);
+        const changePercent = prevClose ? (change / prevClose) * 100 : (quote.open ? (change / quote.open) * 100 : 0);
+
         return {
             symbol: quote.symbol || symbol,
             name: symbol,
-            price: quote.last || quote.close || 0,
-            change: (quote.close || 0) - (quote.open || 0),
-            changePercent: quote.open ? (((quote.close || 0) - quote.open) / quote.open) * 100 : 0,
-            previousClose: 0,
+            price,
+            change,
+            changePercent,
+            previousClose: prevClose,
             open: quote.open || 0,
             high: quote.high || 0,
             low: quote.low || 0,

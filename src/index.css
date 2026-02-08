@@ -130,14 +130,13 @@ html[data-theme='light'] {
 }
 
 /* Home Tab Desktop Adjustment - Prevent Scroll */
+/* Home Tab Desktop Adjustment - Prevent Scroll */
 @media (min-width: 1025px) {
   .home-tab-content {
-    overflow: hidden !important;
-    height: calc(100vh - var(--header-height)) !important;
-    min-height: 0 !important;
+    /* overflow: hidden !important; */
+    height: 100% !important;
+    /* min-height: calc(100vh - var(--header-height)) !important; */
     padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-    /* Override any min-height that forces scroll */
   }
 }
 
@@ -181,11 +180,9 @@ html,
 body,
 #root {
   width: 100%;
-  min-height: 100% !important;
-  height: auto !important;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: visible !important;
 }
 
 body {
@@ -197,6 +194,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
+
+  /* Security / Anti-Copy */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* Light mode background */
@@ -244,11 +247,14 @@ h6 {
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 100vh;
   width: 100%;
   position: relative;
+}
+
+/* Home Tab Content */
+.home-tab-content {
+  overflow: visible !important;
 }
 
 /* Header Styles */
@@ -451,7 +457,7 @@ h6 {
   width: 100%;
   margin: 0;
   position: relative;
-  padding: var(--spacing-lg) var(--spacing-xl);
+  padding: calc(var(--header-height) + var(--spacing-lg)) var(--spacing-xl) var(--spacing-xl);
 }
 
 .tab-content {
@@ -2845,6 +2851,13 @@ body,
   height: auto !important;
   min-height: 100vh !important;
 }
+
 /* Hide Scrollbar Utility */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

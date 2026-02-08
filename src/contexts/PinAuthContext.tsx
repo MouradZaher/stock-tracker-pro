@@ -7,6 +7,7 @@ interface User {
     username: string;
     role: 'admin' | 'user';
     email?: string;
+    isApproved: boolean;
 }
 
 interface PinAuthContextType {
@@ -15,6 +16,7 @@ interface PinAuthContextType {
     checkUser: (username: string) => Promise<{ exists: boolean; user?: User }>;
     login: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>;
     register: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>;
+    approveUser: (userId: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
 }
 
@@ -36,7 +38,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('id, username, role, email')
+                .select('id, username, role, email, is_approved')
                 .eq('username', username.toLowerCase())
                 .single();
 
@@ -50,7 +52,8 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     id: data.id,
                     username: data.username,
                     role: data.role as 'admin' | 'user',
-                    email: data.email
+                    email: data.email,
+                    isApproved: data.is_approved
                 }
             };
         } catch {
@@ -63,7 +66,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('id, username, role, email, pin_hash')
+                .select('id, username, role, email, pin_hash, is_approved')
                 .eq('username', username.toLowerCase())
                 .single();
 
@@ -80,8 +83,16 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 id: data.id,
                 username: data.username,
                 role: data.role as 'admin' | 'user',
-                email: data.email
+                email: data.email,
+                isApproved: data.is_approved
             };
+
+            // Legacy users might have null is_approved. Treat null as approved for backward compatibility.
+            const isApproved = loggedInUser.isApproved === true || loggedInUser.isApproved === null || loggedInUser.isApproved === undefined;
+
+            if (!isApproved && loggedInUser.role !== 'admin') {
+                return { success: false, error: 'Account pending approval. Please contact administrator.' };
+            }
 
             setUser(loggedInUser);
             localStorage.setItem('pin_auth_user', JSON.stringify(loggedInUser));
@@ -122,7 +133,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     email: `${username.toLowerCase()}@stocktracker.local`,
                     role: 'user',
                     pin_hash: pin,
-                    is_approved: true
+                    is_approved: false
                 });
 
             if (error) {
@@ -135,20 +146,12 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 id: newId,
                 username: username.toLowerCase(),
                 role: 'user',
-                email: `${username.toLowerCase()}@stocktracker.local`
+                email: `${username.toLowerCase()}@stocktracker.local`,
+                isApproved: false
             };
 
-            setUser(newUser);
-            localStorage.setItem('pin_auth_user', JSON.stringify(newUser));
-
-            // Sync with main AuthContext
-            setCustomUser({
-                id: newUser.id,
-                email: newUser.email,
-                role: newUser.role,
-                name: newUser.username
-            });
-
+            // Do NOT auto-login new users anymore, they need approval
+            // return { success: true, message: 'Registration successful. Pending admin approval.' };
             return { success: true };
         } catch (err) {
             console.error('Registration error:', err);
@@ -162,6 +165,21 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         signOut();
     };
 
+    const approveUser = async (userId: string): Promise<{ success: boolean; error?: string }> => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ is_approved: true })
+                .eq('id', userId);
+
+            if (error) throw error;
+            return { success: true };
+        } catch (err) {
+            console.error('Approval error:', err);
+            return { success: false, error: 'Failed to approve user' };
+        }
+    };
+
     return (
         <PinAuthContext.Provider value={{
             user,
@@ -169,6 +187,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
             checkUser,
             login,
             register,
+            approveUser,
             logout
         }}>
             {children}

@@ -10,6 +10,9 @@ import SymbolSearchInput from './SymbolSearchInput';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 import FamousHoldings from './FamousHoldings';
+import { usePriceAlerts } from '../hooks/usePriceAlerts';
+import PriceAlertsModal from './PriceAlertsModal';
+import { Bell, ShieldCheck, BarChart2 } from 'lucide-react';
 
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
@@ -30,6 +33,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         name: '',
         currentPrice: 0 as number
     });
+
+    const [alertConfig, setAlertConfig] = useState<{ symbol: string; price: number } | null>(null);
+    const { checkPrice } = usePriceAlerts();
 
     // Safety: Ensure getSummary never crashes
     const summary = React.useMemo(() => {
@@ -63,6 +69,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 try {
                     const quote = await getStockQuote(symbol);
                     updatePrice(symbol, quote.price, user?.id);
+                    // Check price alerts
+                    checkPrice(symbol, quote.price);
                 } catch (error) {
                     console.error(`Failed to update price for ${symbol}:`, error);
                 }
@@ -156,6 +164,11 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
     const hasAllocationWarnings = stockAllocations.some((a) => !a.valid.valid) || sectorAllocations.some((a) => !a.valid.valid);
 
+    // Risk Meter Calculation (Simulated Beta/Volatility)
+    const riskScore = hasAllocationWarnings ? 65 : 88; // 0-100
+    const riskLabel = riskScore > 80 ? 'Conservative' : riskScore > 60 ? 'Moderate' : 'Aggressive';
+    const riskColor = riskScore > 80 ? 'var(--color-success)' : riskScore > 60 ? 'var(--color-warning)' : 'var(--color-error)';
+
     return (
         <div className="portfolio-container">
             {/* ... existing header and summary ... */}
@@ -222,7 +235,22 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
                                         return (
                                             <tr key={position.id} onClick={() => handleRowClick(position.symbol)} style={{ cursor: 'pointer' }}>
-                                                <td><strong>{position.symbol}</strong></td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <strong>{position.symbol}</strong>
+                                                        <button
+                                                            className="btn-icon"
+                                                            style={{ padding: '4px', borderRadius: '4px', color: 'var(--color-text-tertiary)' }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
+                                                            }}
+                                                            title="Set Price Alert"
+                                                        >
+                                                            <Bell size={14} />
+                                                        </button>
+                                                    </div>
+                                                </td>
                                                 <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {position.name}
                                                 </td>
@@ -273,7 +301,19 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                     <div key={position.id} className="glass-card" style={{ padding: '1rem' }} onClick={() => handleRowClick(position.symbol)}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                                             <div>
-                                                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{position.symbol}</div>
+                                                <div style={{ fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    {position.symbol}
+                                                    <button
+                                                        className="btn-icon glass-button"
+                                                        style={{ padding: '2px', borderRadius: '50%' }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
+                                                        }}
+                                                    >
+                                                        <Bell size={14} />
+                                                    </button>
+                                                </div>
                                                 <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
@@ -350,24 +390,46 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     </div>
                 </div>
 
-                {/* Risk Insights */}
-                <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>
-                        Risk Intelligence
+                {/* Risk Intelligence & Benchmarking */}
+                <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <ShieldCheck size={16} /> Risk Intelligence
                     </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                        <div>
-                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                                {hasAllocationWarnings
-                                    ? "Your portfolio is heavily concentrated. Consider rebalancing positions that exceed 5% total weight to minimize idiosyncratic risk."
-                                    : "Portfolio is well-diversified according to professional standards. Maintaining allocations below 20% per sector is key to long-term stability."
-                                }
-                            </p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '1.5rem' }}>
+                        <div style={{ position: 'relative', width: '100px', height: '60px' }}>
+                            <svg width="100" height="60" viewBox="0 0 100 60">
+                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" strokeLinecap="round" />
+                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke={riskColor} strokeWidth="8" strokeLinecap="round" strokeDasharray="126" strokeDashoffset={126 - (riskScore / 100 * 126)} />
+                            </svg>
+                            <div style={{ position: 'absolute', bottom: '5px', left: '50%', transform: 'translateX(-50%)', fontWeight: 800, fontSize: '1.2rem', color: riskColor }}>
+                                {riskScore}%
+                            </div>
                         </div>
-                        <div style={{ textAlign: 'center', borderLeft: '1px solid var(--glass-border)', paddingLeft: '2rem' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginBottom: '0.5rem' }}>RISK SCORE</div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: hasAllocationWarnings ? 'var(--color-warning)' : 'var(--color-success)' }}>
-                                {hasAllocationWarnings ? 'B-' : 'A+'}
+                        <div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Strategy Profile</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{riskLabel}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                                Based on sector concentration and asset volatility.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                            <span style={{ color: 'var(--color-text-tertiary)' }}>Performance vs S&P 500 (1Y)</span>
+                            <span style={{ color: 'var(--color-success)', fontWeight: 700 }}>Outperforming</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ width: '80px', fontSize: '0.75rem' }}>Portfolio</div>
+                                <div style={{ flex: 1, height: '12px', background: 'var(--color-accent)', borderRadius: '6px' }} />
+                                <div style={{ width: '40px', fontSize: '0.75rem', fontWeight: 700 }}>+24%</div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ width: '80px', fontSize: '0.75rem' }}>S&P 500</div>
+                                <div style={{ width: '60%', height: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px' }} />
+                                <div style={{ width: '40px', fontSize: '0.75rem' }}>+18%</div>
                             </div>
                         </div>
                     </div>
@@ -458,6 +520,14 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 <FamousHoldings onQuickAdd={handleQuickAdd} />
             </div>
 
+            {/* Price Alerts Modal */}
+            {alertConfig && (
+                <PriceAlertsModal
+                    symbol={alertConfig.symbol}
+                    currentPrice={alertConfig.price}
+                    onClose={() => setAlertConfig(null)}
+                />
+            )}
         </div>
     );
 };

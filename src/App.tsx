@@ -23,6 +23,7 @@ import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
 import { LogOut, Shield } from 'lucide-react';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 import './index.css';
 
@@ -113,7 +114,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={
-            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', marginTop: '-1.5rem' }}>
+            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--header-height))', marginTop: 0, paddingBottom: 0 }}>
               {!selectedSymbol ? (
                 <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100%', padding: '0' }}>
 
@@ -172,20 +173,22 @@ function App() {
   return (
     <AuthProvider>
       <PinAuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: 'var(--color-bg-elevated)',
-                color: 'var(--color-text-primary)',
-                border: '1px solid var(--color-border)',
-              },
-            }}
-          />
-          <AppContent />
-        </QueryClientProvider>
+        <NotificationProvider>
+          <QueryClientProvider client={queryClient}>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: 'var(--color-bg-elevated)',
+                  color: 'var(--color-text-primary)',
+                  border: '1px solid var(--color-border)',
+                },
+              }}
+            />
+            <AppContent />
+          </QueryClientProvider>
+        </NotificationProvider>
       </PinAuthProvider>
     </AuthProvider>
   );
