@@ -12,7 +12,7 @@ interface Profile {
     id: string;
     email: string;
     role: 'admin' | 'user';
-    is_approved: boolean;
+    is_approved: boolean | null;
     created_at: string;
     portfolioValue?: number;
 }

@@ -7,7 +7,7 @@ interface User {
     username: string;
     role: 'admin' | 'user';
     email?: string;
-    isApproved: boolean;
+    isApproved: boolean | null | undefined;
 }
 
 interface PinAuthContextType {
