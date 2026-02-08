@@ -4,7 +4,7 @@
   background: #050505;
   display: flex !important;
   flex-direction: column !important;
-  min-height: 100vh !important;
+  min-height: 100dvh !important;
   height: auto !important;
 }
 
@@ -325,7 +325,7 @@
 */
 @media (min-width: 1025px) and (min-height: 700px) {
   .landing-page {
-    height: 100vh !important;
+    height: 100dvh !important;
     overflow-y: auto !important;
   }
 

@@ -114,16 +114,16 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={
-            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--header-height))', marginTop: 0, paddingBottom: 0 }}>
+            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - var(--header-height))', marginTop: 0, paddingBottom: 0 }}>
               {!selectedSymbol ? (
-                <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100%', padding: '0' }}>
+                <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100%', padding: '0', paddingBottom: 'calc(60px + env(safe-area-inset-bottom))' }}>
 
                   <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
                     <StockHeatmap />
                   </div>
                 </div>
               ) : (
-                <div style={{ width: '100%', padding: '1rem' }}>
+                <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
                   <StockDetail
                     symbol={selectedSymbol}
                     onBack={() => setSelectedSymbol(null)}
