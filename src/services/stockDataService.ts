@@ -46,7 +46,7 @@ const fetchFromProxy = async (symbol: string): Promise<StockQuote | null> => {
         const response = await api.get('/multi-quote', { params: { symbols: symbol } });
         const result = response.data?.quoteResponse?.result?.[0];
         if (result && result.price > 0) {
-            console.log(`✅ Proxy returned ${symbol}: $${result.price} via ${response.data._provider || 'yahoo'}`);
+
             return result as StockQuote;
         }
         return null;
@@ -66,7 +66,7 @@ const fetchFromFinnhub = async (symbol: string): Promise<StockQuote | null> => {
         });
         const quote = parsers.finnhub(response.data, symbol);
         if (quote && quote.price > 0) {
-            console.log(`✅ Finnhub returned ${symbol}: $${quote.price}`);
+
             markProviderSuccess('finnhub');
             return quote;
         }
@@ -91,7 +91,7 @@ const fetchFromAlphaVantage = async (symbol: string): Promise<StockQuote | null>
         });
         const quote = parsers.alphaVantage(response.data, symbol);
         if (quote && quote.price > 0) {
-            console.log(`✅ Alpha Vantage returned ${symbol}: $${quote.price}`);
+
             markProviderSuccess('alphaVantage');
             return quote;
         }
@@ -112,7 +112,7 @@ const fetchFromTwelveData = async (symbol: string): Promise<StockQuote | null> =
         });
         const quote = parsers.twelveData(response.data, symbol);
         if (quote && quote.price > 0) {
-            console.log(`✅ Twelve Data returned ${symbol}: $${quote.price}`);
+
             markProviderSuccess('twelveData');
             return quote;
         }
@@ -133,7 +133,7 @@ const fetchFromFMP = async (symbol: string): Promise<StockQuote | null> => {
         });
         const quote = parsers.fmp(response.data, symbol);
         if (quote && quote.price > 0) {
-            console.log(`✅ FMP returned ${symbol}: $${quote.price}`);
+
             markProviderSuccess('fmp');
             return quote;
         }
@@ -164,7 +164,7 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
     }
 
     // 2. Try direct API calls if proxy fails
-    console.log(`🔄 Proxy failed, trying direct APIs for ${symbol}...`);
+
 
     const directFetchers = [
         fetchFromFinnhub,
@@ -185,7 +185,7 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
     // 3. Use last known good price with smart jitter
     const lastGood = getCachedData(`last_good_${symbol}`, GOOD_PRICE_CACHE_DURATION);
     if (lastGood) {
-        console.log(`📊 Using cached price for ${symbol}: $${lastGood.price}`);
+
         const jitter = 1 + (Math.random() * 0.002 - 0.001); // ±0.1% jitter
         return {
             ...lastGood,
@@ -363,7 +363,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     const stockMap = new Map<string, Stock>();
     if (symbols.length === 0) return stockMap;
 
-    console.log(`📊 Batch fetching: ${symbols.length} symbols...`);
+
 
     // Try batch request first via proxy
     try {
@@ -404,7 +404,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
                 setCachedData(`last_good_${sym}`, quote);
             }
         }
-        console.log(`✅ Batch loaded: ${stockMap.size}/${symbols.length} symbols`);
+
     } catch (error: any) {
         console.error(`❌ Batch fetch failed:`, error.message);
     }
@@ -412,7 +412,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     // Fill in missing symbols individually
     const missing = symbols.filter(s => !stockMap.has(s));
     if (missing.length > 0 && missing.length <= 10) {
-        console.log(`🔄 Fetching ${missing.length} missing symbols individually...`);
+
         const individualFetches = missing.map(async sym => {
             const stock = await getStockQuote(sym);
             stockMap.set(sym, stock);

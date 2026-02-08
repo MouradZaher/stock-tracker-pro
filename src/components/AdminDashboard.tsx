@@ -209,77 +209,134 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                     {loading ? (
                         <div className="text-center p-xl">Loading users...</div>
                     ) : (
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th style={{ textAlign: 'right' }}>Portfolio Value</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <>
+                            {/* Desktop Table View */}
+                            <table className="admin-table desktop-only">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th style={{ textAlign: 'right' }}>Portfolio Value</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {profiles.map(profile => (
+                                        <tr key={profile.id}>
+                                            <td>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span className="user-email">{profile.email}</span>
+                                                    <span className="user-id">{profile.id}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`role-badge ${profile.role}`}>
+                                                    {profile.role}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className={`status-badge ${profile.is_approved ? 'approved' : 'pending'}`}>
+                                                    {profile.is_approved ? 'Active' : 'Pending'}
+                                                </span>
+                                            </td>
+                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                                                {formatCurrency(profile.portfolioValue || 0)}
+                                            </td>
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        className="btn-icon"
+                                                        onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
+                                                        title="View Portfolio"
+                                                    >
+                                                        <Eye size={18} />
+                                                    </button>
+
+                                                    {profile.id !== user?.id && (
+                                                        <>
+                                                            {profile.is_approved ? (
+                                                                <button
+                                                                    className="btn-icon btn-reject"
+                                                                    onClick={() => handleReject(profile.id, profile.email)}
+                                                                    title="Revoke Access"
+                                                                    style={{ color: 'var(--color-error)' }}
+                                                                >
+                                                                    <X size={18} />
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    className="btn-icon btn-approve"
+                                                                    onClick={() => handleApprove(profile.id, profile.email)}
+                                                                    title="Approve Access"
+                                                                    style={{ color: 'var(--color-success)' }}
+                                                                >
+                                                                    <Check size={18} />
+                                                                </button>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            {/* Mobile Card View */}
+                            <div className="mobile-only admin-cards">
                                 {profiles.map(profile => (
-                                    <tr key={profile.id}>
-                                        <td>
-                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <div key={profile.id} className="admin-user-card glass-card">
+                                        <div className="card-header">
+                                            <div className="user-info">
                                                 <span className="user-email">{profile.email}</span>
                                                 <span className="user-id">{profile.id}</span>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <span className={`role-badge ${profile.role}`}>
-                                                {profile.role}
-                                            </span>
-                                        </td>
-                                        <td>
                                             <span className={`status-badge ${profile.is_approved ? 'approved' : 'pending'}`}>
                                                 {profile.is_approved ? 'Active' : 'Pending'}
                                             </span>
-                                        </td>
-                                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                                            {formatCurrency(profile.portfolioValue || 0)}
-                                        </td>
-                                        <td>
-                                            <div className="action-buttons">
-                                                <button
-                                                    className="btn-icon"
-                                                    onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
-                                                    title="View Portfolio"
-                                                >
-                                                    <Eye size={18} />
-                                                </button>
-
-                                                {profile.id !== user?.id && (
-                                                    <>
-                                                        {profile.is_approved ? (
-                                                            <button
-                                                                className="btn-icon btn-reject"
-                                                                onClick={() => handleReject(profile.id, profile.email)}
-                                                                title="Revoke Access"
-                                                                style={{ color: 'var(--color-error)' }}
-                                                            >
-                                                                <X size={18} />
-                                                            </button>
-                                                        ) : (
-                                                            <button
-                                                                className="btn-icon btn-approve"
-                                                                onClick={() => handleApprove(profile.id, profile.email)}
-                                                                title="Approve Access"
-                                                                style={{ color: 'var(--color-success)' }}
-                                                            >
-                                                                <Check size={18} />
-                                                            </button>
-                                                        )}
-                                                    </>
-                                                )}
+                                        </div>
+                                        <div className="card-stats">
+                                            <div className="stat-row">
+                                                <span className="label">Role:</span>
+                                                <span className={`role-badge ${profile.role}`}>{profile.role}</span>
                                             </div>
-                                        </td>
-                                    </tr>
+                                            <div className="stat-row">
+                                                <span className="label">Portfolio:</span>
+                                                <span className="value">{formatCurrency(profile.portfolioValue || 0)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="card-actions">
+                                            <button
+                                                className="btn btn-secondary btn-small"
+                                                onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
+                                            >
+                                                <Eye size={16} /> View
+                                            </button>
+                                            {profile.id !== user?.id && (
+                                                <>
+                                                    {profile.is_approved ? (
+                                                        <button
+                                                            className="btn btn-danger btn-small"
+                                                            onClick={() => handleReject(profile.id, profile.email)}
+                                                        >
+                                                            <X size={16} /> Revoke
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            className="btn btn-success btn-small"
+                                                            onClick={() => handleApprove(profile.id, profile.email)}
+                                                        >
+                                                            <Check size={16} /> Approve
+                                                        </button>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
+                            </div>
+                        </>
                     )}
                 </div>
 

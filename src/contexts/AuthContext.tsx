@@ -232,7 +232,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             console.log('✅ Magic link sent successfully!', data);
             console.log('📨 Check your inbox for the authentication link');
-            console.log('🔗 Redirect URL:', `${window.location.origin}/`);
+
 
             return { error: null };
         } catch (err) {

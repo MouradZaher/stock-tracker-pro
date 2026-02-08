@@ -169,7 +169,11 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
   );
 }
 
+// ... imports
+import { useContentProtection } from './hooks/useContentProtection';
+
 function App() {
+  useContentProtection();
   return (
     <AuthProvider>
       <PinAuthProvider>

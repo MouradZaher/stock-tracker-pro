@@ -151,7 +151,7 @@ class WebSocketService {
     private sendSubscribe(symbol: string): void {
         if (this.ws?.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({ type: 'subscribe', symbol }));
-            console.log(`📡 Subscribed to ${symbol}`);
+
         }
     }
 
