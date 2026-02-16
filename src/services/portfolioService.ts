@@ -127,7 +127,6 @@ export async function updatePriceForSymbol(userId: string, symbol: string, price
 export async function syncLocalToSupabase(userId: string, localPositions: PortfolioPosition[]): Promise<void> {
     try {
         if (localPositions.length === 0) {
-            console.log('No local positions to sync');
             return;
         }
 
@@ -157,8 +156,6 @@ export async function syncLocalToSupabase(userId: string, localPositions: Portfo
             // Don't throw - just log and continue
             return;
         }
-
-        console.log(`✅ Synced ${localPositions.length} positions to Supabase`);
     } catch (error) {
         console.error('Failed to sync local positions to Supabase:', error);
         // Don't throw - let the app continue working

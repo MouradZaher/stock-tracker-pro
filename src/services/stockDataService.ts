@@ -182,14 +182,11 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
         }
     }
 
-    // 3. Use last known good price with smart jitter
+    // 3. Use last known good price (no jitter)
     const lastGood = getCachedData(`last_good_${symbol}`, GOOD_PRICE_CACHE_DURATION);
     if (lastGood) {
-
-        const jitter = 1 + (Math.random() * 0.002 - 0.001); // ±0.1% jitter
         return {
             ...lastGood,
-            price: lastGood.price * jitter,
             name: lastGood.name + ' (Cached)',
         };
     }
@@ -207,9 +204,38 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
 
     if (quote && quote.price > 0) {
         const price = quote.price;
-        const previousClose = quote.previousClose || 0;
-        const change = quote.change || (previousClose ? price - previousClose : 0);
-        const changePercent = quote.changePercent || (previousClose ? (change / previousClose) * 100 : 0);
+        let previousClose = quote.previousClose || 0;
+        let change = quote.change || 0;
+        let changePercent = quote.changePercent || 0;
+
+        // SANITY CHECK: Calculate derived previous close based on change
+        // Many APIs return inconsistent previousClose vs. Change
+        if (price && change) {
+            const derivedPrevClose = price - change;
+            if (previousClose === 0 || Math.abs(derivedPrevClose - previousClose) > price * 0.1) {
+                // If stated previousClose is widely off or missing, use derived
+                previousClose = derivedPrevClose;
+            }
+        }
+
+        // Recalculate percent if needed
+        if (previousClose > 0) {
+            const calculatedChange = price - previousClose;
+            const calculatedPercent = (calculatedChange / previousClose) * 100;
+
+            // If API percent is an outlier (>200% diff) or missing, use calculated
+            if (Math.abs(changePercent) > 200 && Math.abs(calculatedPercent) < 50) {
+                // Likely a bad API tick 
+                changePercent = calculatedPercent;
+                change = calculatedChange;
+            }
+
+            // If completely missing
+            if (changePercent === 0 && calculatedPercent !== 0) {
+                changePercent = calculatedPercent;
+                change = calculatedChange;
+            }
+        }
 
         return {
             symbol,
@@ -363,8 +389,6 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     const stockMap = new Map<string, Stock>();
     if (symbols.length === 0) return stockMap;
 
-
-
     // Try batch request first via proxy
     try {
         const symbolsString = symbols.join(',');
@@ -412,7 +436,6 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     // Fill in missing symbols individually
     const missing = symbols.filter(s => !stockMap.has(s));
     if (missing.length > 0 && missing.length <= 10) {
-
         const individualFetches = missing.map(async sym => {
             const stock = await getStockQuote(sym);
             stockMap.set(sym, stock);
@@ -450,6 +473,86 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     }
 
     return stockMap;
+};
+
+// ============================================
+// REAL-TIME SECTOR & VOLUME DATA
+// ============================================
+
+// Representative Sector ETFs
+const SECTOR_ETFS: Record<string, string> = {
+    'Technology': 'XLK',
+    'Financials': 'XLF',
+    'Healthcare': 'XLV',
+    'Energy': 'XLE',
+    'Cons. Discret.': 'XLY',
+    'Cons. Staples': 'XLP',
+    'Industrials': 'XLI',
+    'Utilities': 'XLU',
+    'Real Estate': 'XLRE',
+    'Materials': 'XLB'
+};
+
+const SECTOR_ICONS: Record<string, string> = {
+    'Technology': '💻',
+    'Financials': '🏦',
+    'Healthcare': '💊',
+    'Energy': '⚡',
+    'Cons. Discret.': '🛍️',
+    'Cons. Staples': '🛒',
+    'Industrials': '🏗️',
+    'Utilities': '🚰',
+    'Real Estate': '🏘️',
+    'Materials': '🧪'
+};
+
+export const getSectorPerformance = async () => {
+    const symbols = Object.values(SECTOR_ETFS);
+    const quotes = await getMultipleQuotes(symbols);
+
+    return Object.entries(SECTOR_ETFS).map(([name, symbol]) => {
+        const quote = quotes.get(symbol);
+        return {
+            name,
+            change: quote?.changePercent || 0,
+            icon: SECTOR_ICONS[name] || '📊'
+        };
+    }).sort((a, b) => b.change - a.change);
+};
+
+export const getVolumeAnomalies = async () => {
+    // In a real app, this would use a dedicated scanner API
+    // Here we'll fetch major tickers and filter for unusual volume (>1.5x avg)
+    const topTickers = ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'MARA', 'NIO', 'META', 'MSFT', 'GOOGL', 'AMZN'];
+    const quotes = await getMultipleQuotes(topTickers);
+
+    const anomalies: any[] = [];
+    quotes.forEach((stock, symbol) => {
+        if (stock.volume > stock.avgVolume * 1.5 && stock.avgVolume > 0) {
+            const ratio = (stock.volume / stock.avgVolume).toFixed(1);
+            anomalies.push({
+                symbol,
+                vol: `${ratio}x`,
+                reason: stock.changePercent > 0 ? 'Heavy Accumulation' : 'Panic Selling',
+                change: stock.changePercent
+            });
+        }
+    });
+
+    // If no real anomalies found (e.g. market closed), return top movers
+    if (anomalies.length === 0) {
+        return Array.from(quotes.values())
+            .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
+            .slice(0, 4)
+            .map(s => ({
+                symbol: s.symbol,
+                vol: '1.2x',
+                reason: s.changePercent > 0 ? 'Bullish Momentum' : 'Bearish Pressure',
+                change: s.changePercent
+            }));
+    }
+
+    return anomalies.sort((a, b) => parseFloat(b.vol) - parseFloat(a.vol)).slice(0, 4);
 };
 
 // Get available providers status for debugging

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [error, setError] = useState(false);
     const [retryKey, setRetryKey] = useState(0);
+    const { theme } = useTheme();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -25,7 +27,7 @@ const StockHeatmap: React.FC = () => {
                 "blockColor": "change",
                 "locale": "en",
                 "symbolUrl": "",
-                "colorTheme": "dark",
+                "colorTheme": theme === 'dark' ? 'dark' : 'light',
                 "hasTopBar": true,
                 "isDataSetEnabled": true,
                 "isZoomEnabled": true,
@@ -42,7 +44,6 @@ const StockHeatmap: React.FC = () => {
             const widgetContainer = document.createElement('div');
             widgetContainer.className = 'tradingview-widget-container__widget';
             widgetContainer.style.height = '100%';
-            widgetContainer.style.width = '100%';
 
             containerRef.current.appendChild(widgetContainer);
             widgetContainer.appendChild(script);
@@ -56,26 +57,34 @@ const StockHeatmap: React.FC = () => {
                 containerRef.current.innerHTML = '';
             }
         };
-    }, [retryKey]);
+    }, [retryKey, theme]);
 
+    // ===== LOCKED: Heatmap Container Layout — DO NOT MODIFY (approved 2026-02-16) =====
     return (
-        <div className="heatmap-container glass-card" style={{
-            width: '100%',
-            height: '100%',
+        <div className="heatmap-container" style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            padding: 0,
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            position: 'relative',
-            background: 'transparent',
-            padding: '4px'
+            borderRadius: '12px',
+            border: '1px solid var(--glass-border)'
         }}>
             {error ? (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--color-text-secondary)' }}>
-                    <AlertTriangle size={32} className="text-error" />
-                    <p>Unable to load market map</p>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-primary)' }}>
+                    <AlertTriangle size={48} className="text-warning" style={{ marginBottom: '1rem' }} />
+                    <p style={{ marginBottom: '1rem' }}>Failed to load market map</p>
                     <button
-                        className="btn btn-primary btn-small"
-                        onClick={() => setRetryKey(k => k + 1)}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                        onClick={() => {
+                            setError(false);
+                            setRetryKey(k => k + 1);
+                        }}
+                        className="glass-button"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
                         <RefreshCw size={16} /> Retry
                     </button>
@@ -87,11 +96,14 @@ const StockHeatmap: React.FC = () => {
                     style={{
                         flex: 1,
                         width: '100%',
-                        height: '100%'
+                        height: '100%',
+                        position: 'relative',
+                        overflow: 'hidden'
                     }}
                 />
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

@@ -8,11 +8,8 @@ export const getStockNews = async (symbol: string, limit: number = 5): Promise<N
         const cacheKey = `news_${symbol}`;
         const cached = getCachedData(cacheKey);
         if (cached) {
-            console.log(`✅ Using cached news for ${symbol}`);
             return cached;
         }
-
-        console.log(`📰 Fetching live news for ${symbol}...`);
         const response = await yahooFinanceApi.get('/news', {
             params: { symbol }
         });

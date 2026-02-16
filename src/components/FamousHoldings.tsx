@@ -12,11 +12,11 @@ const FAMOUS_PORTFOLIOS = [
         owner: "Nancy Pelosi",
         description: "High-conviction tech & semi-conductor plays.",
         holdings: [
-            { symbol: 'NVDA', name: 'NVIDIA Corp', price: 887.00, change: 4.5, allocation: '28%', type: 'Tech', lastUpdated: '2024-02-15' },
-            { symbol: 'MSFT', name: 'Microsoft Corp', price: 415.50, change: 1.2, allocation: '18%', type: 'Tech', lastUpdated: '2024-02-15' },
-            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '15%', type: 'Tech', lastUpdated: '2024-01-20' },
-            { symbol: 'PANW', name: 'Palo Alto Networks', price: 285.30, change: -0.8, allocation: '12%', type: 'Cyber', lastUpdated: '2024-02-10' },
-            { symbol: 'CRWD', name: 'CrowdStrike', price: 320.10, change: 2.1, allocation: '10%', type: 'Cyber', lastUpdated: '2024-02-12' },
+            { symbol: 'NVDA', name: 'NVIDIA Corp', price: 887.00, change: 4.5, allocation: '28%', type: 'Tech', lastUpdated: '2025-01-15' },
+            { symbol: 'MSFT', name: 'Microsoft Corp', price: 415.50, change: 1.2, allocation: '18%', type: 'Tech', lastUpdated: '2025-01-15' },
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '15%', type: 'Tech', lastUpdated: '2025-01-20' },
+            { symbol: 'AVGO', name: 'Broadcom Inc.', price: 1285.30, change: -0.8, allocation: '12%', type: 'Semis', lastUpdated: '2025-02-10' },
+            { symbol: 'CRWD', name: 'CrowdStrike', price: 320.10, change: 2.1, allocation: '10%', type: 'Cyber', lastUpdated: '2025-02-12' },
         ]
     },
     {
@@ -25,23 +25,23 @@ const FAMOUS_PORTFOLIOS = [
         owner: "Warren Buffett",
         description: "Value investing staples with strong moats.",
         holdings: [
-            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '45%', type: 'Tech', lastUpdated: '2023-12-30' },
-            { symbol: 'BAC', name: 'Bank of America', price: 36.80, change: 1.1, allocation: '10%', type: 'Finance', lastUpdated: '2023-12-30' },
-            { symbol: 'AXP', name: 'American Express', price: 225.40, change: 0.9, allocation: '9%', type: 'Finance', lastUpdated: '2023-12-30' },
-            { symbol: 'KO', name: 'Coca-Cola', price: 60.20, change: -0.1, allocation: '8%', type: 'Consumer', lastUpdated: '2023-12-30' },
-            { symbol: 'CVX', name: 'Chevron Corp', price: 155.10, change: 0.4, allocation: '6%', type: 'Energy', lastUpdated: '2023-12-30' },
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '40%', type: 'Tech', lastUpdated: '2025-01-01' },
+            { symbol: 'BAC', name: 'Bank of America', price: 36.80, change: 1.1, allocation: '12%', type: 'Finance', lastUpdated: '2025-01-01' },
+            { symbol: 'AXP', name: 'American Express', price: 235.40, change: 0.9, allocation: '10%', type: 'Finance', lastUpdated: '2025-01-01' },
+            { symbol: 'KO', name: 'Coca-Cola', price: 62.20, change: -0.1, allocation: '8%', type: 'Consumer', lastUpdated: '2025-01-01' },
+            { symbol: 'CVX', name: 'Chevron Corp', price: 160.10, change: 0.4, allocation: '6%', type: 'Energy', lastUpdated: '2025-01-01' },
         ]
     },
     {
-        id: 'ackman',
-        name: "Ackman's Alpha",
-        owner: "Bill Ackman",
-        description: "Concentrated bets on consumer staples.",
+        id: 'burry',
+        name: "Burry's Big Short",
+        owner: "Michael Burry",
+        description: "Contrarian value & deep OTM puts.",
         holdings: [
-            { symbol: 'CMG', name: 'Chipotle Mexican Grill', price: 2900.50, change: 2.1, allocation: '18%', type: 'Consumer', lastUpdated: '2024-01-15' },
-            { symbol: 'QSR', name: 'Restaurant Brands', price: 82.30, change: -0.2, allocation: '14%', type: 'Consumer', lastUpdated: '2024-01-15' },
-            { symbol: 'HLT', name: 'Hilton Worldwide', price: 205.10, change: 0.4, allocation: '12%', type: 'Hospitality', lastUpdated: '2024-01-15' },
-            { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 145.20, change: 1.5, allocation: '10%', type: 'Tech', lastUpdated: '2024-01-15' },
+            { symbol: 'JD', name: 'JD.com', price: 28.50, change: 2.1, allocation: '15%', type: 'China Tech', lastUpdated: '2025-01-15' },
+            { symbol: 'BABA', name: 'Alibaba Group', price: 78.30, change: -0.2, allocation: '14%', type: 'China Tech', lastUpdated: '2025-01-15' },
+            { symbol: 'HCA', name: 'HCA Healthcare', price: 320.10, change: 0.4, allocation: '10%', type: 'Health', lastUpdated: '2025-01-15' },
+            { symbol: 'C', name: 'Citigroup', price: 55.20, change: 1.5, allocation: '8%', type: 'Finance', lastUpdated: '2025-01-15' },
         ]
     }
 ];

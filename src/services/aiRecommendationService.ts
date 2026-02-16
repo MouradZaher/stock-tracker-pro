@@ -20,17 +20,15 @@ export const getRecommendationsForSector = async (
             let { stock: stockData } = await getStockData(stock.symbol);
             const news = await getStockNews(stock.symbol, 3);
 
-            // LAST RESORT: If price is 0, use a semi-realistic mock price so user doesn't see $0.00
             if (!stockData.price || stockData.price === 0) {
-                stockData.price = 100 + (Math.random() * 900); // Random price between 100-1000
-                stockData.name = stockData.name.includes('Unavailable') ? stock.name : stockData.name;
+                continue; // Skip stocks without real price data
             }
 
-            // Calculate technical indicators (using mock price history)
-            const mockPrices = generateMockPriceHistory(stockData.price);
-            const rsi = calculateRSI(mockPrices);
-            const ma50 = calculateSMA(mockPrices, 50);
-            const ma200 = calculateSMA(mockPrices, 200);
+            // Technical indicators - Use real data points if available
+            // Note: Since we don't have full history, we use real comparative metrics
+            const rsi = null; // RSI requires volume/price history series
+            const ma50 = stockData.previousClose; // Use prev close as a proxy for very short-term MA
+            const ma200 = stockData.fiftyTwoWeekHigh ? (stockData.fiftyTwoWeekHigh + stockData.fiftyTwoWeekLow) / 2 : null;
 
             // Get social sentiment
             const socialSentiment = socialFeedService.getSentimentScore(stock.symbol);
@@ -124,18 +122,9 @@ export const getAllRecommendations = async (): Promise<StockRecommendation[]> =>
     return allRecommendations;
 };
 
-// Generate mock price history
+// Generate mock price history (DEPRECATED - Returning empty to ensure no fake data)
 const generateMockPriceHistory = (currentPrice: number): number[] => {
-    const prices: number[] = [];
-    let price = currentPrice * (0.8 + Math.random() * 0.2); // Start 0-20% below current
-
-    for (let i = 0; i < 200; i++) {
-        price = price * (1 + (Math.random() - 0.48) * 0.02); // Random walk
-        prices.push(price);
-    }
-
-    prices.push(currentPrice); // End at current price
-    return prices;
+    return [currentPrice];
 };
 
 // Calculate recommendation score (0-100)

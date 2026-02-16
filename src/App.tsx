@@ -113,14 +113,12 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
       <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: 'var(--header-height)' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
+          {/* ===== LOCKED: Desktop Home Tab Layout — DO NOT MODIFY (approved 2026-02-16) ===== */}
           <Route path="/search" element={
-            <div className="tab-content home-tab-content" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - var(--header-height))', marginTop: 0, paddingBottom: 0 }}>
+            <div className="tab-content home-tab-content" style={{ position: 'relative', height: 'calc(100vh - var(--header-height))', marginTop: 0, paddingBottom: 0, overflow: 'hidden' }}>
               {!selectedSymbol ? (
-                <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100%', padding: '0', paddingBottom: 'calc(60px + env(safe-area-inset-bottom))' }}>
-
-                  <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
-                    <StockHeatmap />
-                  </div>
+                <div className="heatmap-wrapper" style={{ position: 'fixed', top: 'calc(var(--header-height) + 0.5rem)', left: '1.5rem', right: '1.5rem', bottom: '1rem', overflow: 'hidden', zIndex: 1, borderRadius: '12px' }}>
+                  <StockHeatmap />
                 </div>
               ) : (
                 <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
@@ -173,7 +171,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
 import { useContentProtection } from './hooks/useContentProtection';
 
 function App() {
-  useContentProtection();
+  // useContentProtection();
   return (
     <AuthProvider>
       <PinAuthProvider>

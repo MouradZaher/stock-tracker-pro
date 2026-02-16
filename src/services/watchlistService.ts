@@ -45,7 +45,6 @@ export async function addSymbol(userId: string, symbol: string): Promise<boolean
         if (error) {
             // Ignore duplicate key errors (symbol already in watchlist)
             if (error.code === '23505') {
-                console.log('Symbol already in watchlist');
                 return true;
             }
             throw error;
@@ -90,7 +89,6 @@ export async function syncLocalToSupabase(userId: string, localSymbols: string[]
         const symbolsToSync = localSymbols.filter(symbol => !existingSet.has(symbol));
 
         if (symbolsToSync.length === 0) {
-            console.log('No new watchlist symbols to sync');
             return;
         }
 
@@ -105,8 +103,6 @@ export async function syncLocalToSupabase(userId: string, localSymbols: string[]
             .insert(watchlistData);
 
         if (error) throw error;
-
-        console.log(`✅ Synced ${symbolsToSync.length} watchlist symbols to Supabase`);
     } catch (error) {
         console.error('Failed to sync local watchlist to Supabase:', error);
         throw error;

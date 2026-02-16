@@ -23,6 +23,7 @@ interface PortfolioStore {
 
     // Utility actions
     getSummary: () => PortfolioSummary;
+    clearPositions: () => void;
     clearError: () => void;
 }
 
@@ -197,7 +198,6 @@ export const usePortfolioStore = create<PortfolioStore>()(
                         isLoading: false,
                         error: null,
                     });
-                    console.log(`✅ Loaded ${positions.length} positions from Supabase`);
                 } catch (error) {
                     console.error('Error loading portfolios from Supabase:', error);
                     set({
@@ -212,7 +212,6 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                 // Guard against multiple simultaneous syncs
                 if (get().isSyncing) {
-                    console.log('🔒 Portfolio sync already in progress, skipping...');
                     return;
                 }
 
@@ -230,8 +229,6 @@ export const usePortfolioStore = create<PortfolioStore>()(
                         isSyncing: false,
                         error: null,
                     });
-
-                    console.log('✅ Portfolio sync completed');
                 } catch (error) {
                     console.error('Error syncing portfolios:', error);
                     set({
@@ -256,6 +253,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     positions,
                 };
             },
+
+            clearPositions: () => set({ positions: [], error: null }),
 
             clearError: () => set({ error: null }),
         }),

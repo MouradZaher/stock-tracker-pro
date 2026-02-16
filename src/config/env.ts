@@ -29,10 +29,6 @@ function validateEnv(): void {
         console.error('❌ Missing required environment variables:', missing.join(', '));
         console.error('Please check your .env file and ensure all required variables are set.');
     }
-
-    // Stock data is fetched from free sources - no API keys needed!
-    console.log('ℹ️  Using free Yahoo Finance API for stock data (no API keys required)');
-
 }
 
 /**

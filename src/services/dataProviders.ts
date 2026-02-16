@@ -451,7 +451,6 @@ export const markProviderFailed = (providerId: string): void => {
         setTimeout(() => {
             provider.isHealthy = true;
             provider.consecutiveFailures = 0;
-            console.log(`🔄 Provider ${provider.name} recovered`);
         }, 300000);
     }
 };

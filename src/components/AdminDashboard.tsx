@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { Check, X, Shield, Users, LogOut, Activity, Eye, Wallet, Database, Server, Clock } from 'lucide-react';
+import { Check, X, Shield, Users, LogOut, Activity, Eye, Wallet, Database, Server, Clock, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { yahooFinanceApi } from '../services/api';
 import AdminPortfolioView from './AdminPortfolioView';
@@ -107,8 +107,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
         }
     };
 
-
-
     const handleApprove = async (id: string, email: string) => {
         const { error } = await supabase
             .from('profiles')
@@ -205,140 +203,139 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                <div className="admin-content">
-                    {loading ? (
-                        <div className="text-center p-xl">Loading users...</div>
-                    ) : (
-                        <>
-                            {/* Desktop Table View */}
-                            <table className="admin-table desktop-only">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th style={{ textAlign: 'right' }}>Portfolio Value</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {profiles.map(profile => (
-                                        <tr key={profile.id}>
-                                            <td>
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span className="user-email">{profile.email}</span>
-                                                    <span className="user-id">{profile.id}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className={`role-badge ${profile.role}`}>
-                                                    {profile.role}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span className={`status-badge ${profile.is_approved ? 'approved' : 'pending'}`}>
-                                                    {profile.is_approved ? 'Active' : 'Pending'}
-                                                </span>
-                                            </td>
-                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                                                {formatCurrency(profile.portfolioValue || 0)}
-                                            </td>
-                                            <td>
-                                                <div className="action-buttons">
-                                                    <button
-                                                        className="btn-icon"
-                                                        onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
-                                                        title="View Portfolio"
-                                                    >
-                                                        <Eye size={18} />
-                                                    </button>
-
-                                                    {profile.id !== user?.id && (
-                                                        <>
-                                                            {profile.is_approved ? (
-                                                                <button
-                                                                    className="btn-icon btn-reject"
-                                                                    onClick={() => handleReject(profile.id, profile.email)}
-                                                                    title="Revoke Access"
-                                                                    style={{ color: 'var(--color-error)' }}
-                                                                >
-                                                                    <X size={18} />
-                                                                </button>
-                                                            ) : (
-                                                                <button
-                                                                    className="btn-icon btn-approve"
-                                                                    onClick={() => handleApprove(profile.id, profile.email)}
-                                                                    title="Approve Access"
-                                                                    style={{ color: 'var(--color-success)' }}
-                                                                >
-                                                                    <Check size={18} />
-                                                                </button>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-
-                            {/* Mobile Card View */}
-                            <div className="mobile-only admin-cards">
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '3rem' }}>
+                        <div className="spinner" style={{ margin: '0 auto 1rem' }} />
+                        Loading users...
+                    </div>
+                ) : (
+                    <div className="admin-content-container" style={{ overflowX: 'auto' }}>
+                        {/* Desktop Table View */}
+                        <table className="admin-table desktop-only" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--glass-border)', textAlign: 'left' }}>
+                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>User</th>
+                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Email</th>
+                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Role</th>
+                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Status</th>
+                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Joined</th>
+                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', textAlign: 'right' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {profiles.map(profile => (
-                                    <div key={profile.id} className="admin-user-card glass-card">
-                                        <div className="card-header">
-                                            <div className="user-info">
-                                                <span className="user-email">{profile.email}</span>
-                                                <span className="user-id">{profile.id}</span>
-                                            </div>
-                                            <span className={`status-badge ${profile.is_approved ? 'approved' : 'pending'}`}>
+                                    <tr key={profile.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ fontWeight: 600 }}>{profile.email || 'N/A'}</div>
+                                        </td>
+                                        <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.email}</td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <span style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem',
+                                                background: profile.role === 'admin' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                                                color: profile.role === 'admin' ? '#10B981' : '#6366F1',
+                                                textTransform: 'uppercase',
+                                                fontWeight: 700
+                                            }}>
+                                                {profile.role}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <span style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem',
+                                                background: profile.is_approved ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                color: profile.is_approved ? '#10B981' : '#EF4444',
+                                                fontWeight: 700
+                                            }}>
                                                 {profile.is_approved ? 'Active' : 'Pending'}
                                             </span>
-                                        </div>
-                                        <div className="card-stats">
-                                            <div className="stat-row">
-                                                <span className="label">Role:</span>
-                                                <span className={`role-badge ${profile.role}`}>{profile.role}</span>
-                                            </div>
-                                            <div className="stat-row">
-                                                <span className="label">Portfolio:</span>
-                                                <span className="value">{formatCurrency(profile.portfolioValue || 0)}</span>
-                                            </div>
-                                        </div>
-                                        <div className="card-actions">
-                                            <button
-                                                className="btn btn-secondary btn-small"
-                                                onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
-                                            >
-                                                <Eye size={16} /> View
-                                            </button>
-                                            {profile.id !== user?.id && (
-                                                <>
-                                                    {profile.is_approved ? (
-                                                        <button
-                                                            className="btn btn-danger btn-small"
-                                                            onClick={() => handleReject(profile.id, profile.email)}
-                                                        >
-                                                            <X size={16} /> Revoke
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            className="btn btn-success btn-small"
-                                                            onClick={() => handleApprove(profile.id, profile.email)}
-                                                        >
-                                                            <Check size={16} /> Approve
-                                                        </button>
-                                                    )}
-                                                </>
+                                        </td>
+                                        <td style={{ padding: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+                                            {new Date(profile.created_at).toLocaleDateString()}
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                            {!profile.is_approved && (
+                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        onClick={() => handleApprove(profile.id, profile.email)}
+                                                        className="glass-button"
+                                                        style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-success)', borderColor: 'var(--color-success)' }}
+                                                    >
+                                                        <CheckCircle size={14} style={{ marginRight: '4px' }} /> Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(profile.id, profile.email)}
+                                                        className="glass-button"
+                                                        style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                    >
+                                                        <XCircle size={14} style={{ marginRight: '4px' }} /> Reject
+                                                    </button>
+                                                </div>
                                             )}
-                                        </div>
-                                    </div>
+                                            {profile.is_approved && (
+                                                <button
+                                                    className="glass-button"
+                                                    disabled
+                                                    style={{ opacity: 0.5, cursor: 'not-allowed', padding: '6px 12px', fontSize: '0.8rem' }}
+                                                >
+                                                    Approved
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
                                 ))}
-                            </div>
-                        </>
-                    )}
-                </div>
+                            </tbody>
+                        </table>
+
+                        {/* Mobile Card View */}
+                        <div className="mobile-only admin-cards">
+                            {profiles.map(profile => (
+                                <div key={profile.id} className="glass-card" style={{ padding: '1rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                        <span style={{ fontWeight: 600 }}>{profile.email}</span>
+                                        <span style={{
+                                            padding: '2px 6px',
+                                            borderRadius: '4px',
+                                            fontSize: '0.7rem',
+                                            background: profile.role === 'admin' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                                            color: profile.role === 'admin' ? '#10B981' : '#6366F1'
+                                        }}>
+                                            {profile.role}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                                        <span>Joined: {new Date(profile.created_at).toLocaleDateString()}</span>
+                                        <span style={{ color: profile.is_approved ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                            {profile.is_approved ? 'Active' : 'Pending'}
+                                        </span>
+                                    </div>
+                                    {!profile.is_approved && (
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                onClick={() => handleApprove(profile.id, profile.email)}
+                                                className="glass-button"
+                                                style={{ flex: 1, justifyContent: 'center', color: 'var(--color-success)', borderColor: 'var(--color-success)' }}
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                onClick={() => handleReject(profile.id, profile.email)}
+                                                className="glass-button"
+                                                style={{ flex: 1, justifyContent: 'center', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="admin-footer">
                     <button className="btn btn-secondary btn-small" onClick={() => {

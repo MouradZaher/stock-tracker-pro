@@ -4,9 +4,11 @@ import TopMovers from './TopMovers';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
-import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck } from 'lucide-react';
+import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe } from 'lucide-react';
 import type { NewsArticle, SocialPost } from '../types';
 import { socialFeedService } from '../services/SocialFeedService';
+
+import { getSectorPerformance, getVolumeAnomalies } from '../services/stockDataService';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -19,6 +21,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     }, [onSelectStock]);
 
     const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number }>({ hours: 0, minutes: 0, seconds: 0 });
+    const [sectorData, setSectorData] = useState<any[]>([]);
+    const [volumeAnomalies, setVolumeAnomalies] = useState<any[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
     // Fetch real breaking news - US Markets focus
     const { data: breakingNews, refetch: refetchNews } = useQuery<NewsArticle[]>({
@@ -29,6 +34,29 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         refetchInterval: 60000,
         staleTime: 30000,
     });
+
+    // Fetch Sector and Volume data
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoadingData(true);
+            try {
+                const [sectors, volumes] = await Promise.all([
+                    getSectorPerformance(),
+                    getVolumeAnomalies()
+                ]);
+                setSectorData(sectors);
+                setVolumeAnomalies(volumes);
+            } catch (error) {
+                console.error('Failed to fetch pulse data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        fetchData();
+        const interval = setInterval(fetchData, 30000); // 30s refresh
+        return () => clearInterval(interval);
+    }, []);
 
     // Calculate next market event
     const nextEventData = React.useMemo(() => {
@@ -80,26 +108,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         return () => clearInterval(interval);
     }, [nextEventData.time]);
 
-    // Simulated Sector Data
-    const [sectorData] = useState([
-        { name: 'Technology', change: 2.15, icon: '💻' },
-        { name: 'Financials', change: 0.85, icon: '🏦' },
-        { name: 'Healthcare', change: -0.42, icon: '💊' },
-        { name: 'Energy', change: -1.20, icon: '⚡' },
-        { name: 'Cons. Discret.', change: 1.10, icon: '🛍️' },
-    ]);
-
-    // Simulated Volume Anomalies
-    const [volumeAnomalies] = useState([
-        { symbol: 'PLTR', vol: '4.2x', reason: 'Unusual Call Activity', change: 4.5 },
-        { symbol: 'SOFI', vol: '3.8x', reason: 'Earnings Run-up', change: 5.1 },
-        { symbol: 'NIO', vol: '3.1x', reason: 'Oversold Bounce', change: -2.4 },
-        { symbol: 'MARA', vol: '2.9x', reason: 'Crypto Correlation', change: 8.2 },
-    ]);
-
-    // Sentiment Calculation
+    // Sentiment Calculation (from real data)
     const bullishCount = sectorData.filter(s => s.change > 0).length;
-    const sentimentScore = (bullishCount / sectorData.length) * 100;
+    const sentimentScore = sectorData.length > 0 ? (bullishCount / sectorData.length) * 100 : 50;
     const overallSentiment = sentimentScore >= 60 ? 'Bullish' : sentimentScore <= 40 ? 'Bearish' : 'Neutral';
     const sentimentColor = overallSentiment === 'Bullish' ? '#10B981' : overallSentiment === 'Bearish' ? '#EF4444' : '#F59E0B';
 
@@ -245,11 +256,11 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                         {sectorData.map(sector => (
                             <div key={sector.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                 <div style={{ fontSize: '1.2rem' }}>{sector.icon}</div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                        <span style={{ fontSize: '0.85rem' }}>{sector.name}</span>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            {sector.change > 0 ? '+' : ''}{sector.change}%
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', gap: '8px' }}>
+                                        <span style={{ fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{sector.name}</span>
+                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', whiteSpace: 'nowrap' }}>
+                                            {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
                                         </span>
                                     </div>
                                     <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', position: 'relative' }}>
@@ -338,7 +349,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                     {post.content}
                                 </p>
                                 {post.symbol && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                                         <span
                                             onClick={() => handleAction(post.symbol!)}
                                             style={{
@@ -354,6 +365,15 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                             ${post.symbol}
                                         </span>
                                         <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Weight: {post.weight}/10</span>
+
+                                        <a
+                                            href={`https://x.com/search?q=${encodeURIComponent(post.symbol || post.author)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ marginLeft: 'auto', color: '#1DA1F2', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                                        >
+                                            <Globe size={12} /> View on X Pulse
+                                        </a>
                                     </div>
                                 )}
                             </div>

@@ -39,8 +39,8 @@ export default defineConfig({
   server: {
     host: 'localhost',
     port: 5176,
-    strictPort: false,
-    open: true,
+    strictPort: true,
+    open: false,
     proxy: {
       '/api': {
         target: 'https://stock-tracker-pro.vercel.app',

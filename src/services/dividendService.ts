@@ -39,8 +39,6 @@ const generateMockDividends = (symbol: string): Dividend[] => {
 
 // Get dividends (using enhanced mock data)
 export const getDividends = async (symbol: string): Promise<Dividend[]> => {
-    console.log(`💰 Generating dividend data for ${symbol}...`);
-
     // Return mock dividends
     return generateMockDividends(symbol);
 };

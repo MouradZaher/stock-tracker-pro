@@ -18,6 +18,7 @@ interface WatchlistState {
     loadFromSupabase: (userId: string) => Promise<void>;
 
     // Utility actions
+    clearWatchlist: () => void;
     clearError: () => void;
 }
 
@@ -111,7 +112,6 @@ export const useWatchlist = create<WatchlistState>()(
                         isLoading: false,
                         error: null,
                     });
-                    console.log(`✅ Loaded ${watchlist.length} symbols from Supabase`);
                 } catch (error) {
                     console.error('Error loading watchlist from Supabase:', error);
                     set({
@@ -124,7 +124,6 @@ export const useWatchlist = create<WatchlistState>()(
             syncWithSupabase: async (userId: string) => {
                 // Guard against multiple simultaneous syncs
                 if (get().isSyncing) {
-                    console.log('🔒 Watchlist sync already in progress, skipping...');
                     return;
                 }
 
@@ -142,8 +141,6 @@ export const useWatchlist = create<WatchlistState>()(
                         isSyncing: false,
                         error: null,
                     });
-
-                    console.log('✅ Watchlist sync completed');
                 } catch (error) {
                     console.error('Error syncing watchlist:', error);
                     set({
@@ -152,6 +149,8 @@ export const useWatchlist = create<WatchlistState>()(
                     });
                 }
             },
+
+            clearWatchlist: () => set({ watchlist: [], error: null }),
 
             clearError: () => set({ error: null }),
         }),

@@ -73,13 +73,15 @@
         overflow: hidden;
     }
 
-    /* Header adjustments for mobile */
+    /* LOCKED: Mobile Header — DO NOT MODIFY (approved 2026-02-16) */
     .header {
         height: calc(60px + var(--safe-area-top));
         padding-top: calc(0.5rem + var(--safe-area-top));
         padding-left: var(--spacing-md);
         padding-right: var(--spacing-md);
     }
+
+    /* END LOCKED: Mobile Header */
 
     /* Main content area */
     .main-content {
@@ -143,7 +145,8 @@
 }
 
 /* =========================================
-   MOBILE NAV iOS FIXES
+   LOCKED: Mobile Nav/Footer iOS — DO NOT MODIFY
+   Approved 2026-02-16.
    ========================================= */
 @media (max-width: 768px) {
     .mobile-nav-container {
@@ -182,6 +185,8 @@
         height: 32px;
     }
 }
+
+/* END LOCKED: Mobile Nav/Footer iOS */
 
 /* =========================================
    SCROLLABLE PAGES (non-home tabs)
@@ -225,36 +230,58 @@
 }
 
 /* =========================================
-   HEATMAP iOS OPTIMIZATION
+   LOCKED: Heatmap iOS/Mobile Sizing — DO NOT MODIFY
+   Approved 2026-02-16. Fills between header and footer.
    ========================================= */
 @media (max-width: 768px) {
 
-    /* Force heatmap container to fill most of the screen */
-    /* Force heatmap container to fill most of the screen */
-    .stock-heatmap,
-    .heatmap-container {
-        /* Remove rigid viewport alignment, rely on flex and min-height */
-        height: auto !important;
-        min-height: 550px !important;
-        max-height: none !important;
-        overflow: visible !important;
-        display: flex !important;
-        flex-direction: column !important;
-        flex: 1 0 auto !important;
+    /* Override desktop fixed positioning for mobile */
+    .heatmap-wrapper {
+        position: fixed !important;
+        top: calc(60px + var(--safe-area-top)) !important;
+        left: 0.75rem !important;
+        right: 0.75rem !important;
+        bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 0.5rem) !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        border-radius: 12px !important;
+        z-index: 1 !important;
     }
 
-    /* Force TradingView widget containers to fill parent */
+    /* Home tab on mobile — no scroll, overflow hidden */
+    .home-tab-content {
+        overflow: hidden !important;
+        height: calc(100vh - 60px - var(--safe-area-top)) !important;
+        padding: 0 !important;
+    }
+
+    /* Heatmap container fills its wrapper */
+    .heatmap-container {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: auto !important;
+        min-height: unset !important;
+        max-height: none !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: 12px !important;
+    }
+
+    /* TradingView widget fills the container */
     .heatmap-container .tradingview-widget-container {
         flex: 1 !important;
         height: 100% !important;
-        min-height: 500px !important;
+        min-height: unset !important;
     }
 
     .heatmap-container .tradingview-widget-container__widget,
     .heatmap-container .tradingview-widget-container__widget iframe {
-        height: 550px !important;
-        /* Force a minimum rendered height for the iframe */
-        min-height: 550px !important;
+        height: 100% !important;
+        min-height: unset !important;
         display: block !important;
     }
 
@@ -263,23 +290,19 @@
         touch-action: pan-x pan-y pinch-zoom;
     }
 
-    /* Reduce title spacing on mobile to maximize heatmap space */
-    .home-tab-content h2 {
-        font-size: 0.95rem !important;
-        margin: 0.15rem 0 !important;
-        line-height: 1.2;
-    }
-
+    /* Hide title/subtitle on mobile home tab to maximize heatmap space */
+    .home-tab-content h2,
     .home-tab-content p {
-        font-size: 0.65rem !important;
-        margin: 0 0 0.25rem 0 !important;
+        display: none !important;
     }
 
-    /* Reduce container padding */
+    /* No extra container padding */
     .home-tab-content>div {
-        padding: 0 0.5rem 0.25rem !important;
+        padding: 0 !important;
     }
 }
+
+/* END LOCKED: Heatmap iOS/Mobile Sizing */
 
 /* =========================================
    FORM INPUTS iOS FIXES

@@ -8,6 +8,7 @@ import { soundService } from '../services/soundService';
 import SearchEngine from './SearchEngine';
 import FamousHoldings from './FamousHoldings';
 import { getAllRecommendations } from '../services/aiRecommendationService';
+import { getStockData, getStockQuote } from '../services/stockDataService';
 
 interface MarketSession {
     code: string;
@@ -66,20 +67,8 @@ interface AIRecommendationsProps {
     onSelectStock?: (symbol: string) => void;
 }
 
-// Hardcoded recommendations
-const MOCK_RECOMMENDATIONS = [
-    { symbol: 'CRM', name: 'Salesforce Inc.', sector: 'Technology', price: 194.60, score: 99, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 29.2 indicates oversold conditions', 'Bullish trend: 50-day MA above 200-day MA'] },
-    { symbol: 'META', name: 'Meta Platforms Inc.', sector: 'Technology', price: 671.99, score: 94, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 30.5 shows neutral momentum', 'Bullish trend: 50-day MA above 200-day MA'] },
-    { symbol: 'ORCL', name: 'Oracle Corporation', sector: 'Technology', price: 143.20, score: 94, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 43.8 shows neutral momentum', 'Bullish trend: 50-day MA above 200-day MA'] },
-    { symbol: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', price: 240.94, score: 100, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 67.8 shows neutral momentum', 'Bullish trend: 50-day MA above 200-day MA'] },
-    { symbol: 'UNH', name: 'UnitedHealth Group', sector: 'Healthcare', price: 277.81, score: 94, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 52.9 shows neutral momentum', 'Bullish trend: 50-day MA above 200-day MA'] },
-    { symbol: 'LLY', name: 'Eli Lilly and Company', sector: 'Healthcare', price: 1060.02, score: 89, recommendation: 'Buy', suggestedAllocation: 5, reasoning: ['RSI at 18.3 indicates oversold conditions', 'Bullish trend: 50-day MA above 200-day MA'] },
-    { symbol: 'AMD', name: 'Advanced Micro Devices', sector: 'Technology', price: 178.20, score: 88, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['Breaking out of consolidation pattern', 'Analysts upgrade price target'] },
-    { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', price: 142.50, score: 87, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['Undervalued relative to sector', 'Strong ad revenue growth'] },
-    { symbol: 'AMZN', name: 'Amazon.com Inc.', sector: 'Cons. Cyclical', price: 175.30, score: 85, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['AWS growth accelerating', 'Operating margins improving'] },
-    { symbol: 'MSFT', name: 'Microsoft Corp', sector: 'Technology', price: 415.50, score: 85, recommendation: 'Buy', suggestedAllocation: 4, reasoning: ['AI integration driving cloud growth', 'Solid automated checklist score'] },
-    { symbol: 'PLTR', name: 'Palantir Technologies', sector: 'Technology', price: 25.40, score: 82, recommendation: 'Buy', suggestedAllocation: 3, reasoning: ['Momentum signal triggered', 'High institutional volume'] },
-];
+// Hardcoded recommendations (DEPRECATED - Using real service data)
+const MOCK_RECOMMENDATIONS: any[] = [];
 
 const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) => {
     const { addNotification } = useNotifications();
@@ -183,6 +172,14 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         });
 
         toast.success('Market scan complete. 12 High Conviction setups found.');
+
+        // REFRESH RECOMMENDATIONS
+        try {
+            const freshRecs = await getAllRecommendations();
+            setActiveRecs(freshRecs);
+        } catch (error) {
+            console.error('Failed to refresh recs after scan:', error);
+        }
     };
 
     const getScoreColor = (score: number) => {
@@ -192,20 +189,25 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     };
 
     // --- DETAILED VIEW (Trade Analysis) ---
+    const [detailStockData, setDetailStockData] = useState<any>(null);
+
+    useEffect(() => {
+        if (detailSymbol) {
+            getStockData(detailSymbol).then(data => setDetailStockData(data.stock));
+        }
+    }, [detailSymbol]);
+
     if (detailSymbol) {
         return (
             <div className="portfolio-container ai-detail-view" style={{ paddingTop: '0', animation: 'fadeIn 0.3s ease', paddingBottom: '100px' }}>
                 {/* Header & Navigation */}
                 <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <button onClick={() => setDetailSymbol(null)} className="btn btn-icon glass-button">
+                        <button onClick={() => { setDetailSymbol(null); setDetailStockData(null); }} className="btn btn-icon glass-button">
                             <ArrowRight size={20} style={{ transform: 'rotate(180deg)' }} />
                         </button>
                         <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Trade Analysis</h2>
                     </div>
-                    <button className="btn btn-primary" onClick={handleWatchlistToggle} style={{ gap: '0.5rem', fontSize: '0.85rem' }}>
-                        <Plus size={16} /> Add to Watchlist
-                    </button>
                 </div>
 
                 {/* Stock Header & Data - Mobile Optimized */}
@@ -213,14 +215,16 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                                <div style={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1 }}>{detailSymbol}.US</div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>NASDAQ</div>
+                                <div style={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1 }}>{detailSymbol}</div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>{detailStockData?.name || ''}</div>
                             </div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '0.25rem' }}>$280.91</div>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '0.25rem' }}>{detailStockData ? formatCurrency(detailStockData.price) : '...'}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ color: 'var(--color-success)', fontWeight: 700, fontSize: '1rem' }}>+1176.84%</div>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>LIVE</div>
+                            <div style={{ color: (detailStockData?.change || 0) >= 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 700, fontSize: '1rem' }}>
+                                {detailStockData ? (detailStockData.change >= 0 ? '+' : '') : ''}{detailStockData ? detailStockData.changePercent.toFixed(2) : '0.00'}%
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>REAL-TIME</div>
                         </div>
                     </div>
 
@@ -387,25 +391,36 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
                     {/* Market Sessions - Overview - Localized to Cairo (EGP) */}
                     <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', fontSize: '0.65rem', textAlign: 'center', marginBottom: '0.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', fontSize: '0.65rem', textAlign: 'center', marginBottom: '0.75rem' }}>
                             {getMarketSessions().map(session => (
-                                <div key={session.code} style={{ opacity: session.isOpen ? 1 : 0.4 }}>
+                                <div key={session.code} style={{ opacity: session.isOpen ? 1 : 0.6, background: session.isOpen ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)', padding: '6px 2px', borderRadius: '4px' }}>
                                     <div style={{ fontWeight: 800, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
-                                    {session.isOpen ? (
-                                        <div style={{ fontSize: '0.55rem', color: 'var(--color-success)', marginTop: '2px' }}>● OPEN</div>
-                                    ) : (
-                                        <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>
-                                            {session.isWeekend ? 'WEEKEND' : 'CLOSED'}
-                                        </div>
-                                    )}
+                                    <div style={{ fontSize: '0.5rem', color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', marginTop: '2px', fontWeight: 600 }}>
+                                        {session.isOpen ? 'OPEN' : session.isWeekend ? 'WEEKEND' : 'CLOSED'}
+                                    </div>
                                 </div>
                             ))}
                         </div>
-                        <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', textAlign: 'center', display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span>EGX: 10:00-14:30</span>
-                            <span>LND: 10:00-18:30</span>
-                            <span>NYC: 16:30-23:00</span>
-                            <span>TKY: 02:00-08:00</span>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-secondary)', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.55rem' }}>EGX (CAIRO)</span>
+                                    <span style={{ fontWeight: 700 }}>10:00 - 14:30</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.55rem' }}>LND (LONDON)</span>
+                                    <span style={{ fontWeight: 700 }}>10:00 - 18:30</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.55rem' }}>NYC (N. YORK)</span>
+                                    <span style={{ fontWeight: 700 }}>16:30 - 23:00</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.55rem' }}>TKY (TOKYO)</span>
+                                    <span style={{ fontWeight: 700 }}>02:00 - 08:00</span>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '6px', fontSize: '0.55rem', color: 'var(--color-accent)', fontWeight: 600 }}>ALL TIMES IN CAIRO TIME (UTC+2)</div>
                         </div>
                     </div>
                 </div>

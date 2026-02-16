@@ -75,7 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 // 2. If not approved in DB, approve them now
                 if (!data.is_approved) {
-                    console.log('⚡ Auto-approving user...');
                     await supabase
                         .from('profiles')
                         .update({ is_approved: true })
@@ -96,19 +95,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const syncUserData = useCallback(async (userId: string, force = false) => {
         // Guard against multiple simultaneous syncs and redundant re-syncs
         if (syncInProgressRef.current) {
-            console.log('🔒 Sync already in progress, skipping...');
             return;
         }
 
         // Skip if we already synced this user (unless forced)
         if (!force && lastSyncedUserIdRef.current === userId) {
-            console.log('✅ Already synced for this user, skipping...');
             return;
         }
 
         syncInProgressRef.current = true;
-        console.log('🔄 Syncing user data...');
-
         try {
             // Sync portfolio data
             const portfolioStore = usePortfolioStore.getState();
@@ -119,7 +114,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await watchlistStore.syncWithSupabase(userId);
 
             lastSyncedUserIdRef.current = userId;
-            console.log('✅ User data sync completed');
         } catch (error) {
             console.error('❌ Error syncing user data:', error);
         } finally {
@@ -200,8 +194,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Enhanced error handling and logging for production magic links
         try {
-            console.log('📧 Sending magic link to:', cleanEmail);
-
             const { data, error } = await supabase.auth.signInWithOtp({
                 email: cleanEmail,
                 options: {
@@ -229,11 +221,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 return { error };
             }
-
-            console.log('✅ Magic link sent successfully!', data);
-            console.log('📨 Check your inbox for the authentication link');
-
-
             return { error: null };
         } catch (err) {
             console.error('💥 Unexpected error sending magic link:', err);
@@ -283,6 +270,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem(BYPASS_STORAGE_KEY);
         // Reset sync tracking
         lastSyncedUserIdRef.current = null;
+
+        // Clear stores
+        usePortfolioStore.getState().clearPositions();
+        useWatchlist.getState().clearWatchlist();
+
         await supabase.auth.signOut();
         setRole(null);
         setIsApproved(false);

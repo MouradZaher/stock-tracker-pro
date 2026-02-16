@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X, Zap } from 'lucide-react';
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote } from '../services/stockDataService';
@@ -25,6 +25,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const [showModal, setShowModal] = useState(false);
     // ... existing state ...
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showAIAdvice, setShowAIAdvice] = useState(false);
 
     const [formData, setFormData] = useState({
         symbol: '',
@@ -445,7 +446,83 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     color: 'var(--color-warning)',
                     marginBottom: 'var(--spacing-md)',
                 }}>
-                    ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                        <span>⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)</span>
+                        <button
+                            className="btn btn-primary btn-small ai-pulse-button"
+                            style={{
+                                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                color: '#000',
+                                fontWeight: 800,
+                                fontSize: '0.75rem',
+                                padding: '6px 16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                border: 'none',
+                                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                                borderRadius: '20px',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onClick={() => setShowAIAdvice(true)}
+                        >
+                            <Zap size={14} fill="currentColor" /> AI Recommendation Analysis Portfolio
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* AI Advice Modal */}
+            {showAIAdvice && (
+                <div className="modal-overlay glass-blur" onClick={() => setShowAIAdvice(false)}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
+                        <div className="modal-header">
+                            <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Zap size={20} color="var(--color-warning)" /> Portfolio Optimization Advice
+                            </h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setShowAIAdvice(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                            <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid var(--color-warning-light)' }}>
+                                <h4 style={{ fontSize: '1rem', color: 'var(--color-warning)', marginBottom: '0.5rem' }}>Tactical Rebalancing Required</h4>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+                                    Your portfolio is currently concentrated in specific high-growth sectors. AI models suggest rebalancing
+                                    to defensive sectors (Healthcare/Utilities) to maintain stability in current market conditions.
+                                </p>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {stockAllocations.filter(a => !a.valid.valid).map(a => (
+                                    <div key={a.symbol} className="glass-card" style={{ padding: '1rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            <span style={{ fontWeight: 700 }}>{a.symbol}</span>
+                                            <span style={{ color: 'var(--color-error)', fontWeight: 800 }}>{a.allocation.toFixed(1)}%</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>
+                                            Exceeds 5% safe limit. Strategic trim recommended to capture profits and reduce single-tick risk.
+                                        </p>
+                                    </div>
+                                ))}
+
+                                {sectorAllocations.filter(a => !a.valid.valid).map(a => (
+                                    <div key={a.sector} className="glass-card" style={{ padding: '1rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            <span style={{ fontWeight: 700 }}>{a.sector}</span>
+                                            <span style={{ color: 'var(--color-error)', fontWeight: 800 }}>{a.allocation.toFixed(1)}%</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>
+                                            Sector concentration exceeds 20%. Consider diversifying into negatively correlated assets.
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-primary" onClick={() => setShowAIAdvice(false)}>Apply Strategy</button>
+                        </div>
+                    </div>
                 </div>
             )}
 
