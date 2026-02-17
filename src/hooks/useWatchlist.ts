@@ -155,9 +155,10 @@ export const useWatchlist = create<WatchlistState>()(
                 clearWatchlist: () => set({ watchlist: [], error: null }),
 
                 clearError: () => set({ error: null }),
-            }),
-    {
-        name: 'stock-watchlist',
-    }
-)
+            };
+        },
+        {
+            name: 'stock-watchlist',
+        }
+    )
 );

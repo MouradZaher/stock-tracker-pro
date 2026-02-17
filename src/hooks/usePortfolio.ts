@@ -38,7 +38,6 @@ export const usePortfolioStore = create<PortfolioStore>()(
                 isLoading: false,
                 isSyncing: false,
                 error: null,
-                // ... rest of the implementation
 
                 addPosition: async (position, userId) => {
                     const id = `${position.symbol}-${Date.now()}`;
@@ -294,9 +293,10 @@ export const usePortfolioStore = create<PortfolioStore>()(
                 clearPositions: () => set({ positions: [], error: null }),
 
                 clearError: () => set({ error: null }),
-            }),
-    {
-        name: 'portfolio-storage',
-    }
-)
+            };
+        },
+        {
+            name: 'portfolio-storage',
+        }
+    )
 );
