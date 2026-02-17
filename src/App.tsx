@@ -44,6 +44,7 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
+  console.log('💎 AppContent component rendering...');
   const { isAuthenticated, logout, user } = usePinAuth();
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
@@ -190,6 +191,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
 import { useContentProtection } from './hooks/useContentProtection';
 
 function App() {
+  console.log('🏗️ App component rendering...');
   // useContentProtection();
   return (
     <AuthProvider>
