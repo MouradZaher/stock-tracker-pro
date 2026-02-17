@@ -23,6 +23,7 @@ interface PinAuthContextType {
 const PinAuthContext = createContext<PinAuthContextType | undefined>(undefined);
 
 export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    console.log('🛡️ PinAuthProvider rendering...');
     const [user, setUser] = useState<User | null>(null);
     const { setCustomUser, signOut } = useAuth();
 

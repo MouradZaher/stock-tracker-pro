@@ -30,270 +30,272 @@ interface PortfolioStore {
 }
 
 export const usePortfolioStore = create<PortfolioStore>()(
-    persist<PortfolioStore>(
-        (set, get) => ({
-            positions: [],
-            isLoading: false,
-            isSyncing: false,
-            error: null,
+    persist(
+        (set, get) => {
+            console.log('📊 Initializing usePortfolioStore...');
+            return {
+                positions: [],
+                isLoading: false,
+                isSyncing: false,
+                error: null,
 
-            addPosition: async (position, userId) => {
-                const id = `${position.symbol}-${Date.now()}`;
-                const purchaseValue = position.units * position.avgCost;
-                const marketValue = position.units * position.currentPrice;
-                const { amount, percent } = calculateProfitLoss(position.currentPrice, position.avgCost, position.units);
+                addPosition: async (position, userId) => {
+                    const id = `${position.symbol}-${Date.now()}`;
+                    const purchaseValue = position.units * position.avgCost;
+                    const marketValue = position.units * position.currentPrice;
+                    const { amount, percent } = calculateProfitLoss(position.currentPrice, position.avgCost, position.units);
 
-                const newPosition: PortfolioPosition = {
-                    ...position,
-                    id,
-                    purchaseValue,
-                    marketValue,
-                    profitLoss: amount,
-                    profitLossPercent: percent,
-                    sector: position.sector || getSectorForSymbol(position.symbol),
-                };
+                    const newPosition: PortfolioPosition = {
+                        ...position,
+                        id,
+                        purchaseValue,
+                        marketValue,
+                        profitLoss: amount,
+                        profitLossPercent: percent,
+                        sector: position.sector || getSectorForSymbol(position.symbol),
+                    };
 
-                // Optimistic update
-                set((state) => ({
-                    positions: [...state.positions, newPosition],
-                }));
+                    // Optimistic update
+                    set((state) => ({
+                        positions: [...state.positions, newPosition],
+                    }));
 
-                // Sync to Supabase only if user is logged in AND not a bypass user
-                if (userId && !userId.startsWith('bypass-')) {
-                    try {
-                        const success = await portfolioService.savePosition(userId, newPosition);
-                        if (!success) {
-                            // Rollback on failure
-                            set((state) => ({
-                                positions: state.positions.filter(p => p.id !== id),
-                                error: 'Failed to save position to database',
-                            }));
-                        }
-                    } catch (error) {
-                        console.error('Error saving position:', error);
-                        // Rollback on error
-                        set((state) => ({
-                            positions: state.positions.filter(p => p.id !== id),
-                            error: 'Failed to save position',
-                        }));
-                    }
-                }
-            },
-
-            updatePosition: async (id, updates, userId) => {
-                // Store old position for potential rollback
-                const oldPosition = get().positions.find(p => p.id === id);
-
-                // Optimistic update
-                set((state) => ({
-                    positions: state.positions.map((pos) => {
-                        if (pos.id !== id) return pos;
-
-                        const updated = { ...pos, ...updates };
-                        const purchaseValue = updated.units * updated.avgCost;
-                        const marketValue = updated.units * updated.currentPrice;
-                        const { amount, percent } = calculateProfitLoss(updated.currentPrice, updated.avgCost, updated.units);
-
-                        return {
-                            ...updated,
-                            purchaseValue,
-                            marketValue,
-                            profitLoss: amount,
-                            profitLossPercent: percent,
-                        };
-                    }),
-                }));
-
-                // Sync to Supabase only if user is logged in AND not a bypass user
-                if (userId && oldPosition && !userId.startsWith('bypass-')) {
-                    try {
-                        const updatedPosition = get().positions.find(p => p.id === id);
-                        if (updatedPosition) {
-                            const success = await portfolioService.savePosition(userId, updatedPosition);
+                    // Sync to Supabase only if user is logged in AND not a bypass user
+                    if (userId && !userId.startsWith('bypass-')) {
+                        try {
+                            const success = await portfolioService.savePosition(userId, newPosition);
                             if (!success) {
                                 // Rollback on failure
                                 set((state) => ({
-                                    positions: state.positions.map(p => p.id === id ? oldPosition : p),
-                                    error: 'Failed to update position in database',
+                                    positions: state.positions.filter(p => p.id !== id),
+                                    error: 'Failed to save position to database',
                                 }));
                             }
+                        } catch (error) {
+                            console.error('Error saving position:', error);
+                            // Rollback on error
+                            set((state) => ({
+                                positions: state.positions.filter(p => p.id !== id),
+                                error: 'Failed to save position',
+                            }));
                         }
-                    } catch (error) {
-                        console.error('Error updating position:', error);
-                        // Rollback on error
-                        set((state) => ({
-                            positions: state.positions.map(p => p.id === id ? oldPosition : p),
-                            error: 'Failed to update position',
-                        }));
                     }
-                }
-            },
+                },
 
-            removePosition: async (id, userId) => {
-                // Store old positions for potential rollback
-                const oldPositions = get().positions;
+                updatePosition: async (id, updates, userId) => {
+                    // Store old position for potential rollback
+                    const oldPosition = get().positions.find(p => p.id === id);
 
-                // Optimistic update
-                set((state) => ({
-                    positions: state.positions.filter((pos) => pos.id !== id),
-                }));
+                    // Optimistic update
+                    set((state) => ({
+                        positions: state.positions.map((pos) => {
+                            if (pos.id !== id) return pos;
 
-                // Sync to Supabase only if user is logged in AND not a bypass user
-                if (userId && !userId.startsWith('bypass-')) {
-                    try {
-                        const success = await portfolioService.deletePosition(userId, id);
-                        if (!success) {
-                            // Rollback on failure
+                            const updated = { ...pos, ...updates };
+                            const purchaseValue = updated.units * updated.avgCost;
+                            const marketValue = updated.units * updated.currentPrice;
+                            const { amount, percent } = calculateProfitLoss(updated.currentPrice, updated.avgCost, updated.units);
+
+                            return {
+                                ...updated,
+                                purchaseValue,
+                                marketValue,
+                                profitLoss: amount,
+                                profitLossPercent: percent,
+                            };
+                        }),
+                    }));
+
+                    // Sync to Supabase only if user is logged in AND not a bypass user
+                    if (userId && oldPosition && !userId.startsWith('bypass-')) {
+                        try {
+                            const updatedPosition = get().positions.find(p => p.id === id);
+                            if (updatedPosition) {
+                                const success = await portfolioService.savePosition(userId, updatedPosition);
+                                if (!success) {
+                                    // Rollback on failure
+                                    set((state) => ({
+                                        positions: state.positions.map(p => p.id === id ? oldPosition : p),
+                                        error: 'Failed to update position in database',
+                                    }));
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Error updating position:', error);
+                            // Rollback on error
+                            set((state) => ({
+                                positions: state.positions.map(p => p.id === id ? oldPosition : p),
+                                error: 'Failed to update position',
+                            }));
+                        }
+                    }
+                },
+
+                removePosition: async (id, userId) => {
+                    // Store old positions for potential rollback
+                    const oldPositions = get().positions;
+
+                    // Optimistic update
+                    set((state) => ({
+                        positions: state.positions.filter((pos) => pos.id !== id),
+                    }));
+
+                    // Sync to Supabase only if user is logged in AND not a bypass user
+                    if (userId && !userId.startsWith('bypass-')) {
+                        try {
+                            const success = await portfolioService.deletePosition(userId, id);
+                            if (!success) {
+                                // Rollback on failure
+                                set({
+                                    positions: oldPositions,
+                                    error: 'Failed to delete position from database',
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error deleting position:', error);
+                            // Rollback on error
                             set({
                                 positions: oldPositions,
-                                error: 'Failed to delete position from database',
+                                error: 'Failed to delete position',
                             });
                         }
-                    } catch (error) {
-                        console.error('Error deleting position:', error);
-                        // Rollback on error
+                    }
+                },
+
+                updatePrice: async (symbol, price, userId) => {
+                    // Optimistic update
+                    set((state) => ({
+                        positions: state.positions.map((pos) => {
+                            if (pos.symbol !== symbol) return pos;
+
+                            const marketValue = pos.units * price;
+                            const { amount, percent } = calculateProfitLoss(price, pos.avgCost, pos.units);
+
+                            return {
+                                ...pos,
+                                currentPrice: price,
+                                marketValue,
+                                profitLoss: amount,
+                                profitLossPercent: percent,
+                            };
+                        }),
+                    }));
+
+                    // Sync to Supabase only if user is logged in AND not a bypass user
+                    if (userId && !userId.startsWith('bypass-')) {
+                        try {
+                            await portfolioService.updatePriceForSymbol(userId, symbol, price);
+                        } catch (error) {
+                            console.error('Error updating price in database:', error);
+                            // Don't rollback price updates as they're frequently updated
+                        }
+                    }
+                },
+
+                loadFromSupabase: async (userId: string) => {
+                    if (!userId || userId.startsWith('bypass-')) return;
+                    set({ isLoading: true, error: null });
+                    try {
+                        const positions = await portfolioService.fetchUserPortfolios(userId);
                         set({
-                            positions: oldPositions,
-                            error: 'Failed to delete position',
+                            positions,
+                            isLoading: false,
+                            error: null,
+                        });
+                    } catch (error) {
+                        console.error('Error loading portfolios from Supabase:', error);
+                        set({
+                            isLoading: false,
+                            error: 'Failed to load portfolios',
                         });
                     }
-                }
-            },
+                },
 
-            updatePrice: async (symbol, price, userId) => {
-                // Optimistic update
-                set((state) => ({
-                    positions: state.positions.map((pos) => {
-                        if (pos.symbol !== symbol) return pos;
+                syncWithSupabase: async (userId: string) => {
+                    if (!userId || userId.startsWith('bypass-')) return;
 
-                        const marketValue = pos.units * price;
-                        const { amount, percent } = calculateProfitLoss(price, pos.avgCost, pos.units);
-
-                        return {
-                            ...pos,
-                            currentPrice: price,
-                            marketValue,
-                            profitLoss: amount,
-                            profitLossPercent: percent,
-                        };
-                    }),
-                }));
-
-                // Sync to Supabase only if user is logged in AND not a bypass user
-                if (userId && !userId.startsWith('bypass-')) {
-                    try {
-                        await portfolioService.updatePriceForSymbol(userId, symbol, price);
-                    } catch (error) {
-                        console.error('Error updating price in database:', error);
-                        // Don't rollback price updates as they're frequently updated
+                    // Guard against multiple simultaneous syncs
+                    if (get().isSyncing) {
+                        return;
                     }
-                }
-            },
 
-            loadFromSupabase: async (userId: string) => {
-                if (!userId || userId.startsWith('bypass-')) return;
-                set({ isLoading: true, error: null });
-                try {
-                    const positions = await portfolioService.fetchUserPortfolios(userId);
-                    set({
-                        positions,
-                        isLoading: false,
-                        error: null,
-                    });
-                } catch (error) {
-                    console.error('Error loading portfolios from Supabase:', error);
-                    set({
-                        isLoading: false,
-                        error: 'Failed to load portfolios',
-                    });
-                }
-            },
+                    set({ isSyncing: true, error: null });
+                    try {
+                        const localPositions = get().positions;
 
-            syncWithSupabase: async (userId: string) => {
-                if (!userId || userId.startsWith('bypass-')) return;
+                        // Sync local positions to Supabase (one-time migration)
+                        await portfolioService.syncLocalToSupabase(userId, localPositions);
 
-                // Guard against multiple simultaneous syncs
-                if (get().isSyncing) {
-                    return;
-                }
+                        // Load the merged data from Supabase
+                        const positions = await portfolioService.fetchUserPortfolios(userId);
+                        set({
+                            positions,
+                            isSyncing: false,
+                            error: null,
+                        });
+                    } catch (error) {
+                        console.error('Error syncing portfolios:', error);
+                        set({
+                            isSyncing: false,
+                            error: 'Failed to sync portfolios',
+                        });
+                    }
+                },
 
-                set({ isSyncing: true, error: null });
-                try {
-                    const localPositions = get().positions;
+                initRealtimeSubscription: (userId: string) => {
+                    if (!userId || userId.startsWith('bypass-')) return () => { };
 
-                    // Sync local positions to Supabase (one-time migration)
-                    await portfolioService.syncLocalToSupabase(userId, localPositions);
+                    const channel = supabase
+                        .channel(`portfolio-changes-${userId}`)
+                        .on(
+                            'postgres_changes',
+                            {
+                                event: '*',
+                                schema: 'public',
+                                table: 'portfolios',
+                                filter: `user_id=eq.${userId}`
+                            },
+                            async (payload) => {
+                                console.log('🔄 Realtime portfolio change:', payload.eventType);
 
-                    // Load the merged data from Supabase
-                    const positions = await portfolioService.fetchUserPortfolios(userId);
-                    set({
-                        positions,
-                        isSyncing: false,
-                        error: null,
-                    });
-                } catch (error) {
-                    console.error('Error syncing portfolios:', error);
-                    set({
-                        isSyncing: false,
-                        error: 'Failed to sync portfolios',
-                    });
-                }
-            },
-
-            initRealtimeSubscription: (userId: string) => {
-                if (!userId || userId.startsWith('bypass-')) return () => { };
-
-                const channel = supabase
-                    .channel(`portfolio-changes-${userId}`)
-                    .on(
-                        'postgres_changes',
-                        {
-                            event: '*',
-                            schema: 'public',
-                            table: 'portfolios',
-                            filter: `user_id=eq.${userId}`
-                        },
-                        async (payload) => {
-                            console.log('🔄 Realtime portfolio change:', payload.eventType);
-
-                            // Reload all positions to ensure consistency and correct derived fields
-                            try {
-                                const positions = await portfolioService.fetchUserPortfolios(userId);
-                                set({ positions });
-                            } catch (err) {
-                                console.error('Failed to reload positions on realtime event:', err);
+                                // Reload all positions to ensure consistency and correct derived fields
+                                try {
+                                    const positions = await portfolioService.fetchUserPortfolios(userId);
+                                    set({ positions });
+                                } catch (err) {
+                                    console.error('Failed to reload positions on realtime event:', err);
+                                }
                             }
-                        }
-                    )
-                    .subscribe();
+                        )
+                        .subscribe();
 
-                return () => {
-                    supabase.removeChannel(channel);
-                };
-            },
+                    return () => {
+                        supabase.removeChannel(channel);
+                    };
+                },
 
-            getSummary: () => {
-                const positions = get().positions;
-                const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
-                const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
-                const totalProfitLoss = totalValue - totalCost;
-                const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
+                getSummary: () => {
+                    const positions = get().positions;
+                    const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
+                    const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
+                    const totalProfitLoss = totalValue - totalCost;
+                    const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
 
-                return {
-                    totalValue,
-                    totalCost,
-                    totalProfitLoss,
-                    totalProfitLossPercent,
-                    positions,
-                };
-            },
+                    return {
+                        totalValue,
+                        totalCost,
+                        totalProfitLoss,
+                        totalProfitLossPercent,
+                        positions,
+                    };
+                },
 
-            clearPositions: () => set({ positions: [], error: null }),
+                clearPositions: () => set({ positions: [], error: null }),
 
-            clearError: () => set({ error: null }),
-        }),
-        {
-            name: 'portfolio-storage',
-        }
-    )
+                clearError: () => set({ error: null }),
+            }),
+    {
+        name: 'portfolio-storage',
+    }
+)
 );
