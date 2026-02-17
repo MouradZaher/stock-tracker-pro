@@ -4,6 +4,7 @@ import type { PortfolioPosition, PortfolioSummary } from '../types';
 import { calculateProfitLoss } from '../utils/calculations';
 import { getSectorForSymbol } from '../data/sectors';
 import * as portfolioService from '../services/portfolioService';
+import { supabase } from '../services/supabase';
 
 interface PortfolioStore {
     positions: PortfolioPosition[];
@@ -242,7 +243,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
             initRealtimeSubscription: (userId: string) => {
                 if (!userId || userId.startsWith('bypass-')) return () => { };
 
-                const channel = portfolioService.supabase
+                const channel = supabase
                     .channel(`portfolio-changes-${userId}`)
                     .on(
                         'postgres_changes',
@@ -267,7 +268,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     .subscribe();
 
                 return () => {
-                    portfolioService.supabase.removeChannel(channel);
+                    supabase.removeChannel(channel);
                 };
             },
 

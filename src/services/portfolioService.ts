@@ -1,4 +1,3 @@
-export { supabase } from './supabase';
 import { supabase } from './supabase';
 import type { PortfolioPosition, Dividend } from '../types';
 
