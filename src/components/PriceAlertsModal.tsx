@@ -82,7 +82,7 @@ const PriceAlertsModal: React.FC<PriceAlertsModalProps> = ({ symbol, currentPric
                                 onChange={(e) => setTargetPrice(e.target.value)}
                                 style={{ flex: 1, fontSize: '1.1rem', fontWeight: 600 }}
                             />
-                            <button className="btn btn-primary" onClick={handleAdd}>Set Alert</button>
+                            <button className="btn btn-primary" onClick={handleAdd} style={{ minWidth: '100px', padding: '0.6rem 1.2rem', fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>Set Alert</button>
                         </div>
                     </div>
 

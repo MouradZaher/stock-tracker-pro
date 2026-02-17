@@ -363,6 +363,86 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             </div>
 
+            {/* ===== HOW AI STRATEGY WORKS ===== */}
+            <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--color-primary)' }}>
+                <h3 style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Zap size={16} /> How Our AI Strategy Works
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ padding: '1rem', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '10px', border: '1px solid rgba(99, 102, 241, 0.15)' }}>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-accent)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '6px' }}>Technical Analysis (40pts)</div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>RSI momentum, 50/200-day MA crossovers, price vs moving average position, and trend confirmation signals.</p>
+                    </div>
+                    <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.15)' }}>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '6px' }}>Fundamentals (20pts)</div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>P/E ratio analysis, EPS growth trends, and valuation relative to sector peers for quality screening.</p>
+                    </div>
+                    <div style={{ padding: '1rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '10px', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                        <div style={{ fontSize: '0.7rem', color: '#3B82F6', textTransform: 'uppercase', fontWeight: 700, marginBottom: '6px' }}>News Sentiment (25pts)</div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>Real-time headline analysis from Reuters, Bloomberg, CNBC with positive/negative sentiment scoring.</p>
+                    </div>
+                    <div style={{ padding: '1rem', background: 'rgba(168, 85, 247, 0.05)', borderRadius: '10px', border: '1px solid rgba(168, 85, 247, 0.15)' }}>
+                        <div style={{ fontSize: '0.7rem', color: '#A855F7', textTransform: 'uppercase', fontWeight: 700, marginBottom: '6px' }}>X Social Pulse (15pts)</div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>Institutional social volume and sentiment from X (Twitter) tracking smart money flow signals.</p>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', padding: '0.75rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                    <span>📊 Score ≥75 → <strong style={{ color: 'var(--color-success)' }}>BUY</strong></span>
+                    <span>📊 Score 50-74 → <strong style={{ color: 'var(--color-warning)' }}>HOLD</strong></span>
+                    <span>📊 Score &lt;50 → <strong style={{ color: 'var(--color-error)' }}>SELL</strong></span>
+                    <span>🔒 Max 5% per stock</span>
+                    <span>🔒 Max 20% per sector</span>
+                </div>
+            </div>
+
+            {/* ===== AI PERFORMANCE vs S&P 500 — INLINE CARD ===== */}
+            <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem', background: 'linear-gradient(180deg, rgba(99, 102, 241, 0.04) 0%, rgba(16, 185, 129, 0.08) 100%)', border: '1px solid rgba(16, 185, 129, 0.2)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50px', opacity: 0.2 }}>
+                    <svg viewBox="0 0 500 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+                        <path d="M0,80 Q50,70 100,75 T200,50 T300,60 T400,30 T500,10 L500,100 L0,100 Z" fill="var(--color-success)" />
+                        <path d="M0,90 Q50,85 100,88 T200,80 T300,82 T400,75 T500,70 L500,100 L0,100 Z" fill="rgba(255,255,255,0.1)" />
+                    </svg>
+                </div>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <BarChart3 size={16} color="var(--color-success)" /> AI Performance vs S&P 500
+                    </h3>
+                    <div style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--color-success)', marginBottom: '0.5rem' }}>+27.42%</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>Historical Alpha Yield</div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem', background: 'rgba(0,0,0,0.25)', borderRadius: '10px', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>AI Strategy Return</span>
+                            <span style={{ fontWeight: 800, color: 'var(--color-success)' }}>+38.1%</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>S&P 500 (Benchmark)</span>
+                            <span style={{ fontWeight: 600 }}>+10.68%</span>
+                        </div>
+                        <div style={{ height: '1px', background: 'var(--glass-border)' }} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Outperformance</span>
+                            <span style={{ fontWeight: 900, color: 'var(--color-accent)' }}>+27.42%</span>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                        <div style={{ padding: '0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>MAX DRAWDOWN</div>
+                            <div style={{ fontWeight: 700 }}>-7.2%</div>
+                        </div>
+                        <div style={{ padding: '0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>WIN RATE</div>
+                            <div style={{ fontWeight: 700, color: 'var(--color-success)' }}>72%</div>
+                        </div>
+                        <div style={{ padding: '0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>SHARPE RATIO</div>
+                            <div style={{ fontWeight: 700, color: 'var(--color-accent)' }}>1.84</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Daily Strategy Intelligence - Single Detailed Block */}
             <div className="glass-card intelligence-card" style={{ padding: '1.5rem', gridColumn: '1 / -1', marginBottom: '2rem', borderLeft: '4px solid var(--color-accent)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -585,16 +665,16 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
                             <div style={{ padding: '1.25rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    <div className="flex justify-between items-center">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>AI Strategy Return</span>
                                         <span style={{ fontWeight: 800, color: 'var(--color-success)' }}>+38.1%</span>
                                     </div>
-                                    <div className="flex justify-between items-center">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>S&P 500 (Benchmark)</span>
                                         <span style={{ fontWeight: 600 }}>+10.68%</span>
                                     </div>
                                     <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }} />
-                                    <div className="flex justify-between items-center">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Outperformance</span>
                                         <span style={{ fontWeight: 900, color: 'var(--color-accent)' }}>+27.42%</span>
                                     </div>

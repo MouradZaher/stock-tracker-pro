@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
@@ -24,6 +24,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
 import { LogOut, Shield } from 'lucide-react';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { usePortfolioStore } from './hooks/usePortfolio';
+import { useWatchlist } from './hooks/useWatchlist';
 
 import './index.css';
 
@@ -53,6 +55,18 @@ function AppContent() {
   }
 
   const role = user?.role || 'user';
+
+  // Global Sync Effect
+  const syncWithSupabasePortfolio = usePortfolioStore(state => state.syncWithSupabase);
+  const syncWithSupabaseWatchlist = useWatchlist(state => state.syncWithSupabase);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      console.log('🔄 Triggering global sync for user:', user.id);
+      syncWithSupabasePortfolio(user.id);
+      syncWithSupabaseWatchlist(user.id);
+    }
+  }, [isAuthenticated, user?.id, syncWithSupabasePortfolio, syncWithSupabaseWatchlist]);
 
   return (
     <BrowserRouter>

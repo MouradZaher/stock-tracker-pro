@@ -127,6 +127,7 @@ export interface SocialPost {
   sentiment: 'positive' | 'neutral' | 'negative';
   weight: number; // Institutional weight 1-10
   symbol?: string;
+  url?: string;
   isVerified: boolean;
 }
 

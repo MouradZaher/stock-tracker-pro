@@ -134,7 +134,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div style={{ padding: 'var(--spacing-md) var(--spacing-xl)', maxWidth: '100%', margin: '0 auto', height: '100%', boxSizing: 'border-box', overflowY: 'auto', background: 'var(--color-bg-primary)' }}>
+        <div style={{ padding: 'var(--spacing-md) var(--spacing-xl)', maxWidth: '100%', margin: '0 auto', height: '100%', boxSizing: 'border-box', overflowY: 'auto', background: 'linear-gradient(180deg, #06060f 0%, #0a0a18 50%, #080815 100%)' }}>
 
             {/* Header Area */}
             <div style={{ marginBottom: '1rem' }}>
@@ -367,12 +367,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                         <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Weight: {post.weight}/10</span>
 
                                         <a
-                                            href={`https://x.com/search?q=${encodeURIComponent(post.symbol || post.author)}`}
+                                            href={post.url || `https://x.com/search?q=${encodeURIComponent(post.symbol || post.author)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             style={{ marginLeft: 'auto', color: '#1DA1F2', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
                                         >
-                                            <Globe size={12} /> View on X Pulse
+                                            <Globe size={12} /> {post.url ? 'View Real Link' : 'View on X Pulse'}
                                         </a>
                                     </div>
                                 )}

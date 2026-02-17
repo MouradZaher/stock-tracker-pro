@@ -22,6 +22,7 @@ class SocialFeedService {
                 sentiment: n.sentiment as any,
                 weight: Math.floor(Math.random() * 3) + 7, // High weight for real news
                 symbol: this.extractSymbol(n.headline, symbols),
+                url: n.url,
                 isVerified: true
             }));
 
@@ -50,6 +51,7 @@ class SocialFeedService {
             sentiment: n.sentiment as any,
             weight: 8,
             symbol: symbol,
+            url: n.url,
             isVerified: true
         }));
     }
@@ -84,6 +86,7 @@ class SocialFeedService {
             sentiment: n.sentiment as any,
             weight: 9,
             symbol: targetSymbol,
+            url: n.url,
             isVerified: true
         };
 

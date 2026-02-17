@@ -150,35 +150,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* System Status Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
                     {/* API Status */}
-                    <div className="admin-stat-card">
-                        <Server size={20} className={systemStatus.api.status === 'online' ? "text-success" : "text-error"} />
+                    <div className="admin-stat-card" style={{ padding: '0.5rem 0.75rem' }}>
+                        <Server size={16} className={systemStatus.api.status === 'online' ? "text-success" : "text-error"} />
                         <div>
-                            <div className="stat-value" style={{ fontSize: '1rem' }}>
+                            <div className="stat-value" style={{ fontSize: '0.85rem' }}>
                                 {systemStatus.api.status === 'online' ? 'Online' : 'Offline'}
                             </div>
-                            <div className="stat-label">Market Data API</div>
+                            <div className="stat-label" style={{ fontSize: '0.65rem' }}>Market API</div>
                         </div>
                     </div>
                     {/* DB Status */}
-                    <div className="admin-stat-card">
-                        <Database size={20} className={systemStatus.db.status === 'online' ? "text-success" : "text-error"} />
+                    <div className="admin-stat-card" style={{ padding: '0.5rem 0.75rem' }}>
+                        <Database size={16} className={systemStatus.db.status === 'online' ? "text-success" : "text-error"} />
                         <div>
-                            <div className="stat-value" style={{ fontSize: '1rem' }}>
+                            <div className="stat-value" style={{ fontSize: '0.85rem' }}>
                                 {systemStatus.db.status === 'online' ? 'Connected' : 'Error'}
                             </div>
-                            <div className="stat-label">User Database</div>
+                            <div className="stat-label" style={{ fontSize: '0.65rem' }}>Database</div>
                         </div>
                     </div>
                     {/* Latency */}
-                    <div className="admin-stat-card">
-                        <Clock size={20} className="text-accent" />
+                    <div className="admin-stat-card" style={{ padding: '0.5rem 0.75rem' }}>
+                        <Clock size={16} className="text-accent" />
                         <div>
-                            <div className="stat-value" style={{ fontSize: '1rem' }}>
+                            <div className="stat-value" style={{ fontSize: '0.85rem' }}>
                                 {systemStatus.api.latency > 0 ? `${systemStatus.api.latency}ms` : '--'}
                             </div>
-                            <div className="stat-label">Avg. Latency</div>
+                            <div className="stat-label" style={{ fontSize: '0.65rem' }}>Latency</div>
                         </div>
                     </div>
                 </div>
@@ -209,31 +209,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         Loading users...
                     </div>
                 ) : (
-                    <div className="admin-content-container" style={{ overflowX: 'auto' }}>
+                    <div className="admin-content-container">
                         {/* Desktop Table View */}
-                        <table className="admin-table desktop-only" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <table className="admin-table desktop-only" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                             <thead>
                                 <tr style={{ borderBottom: '1px solid var(--glass-border)', textAlign: 'left' }}>
-                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>User</th>
-                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Email</th>
-                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Role</th>
-                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Status</th>
-                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>Joined</th>
-                                    <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', textAlign: 'right' }}>Actions</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', width: '30%' }}>User</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', width: '10%' }}>Role</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', width: '10%' }}>Status</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', width: '15%' }}>AUM</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', width: '12%' }}>Joined</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-secondary)', fontSize: '0.75rem', textAlign: 'right', width: '23%' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {profiles.map(profile => (
                                     <tr key={profile.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ fontWeight: 600 }}>{profile.email || 'N/A'}</div>
+                                        <td style={{ padding: '0.5rem 0.75rem' }}>
+                                            <div style={{ fontWeight: 600, fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.email || 'N/A'}</div>
                                         </td>
-                                        <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.email}</td>
-                                        <td style={{ padding: '1rem' }}>
+                                        <td style={{ padding: '0.5rem 0.75rem' }}>
                                             <span style={{
-                                                padding: '4px 8px',
+                                                padding: '2px 6px',
                                                 borderRadius: '4px',
-                                                fontSize: '0.75rem',
+                                                fontSize: '0.65rem',
                                                 background: profile.role === 'admin' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)',
                                                 color: profile.role === 'admin' ? '#10B981' : '#6366F1',
                                                 textTransform: 'uppercase',
@@ -242,11 +241,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                                 {profile.role}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '1rem' }}>
+                                        <td style={{ padding: '0.5rem 0.75rem' }}>
                                             <span style={{
-                                                padding: '4px 8px',
+                                                padding: '2px 6px',
                                                 borderRadius: '4px',
-                                                fontSize: '0.75rem',
+                                                fontSize: '0.65rem',
                                                 background: profile.is_approved ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                                                 color: profile.is_approved ? '#10B981' : '#EF4444',
                                                 fontWeight: 700
@@ -254,37 +253,44 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                                 {profile.is_approved ? 'Active' : 'Pending'}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+                                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            {formatCurrency(profile.portfolioValue || 0)}
+                                        </td>
+                                        <td style={{ padding: '0.5rem 0.75rem', color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>
                                             {new Date(profile.created_at).toLocaleDateString()}
                                         </td>
-                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                            {!profile.is_approved && (
-                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                    <button
-                                                        onClick={() => handleApprove(profile.id, profile.email)}
-                                                        className="glass-button"
-                                                        style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-success)', borderColor: 'var(--color-success)' }}
-                                                    >
-                                                        <CheckCircle size={14} style={{ marginRight: '4px' }} /> Approve
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleReject(profile.id, profile.email)}
-                                                        className="glass-button"
-                                                        style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
-                                                    >
-                                                        <XCircle size={14} style={{ marginRight: '4px' }} /> Reject
-                                                    </button>
-                                                </div>
-                                            )}
-                                            {profile.is_approved && (
+                                        <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                                 <button
+                                                    onClick={() => setInspectingUser({ id: profile.id, email: profile.email })}
                                                     className="glass-button"
-                                                    disabled
-                                                    style={{ opacity: 0.5, cursor: 'not-allowed', padding: '6px 12px', fontSize: '0.8rem' }}
+                                                    style={{ padding: '3px 8px', fontSize: '0.7rem' }}
+                                                    title="Inspect Portfolio"
                                                 >
-                                                    Approved
+                                                    <Eye size={12} style={{ marginRight: '2px' }} /> View
                                                 </button>
-                                            )}
+                                                {!profile.is_approved && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleApprove(profile.id, profile.email)}
+                                                            className="glass-button"
+                                                            style={{ padding: '3px 8px', fontSize: '0.7rem', color: 'var(--color-success)', borderColor: 'var(--color-success)' }}
+                                                        >
+                                                            <CheckCircle size={12} /> OK
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleReject(profile.id, profile.email)}
+                                                            className="glass-button"
+                                                            style={{ padding: '3px 8px', fontSize: '0.7rem', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                        >
+                                                            <XCircle size={12} /> No
+                                                        </button>
+                                                    </>
+                                                )}
+                                                {profile.is_approved && (
+                                                    <span style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 600, padding: '3px 6px' }}>✓</span>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
