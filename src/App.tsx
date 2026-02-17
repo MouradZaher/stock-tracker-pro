@@ -44,7 +44,6 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  console.log('💎 AppContent component rendering...');
   const { isAuthenticated, logout, user } = usePinAuth();
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
@@ -56,23 +55,6 @@ function AppContent() {
   }
 
   const role = user?.role || 'user';
-
-  // Global Sync Effect
-  const syncWithSupabasePortfolio = usePortfolioStore(state => state.syncWithSupabase);
-  const syncWithSupabaseWatchlist = useWatchlist(state => state.syncWithSupabase);
-  const initRealtimePortfolio = usePortfolioStore(state => state.initRealtimeSubscription);
-
-  useEffect(() => {
-    if (isAuthenticated && user?.id) {
-      console.log('🔄 Triggering global sync for user:', user.id);
-      syncWithSupabasePortfolio(user.id);
-      syncWithSupabaseWatchlist(user.id);
-
-      // Initialize Realtime
-      const cleanup = initRealtimePortfolio(user.id);
-      return () => cleanup();
-    }
-  }, [isAuthenticated, user?.id, syncWithSupabasePortfolio, syncWithSupabaseWatchlist, initRealtimePortfolio]);
 
   return (
     <BrowserRouter>
@@ -191,7 +173,6 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
 import { useContentProtection } from './hooks/useContentProtection';
 
 function App() {
-  console.log('🏗️ App component rendering...');
   // useContentProtection();
   return (
     <AuthProvider>
