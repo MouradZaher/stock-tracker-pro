@@ -38,6 +38,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                 isLoading: false,
                 isSyncing: false,
                 error: null,
+                // ... rest of the implementation
 
                 addPosition: async (position, userId) => {
                     const id = `${position.symbol}-${Date.now()}`;

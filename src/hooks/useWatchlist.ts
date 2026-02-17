@@ -23,139 +23,141 @@ interface WatchlistState {
 }
 
 export const useWatchlist = create<WatchlistState>()(
-    persist<WatchlistState>(
-        (set, get) => ({
-            watchlist: [],
-            isLoading: false,
-            isSyncing: false,
-            error: null,
+    persist(
+        (set, get) => {
+            console.log('👀 Initializing useWatchlist store...');
+            return {
+                watchlist: [],
+                isLoading: false,
+                isSyncing: false,
+                error: null,
 
-            addToWatchlist: async (symbol, userId) => {
-                const normalizedSymbol = symbol.trim().toUpperCase();
+                addToWatchlist: async (symbol, userId) => {
+                    const normalizedSymbol = symbol.trim().toUpperCase();
 
-                // Check if already in watchlist
-                if (get().watchlist.includes(normalizedSymbol)) {
-                    return;
-                }
+                    // Check if already in watchlist
+                    if (get().watchlist.includes(normalizedSymbol)) {
+                        return;
+                    }
 
-                // Optimistic update
-                set((state) => ({
-                    watchlist: [...state.watchlist, normalizedSymbol],
-                }));
+                    // Optimistic update
+                    set((state) => ({
+                        watchlist: [...state.watchlist, normalizedSymbol],
+                    }));
 
-                // Sync to Supabase only if user is logged in AND not a bypass user
-                if (userId && !userId.startsWith('bypass-')) {
-                    try {
-                        const success = await watchlistService.addSymbol(userId, normalizedSymbol);
-                        if (!success) {
-                            // Rollback on failure
+                    // Sync to Supabase only if user is logged in AND not a bypass user
+                    if (userId && !userId.startsWith('bypass-')) {
+                        try {
+                            const success = await watchlistService.addSymbol(userId, normalizedSymbol);
+                            if (!success) {
+                                // Rollback on failure
+                                set((state) => ({
+                                    watchlist: state.watchlist.filter(s => s !== normalizedSymbol),
+                                    error: 'Failed to add symbol to database',
+                                }));
+                            }
+                        } catch (error) {
+                            console.error('Error adding to watchlist:', error);
+                            // Rollback on error
                             set((state) => ({
                                 watchlist: state.watchlist.filter(s => s !== normalizedSymbol),
-                                error: 'Failed to add symbol to database',
+                                error: 'Failed to add symbol',
                             }));
                         }
-                    } catch (error) {
-                        console.error('Error adding to watchlist:', error);
-                        // Rollback on error
-                        set((state) => ({
-                            watchlist: state.watchlist.filter(s => s !== normalizedSymbol),
-                            error: 'Failed to add symbol',
-                        }));
                     }
-                }
-            },
+                },
 
-            removeFromWatchlist: async (symbol, userId) => {
-                const normalizedSymbol = symbol.trim().toUpperCase();
+                removeFromWatchlist: async (symbol, userId) => {
+                    const normalizedSymbol = symbol.trim().toUpperCase();
 
-                // Store old watchlist for potential rollback
-                const oldWatchlist = get().watchlist;
+                    // Store old watchlist for potential rollback
+                    const oldWatchlist = get().watchlist;
 
-                // Optimistic update
-                set((state) => ({
-                    watchlist: state.watchlist.filter((s) => s !== normalizedSymbol),
-                }));
+                    // Optimistic update
+                    set((state) => ({
+                        watchlist: state.watchlist.filter((s) => s !== normalizedSymbol),
+                    }));
 
-                // Sync to Supabase only if user is logged in AND not a bypass user
-                if (userId && !userId.startsWith('bypass-')) {
-                    try {
-                        const success = await watchlistService.removeSymbol(userId, normalizedSymbol);
-                        if (!success) {
-                            // Rollback on failure
+                    // Sync to Supabase only if user is logged in AND not a bypass user
+                    if (userId && !userId.startsWith('bypass-')) {
+                        try {
+                            const success = await watchlistService.removeSymbol(userId, normalizedSymbol);
+                            if (!success) {
+                                // Rollback on failure
+                                set({
+                                    watchlist: oldWatchlist,
+                                    error: 'Failed to remove symbol from database',
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error removing from watchlist:', error);
+                            // Rollback on error
                             set({
                                 watchlist: oldWatchlist,
-                                error: 'Failed to remove symbol from database',
+                                error: 'Failed to remove symbol',
                             });
                         }
-                    } catch (error) {
-                        console.error('Error removing from watchlist:', error);
-                        // Rollback on error
+                    }
+                },
+
+                isInWatchlist: (symbol) => {
+                    const normalizedSymbol = symbol.trim().toUpperCase();
+                    return get().watchlist.includes(normalizedSymbol);
+                },
+
+                loadFromSupabase: async (userId: string) => {
+                    set({ isLoading: true, error: null });
+                    try {
+                        const watchlist = await watchlistService.fetchUserWatchlist(userId);
                         set({
-                            watchlist: oldWatchlist,
-                            error: 'Failed to remove symbol',
+                            watchlist,
+                            isLoading: false,
+                            error: null,
+                        });
+                    } catch (error) {
+                        console.error('Error loading watchlist from Supabase:', error);
+                        set({
+                            isLoading: false,
+                            error: 'Failed to load watchlist',
                         });
                     }
-                }
-            },
+                },
 
-            isInWatchlist: (symbol) => {
-                const normalizedSymbol = symbol.trim().toUpperCase();
-                return get().watchlist.includes(normalizedSymbol);
-            },
+                syncWithSupabase: async (userId: string) => {
+                    // Guard against multiple simultaneous syncs
+                    if (get().isSyncing) {
+                        return;
+                    }
 
-            loadFromSupabase: async (userId: string) => {
-                set({ isLoading: true, error: null });
-                try {
-                    const watchlist = await watchlistService.fetchUserWatchlist(userId);
-                    set({
-                        watchlist,
-                        isLoading: false,
-                        error: null,
-                    });
-                } catch (error) {
-                    console.error('Error loading watchlist from Supabase:', error);
-                    set({
-                        isLoading: false,
-                        error: 'Failed to load watchlist',
-                    });
-                }
-            },
+                    set({ isSyncing: true, error: null });
+                    try {
+                        const localWatchlist = get().watchlist;
 
-            syncWithSupabase: async (userId: string) => {
-                // Guard against multiple simultaneous syncs
-                if (get().isSyncing) {
-                    return;
-                }
+                        // Sync local watchlist to Supabase (one-time migration)
+                        await watchlistService.syncLocalToSupabase(userId, localWatchlist);
 
-                set({ isSyncing: true, error: null });
-                try {
-                    const localWatchlist = get().watchlist;
+                        // Load the merged data from Supabase
+                        const watchlist = await watchlistService.fetchUserWatchlist(userId);
+                        set({
+                            watchlist,
+                            isSyncing: false,
+                            error: null,
+                        });
+                    } catch (error) {
+                        console.error('Error syncing watchlist:', error);
+                        set({
+                            isSyncing: false,
+                            error: 'Failed to sync watchlist',
+                        });
+                    }
+                },
 
-                    // Sync local watchlist to Supabase (one-time migration)
-                    await watchlistService.syncLocalToSupabase(userId, localWatchlist);
+                clearWatchlist: () => set({ watchlist: [], error: null }),
 
-                    // Load the merged data from Supabase
-                    const watchlist = await watchlistService.fetchUserWatchlist(userId);
-                    set({
-                        watchlist,
-                        isSyncing: false,
-                        error: null,
-                    });
-                } catch (error) {
-                    console.error('Error syncing watchlist:', error);
-                    set({
-                        isSyncing: false,
-                        error: 'Failed to sync watchlist',
-                    });
-                }
-            },
-
-            clearWatchlist: () => set({ watchlist: [], error: null }),
-
-            clearError: () => set({ error: null }),
-        }),
-        {
-            name: 'stock-watchlist',
-        }
-    )
+                clearError: () => set({ error: null }),
+            }),
+    {
+        name: 'stock-watchlist',
+    }
+)
 );
