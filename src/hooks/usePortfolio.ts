@@ -20,6 +20,7 @@ interface PortfolioStore {
     // Supabase sync actions
     syncWithSupabase: (userId: string) => Promise<void>;
     loadFromSupabase: (userId: string) => Promise<void>;
+    initRealtimeSubscription: (userId: string) => () => void;
 
     // Utility actions
     getSummary: () => PortfolioSummary;
@@ -236,6 +237,38 @@ export const usePortfolioStore = create<PortfolioStore>()(
                         error: 'Failed to sync portfolios',
                     });
                 }
+            },
+
+            initRealtimeSubscription: (userId: string) => {
+                if (!userId || userId.startsWith('bypass-')) return () => { };
+
+                const channel = portfolioService.supabase
+                    .channel(`portfolio-changes-${userId}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'portfolios',
+                            filter: `user_id=eq.${userId}`
+                        },
+                        async (payload) => {
+                            console.log('🔄 Realtime portfolio change:', payload.eventType);
+
+                            // Reload all positions to ensure consistency and correct derived fields
+                            try {
+                                const positions = await portfolioService.fetchUserPortfolios(userId);
+                                set({ positions });
+                            } catch (err) {
+                                console.error('Failed to reload positions on realtime event:', err);
+                            }
+                        }
+                    )
+                    .subscribe();
+
+                return () => {
+                    portfolioService.supabase.removeChannel(channel);
+                };
             },
 
             getSummary: () => {

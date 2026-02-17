@@ -20,7 +20,7 @@ const api = axios.create({
 // CACHING LAYER
 // ============================================
 const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 2000; // 2 seconds for near real-time
+const CACHE_DURATION = 1000; // 1 second for near real-time
 const GOOD_PRICE_CACHE_DURATION = 300000; // 5 minutes for fallback prices
 
 export const getCachedData = (key: string, maxAge = CACHE_DURATION) => {

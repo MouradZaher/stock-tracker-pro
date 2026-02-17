@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Plus, Trash2, X, Zap } from 'lucide-react';
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
-import { getStockQuote } from '../services/stockDataService';
+import { getStockQuote, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
 import { checkAllocationLimits, calculateAllocation } from '../utils/calculations';
 import { getSectorForSymbol } from '../data/sectors';
@@ -66,15 +66,20 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     useEffect(() => {
         const updatePrices = async () => {
             const symbols = positionSymbolsRef.current;
-            for (const symbol of symbols) {
-                try {
-                    const quote = await getStockQuote(symbol);
-                    updatePrice(symbol, quote.price, user?.id);
-                    // Check price alerts
-                    checkPrice(symbol, quote.price);
-                } catch (error) {
-                    console.error(`Failed to update price for ${symbol}:`, error);
-                }
+            if (symbols.length === 0) return;
+
+            try {
+                const quotes = await getMultipleQuotes(symbols);
+                symbols.forEach(symbol => {
+                    const quote = quotes.get(symbol);
+                    if (quote && quote.price > 0) {
+                        updatePrice(symbol, quote.price, user?.id);
+                        // Check price alerts
+                        checkPrice(symbol, quote.price);
+                    }
+                });
+            } catch (error) {
+                console.error(`Failed to update prices:`, error);
             }
         };
 
@@ -83,10 +88,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             updatePrices();
         }
 
-        const interval = setInterval(updatePrices, 15000); // Update every 15 seconds
+        const interval = setInterval(updatePrices, 1000); // Live update every 1 second
 
         return () => clearInterval(interval);
-    }, [user?.id, updatePrice]);
+    }, [user?.id, updatePrice, checkPrice]);
 
     const handleAddPosition = async () => {
         if (!formData.symbol || !formData.units || !formData.avgCost) {

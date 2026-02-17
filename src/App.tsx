@@ -59,14 +59,19 @@ function AppContent() {
   // Global Sync Effect
   const syncWithSupabasePortfolio = usePortfolioStore(state => state.syncWithSupabase);
   const syncWithSupabaseWatchlist = useWatchlist(state => state.syncWithSupabase);
+  const initRealtimePortfolio = usePortfolioStore(state => state.initRealtimeSubscription);
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
       console.log('🔄 Triggering global sync for user:', user.id);
       syncWithSupabasePortfolio(user.id);
       syncWithSupabaseWatchlist(user.id);
+
+      // Initialize Realtime
+      const cleanup = initRealtimePortfolio(user.id);
+      return () => cleanup();
     }
-  }, [isAuthenticated, user?.id, syncWithSupabasePortfolio, syncWithSupabaseWatchlist]);
+  }, [isAuthenticated, user?.id, syncWithSupabasePortfolio, syncWithSupabaseWatchlist, initRealtimePortfolio]);
 
   return (
     <BrowserRouter>
