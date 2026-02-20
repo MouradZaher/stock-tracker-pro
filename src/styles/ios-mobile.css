@@ -43,19 +43,63 @@
         overflow: hidden !important;
     }
 
-    /* Mobile Header */
+    /* Mobile Header — force single row, fixed height */
     .header {
-        height: calc(60px + var(--safe-area-top));
-        padding-top: calc(0.5rem + var(--safe-area-top));
-        padding-left: var(--spacing-md);
-        padding-right: var(--spacing-md);
-        z-index: 1002;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        height: calc(56px + var(--safe-area-top)) !important;
+        min-height: calc(56px + var(--safe-area-top)) !important;
+        max-height: calc(56px + var(--safe-area-top)) !important;
+        padding-top: calc(0.4rem + var(--safe-area-top)) !important;
+        padding-bottom: 0.4rem !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        gap: 0.4rem !important;
+        overflow: visible !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 1002 !important;
+    }
+
+    /* Logo — prevent shrinking */
+    .header-logo {
+        flex-shrink: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Logo text — slightly smaller on mobile */
+    .logo-text {
+        font-size: 0.9rem !important;
+    }
+
+    /* Header actions — keep icons right-aligned, no wrap */
+    .header-actions {
+        flex-shrink: 0 !important;
+        flex-wrap: nowrap !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
+    }
+
+    /* Icon buttons — slightly smaller on mobile */
+    .header-actions .glass-button.icon-btn {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    /* Hide logout text on mobile — keep only the icon */
+    .logout-btn .desktop-only {
+        display: none !important;
     }
 
     /* Main content area */
     .main-content {
         flex: 1;
-        padding-top: calc(60px + var(--safe-area-top));
+        padding-top: calc(56px + var(--safe-area-top));
         padding-bottom: var(--mobile-nav-height);
         overflow: hidden;
         position: relative;
