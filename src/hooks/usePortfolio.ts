@@ -15,7 +15,7 @@ interface PortfolioStore {
     // Local state actions (with Supabase sync)
     addPosition: (position: Omit<PortfolioPosition, 'id' | 'profitLoss' | 'profitLossPercent' | 'marketValue' | 'purchaseValue'>, userId?: string) => Promise<void>;
     updatePosition: (id: string, updates: Partial<PortfolioPosition>, userId?: string) => Promise<void>;
-    removePosition: (id: string, userId?: string) => Promise<void>;
+    removePosition: (id: string, symbol: string, userId?: string) => Promise<void>;
     updatePrice: (symbol: string, price: number, userId?: string) => Promise<void>;
 
     // Supabase sync actions
@@ -131,11 +131,11 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     }
                 },
 
-                removePosition: async (id, userId) => {
+                removePosition: async (id, symbol, userId) => {
                     // Store old positions for potential rollback
                     const oldPositions = get().positions;
 
-                    // Optimistic update
+                    // Optimistic update — instant UI response
                     set((state) => ({
                         positions: state.positions.filter((pos) => pos.id !== id),
                     }));
@@ -143,7 +143,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     // Sync to Supabase only if user is logged in AND not a bypass user
                     if (userId && !userId.startsWith('bypass-')) {
                         try {
-                            const success = await portfolioService.deletePosition(userId, id);
+                            const success = await portfolioService.deletePosition(userId, symbol);
                             if (!success) {
                                 // Rollback on failure
                                 set({

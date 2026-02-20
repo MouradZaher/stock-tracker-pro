@@ -223,10 +223,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         setShowModal(true);
     };
 
-    const handleRemove = (id: string, e: React.MouseEvent) => {
+    const handleRemove = (id: string, symbol: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        console.log('🗑️ Removing position with id:', id);
-        removePosition(id, user?.id);
+        removePosition(id, symbol, user?.id);
     };
 
     const handleRowClick = (symbol: string) => {
@@ -391,7 +390,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                 <td>
                                                     <button
                                                         className="btn btn-icon btn-small text-error"
-                                                        onClick={(e) => handleRemove(position.id, e)}
+                                                        onClick={(e) => handleRemove(position.id, position.symbol, e)}
                                                         style={{
                                                             background: 'rgba(239, 68, 68, 0.1)',
                                                             display: 'flex',
@@ -486,7 +485,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
                                             <button
                                                 className="btn btn-icon btn-small text-error"
-                                                onClick={(e) => handleRemove(position.id, e)}
+                                                onClick={(e) => handleRemove(position.id, position.symbol, e)}
                                                 style={{
                                                     background: 'rgba(239, 68, 68, 0.1)',
                                                     display: 'flex',

@@ -78,14 +78,10 @@ export async function savePosition(userId: string, position: PortfolioPosition):
 }
 
 /**
- * Delete a portfolio position
+ * Delete a portfolio position by symbol
  */
-export async function deletePosition(userId: string, positionId: string): Promise<boolean> {
+export async function deletePosition(userId: string, symbol: string): Promise<boolean> {
     try {
-        // ID format is `SYMBOL-TIMESTAMP` where TIMESTAMP is a numeric suffix.
-        // Strip the last `-<digits>` segment to get the symbol, supporting symbols like BRK-B.
-        const symbol = positionId.replace(/-\d+$/, '');
-
         const { error } = await supabase
             .from('portfolios')
             .delete()
@@ -96,6 +92,7 @@ export async function deletePosition(userId: string, positionId: string): Promis
             console.error('Supabase delete error:', error);
             throw error;
         }
+        console.log(`✅ Deleted ${symbol} from Supabase for user ${userId}`);
         return true;
     } catch (error) {
         console.error('Failed to delete position:', error);
