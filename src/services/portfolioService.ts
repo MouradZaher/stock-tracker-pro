@@ -82,8 +82,9 @@ export async function savePosition(userId: string, position: PortfolioPosition):
  */
 export async function deletePosition(userId: string, positionId: string): Promise<boolean> {
     try {
-        // Extract symbol from position ID (format: SYMBOL-TIMESTAMP)
-        const [symbol] = positionId.split('-');
+        // ID format is `SYMBOL-TIMESTAMP` where TIMESTAMP is a numeric suffix.
+        // Strip the last `-<digits>` segment to get the symbol, supporting symbols like BRK-B.
+        const symbol = positionId.replace(/-\d+$/, '');
 
         const { error } = await supabase
             .from('portfolios')

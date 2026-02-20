@@ -219,22 +219,23 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                     set({ isSyncing: true });
                     try {
-                        const localPositions = get().positions;
-
-                        // Sync local positions to Supabase (one-time migration)
-                        if (localPositions.length > 0) {
-                            await portfolioService.syncLocalToSupabase(userId, localPositions);
-                        }
-
-                        // Load data from Supabase
+                        // 1. Load what's in the cloud first — this is the source of truth
                         const cloudPositions = await portfolioService.fetchUserPortfolios(userId);
+                        const cloudSymbols = new Set(cloudPositions.map(p => p.symbol));
 
-                        // Only overwrite if we found something or if we're sure we want to sync
-                        if (cloudPositions.length > 0) {
-                            set({ positions: cloudPositions });
+                        // 2. Only upload local positions that don't exist in the cloud yet
+                        //    (never re-upload items that may have been deleted from the cloud)
+                        const localPositions = get().positions;
+                        const newLocalPositions = localPositions.filter(p => !cloudSymbols.has(p.symbol));
+                        if (newLocalPositions.length > 0) {
+                            await portfolioService.syncLocalToSupabase(userId, newLocalPositions);
+                            // Re-fetch after uploading new ones
+                            const updatedPositions = await portfolioService.fetchUserPortfolios(userId);
+                            set({ positions: updatedPositions, isSyncing: false, error: null });
+                        } else {
+                            // Cloud is the authority — use it directly
+                            set({ positions: cloudPositions, isSyncing: false, error: null });
                         }
-
-                        set({ isSyncing: false, error: null });
                     } catch (error) {
                         console.error('Error syncing portfolios:', error);
                         set({ isSyncing: false, error: 'Failed to sync portfolios' });
