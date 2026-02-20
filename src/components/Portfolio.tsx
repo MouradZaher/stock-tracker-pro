@@ -27,8 +27,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // ... existing state ...
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showAIAdvice, setShowAIAdvice] = useState(false);
-    const [rebalancingActions, setRebalancingActions] = useState<RebalancingAction[]>([]);
-    const [loadingAdvice, setLoadingAdvice] = useState(false);
     const [aiRecs, setAiRecs] = useState<Record<string, StockRecommendation>>({});
 
     const [formData, setFormData] = useState({
@@ -122,22 +120,65 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         return <Minus size={14} color="var(--color-warning)" />;
     };
 
-    // Fetch dynamic rebalancing advice
-    useEffect(() => {
-        if (showAIAdvice) {
-            const fetchAdvice = async () => {
-                setLoadingAdvice(true);
-                try {
-                    const advice = await getTacticalRebalancing(positions);
-                    setRebalancingActions(advice);
-                } catch (error) {
-                    console.error("Failed to fetch rebalancing advice", error);
-                } finally {
-                    setLoadingAdvice(false);
-                }
-            };
-            fetchAdvice();
+    // Compute rebalancing advice synchronously — stays live with positions
+    const rebalancingActions = React.useMemo(() => {
+        if (!showAIAdvice || positions.length === 0) return [];
+        const totalValue = positions.reduce((sum, p) => sum + (p.marketValue || 0), 0);
+        if (totalValue === 0) return [];
+
+        const actions: import('../services/aiRecommendationService').RebalancingAction[] = [];
+        const sectorTotals: Record<string, number> = {};
+
+        for (const p of positions) {
+            const allocation = (p.marketValue / totalValue) * 100;
+            const sector = p.sector || 'Other';
+            sectorTotals[sector] = (sectorTotals[sector] || 0) + allocation;
+
+            if (allocation > 5) {
+                actions.push({
+                    symbol: p.symbol,
+                    action: 'Trim',
+                    reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the 5% limit.`,
+                    impact: `Trim to ~5% to reduce concentration risk.`,
+                    priority: allocation > 10 ? 'High' : 'Medium'
+                });
+            }
+
+            const plPct = p.profitLossPercent ?? 0;
+            if (plPct < -15 && !actions.find(a => a.symbol === p.symbol)) {
+                actions.push({
+                    symbol: p.symbol,
+                    action: plPct < -25 ? 'Exit' : 'Trim',
+                    reason: `Down ${Math.abs(plPct).toFixed(1)}% — exceeds drawdown threshold.`,
+                    impact: `Cut loss to free capital for higher-conviction positions.`,
+                    priority: plPct < -25 ? 'High' : 'Medium'
+                });
+            }
         }
+
+        for (const [sector, allocation] of Object.entries(sectorTotals)) {
+            if (allocation > 20) {
+                actions.push({
+                    symbol: sector,
+                    action: 'Trim',
+                    reason: `${sector} is ${allocation.toFixed(1)}% of portfolio — exceeds 20% sector cap.`,
+                    impact: `Improve diversification across sectors.`,
+                    priority: allocation > 30 ? 'High' : 'Medium'
+                });
+            }
+        }
+
+        if (actions.length === 0) {
+            actions.push({
+                symbol: 'PORTFOLIO',
+                action: 'Hold',
+                reason: 'All positions within institutional risk limits (5% stock / 20% sector).',
+                impact: 'No rebalancing required. Portfolio is well-diversified.',
+                priority: 'Low'
+            });
+        }
+
+        return actions;
     }, [showAIAdvice, positions]);
 
     const handleAddPosition = async () => {
@@ -597,12 +638,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                 </p>
                             </div>
 
-                            {loadingAdvice ? (
-                                <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                    <div className="spinner" style={{ margin: '0 auto 1rem' }} />
-                                    Synthesizing rebalancing strategy...
-                                </div>
-                            ) : rebalancingActions.length === 0 ? (
+                            {rebalancingActions.length === 0 ? (
                                 <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-success)' }}>
                                     <ShieldCheck size={40} style={{ marginBottom: '1rem', opacity: 0.5 }} />
                                     <p>Your portfolio perfectly aligns with AI Alpha risk parameters.</p>
