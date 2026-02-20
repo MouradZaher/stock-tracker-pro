@@ -2,6 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* CSS Variables - Dark Mode Design System */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   /* Colors */
   --color-bg-primary: #0a0a0f;
@@ -71,6 +77,7 @@
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 
   --header-height: 80px;
+  --mobile-nav-height: 72px;
 
   /* Premium Glares */
   --glare-opacity: 0.1;
@@ -130,13 +137,27 @@ html[data-theme='light'] {
 }
 
 /* Heatmap Responsive Wrapper */
+/* Heatmap Responsive Wrapper */
 .heatmap-wrapper {
-  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: var(--mobile-nav-height) !important;
+  border-radius: 0;
+  overflow: hidden;
+  z-index: 100;
+  background: var(--color-bg-primary);
+  border: none;
 }
 
 @media (min-width: 768px) {
   .heatmap-wrapper {
-    padding-bottom: 0;
+    position: fixed !important;
+    left: 1.5rem !important;
+    right: 1.5rem !important;
+    bottom: 1rem !important;
+    top: calc(var(--header-height) + 0.5rem) !important;
   }
 }
 
@@ -218,13 +239,14 @@ body,
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100vw;
   position: relative;
 }
 
@@ -484,6 +506,8 @@ h6 {
   margin: 0;
   position: relative;
   padding: calc(var(--header-height) + var(--spacing-lg)) var(--spacing-xl) var(--spacing-xl);
+  /* Support for iOS safe area and prevent mobile nav overlap */
+  padding-bottom: calc(var(--mobile-nav-height) + var(--spacing-xl) + env(safe-area-inset-bottom));
 }
 
 .tab-content {
@@ -1965,7 +1989,7 @@ html {
 /* --- iPhone 13 Pro Ultra-Adoption (Phase 11) --- */
 
 @media (max-width: 600px) {
-  :root {
+  html[data-theme='dark'] {
     /* OLED Optimization: True Black for deep contrast on HDR screens */
     --color-bg-primary: #000000;
     --color-bg-secondary: #0a0a0a;
@@ -1977,7 +2001,7 @@ html {
   .modal-overlay {
     align-items: flex-end !important;
     /* Slide from bottom */
-    background: rgba(0, 0, 0, 0.8) !important;
+    background: var(--glass-bg) !important;
   }
 
   .modal {
@@ -2003,8 +2027,8 @@ html {
 
   /* Thumb-friendly Header Adjustments */
   .header {
-    background: rgba(0, 0, 0, 0.8) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background: var(--glass-bg) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
   }
 
   /* Increase button scale for ProMotion 120Hz feel */
@@ -2126,14 +2150,14 @@ textarea:focus-visible {
 
 /* OLED True Black Theme for Mobile */
 @media (max-width: 768px) {
-  :root {
+  html[data-theme='dark'] {
     --color-bg-primary: #000000;
     --color-bg-secondary: #0a0a0a;
     --color-bg-tertiary: #111111;
     --color-bg-elevated: #1a1a1a;
   }
 
-  body {
+  html[data-theme='dark'] body {
     background-color: #000000;
   }
 }
@@ -2462,10 +2486,10 @@ textarea:focus-visible {
 
   /* Enhanced glassmorphism on mobile */
   .glass-card {
-    background: rgba(25, 25, 35, 0.6);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+    border: 1px solid var(--glass-border);
   }
 
   /* Better shadows for depth */
@@ -2488,11 +2512,11 @@ textarea:focus-visible {
 /* Mobile Bottom Navigation Enhancements */
 @media (max-width: 600px) {
   .mobile-nav {
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+    border-top: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
   }
 
   .mobile-nav-item {
@@ -2930,3 +2954,12 @@ body,
     display: none !important;
   }
 }
+ / *   A d m i n   D a s h b o a r d   R e f i n e m e n t s   * / 
+ . h o v e r - d a n g e r : h o v e r   { 
+         c o l o r :   v a r ( - - c o l o r - e r r o r )   ! i m p o r t a n t ; 
+         b a c k g r o u n d :   r g b a ( 2 3 9 ,   6 8 ,   6 8 ,   0 . 1 )   ! i m p o r t a n t ; 
+         b o r d e r - c o l o r :   r g b a ( 2 3 9 ,   6 8 ,   6 8 ,   0 . 3 )   ! i m p o r t a n t ; 
+         t r a n s f o r m :   s c a l e ( 1 . 1 ) ; 
+ } 
+  
+ 

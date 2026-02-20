@@ -68,9 +68,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
             <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div className="logo-icon" style={{ padding: '4px' }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
-                        <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-                        <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
                     </svg>
                 </div>
                 <span className="logo-text" style={{ fontSize: '1.1rem' }}>
@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             onAdminClick?.();
                         }}
                         aria-label="Open Admin Panel"
-                        title="Admin Panel"
+                        title="Admin Dashboard"
                         style={{ color: 'var(--color-accent)', width: '32px', height: '32px' }}
                     >
                         <Shield size={16} />
@@ -147,49 +147,65 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     </button>
 
                     {isNotifyOpen && (
-                        <div className="glass-card shadow-xl" style={{
+                        <div className="glass-card shadow-2xl" style={{
                             position: 'absolute',
                             top: '100%',
                             right: 0,
-                            marginTop: '0.5rem',
-                            width: '320px',
+                            marginTop: '0.75rem',
+                            width: '340px',
                             zIndex: 1000,
-                            padding: '1rem',
-                            maxHeight: '400px',
+                            padding: '1.25rem',
+                            maxHeight: '450px',
                             overflowY: 'auto',
-                            border: '1px solid var(--glass-borderShadow)'
+                            background: 'rgba(5, 5, 10, 0.98)',
+                            backdropFilter: 'blur(30px)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
                         }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recent Signals</h4>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                                <h4 style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800 }}>Tactical Signals</h4>
                                 <button
                                     onClick={clearNotifications}
-                                    style={{ background: 'none', border: 'none', color: 'var(--color-text-tertiary)', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                    style={{ background: 'none', border: 'none', color: 'var(--color-text-tertiary)', cursor: 'pointer', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
                                 >
-                                    <Trash2 size={12} /> Clear
+                                    <Trash2 size={12} /> CLEAR_ALL
                                 </button>
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                 {notifications.length === 0 ? (
-                                    <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
-                                        No new signals detected.
+                                    <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                                        No active signals in queue.
                                     </div>
                                 ) : (
                                     notifications.map(n => (
                                         <div key={n.id} style={{
-                                            padding: '0.75rem',
-                                            background: n.read ? 'transparent' : 'rgba(255,255,255,0.03)',
-                                            borderRadius: '8px',
-                                            border: '1px solid var(--glass-border)'
+                                            padding: '1rem',
+                                            background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.04)',
+                                            borderRadius: '12px',
+                                            border: `1px solid ${n.read ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.08)'}`,
+                                            transition: 'all 0.2s'
                                         }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                                {getNotificationIcon(n.type)}
-                                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{n.title}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                                <div style={{
+                                                    padding: '6px',
+                                                    borderRadius: '8px',
+                                                    background: 'rgba(0,0,0,0.2)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}>
+                                                    {getNotificationIcon(n.type)}
+                                                </div>
+                                                <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--color-text-primary)' }}>{n.title}</span>
                                             </div>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0 0 4px 0', lineHeight: 1.4 }}>{n.message}</p>
-                                            <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>
-                                                {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0 0 8px 0', lineHeight: 1.5 }}>{n.message}</p>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>
+                                                    {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                                </span>
+                                                {!n.read && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 8px var(--color-accent)' }}></div>}
+                                            </div>
                                         </div>
                                     ))
                                 )}

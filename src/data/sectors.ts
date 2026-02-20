@@ -159,7 +159,7 @@ export const getSectorForSymbol = (symbol: string): string => {
 };
 
 // Get all symbols for autocomplete
-export const getAllSymbols = (): { symbol: string; name: string; type: string }[] => {
+export const getAllSymbols = (): { symbol: string; name: string; type: string; sector: string }[] => {
     const stocks = Object.entries(STOCKS_BY_SECTOR).flatMap(([sector, stocks]) =>
         stocks.map(s => ({ ...s, type: 'Stock', sector }))
     );

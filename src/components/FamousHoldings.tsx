@@ -72,8 +72,17 @@ const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
                 </h3>
             </div>
 
-            {/* Tabs */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', overflowX: 'auto' }}>
+            {/* Tabs - Improved Scroll Handling */}
+            <div style={{
+                display: 'flex',
+                borderBottom: '1px solid var(--glass-border)',
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+                padding: '0 4px',
+                gap: '2px'
+            }}>
                 {FAMOUS_PORTFOLIOS.map(portfolio => (
                     <button
                         key={portfolio.id}
@@ -87,67 +96,124 @@ const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
                             color: activeTab === portfolio.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                             fontWeight: activeTab === portfolio.id ? 600 : 400,
                             cursor: 'pointer',
-                            minWidth: '120px',
+                            minWidth: '130px',
                             transition: 'all 0.2s'
                         }}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem' }}>
                             <User size={14} /> {portfolio.owner}
                         </div>
                     </button>
                 ))}
             </div>
 
-            <div style={{ padding: '1.25rem' }}>
+            <div style={{ padding: window.innerWidth < 480 ? '1rem' : '1.25rem' }}>
                 <div style={{ marginBottom: '1.25rem' }}>
                     <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem' }}>{activePortfolio.name}</h4>
                     <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>{activePortfolio.description}</div>
                 </div>
 
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                {/* Desktop Table - Hidden on very small screens */}
+                <div style={{ overflowX: 'auto', display: window.innerWidth < 640 ? 'none' : 'block' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '550px' }}>
                         <thead>
-                            <tr style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem', textAlign: 'left' }}>
+                            <tr style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                 <th style={{ paddingBottom: '0.75rem' }}>Asset</th>
                                 <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Price</th>
                                 <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Alloc</th>
-                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Last Updated</th>
+                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Update</th>
                                 <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {activePortfolio.holdings.map((stock, i) => (
+                            {activePortfolio.holdings.map((stock) => (
                                 <tr key={stock.symbol} style={{ borderTop: '1px solid var(--glass-border)' }}>
                                     <td style={{ padding: '0.75rem 0' }}>
-                                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{stock.symbol}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{stock.type}</div>
+                                        <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{stock.symbol}</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{stock.type}</div>
                                     </td>
                                     <td style={{ padding: '0.75rem 0', textAlign: 'right' }}>
-                                        <div style={{ fontWeight: 500 }}>{formatCurrency(stock.price)}</div>
-                                        <div style={{ fontSize: '0.75rem', color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{formatCurrency(stock.price)}</div>
+                                        <div style={{ fontSize: '0.7rem', color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                                             {stock.change > 0 ? '+' : ''}{stock.change}%
                                         </div>
                                     </td>
-                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 500 }}>
+                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 600, fontSize: '0.9rem' }}>
                                         {stock.allocation}
                                     </td>
-                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
-                                        {stock.lastUpdated}
+                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>
+                                        {stock.lastUpdated.split('-').slice(1).join('/')}
                                     </td>
                                     <td style={{ padding: '0.75rem 0', textAlign: 'right' }}>
                                         <button
                                             className="glass-button"
-                                            style={{ padding: '4px 8px', borderRadius: '4px' }}
+                                            style={{
+                                                padding: '6px 10px',
+                                                borderRadius: '8px',
+                                                fontSize: '0.7rem',
+                                                fontWeight: 700,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                            }}
                                             onClick={() => handleCopyTrade(stock.symbol, stock.name, stock.price)}
-                                            title="Copy Trade"
                                         >
-                                            <Plus size={16} />
+                                            <Plus size={14} /> COPY
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card Grid - Visible on small screens */}
+                <div style={{ display: window.innerWidth < 640 ? 'flex' : 'none', flexDirection: 'column', gap: '0.75rem' }}>
+                    {activePortfolio.holdings.map((stock) => (
+                        <div key={stock.symbol} className="glass-card" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                <div>
+                                    <div style={{ fontWeight: 800, fontSize: '1rem' }}>{stock.symbol}</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{stock.type}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>{formatCurrency(stock.price)}</div>
+                                    <div style={{ fontSize: '0.75rem', color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                        {stock.change > 0 ? '+' : ''}{stock.change}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <div>
+                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Weight</div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{stock.allocation}</div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Updated</div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{stock.lastUpdated.split('-').slice(1).join('/')}</div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleCopyTrade(stock.symbol, stock.name, stock.price)}
+                                    style={{
+                                        padding: '6px 12px',
+                                        borderRadius: '8px',
+                                        background: 'var(--color-accent)',
+                                        border: 'none',
+                                        color: 'white',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}
+                                >
+                                    <Plus size={14} /> COPY
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

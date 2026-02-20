@@ -134,11 +134,18 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div style={{ padding: 'var(--spacing-md) var(--spacing-xl)', maxWidth: '100%', margin: '0 auto', height: '100%', boxSizing: 'border-box', overflowY: 'auto', background: 'linear-gradient(180deg, #06060f 0%, #0a0a18 50%, #080815 100%)' }}>
+        <div style={{
+            padding: window.innerWidth < 768 ? 'var(--spacing-md)' : 'var(--spacing-md) var(--spacing-xl)',
+            maxWidth: '100vw',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+            background: 'var(--color-bg-primary)',
+            overflowX: 'hidden'
+        }}>
 
             {/* Header Area */}
             <div style={{ marginBottom: '1rem' }}>
-                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #fff, #888)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
+                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
                     Market Pulse
                 </h1>
                 <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
@@ -146,40 +153,74 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </p>
             </div>
 
-            {/* Breaking News Ticker */}
+            {/* Breaking News Ticker - Financial Terminal Style */}
             <div className="glass-card" style={{
-                padding: '0.75rem 1.5rem',
+                padding: '0 0.5rem',
                 marginBottom: '2rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '1rem',
+                gap: '0',
                 overflow: 'hidden',
-                borderLeft: '4px solid #EF4444',
-                background: 'rgba(239, 68, 68, 0.05)'
+                background: 'rgba(0, 0, 0, 0.4)',
+                border: '1px solid var(--glass-border-bright)',
+                borderRadius: '8px',
+                height: '42px'
             }}>
                 <div style={{
                     background: 'var(--color-error)',
                     color: '#fff',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.7rem',
-                    fontWeight: 800,
+                    padding: '0 12px',
+                    height: '100%',
+                    fontSize: '0.65rem',
+                    fontWeight: 900,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px',
-                    boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)'
+                    gap: '6px',
+                    letterSpacing: '0.1em',
+                    boxShadow: '10px 0 20px rgba(0,0,0,0.5)',
+                    zIndex: 2,
+                    position: 'relative'
                 }}>
-                    <Zap size={10} fill="currentColor" /> BREAKING
+                    <div className="pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }}></div>
+                    LIVE_FEED
                 </div>
-                <div style={{ whiteSpace: 'nowrap', fontSize: '0.9rem', color: '#e5e5e5', flex: 1, overflow: 'hidden' }}>
-                    <div style={{ display: 'inline-block', animation: 'scroll-news 40s linear infinite' }}>
+
+                <div style={{
+                    padding: '0 15px',
+                    height: '100%',
+                    background: 'rgba(255,255,255,0.03)',
+                    fontSize: '0.6rem',
+                    fontWeight: 800,
+                    color: 'var(--color-text-tertiary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    letterSpacing: '0.05em',
+                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                    whiteSpace: 'nowrap'
+                }}>
+                    GLOBAL_INTELLIGENCE_FLOW
+                </div>
+
+                <div style={{ whiteSpace: 'nowrap', fontSize: '0.85rem', color: 'var(--color-text-primary)', flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        animation: 'scroll-news 45s linear infinite',
+                        paddingLeft: '20px',
+                        fontWeight: 500,
+                        letterSpacing: '0.02em'
+                    }}>
                         {newsTickerText}
                     </div>
                 </div>
             </div>
 
             {/* Main Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+                gap: '1.25rem',
+                marginBottom: '1.5rem'
+            }}>
 
                 {/* Sentiment Heatmap */}
                 <div className="glass-card" style={{ padding: '1.5rem', position: 'relative' }}>
@@ -384,7 +425,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             </div>
 
             {/* Top Movers & Calendar */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                     <TopMovers />
                 </div>

@@ -74,11 +74,11 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     width: 100%;
                     z-index: 1001;
                     padding-bottom: env(safe-area-inset-bottom, 0px);
-                    background: rgba(10, 10, 20, 0.95);
-                    backdrop-filter: blur(24px);
-                    -webkit-backdrop-filter: blur(24px);
-                    border-top: 1px solid rgba(255, 255, 255, 0.1);
-                    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+                    background: var(--glass-bg);
+                    backdrop-filter: var(--glass-blur);
+                    -webkit-backdrop-filter: var(--glass-blur);
+                    border-top: 1px solid var(--glass-border);
+                    box-shadow: var(--glass-shadow);
                 }
 
                 .mobile-nav-pill {
@@ -115,14 +115,14 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     height: 36px;
                     border-radius: 12px;
                     background: transparent;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: var(--color-text-tertiary);
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .nav-icon-wrapper.active {
-                    background: rgba(99, 102, 241, 0.2);
-                    color: #818cf8;
-                    box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
+                    background: var(--color-accent-light);
+                    color: var(--color-accent);
+                    box-shadow: 0 0 16px var(--color-accent-light);
                 }
 
                 .nav-icon-wrapper.ai-active {
@@ -134,13 +134,13 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                 .nav-label {
                     font-size: 10px;
                     font-weight: 500;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: var(--color-text-tertiary);
                     letter-spacing: 0.3px;
                     transition: color 0.3s ease;
                 }
 
                 .mobile-nav-btn.active .nav-label {
-                    color: #818cf8;
+                    color: var(--color-accent);
                 }
 
                 .mobile-nav-btn.ai-btn.active .nav-label {
@@ -148,8 +148,8 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                 }
 
                 .mobile-nav-btn:hover .nav-icon-wrapper:not(.active) {
-                    background: rgba(255, 255, 255, 0.08);
-                    color: rgba(255, 255, 255, 0.7);
+                    background: var(--color-surface-hover);
+                    color: var(--color-text-secondary);
                 }
 
                 .mobile-nav-btn:active {

@@ -69,6 +69,25 @@ class SocialFeedService {
         return (sentimentSum / totalWeight) * 100; // -100 to 100
     }
 
+    getGlobalSentiment(): { score: number; label: string; count: number } {
+        if (this.posts.length === 0) return { score: 0, label: 'Neutral', count: 0 };
+
+        const totalWeight = this.posts.reduce((acc, p) => acc + p.weight, 0);
+        const sentimentSum = this.posts.reduce((acc, p) => {
+            const multiplier = p.sentiment === 'positive' ? 1 : p.sentiment === 'negative' ? -1 : 0;
+            return acc + (p.weight * multiplier);
+        }, 0);
+
+        const score = (sentimentSum / totalWeight) * 100;
+        let label = 'Neutral';
+        if (score > 20) label = 'Bullish';
+        if (score > 50) label = 'Strong Bullish';
+        if (score < -20) label = 'Bearish';
+        if (score < -50) label = 'Strong Bearish';
+
+        return { score, label, count: this.posts.length };
+    }
+
     // Transform a real piece of news into a "live" post pulse
     async generateLivePost(symbol?: string): Promise<SocialPost | null> {
         const targetSymbol = symbol || ['AAPL', 'NVDA', 'TSLA', 'MSFT', 'META'][Math.floor(Math.random() * 5)];

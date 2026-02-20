@@ -28,6 +28,7 @@ import { usePortfolioStore } from './hooks/usePortfolio';
 import { useWatchlist } from './hooks/useWatchlist';
 
 import './index.css';
+import './styles/ios-mobile.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,6 +90,17 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
     navigate('/search');
   };
 
+  // Listen for symbol query parameters (from heatmap deep-linking)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const symbolFromUrl = params.get('symbol');
+    if (symbolFromUrl && symbolFromUrl !== selectedSymbol) {
+      setSelectedSymbol(symbolFromUrl);
+      // Clear the query param to keep URL clean after processing
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, navigate, selectedSymbol, setSelectedSymbol]);
+
   return (
     <div className="app">
 
@@ -117,9 +129,16 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
           <Route path="/" element={<Navigate to="/search" replace />} />
           {/* ===== LOCKED: Desktop Home Tab Layout — DO NOT MODIFY (approved 2026-02-16) ===== */}
           <Route path="/search" element={
-            <div className="tab-content home-tab-content" style={{ position: 'relative', height: 'calc(100vh - var(--header-height))', marginTop: 0, paddingBottom: 0, overflow: 'hidden' }}>
+            <div
+              className="tab-content home-tab-content"
+              style={{
+                position: 'relative',
+                overflowY: !selectedSymbol ? 'hidden' : 'auto',
+                height: !selectedSymbol ? '100%' : 'auto'
+              }}
+            >
               {!selectedSymbol ? (
-                <div className="heatmap-wrapper" style={{ position: 'fixed', top: 'calc(var(--header-height) + 0.5rem)', left: '1.5rem', right: '1.5rem', bottom: '1rem', overflow: 'hidden', zIndex: 1, borderRadius: '12px' }}>
+                <div className="heatmap-wrapper">
                   <StockHeatmap />
                 </div>
               ) : (
@@ -133,12 +152,12 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             </div>
           } />
           <Route path="/watchlist" element={
-            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+            <div className="tab-content">
               <WatchlistPage onSelectSymbol={handleSelectSymbol} />
             </div>
           } />
           <Route path="/portfolio" element={
-            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+            <div className="tab-content">
               <ErrorBoundary>
                 <Suspense fallback={<PageSkeleton />}>
                   <Portfolio onSelectSymbol={handleSelectSymbol} />
@@ -147,7 +166,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             </div>
           } />
           <Route path="/recommendations" element={
-            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+            <div className="tab-content">
               <ErrorBoundary>
                 <Suspense fallback={<PageSkeleton />}>
                   <AIRecommendations onSelectStock={handleSelectSymbol} />
@@ -156,7 +175,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             </div>
           } />
           <Route path="/pulse" element={
-            <div className="tab-content" style={{ paddingBottom: '80px' }}>
+            <div className="tab-content">
               <MarketPulsePage onSelectStock={handleSelectSymbol} />
             </div>
           } />

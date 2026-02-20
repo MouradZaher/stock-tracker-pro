@@ -124,31 +124,32 @@ export const useWatchlist = create<WatchlistState>()(
                 },
 
                 syncWithSupabase: async (userId: string) => {
-                    // Guard against multiple simultaneous syncs
-                    if (get().isSyncing) {
-                        return;
-                    }
+                    if (!userId || userId.startsWith('bypass-')) return;
 
-                    set({ isSyncing: true, error: null });
+                    // Guard against multiple simultaneous syncs
+                    if (get().isSyncing) return;
+
+                    set({ isSyncing: true });
                     try {
                         const localWatchlist = get().watchlist;
 
                         // Sync local watchlist to Supabase (one-time migration)
-                        await watchlistService.syncLocalToSupabase(userId, localWatchlist);
+                        if (localWatchlist.length > 0) {
+                            await watchlistService.syncLocalToSupabase(userId, localWatchlist);
+                        }
 
-                        // Load the merged data from Supabase
-                        const watchlist = await watchlistService.fetchUserWatchlist(userId);
-                        set({
-                            watchlist,
-                            isSyncing: false,
-                            error: null,
-                        });
+                        // Load data from Supabase
+                        const cloudWatchlist = await watchlistService.fetchUserWatchlist(userId);
+
+                        // Only overwrite if we found something
+                        if (cloudWatchlist.length > 0) {
+                            set({ watchlist: cloudWatchlist });
+                        }
+
+                        set({ isSyncing: false, error: null });
                     } catch (error) {
                         console.error('Error syncing watchlist:', error);
-                        set({
-                            isSyncing: false,
-                            error: 'Failed to sync watchlist',
-                        });
+                        set({ isSyncing: false, error: 'Failed to sync watchlist' });
                     }
                 },
 
@@ -159,6 +160,10 @@ export const useWatchlist = create<WatchlistState>()(
         },
         {
             name: 'stock-watchlist',
+            partialize: (state) => ({ watchlist: state.watchlist }),
+            onRehydrateStorage: () => (state) => {
+                console.log('📦 Watchlist storage rehydrated:', state?.watchlist.length || 0, 'symbols');
+            }
         }
     )
 );

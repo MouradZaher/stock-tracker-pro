@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, X, Zap } from 'lucide-react';
+import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote, getMultipleQuotes } from '../services/stockDataService';
@@ -12,7 +12,8 @@ import toast from 'react-hot-toast';
 import FamousHoldings from './FamousHoldings';
 import { usePriceAlerts } from '../hooks/usePriceAlerts';
 import PriceAlertsModal from './PriceAlertsModal';
-import { Bell, ShieldCheck, BarChart2 } from 'lucide-react';
+import { analyzeSymbol, getTacticalRebalancing, type RebalancingAction } from '../services/aiRecommendationService';
+import type { StockRecommendation } from '../types';
 
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
@@ -26,6 +27,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // ... existing state ...
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showAIAdvice, setShowAIAdvice] = useState(false);
+    const [rebalancingActions, setRebalancingActions] = useState<RebalancingAction[]>([]);
+    const [loadingAdvice, setLoadingAdvice] = useState(false);
+    const [aiRecs, setAiRecs] = useState<Record<string, StockRecommendation>>({});
 
     const [formData, setFormData] = useState({
         symbol: '',
@@ -93,6 +97,49 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         return () => clearInterval(interval);
     }, [user?.id, updatePrice, checkPrice]);
 
+    // Fetch AI Recommendations for positions
+    useEffect(() => {
+        const fetchAIRecs = async () => {
+            const symbols = positions.map(p => p.symbol);
+            if (symbols.length === 0) return;
+
+            const recs: Record<string, StockRecommendation> = {};
+            for (const sym of symbols) {
+                const rec = await analyzeSymbol(sym);
+                if (rec) recs[sym] = rec;
+            }
+            setAiRecs(recs);
+        };
+
+        fetchAIRecs();
+        const interval = setInterval(fetchAIRecs, 60000); // Refresh AI recs every minute
+        return () => clearInterval(interval);
+    }, [positions.length]); // Re-fetch only when a position is added/removed
+
+    const getRecIcon = (rec?: string) => {
+        if (rec === 'Buy') return <TrendingUp size={14} color="var(--color-success)" />;
+        if (rec === 'Sell') return <TrendingDown size={14} color="var(--color-error)" />;
+        return <Minus size={14} color="var(--color-warning)" />;
+    };
+
+    // Fetch dynamic rebalancing advice
+    useEffect(() => {
+        if (showAIAdvice) {
+            const fetchAdvice = async () => {
+                setLoadingAdvice(true);
+                try {
+                    const advice = await getTacticalRebalancing(positions);
+                    setRebalancingActions(advice);
+                } catch (error) {
+                    console.error("Failed to fetch rebalancing advice", error);
+                } finally {
+                    setLoadingAdvice(false);
+                }
+            };
+            fetchAdvice();
+        }
+    }, [showAIAdvice, positions]);
+
     const handleAddPosition = async () => {
         if (!formData.symbol || !formData.units || !formData.avgCost) {
             toast.error('Please fill in all fields');
@@ -137,9 +184,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
     const handleRemove = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (confirm('Are you sure you want to remove this position?')) {
-            removePosition(id, user?.id);
-        }
+        console.log('🗑️ Removing position with id:', id);
+        removePosition(id, user?.id);
     };
 
     const handleRowClick = (symbol: string) => {
@@ -230,6 +276,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         <th style={{ textAlign: 'right' }}>Market Value</th>
                                         <th style={{ textAlign: 'right' }}>P/L ($)</th>
                                         <th style={{ textAlign: 'right' }}>P/L (%)</th>
+                                        <th style={{ textAlign: 'center' }}>AI Strategy</th>
                                         <th style={{ textAlign: 'right' }}>Allocation</th>
                                         <th>Actions</th>
                                     </tr>
@@ -269,6 +316,31 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                 </td>
                                                 <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
                                                     {formatPercent(position.profitLossPercent)}
+                                                </td>
+                                                <td style={{ textAlign: 'center' }}>
+                                                    {aiRecs[position.symbol] ? (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                padding: '2px 6px',
+                                                                background: aiRecs[position.symbol].score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (aiRecs[position.symbol].score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
+                                                                borderRadius: '4px',
+                                                                border: `1px solid ${aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')}`
+                                                            }}>
+                                                                {getRecIcon(aiRecs[position.symbol].recommendation)}
+                                                                <span style={{ fontSize: '0.7rem', fontWeight: 800, color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)') }}>
+                                                                    {aiRecs[position.symbol].recommendation?.toUpperCase()}
+                                                                </span>
+                                                            </div>
+                                                            <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>
+                                                                Score: {aiRecs[position.symbol].score}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>Analyzing...</span>
+                                                    )}
                                                 </td>
                                                 <td style={{ textAlign: 'right' }}>
                                                     <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
@@ -329,6 +401,32 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                 </span>
                                             </div>
                                         </div>
+
+                                        {/* Mobile AI Badge */}
+                                        {aiRecs[position.symbol] && (
+                                            <div style={{
+                                                margin: '0 -1rem 0.75rem -1rem',
+                                                padding: '4px 1rem',
+                                                background: 'rgba(99, 102, 241, 0.05)',
+                                                borderTop: '1px solid var(--glass-border)',
+                                                borderBottom: '1px solid var(--glass-border)',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center'
+                                            }}>
+                                                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Strategy Signal</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <span style={{
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: 800,
+                                                        color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
+                                                    }}>
+                                                        {aiRecs[position.symbol].recommendation?.toUpperCase()} ({aiRecs[position.symbol].score})
+                                                    </span>
+                                                    {getRecIcon(aiRecs[position.symbol].recommendation)}
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
                                             <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
@@ -489,40 +587,85 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                 <X size={20} />
                             </button>
                         </div>
-                        <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                            <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid var(--color-warning-light)' }}>
-                                <h4 style={{ fontSize: '1rem', color: 'var(--color-warning)', marginBottom: '0.5rem' }}>Tactical Rebalancing Required</h4>
+                        <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', paddingBottom: '80px' }}>
+                            <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid var(--color-accent-light)' }}>
+                                <h4 style={{ fontSize: '1rem', color: 'var(--color-accent)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Zap size={16} fill="currentColor" /> AI Alpha Intelligence Advice
+                                </h4>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                                    Your portfolio is currently concentrated in specific high-growth sectors. AI models suggest rebalancing
-                                    to defensive sectors (Healthcare/Utilities) to maintain stability in current market conditions.
+                                    Your portfolio is being analyzed against institutional 5% single-asset and 20% sector-weighted safety rules.
                                 </p>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {stockAllocations.filter(a => !a.valid.valid).map(a => (
-                                    <div key={a.symbol} className="glass-card" style={{ padding: '1rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                            <span style={{ fontWeight: 700 }}>{a.symbol}</span>
-                                            <span style={{ color: 'var(--color-error)', fontWeight: 800 }}>{a.allocation.toFixed(1)}%</span>
+                            {loadingAdvice ? (
+                                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <div className="spinner" style={{ margin: '0 auto 1rem' }} />
+                                    Synthesizing rebalancing strategy...
+                                </div>
+                            ) : rebalancingActions.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-success)' }}>
+                                    <ShieldCheck size={40} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                                    <p>Your portfolio perfectly aligns with AI Alpha risk parameters.</p>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {rebalancingActions.map((action, idx) => (
+                                        <div key={idx} className="glass-card" style={{
+                                            padding: '1.25rem',
+                                            borderLeft: `4px solid ${action.action === 'Trim' ? 'var(--color-error)' : (action.action === 'Add' ? 'var(--color-success)' : 'var(--color-warning)')}`,
+                                            background: 'rgba(255,255,255,0.02)'
+                                        }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                                <div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{action.symbol}</span>
+                                                        <span style={{
+                                                            fontSize: '0.65rem',
+                                                            padding: '2px 8px',
+                                                            borderRadius: '10px',
+                                                            background: action.priority === 'High' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)',
+                                                            color: action.priority === 'High' ? 'var(--color-error)' : 'var(--color-text-tertiary)',
+                                                            border: '1px solid currentColor'
+                                                        }}>
+                                                            {action.priority} Priority
+                                                        </span>
+                                                    </div>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        marginTop: '4px',
+                                                        color: action.action === 'Trim' ? 'var(--color-error)' : 'var(--color-success)',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.85rem'
+                                                    }}>
+                                                        {action.action === 'Trim' ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+                                                        {action.action.toUpperCase()} ACTION RECOMMENDED
+                                                    </div>
+                                                </div>
+                                                <div style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
+                                                    Strategic Setup
+                                                </div>
+                                            </div>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '1rem', lineHeight: 1.5 }}>
+                                                {action.reason} {action.impact}
+                                            </p>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                padding: '8px 12px',
+                                                background: 'rgba(255,255,255,0.03)',
+                                                borderRadius: '6px',
+                                                fontSize: '0.8rem'
+                                            }}>
+                                                <span style={{ color: 'var(--color-text-tertiary)' }}>Rebalance Execution</span>
+                                                <ArrowRight size={14} />
+                                            </div>
                                         </div>
-                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>
-                                            Exceeds 5% safe limit. Strategic trim recommended to capture profits and reduce single-tick risk.
-                                        </p>
-                                    </div>
-                                ))}
-
-                                {sectorAllocations.filter(a => !a.valid.valid).map(a => (
-                                    <div key={a.sector} className="glass-card" style={{ padding: '1rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                            <span style={{ fontWeight: 700 }}>{a.sector}</span>
-                                            <span style={{ color: 'var(--color-error)', fontWeight: 800 }}>{a.allocation.toFixed(1)}%</span>
-                                        </div>
-                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>
-                                            Sector concentration exceeds 20%. Consider diversifying into negatively correlated assets.
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <div className="modal-footer">
                             <button className="btn btn-primary" onClick={() => setShowAIAdvice(false)}>Apply Strategy</button>
@@ -542,7 +685,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             </button>
                         </div>
 
-                        <div className="modal-body">
+                        <div className="modal-body" style={{ paddingBottom: '80px' }}>
                             <div className="form-group">
                                 <label className="form-label">Symbol</label>
                                 <SymbolSearchInput

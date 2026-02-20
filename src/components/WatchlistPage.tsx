@@ -4,9 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
-import { TrendingUp, TrendingDown, Trash2, Star, Bell } from 'lucide-react';
+import { TrendingUp, TrendingDown, Trash2, Star, Bell, Search, Zap, Minus } from 'lucide-react';
 import { usePriceAlerts } from '../hooks/usePriceAlerts';
 import PriceAlertsModal from './PriceAlertsModal';
+import SymbolSearchInput from './SymbolSearchInput';
+import { analyzeSymbol } from '../services/aiRecommendationService';
+import type { StockRecommendation } from '../types';
 
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
@@ -103,8 +106,9 @@ const InteractiveSparkline: React.FC<SparklineProps> = ({ data, color }) => {
 
 const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
-    const { watchlist, removeFromWatchlist } = useWatchlist();
+    const { watchlist, removeFromWatchlist, addToWatchlist } = useWatchlist();
     const [stockData, setStockData] = useState<Record<string, Stock>>({});
+    const [aiRecs, setAiRecs] = useState<Record<string, StockRecommendation>>({});
     const [loading, setLoading] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
     const categories = ['All', 'Tech', 'Growth', 'Dividends'];
@@ -143,125 +147,196 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
         return () => clearInterval(interval);
     }, [watchlist]);
 
-    if (watchlist.length === 0) {
-        return (
-            <div className="empty-state" style={{
+    // Fetch AI Recs for watchlist
+    useEffect(() => {
+        const fetchAIRecs = async () => {
+            if (watchlist.length === 0) return;
+            const recs: Record<string, StockRecommendation> = {};
+            for (const sym of watchlist) {
+                const rec = await analyzeSymbol(sym);
+                if (rec) recs[sym] = rec;
+            }
+            setAiRecs(recs);
+        };
+
+        fetchAIRecs();
+        const interval = setInterval(fetchAIRecs, 60000);
+        return () => clearInterval(interval);
+    }, [watchlist.length]);
+
+    const getRecIcon = (rec?: string) => {
+        if (rec === 'Buy') return <TrendingUp size={14} color="var(--color-success)" />;
+        if (rec === 'Sell') return <TrendingDown size={14} color="var(--color-error)" />;
+        return <Minus size={14} color="var(--color-warning)" />;
+    };
+
+    const EmptyState = () => (
+        <div className="empty-state" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '400px',
+            padding: '3rem',
+            textAlign: 'center'
+        }}>
+            <div style={{
+                width: '80px',
+                height: '80px',
+                background: 'var(--color-bg-secondary)',
+                borderRadius: '50%',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '100%',
-                padding: '3rem',
-                textAlign: 'center'
+                marginBottom: '1.5rem'
             }}>
-                <div style={{
-                    width: '80px',
-                    height: '80px',
-                    background: 'var(--color-bg-secondary)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1.5rem'
-                }}>
-                    <Star size={40} color="var(--color-warning)" fill="var(--color-warning)" style={{ opacity: 0.5 }} />
-                </div>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Your watchlist is empty</h2>
-                <p style={{ color: 'var(--color-text-secondary)', maxWidth: '400px' }}>
-                    Star symbols to add them here for quick access.
-                </p>
+                <Star size={40} color="var(--color-warning)" fill="var(--color-warning)" style={{ opacity: 0.5 }} />
             </div>
-        );
-    }
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Your watchlist is empty</h2>
+            <p style={{ color: 'var(--color-text-secondary)', maxWidth: '400px', marginBottom: '2rem' }}>
+                Search for symbols above or star them to add them here for quick access.
+            </p>
+        </div>
+    );
 
     return (
-        <div className="watchlist-page" style={{ padding: '0 var(--spacing-xl)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="watchlist-page" style={{ padding: '0 var(--spacing-xl)', paddingBottom: '100px' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                paddingTop: '1rem'
+            }}>
+                <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
                     <Star size={24} fill="currentColor" className="text-warning" />
                     My Watchlist
                 </h2>
+                <div style={{ width: '100%', maxWidth: '350px' }}>
+                    <SymbolSearchInput
+                        placeholder="Quick add symbol..."
+                        onSelect={(symbol) => addToWatchlist(symbol, user?.id)}
+                    />
+                </div>
             </div>
 
-            {loading && Object.keys(stockData).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem' }}>
-                    <div className="spinner" style={{ margin: '0 auto 1rem' }} />
-                    Loading watchlist data...
-                </div>
-            ) : (
-                <div className="watchlist-grid" style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
-                    gap: '1.5rem',
-                    paddingBottom: '2rem'
-                }}>
-                    {watchlist.map(symbol => {
-                        const stock = stockData[symbol];
-                        if (!stock) return null;
+            {watchlist.length === 0 ? <EmptyState /> : (
+                <>
+                    {loading && Object.keys(stockData).length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            <div className="spinner" style={{ margin: '0 auto 1rem' }} />
+                            Loading watchlist data...
+                        </div>
+                    ) : (
+                        <div className="watchlist-grid" style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+                            gap: '1.25rem',
+                            paddingBottom: '2rem'
+                        }}>
+                            {watchlist.map(symbol => {
+                                const stock = stockData[symbol];
+                                if (!stock) return null;
 
-                        // Mock trend data for sparkline
-                        const mockTrend = Array.from({ length: 10 }, () => stock.price * (0.98 + Math.random() * 0.04));
-                        const trendColor = stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)';
+                                // Mock trend data for sparkline
+                                const mockTrend = Array.from({ length: 10 }, () => stock.price * (0.98 + Math.random() * 0.04));
+                                const trendColor = stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)';
 
-                        return (
-                            <div
-                                key={symbol}
-                                className="watchlist-card glass-card"
-                                style={{
-                                    padding: '1.5rem',
-                                    cursor: 'pointer',
-                                    position: 'relative'
-                                }}
-                                onClick={() => onSelectSymbol(symbol)}
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{symbol}</h3>
-                                        <button
-                                            className="btn-icon glass-button"
-                                            style={{ padding: '2px', borderRadius: '50%', color: 'var(--color-text-tertiary)' }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setAlertConfig({ symbol, price: stock.price });
-                                            }}
-                                            title="Set Price Alert"
-                                        >
-                                            <Bell size={14} />
-                                        </button>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', marginLeft: 'auto' }}>{stock.name}</p>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
-                                        <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.875rem', fontWeight: 600 }}>
-                                            {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                            {formatPercent(stock.changePercent)}
+                                return (
+                                    <div
+                                        key={symbol}
+                                        className="watchlist-card glass-card"
+                                        style={{
+                                            padding: '1.5rem',
+                                            cursor: 'pointer',
+                                            position: 'relative'
+                                        }}
+                                        onClick={() => onSelectSymbol(symbol)}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{symbol}</h3>
+                                                <button
+                                                    className="btn-icon glass-button"
+                                                    style={{ padding: '2px', borderRadius: '50%', color: 'var(--color-text-tertiary)' }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setAlertConfig({ symbol, price: stock.price });
+                                                    }}
+                                                    title="Set Price Alert"
+                                                >
+                                                    <Bell size={14} />
+                                                </button>
+                                                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', marginLeft: 'auto' }}>{stock.name}</p>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
+                                                <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.875rem', fontWeight: 600 }}>
+                                                    {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                                                    {formatPercent(stock.changePercent)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* AI Signal Strip */}
+                                        {aiRecs[symbol] && (
+                                            <div style={{
+                                                margin: '0.5rem 0 1rem 0',
+                                                padding: '6px 10px',
+                                                background: 'rgba(99, 102, 241, 0.04)',
+                                                borderRadius: '8px',
+                                                border: '1px solid var(--glass-border)',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <Zap size={14} color="var(--color-accent)" />
+                                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Conviction:</span>
+                                                </div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <span style={{
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 800,
+                                                        color: aiRecs[symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
+                                                    }}>
+                                                        {aiRecs[symbol].recommendation?.toUpperCase()}
+                                                    </span>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-tertiary)' }}>
+                                                        ({aiRecs[symbol].score})
+                                                    </span>
+                                                    {getRecIcon(aiRecs[symbol].recommendation)}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.5rem' }}>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>7D Trend</div>
+                                                <InteractiveSparkline data={mockTrend} color={trendColor} />
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <button
+                                                    className="btn-icon delete-btn glass-button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        removeFromWatchlist(symbol, user?.id);
+                                                    }}
+                                                    title="Remove from watchlist"
+                                                    style={{ color: 'var(--color-text-tertiary)', borderRadius: '50%', padding: '6px' }}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.5rem' }}>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>7D Trend</div>
-                                        <InteractiveSparkline data={mockTrend} color={trendColor} />
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <button
-                                            className="btn-icon delete-btn glass-button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                removeFromWatchlist(symbol, user?.id);
-                                            }}
-                                            title="Remove from watchlist"
-                                            style={{ color: 'var(--color-text-tertiary)', borderRadius: '50%', padding: '6px' }}
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </>
             )}
 
             {alertConfig && (

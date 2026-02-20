@@ -1,7 +1,7 @@
 import { getStockData } from './stockDataService';
 import { getStockNews } from './newsService';
 import type { StockRecommendation, NewsArticle } from '../types';
-import { STOCKS_BY_SECTOR, SECTORS } from '../data/sectors';
+import { STOCKS_BY_SECTOR, SECTORS, getAllSymbols } from '../data/sectors';
 import { calculateRSI, calculateSMA } from '../utils/calculations';
 import { socialFeedService } from './SocialFeedService';
 
@@ -92,34 +92,193 @@ export const getRecommendationsForSector = async (
     recommendations.sort((a, b) => b.score - a.score);
     const topRecommendations = recommendations.slice(0, topN);
 
-    // Calculate suggested allocations (within 5% per stock, 20% per sector limits)
-    const sectorAllocation = 20; // Maximum 20% per sector
-    const maxStockAllocation = 5; // Maximum 5% per stock
-    const totalScore = topRecommendations.reduce((sum, r) => sum + r.score, 0);
+    // Initial allocation based on score within sector limits
+    const maxSectorAllocation = 20; // Maximum 20% per sector
+    const maxStockAllocation = 5;  // Maximum 5% per stock
+
+    // We allocate the 20% sector budget among the top N stocks
+    const totalSectorScore = topRecommendations.reduce((sum, r) => sum + r.score, 0);
 
     topRecommendations.forEach((rec) => {
-        const scoreRatio = rec.score / totalScore;
-        let allocation = sectorAllocation * scoreRatio;
-
-        // Cap at 5% per stock
-        allocation = Math.min(allocation, maxStockAllocation);
-
-        rec.suggestedAllocation = parseFloat(allocation.toFixed(2));
+        if (totalSectorScore > 0) {
+            const scoreRatio = rec.score / totalSectorScore;
+            // Distribute the 20% sector budget proportionally
+            let allocation = maxSectorAllocation * scoreRatio;
+            // Cap at 5% per stock
+            allocation = Math.min(allocation, maxStockAllocation);
+            rec.suggestedAllocation = parseFloat(allocation.toFixed(1));
+        } else {
+            rec.suggestedAllocation = 0;
+        }
     });
 
     return topRecommendations;
 };
 
-// Get all recommendations
-export const getAllRecommendations = async (): Promise<StockRecommendation[]> => {
-    const allRecommendations: StockRecommendation[] = [];
+// Analyze a specific symbol on demand
+export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation | null> => {
+    try {
+        const symbols = getAllSymbols();
+        const stockInfo = symbols.find(s => s.symbol === symbol);
+        if (!stockInfo) return null;
 
-    for (const sector of SECTORS) {
-        const sectorRecs = await getRecommendationsForSector(sector, 3);
-        allRecommendations.push(...sectorRecs);
+        let { stock: stockData } = await getStockData(symbol);
+        const news = await getStockNews(symbol, 3);
+
+        if (!stockData.price || stockData.price === 0) return null;
+
+        const rsi = null;
+        const ma50 = stockData.previousClose;
+        const ma200 = stockData.fiftyTwoWeekHigh ? (stockData.fiftyTwoWeekHigh + stockData.fiftyTwoWeekLow) / 2 : null;
+        const socialSentiment = socialFeedService.getSentimentScore(symbol);
+
+        const score = calculateRecommendationScore({
+            price: stockData.price,
+            change: stockData.change,
+            changePercent: stockData.changePercent,
+            rsi,
+            ma50,
+            ma200,
+            peRatio: stockData.peRatio,
+            eps: stockData.eps,
+            news,
+            socialSentiment,
+        });
+
+        const recommendation = getRecommendationType(score);
+        const reasoning = generateReasoning({
+            score,
+            rsi,
+            ma50,
+            ma200,
+            price: stockData.price,
+            peRatio: stockData.peRatio,
+            changePercent: stockData.changePercent,
+            news,
+            socialSentiment,
+        });
+
+        return {
+            symbol: stockInfo.symbol,
+            name: stockInfo.name,
+            sector: stockInfo.sector,
+            price: stockData.price,
+            score,
+            recommendation,
+            suggestedAllocation: 0,
+            reasoning,
+            news,
+            technicalIndicators: { rsi, ma50, ma200 },
+            fundamentals: { peRatio: stockData.peRatio, epsGrowth: null },
+        };
+    } catch (error) {
+        console.error(`Failed to analyze ${symbol}:`, error);
+        return null;
+    }
+};
+
+export interface RebalancingAction {
+    symbol: string;
+    action: 'Trim' | 'Add' | 'Exit' | 'Hold';
+    reason: string;
+    impact: string;
+    priority: 'High' | 'Medium' | 'Low';
+}
+
+export const getTacticalRebalancing = async (positions: any[]): Promise<RebalancingAction[]> => {
+    const actions: RebalancingAction[] = [];
+    const totalValue = positions.reduce((sum, p) => sum + (p.price * p.units), 0);
+    if (totalValue === 0) return [];
+
+    const sectorTotals: Record<string, number> = {};
+    const stockAllocations: Record<string, number> = {};
+
+    for (const p of positions) {
+        const value = p.price * p.units;
+        const allocation = (value / totalValue) * 100;
+        stockAllocations[p.symbol] = allocation;
+
+        const sector = getAllSymbols().find(s => s.symbol === p.symbol)?.sector || 'Unknown';
+        sectorTotals[sector] = (sectorTotals[sector] || 0) + allocation;
+
+        // Individual stock limit (5%)
+        if (allocation > 5) {
+            actions.push({
+                symbol: p.symbol,
+                action: 'Trim',
+                reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the 5% risk limit.`,
+                impact: `Reduces concentration risk in ${p.symbol}.`,
+                priority: allocation > 10 ? 'High' : 'Medium'
+            });
+        }
     }
 
-    return allRecommendations;
+    // Sector limits (20%)
+    for (const [sector, allocation] of Object.entries(sectorTotals)) {
+        if (allocation > 20) {
+            const symbolsInSector = positions.filter(p => getAllSymbols().find(s => s.symbol === p.symbol)?.sector === sector);
+            actions.push({
+                symbol: sector,
+                action: 'Trim',
+                reason: `${sector} sector allocation is ${allocation.toFixed(1)}%, exceeding the 20% limit.`,
+                impact: `Improves sector diversification.`,
+                priority: allocation > 30 ? 'High' : 'Medium'
+            });
+        }
+    }
+
+    // Add Alpha recommendations
+    const topRecs = await getAllRecommendations();
+    for (const rec of topRecs.slice(0, 3)) {
+        if (!stockAllocations[rec.symbol] && actions.length < 5) {
+            actions.push({
+                symbol: rec.symbol,
+                action: 'Add',
+                reason: `Top AI Recommendation (Score: ${rec.score}) in ${rec.sector}.`,
+                impact: `Captures tactical alpha with high institutional conviction.`,
+                priority: 'Medium'
+            });
+        }
+    }
+
+    return actions;
+};
+
+// Get all recommendations with global optimization
+export const getAllRecommendations = async (): Promise<StockRecommendation[]> => {
+    // Process sectors in smaller chunks to avoid overwhelming the API/Network
+    const allRecommendations: StockRecommendation[] = [];
+
+    // Use a subset of sectors for a "Quick Scan" if scanning all is too slow, 
+    // but here we'll try all with a slight delay or concurrency limit if needed.
+    // For now, let's just make it robust.
+
+    const sectorPromises = SECTORS.map(async (sector) => {
+        try {
+            return await getRecommendationsForSector(sector, 2); // 2 per sector for better distribution
+        } catch (e) {
+            console.error(`Error scanning sector ${sector}:`, e);
+            return [];
+        }
+    });
+
+    const results = await Promise.all(sectorPromises);
+    results.forEach(recs => allRecommendations.push(...recs));
+
+    // Final global sort and limit to top 15-20 meaningful recs
+    allRecommendations.sort((a, b) => b.score - a.score);
+
+    // Final Global Allocation Normalization
+    // Ensure the sum of all allocations doesn't exceed 100%
+    const currentTotal = allRecommendations.reduce((sum, r) => sum + r.suggestedAllocation, 0);
+    if (currentTotal > 100) {
+        const multiplier = 100 / currentTotal;
+        allRecommendations.forEach(r => {
+            r.suggestedAllocation = parseFloat((r.suggestedAllocation * multiplier).toFixed(1));
+        });
+    }
+
+    return allRecommendations.slice(0, 15);
 };
 
 // Generate mock price history (DEPRECATED - Returning empty to ensure no fake data)

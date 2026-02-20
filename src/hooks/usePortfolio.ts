@@ -215,30 +215,29 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     if (!userId || userId.startsWith('bypass-')) return;
 
                     // Guard against multiple simultaneous syncs
-                    if (get().isSyncing) {
-                        return;
-                    }
+                    if (get().isSyncing) return;
 
-                    set({ isSyncing: true, error: null });
+                    set({ isSyncing: true });
                     try {
                         const localPositions = get().positions;
 
                         // Sync local positions to Supabase (one-time migration)
-                        await portfolioService.syncLocalToSupabase(userId, localPositions);
+                        if (localPositions.length > 0) {
+                            await portfolioService.syncLocalToSupabase(userId, localPositions);
+                        }
 
-                        // Load the merged data from Supabase
-                        const positions = await portfolioService.fetchUserPortfolios(userId);
-                        set({
-                            positions,
-                            isSyncing: false,
-                            error: null,
-                        });
+                        // Load data from Supabase
+                        const cloudPositions = await portfolioService.fetchUserPortfolios(userId);
+
+                        // Only overwrite if we found something or if we're sure we want to sync
+                        if (cloudPositions.length > 0) {
+                            set({ positions: cloudPositions });
+                        }
+
+                        set({ isSyncing: false, error: null });
                     } catch (error) {
                         console.error('Error syncing portfolios:', error);
-                        set({
-                            isSyncing: false,
-                            error: 'Failed to sync portfolios',
-                        });
+                        set({ isSyncing: false, error: 'Failed to sync portfolios' });
                     }
                 },
 
@@ -297,6 +296,10 @@ export const usePortfolioStore = create<PortfolioStore>()(
         },
         {
             name: 'portfolio-storage',
+            partialize: (state) => ({ positions: state.positions }),
+            onRehydrateStorage: () => (state) => {
+                console.log('📦 Portfolio storage rehydrated:', state?.positions.length || 0, 'positions');
+            }
         }
     )
 );
