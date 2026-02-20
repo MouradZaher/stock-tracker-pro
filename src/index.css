@@ -2954,12 +2954,11 @@ body,
     display: none !important;
   }
 }
- / *   A d m i n   D a s h b o a r d   R e f i n e m e n t s   * / 
- . h o v e r - d a n g e r : h o v e r   { 
-         c o l o r :   v a r ( - - c o l o r - e r r o r )   ! i m p o r t a n t ; 
-         b a c k g r o u n d :   r g b a ( 2 3 9 ,   6 8 ,   6 8 ,   0 . 1 )   ! i m p o r t a n t ; 
-         b o r d e r - c o l o r :   r g b a ( 2 3 9 ,   6 8 ,   6 8 ,   0 . 3 )   ! i m p o r t a n t ; 
-         t r a n s f o r m :   s c a l e ( 1 . 1 ) ; 
- } 
-  
- 
+
+/* Admin Dashboard Refinements */
+.hover-danger:hover {
+    color: var(--color-error) !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    transform: scale(1.1);
+}
