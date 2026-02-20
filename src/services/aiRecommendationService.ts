@@ -187,18 +187,18 @@ export interface RebalancingAction {
 
 export const getTacticalRebalancing = async (positions: any[]): Promise<RebalancingAction[]> => {
     const actions: RebalancingAction[] = [];
-    const totalValue = positions.reduce((sum, p) => sum + (p.price * p.units), 0);
+    const totalValue = positions.reduce((sum, p) => sum + (p.marketValue || (p.currentPrice || 0) * p.units || 0), 0);
     if (totalValue === 0) return [];
 
     const sectorTotals: Record<string, number> = {};
     const stockAllocations: Record<string, number> = {};
 
     for (const p of positions) {
-        const value = p.price * p.units;
+        const value = p.marketValue || (p.currentPrice || 0) * p.units;
         const allocation = (value / totalValue) * 100;
         stockAllocations[p.symbol] = allocation;
 
-        const sector = getAllSymbols().find(s => s.symbol === p.symbol)?.sector || 'Unknown';
+        const sector = getAllSymbols().find(s => s.symbol === p.symbol)?.sector || 'Other';
         sectorTotals[sector] = (sectorTotals[sector] || 0) + allocation;
 
         // Individual stock limit (5%)
@@ -206,9 +206,21 @@ export const getTacticalRebalancing = async (positions: any[]): Promise<Rebalanc
             actions.push({
                 symbol: p.symbol,
                 action: 'Trim',
-                reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the 5% risk limit.`,
-                impact: `Reduces concentration risk in ${p.symbol}.`,
+                reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the 5% single-asset safety limit.`,
+                impact: `Reduces concentration risk. Target: trim to ~5%.`,
                 priority: allocation > 10 ? 'High' : 'Medium'
+            });
+        }
+
+        // Underperforming position (P&L < -15%)
+        const plPct = p.profitLossPercent ?? 0;
+        if (plPct < -15 && !actions.find(a => a.symbol === p.symbol)) {
+            actions.push({
+                symbol: p.symbol,
+                action: plPct < -25 ? 'Exit' : 'Trim',
+                reason: `Position is down ${Math.abs(plPct).toFixed(1)}% — exceeds drawdown threshold.`,
+                impact: `Cutting loss frees capital for higher-conviction positions.`,
+                priority: plPct < -25 ? 'High' : 'Medium'
             });
         }
     }
@@ -216,29 +228,25 @@ export const getTacticalRebalancing = async (positions: any[]): Promise<Rebalanc
     // Sector limits (20%)
     for (const [sector, allocation] of Object.entries(sectorTotals)) {
         if (allocation > 20) {
-            const symbolsInSector = positions.filter(p => getAllSymbols().find(s => s.symbol === p.symbol)?.sector === sector);
             actions.push({
                 symbol: sector,
                 action: 'Trim',
-                reason: `${sector} sector allocation is ${allocation.toFixed(1)}%, exceeding the 20% limit.`,
-                impact: `Improves sector diversification.`,
+                reason: `${sector} sector is ${allocation.toFixed(1)}% of portfolio, exceeding the 20% sector cap.`,
+                impact: `Improves diversification and lowers sector concentration risk.`,
                 priority: allocation > 30 ? 'High' : 'Medium'
             });
         }
     }
 
-    // Add Alpha recommendations
-    const topRecs = await getAllRecommendations();
-    for (const rec of topRecs.slice(0, 3)) {
-        if (!stockAllocations[rec.symbol] && actions.length < 5) {
-            actions.push({
-                symbol: rec.symbol,
-                action: 'Add',
-                reason: `Top AI Recommendation (Score: ${rec.score}) in ${rec.sector}.`,
-                impact: `Captures tactical alpha with high institutional conviction.`,
-                priority: 'Medium'
-            });
-        }
+    // If well-balanced, give a positive signal
+    if (actions.length === 0) {
+        actions.push({
+            symbol: 'PORTFOLIO',
+            action: 'Hold',
+            reason: `All positions are within institutional risk limits (5% stock / 20% sector).`,
+            impact: `No rebalancing required. Portfolio is well-diversified.`,
+            priority: 'Low'
+        });
     }
 
     return actions;
