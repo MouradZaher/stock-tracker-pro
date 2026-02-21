@@ -234,7 +234,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                     ) : (
                         <div className="watchlist-grid" style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, clamp(250px, 30vw, 320px)), 1fr))',
                             gap: '1.25rem',
                             paddingBottom: '2rem'
                         }}>
