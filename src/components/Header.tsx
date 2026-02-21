@@ -147,15 +147,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     </button>
 
                     {isNotifyOpen && (
-                        <div className="glass-card shadow-2xl" style={{
+                        <div className="glass-card shadow-2xl notification-dropdown" style={{
                             position: 'absolute',
                             top: '100%',
                             right: 0,
                             marginTop: '0.75rem',
-                            width: '340px',
                             zIndex: 1000,
                             padding: '1.25rem',
-                            maxHeight: '450px',
                             overflowY: 'auto',
                             background: 'rgba(5, 5, 10, 0.98)',
                             backdropFilter: 'blur(30px)',

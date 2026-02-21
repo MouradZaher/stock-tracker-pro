@@ -2002,6 +2002,7 @@ html {
     align-items: flex-end !important;
     /* Slide from bottom */
     background: var(--glass-bg) !important;
+    z-index: 2000 !important;
   }
 
   .modal {
@@ -2023,6 +2024,15 @@ html {
     to {
       transform: translateY(0);
     }
+  }
+
+  /* Fix notification dropdown clipping on mobile */
+  .notification-dropdown {
+    width: calc(100vw - 2rem) !important;
+    max-width: 380px !important;
+    right: 1rem !important;
+    left: auto !important;
+    max-height: 70vh !important;
   }
 
   /* Thumb-friendly Header Adjustments */
@@ -2957,8 +2967,8 @@ body,
 
 /* Admin Dashboard Refinements */
 .hover-danger:hover {
-    color: var(--color-error) !important;
-    background: rgba(239, 68, 68, 0.1) !important;
-    border-color: rgba(239, 68, 68, 0.3) !important;
-    transform: scale(1.1);
+  color: var(--color-error) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  transform: scale(1.1);
 }

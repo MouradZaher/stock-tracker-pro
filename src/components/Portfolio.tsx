@@ -720,7 +720,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             </button>
                         </div>
 
-                        <div className="modal-body" style={{ paddingBottom: '80px' }}>
+                        <div className="modal-body">
                             <div className="form-group">
                                 <label className="form-label">Symbol</label>
                                 <SymbolSearchInput
