@@ -1,6 +1,6 @@
 /* =========================================
    iOS MOBILE RESPONSIVE FIXES
-   iPhone 13 Pro (390x844) Optimized
+   iPhone 13 Pro (390×844) Optimized
    ========================================= */
 
 /* iOS Safe Area Support */
@@ -17,83 +17,82 @@
    ========================================= */
 @media (max-width: 768px) {
 
-    /* Root scrolling control - PREVENT ROOT SCROLLING */
+    /* Root scrolling — prevent overscroll on body */
     html,
     body {
-        height: 100% !important;
-        min-height: 100% !important;
-        overflow-x: hidden !important;
-        overflow-y: hidden !important;
-        position: relative !important;
-        width: 100% !important;
-        -webkit-overflow-scrolling: touch !important;
+        height: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        position: relative;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
         overscroll-behavior-y: none;
     }
 
     #root {
-        height: 100% !important;
-        overflow: hidden !important;
+        height: 100%;
+        overflow: hidden;
     }
 
     .app {
-        height: 100% !important;
+        height: 100%;
         width: 100%;
         display: flex;
         flex-direction: column;
-        overflow: hidden !important;
+        overflow: hidden;
     }
 
-    /* Mobile Header — force single row, fixed height */
+    /* Mobile Header — single row, fixed */
     .header {
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        height: calc(56px + var(--safe-area-top)) !important;
-        min-height: calc(56px + var(--safe-area-top)) !important;
-        max-height: calc(56px + var(--safe-area-top)) !important;
-        padding-top: calc(0.4rem + var(--safe-area-top)) !important;
-        padding-bottom: 0.4rem !important;
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-        gap: 0.4rem !important;
-        overflow: visible !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 1002 !important;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        height: calc(56px + var(--safe-area-top));
+        min-height: calc(56px + var(--safe-area-top));
+        max-height: calc(56px + var(--safe-area-top));
+        padding-top: calc(0.4rem + var(--safe-area-top));
+        padding-bottom: 0.4rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        gap: 0.4rem;
+        overflow: visible;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1002;
     }
 
-    /* Logo — prevent shrinking */
+    /* Logo — no shrink */
     .header-logo {
-        flex-shrink: 0 !important;
-        margin-bottom: 0 !important;
+        flex-shrink: 0;
+        margin-bottom: 0;
     }
 
-    /* Logo text — slightly smaller on mobile */
     .logo-text {
-        font-size: 0.9rem !important;
+        font-size: 0.9rem;
     }
 
-    /* Header actions — keep icons right-aligned, no wrap */
+    /* Header actions */
     .header-actions {
-        flex-shrink: 0 !important;
-        flex-wrap: nowrap !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.3rem !important;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
     }
 
-    /* Icon buttons — slightly smaller on mobile */
-    .header-actions .glass-button.icon-btn {
-        width: 30px !important;
-        height: 30px !important;
+    /* All icon buttons in header — compact on mobile */
+    .header-actions button {
+        padding: 5px 7px;
+        font-size: 0.7rem;
     }
 
-    /* Hide logout text on mobile — keep only the icon */
-    .logout-btn .desktop-only {
-        display: none !important;
+    /* Hide text labels in header on mobile */
+    .header-actions .desktop-only {
+        display: none;
     }
 
     /* Main content area */
@@ -109,15 +108,15 @@
     .tab-content {
         height: 100%;
         width: 100%;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior-y: contain !important;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
         padding-bottom: calc(var(--mobile-nav-height) + 20px + var(--safe-area-bottom));
         scroll-behavior: smooth;
     }
 
-    /* Home/Search tab - Dynamic overflow handled in App.tsx */
+    /* Home tab */
     .home-tab-content {
         touch-action: pan-y pinch-zoom;
     }
@@ -125,7 +124,7 @@
     /* Mobile Nav */
     .mobile-nav-container {
         position: fixed;
-        bottom: 0 !important;
+        bottom: 0;
         left: 0;
         right: 0;
         width: 100%;
@@ -147,7 +146,22 @@
         box-shadow: none;
     }
 
-    /* Sizing for smaller phones (iPhone SE/Mini) */
+    /* Prevent text overflow in cards */
+    .glass-card {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Admin modal — full screen on mobile */
+    .admin-modal {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        height: 100%;
+        max-height: 100%;
+    }
+
+    /* iPhone SE / Mini (≤375px) */
     @media (max-width: 375px) {
         :root {
             --spacing-xl: 1rem;
@@ -156,7 +170,7 @@
         }
 
         .logo-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .header-tab {
@@ -165,27 +179,13 @@
         }
 
         .glass-card {
-            padding: 0.75rem !important;
+            padding: 0.75rem;
         }
 
         .btn {
-            padding: 0.5rem 0.75rem !important;
-            font-size: 0.75rem !important;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
         }
-    }
-
-    /* Prevent text overflow in cards */
-    .glass-card {
-        word-break: break-word;
-        overflow-wrap: break-word;
-    }
-
-    .admin-modal {
-        width: 100% !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        height: 100% !important;
-        max-height: 100% !important;
     }
 }
 
@@ -194,28 +194,28 @@
    ========================================= */
 @media (max-width: 768px) {
     .heatmap-wrapper {
-        position: fixed !important;
-        top: calc(60px + var(--safe-area-top)) !important;
-        bottom: var(--mobile-nav-height) !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 1 !important;
-        overflow: hidden !important;
+        position: fixed;
+        top: calc(60px + var(--safe-area-top));
+        bottom: var(--mobile-nav-height);
+        left: 0;
+        right: 0;
+        z-index: 1;
+        overflow: hidden;
         background: var(--color-bg-primary);
     }
 
     .heatmap-container,
     .tradingview-widget-container,
     .tradingview-widget-container iframe {
-        height: 100% !important;
-        width: 100% !important;
-        border: none !important;
+        height: 100%;
+        width: 100%;
+        border: none;
     }
 
-    /* Hide text when heatmap is active */
+    /* Hide text labels when heatmap is full-screen */
     .home-tab-content h2,
     .home-tab-content p {
-        display: none !important;
+        display: none;
     }
 }
 
@@ -224,18 +224,21 @@
    ========================================= */
 @media (max-width: 768px) {
 
+    /* Prevent iOS zoom on input focus */
     input,
     select,
     textarea {
-        font-size: 16px !important;
+        font-size: 16px;
     }
 
+    /* Remove tap highlight */
     button,
     a,
     .mobile-nav-btn {
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* Hide nav when keyboard is open */
     .keyboard-open .mobile-nav-container {
         display: none;
     }

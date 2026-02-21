@@ -190,7 +190,6 @@ html[data-theme='light'] {
 }
 
 /* Heatmap Responsive Wrapper */
-/* Heatmap Responsive Wrapper */
 .heatmap-wrapper {
   position: absolute !important;
   top: 0 !important;
@@ -544,7 +543,18 @@ h6 {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.4rem;
+}
+
+/* Hide on mobile, show on desktop */
+.desktop-only {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
 }
 
 .icon-btn {
