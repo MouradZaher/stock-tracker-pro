@@ -85,7 +85,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     display: flex;
                     align-items: center;
                     justify-content: space-around;
-                    padding: 8px 0;
+                    padding: var(--spacing-xs) 0;
                     width: 100%;
                     background: transparent;
                     border: none;
@@ -98,8 +98,8 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    gap: 4px;
-                    padding: 8px 12px;
+                    gap: var(--spacing-xs);
+                    padding: var(--spacing-xs) var(--spacing-sm);
                     background: transparent;
                     border: none;
                     cursor: pointer;
@@ -113,7 +113,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     justify-content: center;
                     width: 36px;
                     height: 36px;
-                    border-radius: 12px;
+                    border-radius: var(--radius-md);
                     background: transparent;
                     color: var(--color-text-tertiary);
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -135,7 +135,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     font-size: var(--font-size-xs);
                     font-weight: 500;
                     color: var(--color-text-tertiary);
-                    letter-spacing: 0.3px;
+                    letter-spacing: 0.02em;
                     transition: color 0.3s ease;
                 }
 

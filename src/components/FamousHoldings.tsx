@@ -66,8 +66,8 @@ const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
 
     return (
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-            <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--glass-border)' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--glass-border)' }}>
+                <h3 style={{ margin: 0, fontSize: 'var(--font-size-base)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
                     <Briefcase size={18} color="var(--color-accent)" /> Famous Portfolio Holdings
                 </h3>
             </div>
@@ -89,28 +89,28 @@ const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
                         onClick={() => setActiveTab(portfolio.id)}
                         style={{
                             flex: 1,
-                            padding: '1rem',
+                            padding: 'var(--spacing-md)',
                             background: activeTab === portfolio.id ? 'rgba(255,255,255,0.05)' : 'transparent',
                             border: 'none',
                             borderBottom: activeTab === portfolio.id ? '2px solid var(--color-accent)' : '2px solid transparent',
                             color: activeTab === portfolio.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                             fontWeight: activeTab === portfolio.id ? 600 : 400,
                             cursor: 'pointer',
-                            minWidth: '130px',
+                            minWidth: 'clamp(120px, 15vw, 150px)',
                             transition: 'all 0.2s'
                         }}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-xs)' }}>
                             <User size={14} /> {portfolio.owner}
                         </div>
                     </button>
                 ))}
             </div>
 
-            <div style={{ padding: window.innerWidth < 480 ? '1rem' : '1.25rem' }}>
-                <div style={{ marginBottom: '1.25rem' }}>
-                    <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.1rem' }}>{activePortfolio.name}</h4>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>{activePortfolio.description}</div>
+            <div style={{ padding: 'var(--spacing-md)' }}>
+                <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                    <h4 style={{ margin: '0 0 var(--spacing-xs) 0', fontSize: 'var(--font-size-lg)' }}>{activePortfolio.name}</h4>
+                    <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{activePortfolio.description}</div>
                 </div>
 
                 {/* Desktop Table - Hidden on very small screens */}
