@@ -178,7 +178,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>{profile?.sector || 'Global Equities'}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '0.75rem', padding: '4px 12px', borderRadius: '12px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 700, border: '1px solid var(--color-success-light)' }}>
+                            <div style={{ fontSize: 'var(--font-size-xs)', padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-full)', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 700, border: '1px solid var(--color-success-light)' }}>
                                 OUTPERFORMING
                             </div>
                         </div>
@@ -196,7 +196,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
                         {/* Stock Marker (Right/Left based on performance) */}
                         <div style={{ position: 'absolute', left: '75%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', zIndex: 2 }}>
-                            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'var(--color-success)', border: '3px solid var(--color-bg-primary)', boxShadow: '0 0 12px var(--color-success-light)' }} />
+                            <div style={{ width: 'var(--spacing-sm)', height: 'var(--spacing-sm)', borderRadius: '50%', background: 'var(--color-success)', border: '2px solid var(--color-bg-primary)', boxShadow: '0 0 12px var(--color-success-light)' }} />
                             <div style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 800 }}>{stock.symbol}</div>
                         </div>
 
@@ -289,7 +289,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                                     <tr key={idx}>
                                         <td>
                                             <span style={{
-                                                padding: '2px 8px',
+                                                padding: 'var(--spacing-xs) var(--spacing-sm)',
                                                 borderRadius: '4px',
                                                 fontSize: '0.7rem',
                                                 background: div.type === 'upcoming' ? 'var(--color-accent-light)' : 'var(--color-bg-tertiary)',

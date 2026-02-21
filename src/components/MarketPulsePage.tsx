@@ -169,7 +169,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 <div style={{
                     background: 'var(--color-error)',
                     color: '#fff',
-                    padding: '0 12px',
+                    padding: '0 var(--spacing-sm)',
                     height: '100%',
                     fontSize: '0.65rem',
                     fontWeight: 900,
@@ -186,7 +186,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 <div style={{
-                    padding: '0 15px',
+                    padding: '0 var(--spacing-md)',
                     height: '100%',
                     background: 'rgba(255,255,255,0.03)',
                     fontSize: '0.6rem',
@@ -217,7 +217,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             {/* Main Grid */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, clamp(250px, 30vw, 320px)), 1fr))',
                 gap: '1.25rem',
                 marginBottom: '1.5rem'
             }}>
@@ -271,7 +271,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                         </div>
 
                         {/* Labels */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: 'var(--spacing-xs) var(--spacing-sm)' }}>
                             {['EXTREME FEAR', 'NEUTRAL', 'EXTREME GREED'].map((label, idx) => (
                                 <div key={label} style={{
                                     fontSize: '0.6rem',
@@ -456,7 +456,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             </div>
 
             {/* Top Movers & Calendar */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, clamp(250px, 30vw, 320px)), 1fr))', gap: '1.25rem' }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                     <TopMovers />
                 </div>
