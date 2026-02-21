@@ -207,11 +207,12 @@ html[data-theme='light'] {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   box-shadow: var(--glass-shadow);
   transition: var(--transition-base);
   position: relative;
   overflow: hidden;
+  padding: var(--spacing-md);
 }
 
 .glass-card:hover {
@@ -368,11 +369,11 @@ h6 {
 
 .header-tab {
   position: relative;
-  padding: 0.6rem 1rem;
+  padding: var(--spacing-xs) var(--spacing-md);
   border: 1px solid rgba(255, 255, 255, 0.05);
   background: rgba(255, 255, 255, 0.02);
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-base) !important;
@@ -381,8 +382,8 @@ h6 {
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 4px;
+  gap: var(--spacing-xs);
+  margin: 0 var(--spacing-xs);
 }
 
 .header-tab:hover {
