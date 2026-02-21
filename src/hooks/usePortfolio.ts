@@ -32,7 +32,6 @@ interface PortfolioStore {
 export const usePortfolioStore = create<PortfolioStore>()(
     persist(
         (set, get) => {
-            console.log('📊 Initializing usePortfolioStore...');
             return {
                 positions: [],
                 isLoading: false,
@@ -256,7 +255,6 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                 filter: `user_id=eq.${userId}`
                             },
                             async (payload) => {
-                                console.log('🔄 Realtime portfolio change:', payload.eventType);
 
                                 // Reload all positions to ensure consistency and correct derived fields
                                 try {
@@ -299,7 +297,6 @@ export const usePortfolioStore = create<PortfolioStore>()(
             name: 'portfolio-storage',
             partialize: (state) => ({ positions: state.positions }),
             onRehydrateStorage: () => (state) => {
-                console.log('📦 Portfolio storage rehydrated:', state?.positions.length || 0, 'positions');
             }
         }
     )

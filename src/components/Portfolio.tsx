@@ -248,7 +248,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             avgCost: price.toString(),
             name,
             currentPrice: price
-        } as any);
+        });
         setShowModal(true);
     };
 

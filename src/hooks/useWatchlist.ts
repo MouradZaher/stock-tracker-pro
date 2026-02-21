@@ -25,7 +25,6 @@ interface WatchlistState {
 export const useWatchlist = create<WatchlistState>()(
     persist(
         (set, get) => {
-            console.log('👀 Initializing useWatchlist store...');
             return {
                 watchlist: [],
                 isLoading: false,
@@ -162,7 +161,6 @@ export const useWatchlist = create<WatchlistState>()(
             name: 'stock-watchlist',
             partialize: (state) => ({ watchlist: state.watchlist }),
             onRehydrateStorage: () => (state) => {
-                console.log('📦 Watchlist storage rehydrated:', state?.watchlist.length || 0, 'symbols');
             }
         }
     )

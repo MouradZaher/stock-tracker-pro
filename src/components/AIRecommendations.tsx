@@ -182,7 +182,6 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
         // REFRESH RECOMMENDATIONS
         try {
-            console.log('Refreshing recommendations after scan...');
             const freshRecs = await getAllRecommendations();
             setActiveRecs(freshRecs);
             // Ensure we are back at the top view if we were in a detail view

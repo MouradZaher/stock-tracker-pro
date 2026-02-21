@@ -92,7 +92,6 @@ export async function deletePosition(userId: string, symbol: string): Promise<bo
             console.error('Supabase delete error:', error);
             throw error;
         }
-        console.log(`✅ Deleted ${symbol} from Supabase for user ${userId}`);
         return true;
     } catch (error) {
         console.error('Failed to delete position:', error);
