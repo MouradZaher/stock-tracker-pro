@@ -82,8 +82,31 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
     const [scanLog, setScanLog] = useState<string[]>([]);
+    // Instant curated recommendations shown immediately — no API needed
+    const INSTANT_RECS = React.useMemo(() => {
+        const curated = [
+            { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology', score: 82, recommendation: 'Buy', suggestedAllocation: 5.0 },
+            { symbol: 'MSFT', name: 'Microsoft Corp.', sector: 'Technology', score: 85, recommendation: 'Buy', suggestedAllocation: 5.0 },
+            { symbol: 'NVDA', name: 'NVIDIA Corp.', sector: 'Technology', score: 88, recommendation: 'Buy', suggestedAllocation: 5.0 },
+            { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', score: 79, recommendation: 'Buy', suggestedAllocation: 4.5 },
+            { symbol: 'AMZN', name: 'Amazon.com Inc.', sector: 'Consumer Cyclical', score: 76, recommendation: 'Buy', suggestedAllocation: 4.0 },
+            { symbol: 'META', name: 'Meta Platforms', sector: 'Technology', score: 74, recommendation: 'Buy', suggestedAllocation: 3.5 },
+            { symbol: 'JPM', name: 'JPMorgan Chase', sector: 'Financial', score: 72, recommendation: 'Buy', suggestedAllocation: 4.0 },
+            { symbol: 'UNH', name: 'UnitedHealth Group', sector: 'Healthcare', score: 70, recommendation: 'Hold', suggestedAllocation: 3.0 },
+            { symbol: 'V', name: 'Visa Inc.', sector: 'Financial', score: 68, recommendation: 'Hold', suggestedAllocation: 3.0 },
+            { symbol: 'LLY', name: 'Eli Lilly & Co.', sector: 'Healthcare', score: 80, recommendation: 'Buy', suggestedAllocation: 4.5 },
+            { symbol: 'XOM', name: 'Exxon Mobil Corp.', sector: 'Energy', score: 65, recommendation: 'Hold', suggestedAllocation: 2.5 },
+            { symbol: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', score: 62, recommendation: 'Hold', suggestedAllocation: 2.5 },
+            { symbol: 'WMT', name: 'Walmart Inc.', sector: 'Consumer Staples', score: 69, recommendation: 'Hold', suggestedAllocation: 3.0 },
+            { symbol: 'TSLA', name: 'Tesla Inc.', sector: 'Consumer Cyclical', score: 58, recommendation: 'Hold', suggestedAllocation: 2.0 },
+            { symbol: 'AVGO', name: 'Broadcom Inc.', sector: 'Technology', score: 77, recommendation: 'Buy', suggestedAllocation: 4.0 },
+        ];
+        return curated.sort((a, b) => b.score - a.score);
+    }, []);
+
+    // Fetch real recommendations ONLY on demand (Run AI Scan)
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [checklist, setChecklist] = useState({
         positiveBreadth: true,
@@ -94,23 +117,6 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         volumeEntry: false,
         fakeBreakout: true
     });
-
-    // Fetch real recommendations on mount
-    useEffect(() => {
-        const fetchRecs = async () => {
-            setIsLoading(true);
-            try {
-                const recs = await getAllRecommendations();
-                setActiveRecs(recs);
-            } catch (error) {
-                console.error('Failed to fetch recommendations:', error);
-                setActiveRecs(MOCK_RECOMMENDATIONS);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchRecs();
-    }, []);
 
     const handleLocalSelect = (symbol: string) => {
         soundService.playTap();
@@ -592,7 +598,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                             </tr>
                         </thead>
                         <tbody>
-                            {(activeRecs.length > 0 ? activeRecs : MOCK_RECOMMENDATIONS).map((rec) => (
+                            {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec) => (
                                 <tr key={rec.symbol} onClick={() => handleLocalSelect(rec.symbol)} style={{ cursor: 'pointer' }}>
                                     <td style={{ paddingLeft: '1.25rem' }}>
                                         <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{rec.symbol}</div>
@@ -613,7 +619,11 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                             {rec.recommendation?.toUpperCase() || 'HOLD'}
                                         </span>
                                     </td>
-                                    <td style={{ textAlign: 'right', fontWeight: 700, paddingRight: '1.25rem', color: 'var(--color-accent)' }}>{rec.suggestedAllocation}%</td>
+                                    <td style={{ textAlign: 'right', fontWeight: 700, paddingRight: '1.25rem', color: 'var(--color-accent)' }}>
+                                        {typeof rec.suggestedAllocation === 'number' && rec.suggestedAllocation > 0
+                                            ? `${rec.suggestedAllocation.toFixed(1)}%`
+                                            : rec.score >= 75 ? '4.5%' : rec.score >= 60 ? '3.0%' : '1.5%'}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
