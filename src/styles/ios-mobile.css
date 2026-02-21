@@ -113,7 +113,7 @@
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior-y: contain !important;
-        padding-bottom: calc(40px + var(--safe-area-bottom));
+        padding-bottom: calc(var(--mobile-nav-height) + 20px + var(--safe-area-bottom));
         scroll-behavior: smooth;
     }
 

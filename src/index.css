@@ -86,7 +86,7 @@
   --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
 
   --header-height: clamp(64px, 8vh, 80px);
-  --mobile-nav-height: 72px;
+  --mobile-nav-height: 80px;
 
   /* Premium Glares */
   --glare-opacity: 0.15;
@@ -524,7 +524,7 @@ h6 {
   position: relative;
   padding: calc(var(--header-height) + var(--spacing-lg)) var(--spacing-xl) var(--spacing-xl);
   /* Support for iOS safe area and prevent mobile nav overlap */
-  padding-bottom: calc(var(--mobile-nav-height) + var(--spacing-xl) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--mobile-nav-height) + var(--spacing-lg) + env(safe-area-inset-bottom));
 }
 
 .tab-content {
