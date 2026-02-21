@@ -132,7 +132,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                 }
 
                 .nav-label {
-                    font-size: 10px;
+                    font-size: var(--font-size-xs);
                     font-weight: 500;
                     color: var(--color-text-tertiary);
                     letter-spacing: 0.3px;

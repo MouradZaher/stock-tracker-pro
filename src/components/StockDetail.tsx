@@ -118,15 +118,15 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                 </div>
 
                 <div className="stock-price-section">
-                    <div className="stock-price" style={{ fontSize: '2.5rem' }}>{formatCurrency(stock.price)}</div>
-                    <div className={`stock-change ${getChangeClass(stock.change)}`} style={{ padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
+                    <div className="stock-price" style={{ fontSize: 'var(--font-size-3xl)' }}>{formatCurrency(stock.price)}</div>
+                    <div className={`stock-change ${getChangeClass(stock.change)}`} style={{ padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-sm)' }}>
                         {stock.change >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
-                        <span style={{ fontSize: '1.1rem', fontWeight: 700 }}>
+                        <span style={{ fontSize: 'var(--font-size-base)', fontWeight: 700 }}>
                             {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
                         </span>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', marginTop: '0.75rem' }}>
-                        <div className="last-updated" style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--spacing-xs)', marginTop: 'var(--spacing-sm)' }}>
+                        <div className="last-updated" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-tertiary)' }}>
                             <Clock size={12} /> Live Updates: {formatTimeAgo(lastUpdate)}
                         </div>
                         <MarketStatus />

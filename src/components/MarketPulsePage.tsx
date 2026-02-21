@@ -144,27 +144,27 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         }}>
 
             {/* Header Area */}
-            <div style={{ marginBottom: '1rem' }}>
-                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
+            <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 800, letterSpacing: '-0.02em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
                     Market Pulse
                 </h1>
-                <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                <p style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--font-size-sm)', marginTop: 'var(--spacing-xs)' }}>
                     Real-time institutional grade market intelligence.
                 </p>
             </div>
 
             {/* Breaking News Ticker - Financial Terminal Style */}
             <div className="glass-card" style={{
-                padding: '0 0.5rem',
-                marginBottom: '2rem',
+                padding: '0 var(--spacing-xs)',
+                marginBottom: 'var(--spacing-lg)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0',
                 overflow: 'hidden',
                 background: 'rgba(0, 0, 0, 0.4)',
                 border: '1px solid var(--glass-border-bright)',
-                borderRadius: '8px',
-                height: '42px'
+                borderRadius: 'var(--radius-md)',
+                height: 'clamp(40px, 5vh, 48px)'
             }}>
                 <div style={{
                     background: 'var(--color-error)',

@@ -274,18 +274,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {/* Summary Cards */}
             <div className="portfolio-summary">
                 <div className="summary-card glass-card">
-                    <div className="summary-label">Total Value</div>
-                    <div className="summary-value">{formatCurrency(summary.totalValue)}</div>
+                    <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total Value</div>
+                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>{formatCurrency(summary.totalValue)}</div>
                 </div>
                 <div className={`summary-card glass-card ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`}>
-                    <div className="summary-label">Total P/L</div>
-                    <div className="summary-value">
+                    <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total P/L</div>
+                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>
                         {formatCurrency(summary.totalProfitLoss)} ({formatPercent(summary.totalProfitLossPercent)})
                     </div>
                 </div>
                 <div className="summary-card glass-card">
-                    <div className="summary-label">Portfolio Health</div>
-                    <div className="summary-value" style={{ color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)' }}>
+                    <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Portfolio Health</div>
+                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)', color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)' }}>
                         {!hasAllocationWarnings ? 'Diversified Optimized' : 'Allocation Warning'}
                     </div>
                 </div>
@@ -293,13 +293,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
             {/* Risk & Concentration Audit */}
             {positions.length > 0 && (
-                <div className="section glass-card" style={{ padding: '1.25rem', marginBottom: '2rem', border: '1px solid var(--color-border-light)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="section glass-card" style={{ padding: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)', border: '1px solid var(--color-border-light)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
+                        <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
                             <ShieldCheck size={18} color="var(--color-accent)" />
                             Tactical Risk Audit
                         </h3>
-                        <div style={{ fontSize: '0.75rem', color: riskColor, fontWeight: 700, padding: '4px 10px', background: `${riskColor}15`, borderRadius: '12px', border: `1px solid ${riskColor}30` }}>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: riskColor, fontWeight: 700, padding: 'var(--spacing-xs) var(--spacing-sm)', background: `${riskColor}15`, borderRadius: 'var(--radius-md)', border: `1px solid ${riskColor}30` }}>
                             {riskLabel.toUpperCase()} PROFILE
                         </div>
                     </div>

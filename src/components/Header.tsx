@@ -65,22 +65,22 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
             gap: '0.5rem'
         }}>
             {/* Logo Section - Aligned Left */}
-            <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div className="logo-icon" style={{ padding: '4px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+                <div className="logo-icon" style={{ padding: 'var(--spacing-xs)' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                         <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
                         <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
                     </svg>
                 </div>
-                <span className="logo-text" style={{ fontSize: '1.1rem' }}>
+                <span className="logo-text" style={{ fontSize: 'var(--font-size-lg)' }}>
                     StockTracker <span>PRO</span>
                 </span>
             </div>
 
             {/* Center Section: Nav + Ticker - Hidden on Mobile */}
-            <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, overflow: 'hidden' }}>
-                <nav className="header-nav" style={{ padding: '4px', display: 'flex', justifyContent: 'center', gap: '8px' }} role="navigation" aria-label="Main navigation">
+            <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--spacing-xs)', flex: 1, overflow: 'hidden' }}>
+                <nav className="header-nav" style={{ padding: 'var(--spacing-xs)', display: 'flex', justifyContent: 'center', gap: 'var(--spacing-xs)' }} role="navigation" aria-label="Main navigation">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             aria-label={`Navigate to ${tab.label}`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
-                            {tab.isCustomIcon ? <tab.icon size={16} /> : <tab.icon size={16} />}
+                            {tab.isCustomIcon ? <tab.icon size={18} /> : <tab.icon size={18} />}
                             {tab.label}
                         </button>
                     ))}
@@ -218,10 +218,10 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         soundService.playTap();
                         toggleTheme();
                     }}
-                    style={{ width: '32px', height: '32px' }}
+                    style={{ width: 'auto', height: 'auto', padding: 'var(--spacing-xs)' }}
                     aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                 >
-                    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
 
                 <button
@@ -230,11 +230,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         soundService.playTap();
                         onLogout();
                     }}
-                    style={{ padding: '0.4rem 0.8rem', height: '32px' }}
+                    style={{ padding: 'var(--spacing-xs) var(--spacing-sm)', height: 'auto' }}
                     aria-label="Sign out"
                 >
-                    <LogOut size={14} />
-                    <span className="desktop-only">Sign Out</span>
+                    <LogOut size={16} />
+                    <span className="desktop-only" style={{ marginLeft: 'var(--spacing-xs)' }}>Sign Out</span>
                 </button>
             </div>
         </header>
