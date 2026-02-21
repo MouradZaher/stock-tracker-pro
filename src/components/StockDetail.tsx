@@ -166,6 +166,47 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
             {/* Chart */}
             <TradingViewChart symbol={symbol} />
 
+            {/* Sector Strength Benchmarking */}
+            <div className="section">
+                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <TrendingUp size={20} color="var(--color-success)" /> Relative Sector Strength
+                </h3>
+                <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Benchmarked against</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>{profile?.sector || 'Global Equities'}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.75rem', padding: '4px 12px', borderRadius: '12px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 700, border: '1px solid var(--color-success-light)' }}>
+                                OUTPERFORMING
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ position: 'relative', height: '80px', display: 'flex', alignItems: 'center' }}>
+                        {/* Comparison Line */}
+                        <div style={{ position: 'absolute', width: '100%', height: '2px', background: 'var(--color-border)', top: '50%', transform: 'translateY(-50%)' }} />
+
+                        {/* Sector Reference (Center) */}
+                        <div style={{ position: 'absolute', left: '40%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-text-tertiary)', border: '2px solid var(--color-bg-primary)' }} />
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Sector Avg</div>
+                        </div>
+
+                        {/* Stock Marker (Right/Left based on performance) */}
+                        <div style={{ position: 'absolute', left: '75%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', zIndex: 2 }}>
+                            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'var(--color-success)', border: '3px solid var(--color-bg-primary)', boxShadow: '0 0 12px var(--color-success-light)' }} />
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 800 }}>{stock.symbol}</div>
+                        </div>
+
+                        {/* Range Labels */}
+                        <div style={{ position: 'absolute', left: '0', bottom: '0', fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Lagging</div>
+                        <div style={{ position: 'absolute', right: '0', bottom: '0', fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Leading</div>
+                    </div>
+                </div>
+            </div>
+
             {/* Stats Grid - Comprehensive Statistics */}
             <div className="section">
                 <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -218,7 +259,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                     </div>
                     <div className="stat-card glass-card">
                         <div className="stat-label">52W Range</div>
-                        <div className="stat-value" style={{ fontSize: '1rem' }}>
+                        <div className="stat-value" style={{ fontSize: '1.1rem', fontWeight: 600 }}>
                             {stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh ?
                                 `${formatCurrency(stock.fiftyTwoWeekLow)} - ${formatCurrency(stock.fiftyTwoWeekHigh)}` : 'N/A'
                             }

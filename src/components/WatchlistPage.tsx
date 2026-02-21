@@ -285,7 +285,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                         {/* AI Signal Strip */}
                                         {aiRecs[symbol] && (
                                             <div style={{
-                                                margin: '0.5rem 0 1rem 0',
+                                                margin: '0.5rem 0 0.75rem 0',
                                                 padding: '6px 10px',
                                                 background: 'rgba(99, 102, 241, 0.04)',
                                                 borderRadius: '8px',
@@ -313,6 +313,27 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                 </div>
                                             </div>
                                         )}
+
+                                        {/* Fundamentals Mini-Stats */}
+                                        <div style={{
+                                            display: 'flex',
+                                            gap: '12px',
+                                            margin: '0 0 1rem 0',
+                                            padding: '0 4px'
+                                        }}>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '2px' }}>P/E Ratio</div>
+                                                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{stock.peRatio ? stock.peRatio.toFixed(1) : '—'}</div>
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '2px' }}>Market Cap</div>
+                                                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{stock.marketCap ? (stock.marketCap / 1e9).toFixed(1) + 'B' : '—'}</div>
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '2px' }}>Div Yield</div>
+                                                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-success)' }}>{stock.dividendYield ? stock.dividendYield.toFixed(1) + '%' : '—'}</div>
+                                            </div>
+                                        </div>
 
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.5rem' }}>
                                             <div style={{ flex: 1 }}>

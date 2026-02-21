@@ -222,36 +222,67 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 marginBottom: '1.5rem'
             }}>
 
-                {/* Sentiment Heatmap */}
-                <div className="glass-card" style={{ padding: '1.5rem', position: 'relative' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                {/* Market Psychological Gauge (Fear & Greed) */}
+                <div className="glass-card" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                         <div>
                             <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Activity size={16} color={sentimentColor} /> Market Sentiment
+                                <Zap size={16} color="var(--color-warning)" /> Fear & Greed Index
                             </h3>
-                            <div style={{ fontSize: '2rem', fontWeight: 800, color: sentimentColor, marginTop: '0.25rem' }}>
-                                {overallSentiment}
+                            <div style={{ fontSize: '2rem', fontWeight: 900, color: sentimentColor, marginTop: '0.25rem', letterSpacing: '-0.03em' }}>
+                                {sentimentScore.toFixed(0)}
                             </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>Bullish Percent</div>
-                            <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>{sentimentScore.toFixed(0)}%</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>MARKET_MOOD</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: sentimentColor }}>{overallSentiment.toUpperCase()}</div>
                         </div>
                     </div>
 
-                    {/* Gauge Visual */}
-                    <div style={{ height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden', marginBottom: '1rem' }}>
+                    {/* Gauge Visual - Institutional Style */}
+                    <div style={{ position: 'relative', height: '100px', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '15px' }}>
+                        {/* Gauge Track */}
                         <div style={{
-                            width: `${sentimentScore}%`,
-                            height: '100%',
-                            background: `linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #10B981 100%)`,
-                            opacity: 0.8
-                        }} />
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
-                        <span>Bearish Zone</span>
-                        <span>Neutral</span>
-                        <span>Bullish Zone</span>
+                            height: '14px',
+                            width: '100%',
+                            background: 'rgba(255,255,255,0.05)',
+                            borderRadius: '7px',
+                            position: 'relative',
+                            display: 'flex',
+                            overflow: 'hidden',
+                            border: '1px solid var(--glass-border)'
+                        }}>
+                            <div style={{ flex: 1, background: '#EF4444', opacity: 0.2 }} />
+                            <div style={{ flex: 1, background: '#F59E0B', opacity: 0.2 }} />
+                            <div style={{ flex: 1, background: '#10B981', opacity: 0.2 }} />
+
+                            {/* Active Indicator Fill */}
+                            <div style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: 0,
+                                height: '100%',
+                                width: `${sentimentScore}%`,
+                                background: sentimentColor,
+                                opacity: 0.8,
+                                boxShadow: `0 0 15px ${sentimentColor}60`,
+                                transition: 'width 1s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                            }} />
+                        </div>
+
+                        {/* Labels */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px' }}>
+                            {['EXTREME FEAR', 'NEUTRAL', 'EXTREME GREED'].map((label, idx) => (
+                                <div key={label} style={{
+                                    fontSize: '0.6rem',
+                                    fontWeight: 800,
+                                    color: idx === 0 && sentimentScore < 33 ? '#EF4444' : (idx === 1 && sentimentScore >= 33 && sentimentScore < 66 ? '#F59E0B' : (idx === 2 && sentimentScore >= 66 ? '#10B981' : 'var(--color-text-tertiary)')),
+                                    transition: 'color 0.3s ease'
+                                }}>
+                                    {label}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

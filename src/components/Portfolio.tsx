@@ -291,6 +291,67 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 </div>
             </div>
 
+            {/* Risk & Concentration Audit */}
+            {positions.length > 0 && (
+                <div className="section glass-card" style={{ padding: '1.25rem', marginBottom: '2rem', border: '1px solid var(--color-border-light)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <ShieldCheck size={18} color="var(--color-accent)" />
+                            Tactical Risk Audit
+                        </h3>
+                        <div style={{ fontSize: '0.75rem', color: riskColor, fontWeight: 700, padding: '4px 10px', background: `${riskColor}15`, borderRadius: '12px', border: `1px solid ${riskColor}30` }}>
+                            {riskLabel.toUpperCase()} PROFILE
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1.5', minWidth: '240px' }}>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Sector Diversification</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {sectorAllocations.map((sa, idx) => (
+                                    <div key={idx} style={{ marginBottom: '4px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '4px' }}>
+                                            <span style={{ color: 'var(--color-text-secondary)' }}>{sa.sector}</span>
+                                            <span style={{ fontWeight: 600, color: sa.valid.valid ? 'var(--color-text-primary)' : 'var(--color-error)' }}>
+                                                {sa.allocation.toFixed(1)}%
+                                            </span>
+                                        </div>
+                                        <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                            <div style={{
+                                                width: `${Math.min(sa.allocation, 100)}%`,
+                                                height: '100%',
+                                                background: sa.valid.valid ? 'var(--gradient-primary)' : 'var(--color-error)',
+                                                transition: 'width 0.5s ease'
+                                            }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ flex: '1', minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="glass-card" style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Highest Overexposure</div>
+                                {stockAllocations.length > 0 ? (
+                                    <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>
+                                        {stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].symbol}
+                                        <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-text-secondary)', marginLeft: '4px' }}>
+                                            ({stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].allocation.toFixed(1)}%)
+                                        </span>
+                                    </div>
+                                ) : 'None'}
+                            </div>
+                            <div className="glass-card" style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Risk Intelligence</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                                    {hasAllocationWarnings ? 'Risk identified in concentration limits. Consider rebalancing to institutional 5% rules.' : 'Portfolio is currently within optimized risk parameters.'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Portfolio Content - Main Table and Cards */}
             <div style={{ marginBottom: '2rem' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
