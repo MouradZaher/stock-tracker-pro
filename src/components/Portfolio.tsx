@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save } from 'lucide-react';
+
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote, getMultipleQuotes } from '../services/stockDataService';
@@ -21,8 +22,12 @@ interface PortfolioProps {
 const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
     // ... existing hooks ...
-    const { positions, addPosition, removePosition, getSummary, updatePrice } = usePortfolioStore();
+    const { positions, addPosition, removePosition, updatePosition, getSummary, updatePrice } = usePortfolioStore();
     const [showModal, setShowModal] = useState(false);
+    const [editingPosition, setEditingPosition] = useState<{ id: string; symbol: string; units: number; avgCost: number } | null>(null);
+    const [editForm, setEditForm] = useState({ units: '', avgCost: '' });
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
+
     // ... existing state ...
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showAIAdvice, setShowAIAdvice] = useState(false);
@@ -251,6 +256,35 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const handleRowClick = (symbol: string) => {
         soundService.playTap();
         onSelectSymbol?.(symbol);
+    };
+
+    const handleEditClick = (position: typeof positions[0], e: React.MouseEvent) => {
+        e.stopPropagation();
+        soundService.playTap();
+        setEditingPosition({ id: position.id, symbol: position.symbol, units: position.units, avgCost: position.avgCost });
+        setEditForm({ units: position.units.toString(), avgCost: position.avgCost.toString() });
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingPosition) return;
+        const newUnits = parseFloat(editForm.units);
+        const newAvgCost = parseFloat(editForm.avgCost);
+        if (isNaN(newUnits) || newUnits <= 0 || isNaN(newAvgCost) || newAvgCost <= 0) {
+            toast.error('Please enter valid units and average cost.');
+            return;
+        }
+        setIsSavingEdit(true);
+        try {
+            await updatePosition(editingPosition.id, { units: newUnits, avgCost: newAvgCost }, user?.id);
+            soundService.playSuccess();
+            toast.success(`${editingPosition.symbol} position updated.`);
+            setEditingPosition(null);
+        } catch {
+            soundService.playError();
+            toast.error('Failed to update position.');
+        } finally {
+            setIsSavingEdit(false);
+        }
     };
 
     // Calculate allocations
@@ -490,21 +524,40 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <button
-                                                        className="btn btn-icon btn-small text-error"
-                                                        onClick={(e) => handleRemove(position.id, position.symbol, e)}
-                                                        style={{
-                                                            background: 'rgba(239, 68, 68, 0.1)',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '4px',
-                                                            padding: '4px 8px',
-                                                            borderRadius: '6px'
-                                                        }}
-                                                    >
-                                                        <Trash2 size={14} />
-                                                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
-                                                    </button>
+                                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                                        <button
+                                                            className="btn btn-icon btn-small"
+                                                            onClick={(e) => handleEditClick(position, e)}
+                                                            title="Edit Position"
+                                                            style={{
+                                                                background: 'rgba(99, 102, 241, 0.1)',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                padding: '4px 8px',
+                                                                borderRadius: '6px',
+                                                                color: 'var(--color-accent)',
+                                                            }}
+                                                        >
+                                                            <Pencil size={13} />
+                                                            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Edit</span>
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-icon btn-small text-error"
+                                                            onClick={(e) => handleRemove(position.id, position.symbol, e)}
+                                                            style={{
+                                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                padding: '4px 8px',
+                                                                borderRadius: '6px'
+                                                            }}
+                                                        >
+                                                            <Trash2 size={13} />
+                                                            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );
@@ -593,7 +646,25 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                             <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{formatCurrency(position.profitLoss)}</div>
                                         </div>
 
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
+                                            <button
+                                                className="btn btn-icon btn-small"
+                                                onClick={(e) => handleEditClick(position, e)}
+                                                style={{
+                                                    background: 'rgba(99, 102, 241, 0.1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    padding: '6px 12px',
+                                                    borderRadius: '8px',
+                                                    color: 'var(--color-accent)',
+                                                    flex: 1,
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                <Pencil size={15} />
+                                                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Edit</span>
+                                            </button>
                                             <button
                                                 className="btn btn-icon btn-small text-error"
                                                 onClick={(e) => handleRemove(position.id, position.symbol, e)}
@@ -603,11 +674,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                     alignItems: 'center',
                                                     gap: '6px',
                                                     padding: '6px 12px',
-                                                    borderRadius: '8px'
+                                                    borderRadius: '8px',
+                                                    flex: 1,
+                                                    justifyContent: 'center',
                                                 }}
                                             >
-                                                <Trash2 size={16} />
-                                                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete Position</span>
+                                                <Trash2 size={15} />
+                                                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete</span>
                                             </button>
                                         </div>
                                     </div>
@@ -887,6 +960,137 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 </div>
             )}
 
+
+            {/* Edit Position Modal */}
+            {editingPosition && (
+                <div
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 3000,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)',
+                        padding: '1rem',
+                    }}
+                    onClick={() => setEditingPosition(null)}
+                >
+                    <div
+                        className="glass-card"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            width: '100%', maxWidth: '400px',
+                            background: 'rgba(8,8,16,0.98)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: 'var(--radius-xl)',
+                            padding: '1.75rem',
+                            boxShadow: '0 32px 80px rgba(0,0,0,0.7)',
+                            animation: 'slideUp 0.2s ease-out both',
+                        }}
+                    >
+                        {/* Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <div>
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Edit Position</h3>
+                                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
+                                    {editingPosition.symbol} — update units or average cost
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setEditingPosition(null)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.06)', border: 'none',
+                                    borderRadius: '8px', width: '30px', height: '30px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer', color: 'var(--color-text-secondary)',
+                                }}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        {/* Fields */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.4rem' }}>
+                                    Units (Shares / Qty)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0.0001"
+                                    step="any"
+                                    value={editForm.units}
+                                    onChange={(e) => setEditForm(f => ({ ...f, units: e.target.value }))}
+                                    style={{
+                                        width: '100%', padding: '0.8rem 1rem',
+                                        background: 'rgba(255,255,255,0.04)',
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        borderRadius: 'var(--radius-md)',
+                                        color: 'var(--color-text-primary)',
+                                        fontSize: '1rem', fontFamily: 'inherit', outline: 'none',
+                                        transition: 'border-color 0.2s',
+                                    }}
+                                    autoFocus
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.4rem' }}>
+                                    Average Cost (per unit)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0.0001"
+                                    step="any"
+                                    value={editForm.avgCost}
+                                    onChange={(e) => setEditForm(f => ({ ...f, avgCost: e.target.value }))}
+                                    style={{
+                                        width: '100%', padding: '0.8rem 1rem',
+                                        background: 'rgba(255,255,255,0.04)',
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        borderRadius: 'var(--radius-md)',
+                                        color: 'var(--color-text-primary)',
+                                        fontSize: '1rem', fontFamily: 'inherit', outline: 'none',
+                                        transition: 'border-color 0.2s',
+                                    }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                            <button
+                                onClick={() => setEditingPosition(null)}
+                                style={{
+                                    flex: 1, padding: '0.8rem',
+                                    background: 'rgba(255,255,255,0.04)',
+                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    borderRadius: 'var(--radius-md)', cursor: 'pointer',
+                                    color: 'var(--color-text-secondary)', fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveEdit}
+                                disabled={isSavingEdit}
+                                style={{
+                                    flex: 2, padding: '0.8rem',
+                                    background: isSavingEdit ? 'rgba(99,102,241,0.4)' : 'var(--gradient-primary)',
+                                    border: 'none', borderRadius: 'var(--radius-md)',
+                                    cursor: isSavingEdit ? 'not-allowed' : 'pointer',
+                                    color: 'white', fontWeight: 700, fontSize: '0.9rem',
+                                    display: 'flex', alignItems: 'center',
+                                    justifyContent: 'center', gap: '0.5rem',
+                                    boxShadow: '0 4px 15px rgba(99,102,241,0.4)',
+                                }}
+                            >
+                                <Save size={16} />
+                                {isSavingEdit ? 'Saving…' : 'Save Changes'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Price Alerts Modal */}
             {alertConfig && (
                 <PriceAlertsModal
@@ -895,6 +1099,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     onClose={() => setAlertConfig(null)}
                 />
             )}
+
         </div>
     );
 };

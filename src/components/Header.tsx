@@ -36,15 +36,25 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         onTabChange(tabId);
     };
 
-    // Close market dropdown on outside click
+    // Close market dropdown on outside click or Escape key
     useEffect(() => {
-        const handler = (e: MouseEvent) => {
+        const clickHandler = (e: MouseEvent) => {
             if (marketDropdownRef.current && !marketDropdownRef.current.contains(e.target as Node)) {
                 setIsMarketOpen(false);
             }
         };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
+        const keyHandler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsMarketOpen(false);
+                setIsNotifyOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', clickHandler);
+        document.addEventListener('keydown', keyHandler);
+        return () => {
+            document.removeEventListener('mousedown', clickHandler);
+            document.removeEventListener('keydown', keyHandler);
+        };
     }, []);
 
     const getNotificationIcon = (type: string) => {
