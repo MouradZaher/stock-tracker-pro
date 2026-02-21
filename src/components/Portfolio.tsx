@@ -90,7 +90,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             updatePrices();
         }
 
-        const interval = setInterval(updatePrices, 1000); // Live update every 1 second
+        const interval = setInterval(updatePrices, 15000); // Live update every 15 seconds (prevents API rate limiting)
 
         return () => clearInterval(interval);
     }, [user?.id, updatePrice, checkPrice]);
