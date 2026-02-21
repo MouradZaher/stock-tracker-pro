@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Clock, TrendingUp, TrendingDown, ArrowLeft, Info, Briefcase, DollarSign, PieChart, Users } from 'lucide-react';
+import { Clock, TrendingUp, TrendingDown, ArrowLeft, Info, Briefcase, DollarSign, PieChart, Users, Bell } from 'lucide-react';
 
 import { getStockData } from '../services/stockDataService';
 import { REFRESH_INTERVALS } from '../services/api';
@@ -14,6 +14,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AIRecommendations from './AIRecommendations';
+import PriceAlertsModal from './PriceAlertsModal';
+import TradeAnalysisPanel from './TradeAnalysisPanel';
 
 interface StockDetailProps {
     symbol: string;
@@ -22,6 +24,7 @@ interface StockDetailProps {
 
 const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+    const [showAlerts, setShowAlerts] = useState(false);
     const { user } = useAuth();
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
     const { positions } = usePortfolioStore();
@@ -117,6 +120,16 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                             title={inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
                         >
                             <Star size={24} fill={inWatchlist ? "currentColor" : "none"} />
+                        </button>
+                        <button
+                            className="btn-icon"
+                            onClick={() => setShowAlerts(true)}
+                            title="Set Price Alert"
+                            style={{ color: 'var(--color-accent)', transition: 'transform 0.15s ease' }}
+                            onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.15)')}
+                            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                        >
+                            <Bell size={22} />
                         </button>
                     </div>
                     <div className="stock-name" style={{ fontSize: '1.25rem', fontWeight: 600 }}>{stock.name}</div>
@@ -362,6 +375,17 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                 </div>
             )}
 
+            {/* Trade Analysis Panel */}
+            <TradeAnalysisPanel
+                symbol={stock.symbol}
+                price={stock.price}
+                high={stock.high}
+                low={stock.low}
+                volume={stock.volume}
+                avgVolume={stock.avgVolume}
+                changePercent={stock.changePercent}
+            />
+
             {/* AI Insights */}
             <div className="section" style={{ marginTop: '1rem' }}>
                 <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -372,6 +396,15 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                     <AIRecommendations />
                 </div>
             </div>
+
+            {/* Price Alerts Modal */}
+            {showAlerts && (
+                <PriceAlertsModal
+                    symbol={stock.symbol}
+                    currentPrice={stock.price}
+                    onClose={() => setShowAlerts(false)}
+                />
+            )}
         </div>
     );
 };
