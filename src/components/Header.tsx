@@ -1,8 +1,9 @@
-import { LogOut, Sun, Moon, Shield, LayoutDashboard, List, Briefcase, Activity, Brain, Bell, X, Trash2, Zap, MessageSquare } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { LogOut, Sun, Moon, Shield, List, Briefcase, Activity, Brain, Bell, X, Trash2, Zap, MessageSquare, ChevronDown } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
-import { useState, useRef, useEffect } from 'react';
 import HomeIcon from './icons/HomeIcon';
 import type { TabType } from '../types';
 
@@ -16,32 +17,34 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick }) => {
     const { theme, toggleTheme } = useTheme();
-    const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useNotifications();
+    const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
+    const { selectedMarket, setMarket } = useMarket();
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [isMarketOpen, setIsMarketOpen] = useState(false);
+    const marketDropdownRef = useRef<HTMLDivElement>(null);
+
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: HomeIcon, isCustomIcon: true },
-        { id: 'recommendations', label: 'AI', icon: Brain, isCustomIcon: false },
+        { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
-
-    // Indicator logic removed for separate boxes
 
     const handleTabClick = (tabId: TabType) => {
         soundService.playTap();
         onTabChange(tabId);
     };
 
+    // Close market dropdown on outside click
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsNotifyOpen(false);
+        const handler = (e: MouseEvent) => {
+            if (marketDropdownRef.current && !marketDropdownRef.current.contains(e.target as Node)) {
+                setIsMarketOpen(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     const getNotificationIcon = (type: string) => {
@@ -54,76 +57,159 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         }
     };
 
+    // --- Icon button shared style ---
+    const iconBtn: React.CSSProperties = {
+        background: 'var(--glass-bg)',
+        border: '1px solid var(--glass-border)',
+        borderRadius: 'var(--radius-md)',
+        color: 'var(--color-text-secondary)',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '6px 8px',
+        transition: 'var(--transition-fast)',
+        gap: '6px',
+        fontSize: '0.75rem',
+        fontWeight: 600,
+        whiteSpace: 'nowrap' as const,
+    };
+
     return (
-        <header className="header glass-blur" role="banner" style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0.5rem 1rem',
-            height: 'var(--header-height)',
-            gap: '0.5rem'
-        }}>
-            {/* Logo Section - Aligned Left */}
-            <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
-                <div className="logo-icon" style={{ padding: 'var(--spacing-xs)' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
-                        <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-                        <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
-                    </svg>
+        <>
+            <header className="header glass-blur" role="banner" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0.5rem 1rem',
+                height: 'var(--header-height)',
+                gap: '0.5rem'
+            }}>
+                {/* ── Logo ─────────────────────────────── */}
+                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+                    <div className="logo-icon" style={{ padding: 'var(--spacing-xs)' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
+                        </svg>
+                    </div>
+                    <span className="logo-text" style={{ fontSize: 'var(--font-size-lg)' }}>
+                        StockTracker <span>PRO</span>
+                    </span>
                 </div>
-                <span className="logo-text" style={{ fontSize: 'var(--font-size-lg)' }}>
-                    StockTracker <span>PRO</span>
-                </span>
-            </div>
 
-            {/* Center Section: Nav + Ticker - Hidden on Mobile */}
-            <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--spacing-xs)', flex: 1, overflow: 'hidden' }}>
-                <nav className="header-nav" style={{ padding: 'var(--spacing-xs)', display: 'flex', justifyContent: 'center', gap: 'var(--spacing-xs)' }} role="navigation" aria-label="Main navigation">
-                    {tabs.map((tab) => (
+                {/* ── Center Nav (desktop only) ─────────── */}
+                <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--spacing-xs)', flex: 1, overflow: 'hidden' }}>
+                    <nav className="header-nav" style={{ padding: 'var(--spacing-xs)', display: 'flex', justifyContent: 'center', gap: 'var(--spacing-xs)' }} role="navigation" aria-label="Main navigation">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                className={`header-tab ${activeTab === tab.id ? 'active' : ''}`}
+                                onClick={() => handleTabClick(tab.id)}
+                                aria-label={`Navigate to ${tab.label}`}
+                                aria-current={activeTab === tab.id ? 'page' : undefined}
+                            >
+                                <tab.icon size={18} />
+                                {tab.label}
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+
+                {/* ── Actions (right-aligned) ───────────── */}
+                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+
+                    {/* Market Selector */}
+                    <div style={{ position: 'relative' }} ref={marketDropdownRef}>
                         <button
-                            key={tab.id}
-                            className={`header-tab ${activeTab === tab.id ? 'active' : ''}`}
-                            onClick={() => handleTabClick(tab.id)}
-                            aria-label={`Navigate to ${tab.label}`}
-                            aria-current={activeTab === tab.id ? 'page' : undefined}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, color: selectedMarket.color }}
+                            onClick={() => { soundService.playTap(); setIsMarketOpen(v => !v); }}
+                            title="Select Market"
+                            aria-label="Select market"
                         >
-                            {tab.isCustomIcon ? <tab.icon size={18} /> : <tab.icon size={18} />}
-                            {tab.label}
+                            <span style={{ fontSize: '1rem' }}>{selectedMarket.flag}</span>
+                            <span className="desktop-only">{selectedMarket.shortName}</span>
+                            <ChevronDown size={12} style={{ opacity: 0.6, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                         </button>
-                    ))}
-                </nav>
-            </div>
 
-            {/* Actions Section - Aligned Right */}
-            <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                {showAdmin && (
-                    <button
-                        className="glass-button icon-btn"
-                        onClick={() => {
-                            soundService.playTap();
-                            onAdminClick?.();
-                        }}
-                        aria-label="Open Admin Panel"
-                        title="Admin Dashboard"
-                        style={{ color: 'var(--color-accent)', width: '32px', height: '32px' }}
-                    >
-                        <Shield size={16} />
-                    </button>
-                )}
+                        {isMarketOpen && (
+                            <div style={{
+                                position: 'absolute',
+                                top: 'calc(100% + 8px)',
+                                right: 0,
+                                zIndex: 2000,
+                                background: 'rgba(10,10,18,0.97)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                borderRadius: 'var(--radius-lg)',
+                                padding: '0.5rem',
+                                minWidth: '200px',
+                                backdropFilter: 'blur(30px)',
+                                boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '4px',
+                            }}>
+                                <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
+                                    Select Market
+                                </div>
+                                {MARKETS.map(m => (
+                                    <button
+                                        key={m.id}
+                                        onClick={() => { setMarket(m.id as MarketId); setIsMarketOpen(false); soundService.playTap(); }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '0.65rem 0.75rem',
+                                            borderRadius: 'var(--radius-md)',
+                                            background: selectedMarket.id === m.id ? `${m.color}18` : 'transparent',
+                                            border: selectedMarket.id === m.id ? `1px solid ${m.color}44` : '1px solid transparent',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            transition: 'all 0.15s',
+                                            width: '100%',
+                                        }}
+                                    >
+                                        <span style={{ fontSize: '1.2rem' }}>{m.flag}</span>
+                                        <div>
+                                            <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedMarket.id === m.id ? m.color : 'var(--color-text-primary)' }}>
+                                                {m.name}
+                                            </div>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '1px' }}>
+                                                {m.indexName}
+                                            </div>
+                                        </div>
+                                        {selectedMarket.id === m.id && (
+                                            <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: m.color, boxShadow: `0 0 8px ${m.color}` }} />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
-                <div style={{ position: 'relative' }} ref={dropdownRef}>
+                    {/* Admin icon */}
+                    {showAdmin && (
+                        <button
+                            style={{ ...iconBtn, color: 'var(--color-accent)', borderColor: 'var(--color-accent-light)' }}
+                            onClick={() => { soundService.playTap(); onAdminClick?.(); }}
+                            aria-label="Open Admin Panel"
+                            title="Admin Dashboard"
+                        >
+                            <Shield size={16} />
+                        </button>
+                    )}
+
+                    {/* Bell / Notifications */}
                     <button
-                        className="glass-button icon-btn"
-                        onClick={() => {
-                            soundService.playTap();
-                            setIsNotifyOpen(!isNotifyOpen);
-                            if (!isNotifyOpen) markAllAsRead();
-                        }}
-                        style={{ width: 'auto', height: 'auto', padding: 'var(--spacing-xs)', position: 'relative' }}
+                        style={{ ...iconBtn, position: 'relative' }}
+                        onClick={() => { soundService.playTap(); setIsNotifyOpen(true); markAllAsRead(); }}
+                        aria-label="Notifications"
+                        title="Notifications"
                     >
-                        <Bell size={18} />
+                        <Bell size={16} />
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
@@ -132,112 +218,128 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 background: 'var(--color-error)',
                                 color: 'white',
                                 borderRadius: 'var(--radius-full)',
-                                width: '18px',
-                                height: '18px',
-                                fontSize: '10px',
+                                width: '16px',
+                                height: '16px',
+                                fontSize: '9px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 border: '2px solid var(--color-bg-primary)',
-                                fontWeight: 800
+                                fontWeight: 800,
                             }}>
                                 {unreadCount}
                             </span>
                         )}
                     </button>
 
-                    {isNotifyOpen && (
-                        <div className="glass-card shadow-2xl notification-dropdown" style={{
-                            position: 'absolute',
-                            top: '100%',
-                            right: 0,
-                            marginTop: '0.75rem',
-                            zIndex: 1000,
-                            padding: '1.25rem',
-                            overflowY: 'auto',
-                            background: 'rgba(5, 5, 10, 0.98)',
-                            backdropFilter: 'blur(30px)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                                <h4 style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800 }}>Tactical Signals</h4>
+                    {/* Theme toggle */}
+                    <button
+                        style={iconBtn}
+                        onClick={() => { soundService.playTap(); toggleTheme(); }}
+                        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        title={`${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                    >
+                        {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                    </button>
+
+                    {/* Logout */}
+                    <button
+                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)' }}
+                        onClick={() => { soundService.playTap(); onLogout(); }}
+                        aria-label="Sign out"
+                        title="Sign Out"
+                    >
+                        <LogOut size={16} />
+                        <span className="desktop-only">Sign Out</span>
+                    </button>
+                </div>
+            </header>
+
+            {/* ── Notifications: Centered Modal ──────── */}
+            {isNotifyOpen && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 3000,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
+                        padding: '1rem',
+                    }}
+                    onClick={(e) => { if (e.target === e.currentTarget) setIsNotifyOpen(false); }}
+                >
+                    <div className="glass-card" style={{
+                        width: '100%',
+                        maxWidth: '460px',
+                        maxHeight: '80vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: 'rgba(8,8,16,0.98)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 'var(--radius-xl)',
+                        boxShadow: '0 32px 80px rgba(0,0,0,0.7)',
+                        overflow: 'hidden',
+                        animation: 'slideUp 0.25s ease-out both',
+                    }}>
+                        {/* Modal Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                            <div>
+                                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>Tactical Signals</h4>
+                                <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{notifications.length} active signal{notifications.length !== 1 ? 's' : ''}</p>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                 <button
                                     onClick={clearNotifications}
-                                    style={{ background: 'none', border: 'none', color: 'var(--color-text-tertiary)', cursor: 'pointer', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                                    style={{ background: 'none', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--color-text-tertiary)', cursor: 'pointer', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, padding: '4px 8px', borderRadius: '8px' }}
                                 >
-                                    <Trash2 size={12} /> CLEAR_ALL
+                                    <Trash2 size={11} /> CLEAR ALL
+                                </button>
+                                <button
+                                    onClick={() => setIsNotifyOpen(false)}
+                                    style={{ background: 'rgba(255,255,255,0.06)', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', width: '28px', height: '28px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                >
+                                    <X size={14} />
                                 </button>
                             </div>
-
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                {notifications.length === 0 ? (
-                                    <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                                        No active signals in queue.
-                                    </div>
-                                ) : (
-                                    notifications.map(n => (
-                                        <div key={n.id} style={{
-                                            padding: '1rem',
-                                            background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.04)',
-                                            borderRadius: '12px',
-                                            border: `1px solid ${n.read ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.08)'}`,
-                                            transition: 'all 0.2s'
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                                                <div style={{
-                                                    padding: '6px',
-                                                    borderRadius: '8px',
-                                                    background: 'rgba(0,0,0,0.2)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}>
-                                                    {getNotificationIcon(n.type)}
-                                                </div>
-                                                <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--color-text-primary)' }}>{n.title}</span>
-                                            </div>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0 0 8px 0', lineHeight: 1.5 }}>{n.message}</p>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>
-                                                    {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                                </span>
-                                                {!n.read && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 8px var(--color-accent)' }}></div>}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
                         </div>
-                    )}
+
+                        {/* Notification list */}
+                        <div style={{ overflowY: 'auto', padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {notifications.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+                                    <Bell size={28} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
+                                    <div>No active signals in queue.</div>
+                                </div>
+                            ) : (
+                                notifications.map(n => (
+                                    <div key={n.id} style={{
+                                        padding: '1rem',
+                                        background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.04)',
+                                        borderRadius: '12px',
+                                        border: `1px solid ${n.read ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.08)'}`,
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                            <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {getNotificationIcon(n.type)}
+                                            </div>
+                                            <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--color-text-primary)' }}>{n.title}</span>
+                                            {!n.read && <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 8px var(--color-accent)', flexShrink: 0 }} />}
+                                        </div>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0 0 6px 0', lineHeight: 1.5 }}>{n.message}</p>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>
+                                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
-
-                <button
-                    className="glass-button icon-btn"
-                    onClick={() => {
-                        soundService.playTap();
-                        toggleTheme();
-                    }}
-                    style={{ width: 'auto', height: 'auto', padding: 'var(--spacing-xs)' }}
-                    aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                >
-                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                </button>
-
-                <button
-                    className="glass-button logout-btn"
-                    onClick={() => {
-                        soundService.playTap();
-                        onLogout();
-                    }}
-                    style={{ padding: 'var(--spacing-xs) var(--spacing-sm)', height: 'auto' }}
-                    aria-label="Sign out"
-                >
-                    <LogOut size={16} />
-                    <span className="desktop-only" style={{ marginLeft: 'var(--spacing-xs)' }}>Sign Out</span>
-                </button>
-            </div>
-        </header>
+            )}
+        </>
     );
 };
 

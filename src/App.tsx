@@ -9,6 +9,8 @@ import SearchEngine from './components/SearchEngine';
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
 import { PageSkeleton } from './components/LoadingSkeleton';
+import MarketIndexCard from './components/MarketIndexCard';
+import { MarketProvider } from './contexts/MarketContext';
 
 // Lazy load heavy components
 const Portfolio = lazy(() => import('./components/Portfolio'));
@@ -138,9 +140,23 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
               }}
             >
               {!selectedSymbol ? (
-                <div className="heatmap-wrapper">
-                  <StockHeatmap />
-                </div>
+                <>
+                  {/* Market index card — floats above the heatmap */}
+                  <div style={{
+                    position: 'fixed',
+                    top: 'calc(var(--header-height) + 4px)',
+                    left: '1.5rem',
+                    right: '1.5rem',
+                    zIndex: 200,
+                    pointerEvents: 'auto',
+                  }}>
+                    <MarketIndexCard />
+                  </div>
+                  {/* Heatmap fills the rest */}
+                  <div className="heatmap-wrapper" style={{ top: 'calc(var(--header-height) + 96px)' } as any}>
+                    <StockHeatmap />
+                  </div>
+                </>
               ) : (
                 <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
                   <StockDetail
@@ -197,20 +213,22 @@ function App() {
     <AuthProvider>
       <PinAuthProvider>
         <NotificationProvider>
-          <QueryClientProvider client={queryClient}>
-            <Toaster
-              position="top-center"
-              toastOptions={{
-                duration: 3000,
-                style: {
-                  background: 'var(--color-bg-elevated)',
-                  color: 'var(--color-text-primary)',
-                  border: '1px solid var(--color-border)',
-                },
-              }}
-            />
-            <AppContent />
-          </QueryClientProvider>
+          <MarketProvider>
+            <QueryClientProvider client={queryClient}>
+              <Toaster
+                position="top-center"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: 'var(--color-bg-elevated)',
+                    color: 'var(--color-text-primary)',
+                    border: '1px solid var(--color-border)',
+                  },
+                }}
+              />
+              <AppContent />
+            </QueryClientProvider>
+          </MarketProvider>
         </NotificationProvider>
       </PinAuthProvider>
     </AuthProvider>
