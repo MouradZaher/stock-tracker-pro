@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../services/supabase';
+import { usePortfolioStore } from '../hooks/usePortfolio';
 
 interface User {
     id: string;
@@ -26,6 +27,21 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
     console.log('🛡️ PinAuthProvider rendering...');
     const [user, setUser] = useState<User | null>(null);
     const { setCustomUser, signOut } = useAuth();
+    const { loadFromSupabase, syncWithSupabase, initRealtimeSubscription, clearPositions } = usePortfolioStore();
+    const unsubRef = useRef<(() => void) | null>(null);
+
+    // Helper: start listening to realtime changes for a user
+    const startSync = (userId: string) => {
+        // Unsubscribe any existing channel first
+        if (unsubRef.current) {
+            unsubRef.current();
+            unsubRef.current = null;
+        }
+        // Load from DB immediately
+        loadFromSupabase(userId);
+        // Subscribe to realtime changes
+        unsubRef.current = initRealtimeSubscription(userId);
+    };
 
     // Load user from localStorage on mount if it exists
     useEffect(() => {
@@ -40,11 +56,15 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     role: loggedInUser.role,
                     name: loggedInUser.username
                 });
+                // Immediately sync portfolio on session restore
+                startSync(loggedInUser.id);
             } catch (e) {
                 console.error('Failed to parse saved user', e);
                 localStorage.removeItem('pin_auth_user');
             }
         }
+        // Cleanup realtime on unmount
+        return () => { unsubRef.current?.(); };
     }, []);
 
     // Check if username exists in Supabase
@@ -119,6 +139,9 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 name: loggedInUser.username
             });
 
+            // Start portfolio sync + realtime subscription
+            startSync(loggedInUser.id);
+
             return { success: true };
         } catch (err) {
             console.error('Login error:', err);
@@ -176,6 +199,12 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const logout = () => {
         setUser(null);
         localStorage.removeItem('pin_auth_user');
+        // Unsubscribe realtime and clear local portfolio cache
+        if (unsubRef.current) {
+            unsubRef.current();
+            unsubRef.current = null;
+        }
+        clearPositions();
         signOut();
     };
 

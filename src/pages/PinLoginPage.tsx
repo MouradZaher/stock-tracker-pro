@@ -204,16 +204,21 @@ const PinLoginPage: React.FC = () => {
                 </div>
             </nav>
 
-            <div className="hero-section">
+            <div className="hero-section" style={{ animation: 'fadeIn 0.8s ease-out both' }}>
                 <div className="hero-content">
-                    <h1 className="hero-title">
+                    <h1 className="hero-title" style={{ animation: 'slideUp 0.8s ease-out 0.2s both' }}>
                         Master the Market <span className="gradient-text">with Precision.</span>
                     </h1>
-                    <p className="hero-subtitle">
+                    <p className="hero-subtitle" style={{ animation: 'slideUp 0.8s ease-out 0.4s both' }}>
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div className="login-form-wrapper glass-card" style={{ marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-lg)', borderRadius: 'var(--radius-xl)' }}>
+                    <div className="login-form-wrapper glass-card" style={{
+                        marginTop: 'var(--spacing-lg)',
+                        padding: 'var(--spacing-lg)',
+                        borderRadius: 'var(--radius-xl)',
+                        animation: 'slideUp 0.8s ease-out 0.6s both'
+                    }}>
                         <div className="login-form" style={{ minHeight: 'auto' }}>
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (

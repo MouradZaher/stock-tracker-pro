@@ -27,6 +27,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showAIAdvice, setShowAIAdvice] = useState(false);
     const [aiRecs, setAiRecs] = useState<Record<string, StockRecommendation>>({});
+    const [newlyAddedSymbol, setNewlyAddedSymbol] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         symbol: '',
@@ -187,21 +188,41 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         }
 
         setIsSubmitting(true);
+        const upperSymbol = formData.symbol.toUpperCase();
+
+        // 1. Fetch live price FIRST so the position is added with a real price
+        let livePrice = formData.currentPrice || parseFloat(formData.avgCost);
+        try {
+            const quote = await getStockQuote(upperSymbol);
+            if (quote?.price && quote.price > 0) {
+                livePrice = quote.price;
+            }
+        } catch {
+            // Silently fall back to avg cost as currentPrice
+        }
+
         try {
             await addPosition({
-                symbol: formData.symbol.toUpperCase(),
-                name: formData.name || formData.symbol.toUpperCase(),
+                symbol: upperSymbol,
+                name: formData.name || upperSymbol,
                 units: parseFloat(formData.units),
                 avgCost: parseFloat(formData.avgCost),
-                currentPrice: formData.currentPrice || 0,
-                sector: getSectorForSymbol(formData.symbol.toUpperCase()),
+                currentPrice: livePrice,
+                sector: getSectorForSymbol(upperSymbol),
                 dividends: [],
             }, user?.id);
 
+            // 2. Force immediate price sync for the new symbol so it appears instantly
+            updatePrice(upperSymbol, livePrice, user?.id);
+
             soundService.playSuccess();
-            toast.success(`Position added: ${formData.symbol.toUpperCase()}`);
+            toast.success(`Position added: ${upperSymbol}`);
+            setNewlyAddedSymbol(upperSymbol);
             setShowModal(false);
             setFormData({ symbol: '', units: '', avgCost: '', name: '', currentPrice: 0 });
+
+            // Clear highlight after 3 seconds
+            setTimeout(() => setNewlyAddedSymbol(null), 3000);
         } catch (error) {
             soundService.playError();
             toast.error('Failed to add position.');
@@ -265,7 +286,20 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {/* ... existing header and summary ... */}
             <div className="portfolio-header">
                 <h2>My Portfolio</h2>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                <button
+                    className="btn btn-primary"
+                    onClick={() => setShowModal(true)}
+                    style={{
+                        background: 'var(--gradient-primary)',
+                        border: 'none',
+                        boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
+                        padding: 'var(--spacing-sm) var(--spacing-lg)',
+                        borderRadius: 'var(--radius-full)',
+                        fontWeight: 700,
+                        letterSpacing: '0.02em',
+                        transition: 'var(--transition-base)'
+                    }}
+                >
                     <Plus size={18} />
                     Add Position
                 </button>
@@ -364,8 +398,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 ) : (
                     <>
                         {/* Desktop Table */}
-                        <div className="table-container glass-card desktop-only" style={{ padding: '0.5rem', marginBottom: '1.5rem' }}>
-                            <table className="portfolio-table">
+                        <div className="table-container glass-card desktop-only" style={{ padding: '0', marginBottom: '1.5rem', maxHeight: '600px', overflowY: 'auto' }}>
+                            <table className="portfolio-table sticky-header">
                                 <thead>
                                     <tr>
                                         <th>Symbol</th>
@@ -387,7 +421,15 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         const allocationCheck = checkAllocationLimits(allocation, 'stock');
 
                                         return (
-                                            <tr key={position.id} onClick={() => handleRowClick(position.symbol)} style={{ cursor: 'pointer' }}>
+                                            <tr
+                                                key={position.id}
+                                                onClick={() => handleRowClick(position.symbol)}
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                                                    transition: 'background 1s ease'
+                                                }}
+                                            >
                                                 <td>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                         <strong>{position.symbol}</strong>
@@ -476,7 +518,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             {positions.map((position) => {
                                 const allocation = calculateAllocation(position.marketValue, summary.totalValue);
                                 return (
-                                    <div key={position.id} className="glass-card" style={{ padding: '1rem' }} onClick={() => handleRowClick(position.symbol)}>
+                                    <div
+                                        key={position.id}
+                                        className="glass-card"
+                                        style={{
+                                            padding: '1rem',
+                                            background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)',
+                                            transition: 'background 1s ease'
+                                        }}
+                                        onClick={() => handleRowClick(position.symbol)}
+                                    >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                                             <div>
                                                 <div style={{ fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>

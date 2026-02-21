@@ -77,7 +77,25 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     return (
         <div className="stock-detail">
             {/* Header */}
-            <div className="stock-header glass-card" style={{ padding: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
+            <div className="stock-header glass-card" style={{
+                padding: 'var(--spacing-lg)',
+                marginBottom: 'var(--spacing-xl)',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div style={{
+                    position: 'absolute',
+                    top: '-50%',
+                    right: '-20%',
+                    width: '300px',
+                    height: '300px',
+                    background: 'var(--color-accent-light)',
+                    filter: 'blur(80px)',
+                    opacity: 0.3,
+                    borderRadius: '50%',
+                    zIndex: 0,
+                    pointerEvents: 'none'
+                }} />
                 <div className="stock-title">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         {onBack && (
@@ -213,7 +231,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                     <Info size={20} /> Market Statistics
                 </h3>
                 <div className="stats-grid">
-                    <div className="stat-card glass-card">
+                    <div className="stat-card glass-card" style={{ border: '1px solid var(--glass-border-bright)' }}>
                         <div className="stat-label">Open</div>
                         <div className="stat-value">{formatCurrency(stock.open)}</div>
                     </div>
