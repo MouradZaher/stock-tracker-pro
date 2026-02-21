@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import toast from 'react-hot-toast';
+import { soundService } from '../services/soundService';
 
 export interface PriceAlert {
     id: string;
@@ -61,10 +62,13 @@ export const usePriceAlerts = create<PriceAlertsState>()(
                     }
 
                     if (triggered) {
-                        toast(`🚨 ${symbol} is now ${alert.condition} ${alert.targetPrice}! Current: ${currentPrice}`, {
-                            duration: 6000,
-                            icon: '💰',
+                        toast(`🔔 ${symbol} Price Alert: hit ${alert.targetPrice}!`, {
+                            duration: 8000,
+                            icon: '🔔',
                         });
+
+                        // Audio feedback
+                        soundService.playNotification();
 
                         // Dispatch event for Notification Hub
                         window.dispatchEvent(new CustomEvent('market-signal', {

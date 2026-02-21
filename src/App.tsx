@@ -27,6 +27,7 @@ import { LogOut, Shield } from 'lucide-react';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { usePortfolioStore } from './hooks/usePortfolio';
 import { useWatchlist } from './hooks/useWatchlist';
+import PriceAlertManager from './components/PriceAlertManager';
 
 import './index.css';
 import './styles/ios-mobile.css';
@@ -214,6 +215,7 @@ function App() {
                   },
                 }}
               />
+              <PriceAlertManager />
               <AppContent />
             </QueryClientProvider>
           </MarketProvider>

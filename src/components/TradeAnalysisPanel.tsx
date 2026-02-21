@@ -25,7 +25,9 @@ function deriveTradeAnalysis(
     low: number,
     volume: number,
     avgVolume: number,
-    changePercent: number
+    changePercent: number,
+    accountSize: number,
+    accountRiskPercent: number
 ): TradeAnalysis {
     // Derived support / resistance from day's range
     const dayRange = high - low;
@@ -68,9 +70,7 @@ function deriveTradeAnalysis(
         ? `1 : ${(rewardPerShare / riskPerShare).toFixed(1)}`
         : 'N/A';
 
-    // Sizing: assume $100k account, 1% risk
-    const accountSize = 100000;
-    const accountRiskPercent = 1;
+    // Sizing: based on user config
     const riskAmount = +(accountSize * (accountRiskPercent / 100)).toFixed(0);
     const shares = riskPerShare > 0 ? Math.floor(riskAmount / riskPerShare) : 0;
     const positionValue = +(shares * entry).toFixed(0);
@@ -108,7 +108,14 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
     symbol, price, high, low, volume, avgVolume, changePercent
 }) => {
     const [expanded, setExpanded] = useState(false);
-    const analysis = deriveTradeAnalysis(symbol, price, high, low, volume, avgVolume, changePercent);
+    const [showConfig, setShowConfig] = useState(false);
+    const [accountSize, setAccountSize] = useState(100000);
+    const [riskPercent, setRiskPercent] = useState(1);
+
+    const analysis = deriveTradeAnalysis(
+        symbol, price, high, low, volume, avgVolume, changePercent,
+        accountSize, riskPercent
+    );
 
     return (
         <div className="section" style={{ marginTop: '1rem' }}>
@@ -149,15 +156,75 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
                     </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-tertiary)' }}>
+                    <div
+                        onClick={(e) => { e.stopPropagation(); setShowConfig(!showConfig); }}
+                        style={{
+                            fontSize: '0.7rem', fontWeight: 600, padding: '4px 8px',
+                            background: showConfig ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
+                            color: showConfig ? '#fff' : 'inherit',
+                            borderRadius: '4px', marginRight: '8px'
+                        }}
+                    >
+                        Risk Config
+                    </div>
                     <span style={{ fontSize: '0.75rem' }}>{expanded ? 'Collapse' : 'Expand'}</span>
                     {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                 </div>
             </button>
 
+            {/* Risk Configuration Row */}
+            {showConfig && (
+                <div style={{
+                    margin: '0 1rem', padding: '1rem',
+                    background: 'rgba(99, 102, 241, 0.05)',
+                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                    borderTop: 'none', borderRadius: '0 0 12px 12px',
+                    display: 'flex', gap: '1.5rem', alignItems: 'center',
+                    animation: 'slideDown 0.2s ease-out'
+                }}>
+                    <style>{`
+                        @keyframes slideDown {
+                            from { opacity: 0; transform: translateY(-10px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                    `}</style>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>ACCOUNT SIZE</label>
+                        <input
+                            type="number"
+                            value={accountSize}
+                            onChange={(e) => setAccountSize(Number(e.target.value))}
+                            style={{
+                                background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)',
+                                color: '#fff', fontSize: '0.85rem', padding: '4px 8px', borderRadius: '4px',
+                                width: '100px'
+                            }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>RISK % PER TRADE</label>
+                        <select
+                            value={riskPercent}
+                            onChange={(e) => setRiskPercent(Number(e.target.value))}
+                            style={{
+                                background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)',
+                                color: '#fff', fontSize: '0.85rem', padding: '4px 8px', borderRadius: '4px'
+                            }}
+                        >
+                            {[0.25, 0.5, 1, 2, 5].map(v => <option key={v} value={v}>{v}%</option>)}
+                        </select>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginLeft: 'auto' }}>
+                        Risking <span style={{ color: 'var(--color-error)', fontWeight: 700 }}>${(accountSize * riskPercent / 100).toLocaleString()}</span> per setup
+                    </div>
+                </div>
+            )}
+
             {/* Panel Body */}
             {expanded && (
                 <div style={{
                     border: '1px solid rgba(99,102,241,0.25)',
+                    marginTop: showConfig ? '0.5rem' : '0',
                     borderTop: 'none',
                     borderRadius: '0 0 14px 14px',
                     padding: '1.5rem',

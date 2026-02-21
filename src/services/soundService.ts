@@ -47,6 +47,13 @@ class SoundService {
     playError() {
         this.createOscillator(150, 'triangle', 0.4, 0.1);
     }
+
+    // High-fidelity notification chime
+    playNotification() {
+        setTimeout(() => this.createOscillator(880, 'sine', 0.15, 0.03), 0); // A5
+        setTimeout(() => this.createOscillator(1108.73, 'sine', 0.2, 0.03), 50); // C#6
+        setTimeout(() => this.createOscillator(1318.51, 'sine', 0.25, 0.03), 100); // E6
+    }
 }
 
 export const soundService = new SoundService();
