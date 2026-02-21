@@ -74,14 +74,6 @@ const MarketIndexCard: React.FC = () => {
                 {/* Market Identity */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <span style={{ fontSize: '2rem', lineHeight: 1 }}>{selectedMarket.flag}</span>
-                    <div>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
-                            {selectedMarket.name} — Live Index
-                        </div>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: '2px' }}>
-                            {selectedMarket.indexName}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Index Value */}

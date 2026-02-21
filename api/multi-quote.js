@@ -1,7 +1,25 @@
 import axios from 'axios';
 
-// Multi-provider quote endpoint with cascading fallbacks
-// Supports: Yahoo, Finnhub, Alpha Vantage, Twelve Data, Polygon, FMP, IEX, Tiingo, Marketstack, Stooq
+// Simple in-memory rate limiting (per-instance)
+const RATE_LIMIT_WINDOW = 60 * 1000;
+const MAX_REQUESTS = 40; // Slightly higher for multi-quote as it's used for dashboard
+const ipCache = new Map();
+
+function checkRateLimit(ip) {
+    const now = Date.now();
+    const records = ipCache.get(ip) || [];
+    const recentRecords = records.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+    if (recentRecords.length >= MAX_REQUESTS) return false;
+    recentRecords.push(now);
+    ipCache.set(ip, recentRecords);
+    return true;
+}
+
+function isValidSymbols(symbols) {
+    if (!symbols || typeof symbols !== 'string') return false;
+    // Allow letters, numbers, dots, hyphens, ^, :, and commas
+    return /^[A-Z0-9.,^:-]{1,400}$/i.test(symbols);
+}
 
 const PROVIDERS = [
     {
@@ -151,7 +169,6 @@ const PROVIDERS = [
         name: 'stooq',
         url: 'https://stooq.com/q/l/',
         parse: (data, symbol) => {
-            // Stooq returns CSV
             if (typeof data !== 'string') return null;
             const lines = data.split('\n');
             if (lines.length < 2) return null;
@@ -175,13 +192,12 @@ const PROVIDERS = [
         },
         buildParams: (symbols) => {
             let symbol = symbols.split(',')[0].toLowerCase();
-            // Stooq symbol mapping for indices
             if (symbol === '^gspc') symbol = '^spx';
             else if (symbol === '^dji') symbol = '^dji';
             else if (symbol === '^ixic') symbol = '^icic';
             else if (symbol === '^rut') symbol = '^rut';
             else if (symbol === '^vix') symbol = '^vix';
-            else if (!symbol.includes('.')) symbol += '.us'; // Default to US stocks if no suffix
+            else if (!symbol.includes('.')) symbol += '.us';
 
             return {
                 s: symbol,
@@ -195,22 +211,44 @@ const PROVIDERS = [
 
 export default async function handler(req, res) {
     const { symbols, modules } = req.query;
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
+    // 1. Rate Limiting
+    if (!checkRateLimit(clientIp)) {
+        return res.status(429).json({ error: 'Too many requests' });
+    }
+
+    // 2. Input Validation
     if (!symbols) {
         return res.status(400).json({ error: 'Missing symbols parameter' });
     }
 
-    // Set CORS headers
+    if (!isValidSymbols(symbols)) {
+        return res.status(400).json({ error: 'Invalid symbol format' });
+    }
+
+    if (modules && !/^[a-z,]{1,100}$/i.test(modules)) {
+        // Silently ignore or return 400
+    }
+
+    // 3. CORS Lockdown
+    const origin = req.headers.origin;
+    const isAllowedOrigin = !origin ||
+        origin.includes('vercel.app') ||
+        origin.includes('localhost');
+
+    if (!isAllowedOrigin) {
+        return res.status(403).json({ error: 'Origin not allowed' });
+    }
+
     res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
     res.setHeader('Cache-Control', 's-maxage=2, stale-while-revalidate=10');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
-
-    console.log(`📡 Multi-Quote Request - Symbols: ${symbols}`);
 
     // If modules are requested, use dedicated Yahoo quoteSummary endpoint
     if (modules) {
@@ -222,16 +260,13 @@ export default async function handler(req, res) {
             });
             return res.status(200).json(response.data);
         } catch (error) {
-            console.error('QuoteSummary failed:', error.message);
             return res.status(500).json({ error: 'Failed to fetch quote summary' });
         }
     }
 
-    // Try each provider in order until one succeeds
     let lastError = null;
 
     for (const provider of PROVIDERS) {
-        // Skip providers that require API keys we don't have
         if (provider.requiresKey && !process.env[provider.requiresKey]) {
             continue;
         }
@@ -242,22 +277,16 @@ export default async function handler(req, res) {
             const params = provider.buildParams(symbols, apiKey);
             const headers = provider.headers || PROVIDERS[0].headers;
 
-            console.log(`🔄 Trying ${provider.name}...`);
-
             const response = await axios.get(url, {
                 params,
                 headers,
                 timeout: 6000
             });
 
-            // Use the provider's parser or fall back to first parser
             const parser = provider.parse || PROVIDERS[0].parse;
             const parsed = parser(response.data, symbols.split(',')[0]);
 
             if (parsed && parsed.price > 0) {
-                console.log(`✅ SUCCESS via ${provider.name} - ${symbols}: $${parsed.price}`);
-
-                // Return in Yahoo-compatible format for frontend compatibility
                 return res.status(200).json({
                     quoteResponse: {
                         result: [parsed],
@@ -267,14 +296,10 @@ export default async function handler(req, res) {
                 });
             }
         } catch (error) {
-            console.error(`❌ ${provider.name} failed:`, error.message);
             lastError = error;
         }
     }
 
-    // All providers failed
-    console.error(`💥 ALL PROVIDERS FAILED for ${symbols}`);
-    // Return 200 with error flag to prevent frontend crash
     return res.status(200).json({
         error: 'All data providers failed',
         details: lastError?.message || 'Unknown error',

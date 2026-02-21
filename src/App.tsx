@@ -9,7 +9,6 @@ import SearchEngine from './components/SearchEngine';
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
 import { PageSkeleton } from './components/LoadingSkeleton';
-import MarketIndexCard from './components/MarketIndexCard';
 import { MarketProvider } from './contexts/MarketContext';
 
 // Lazy load heavy components
@@ -141,19 +140,8 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             >
               {!selectedSymbol ? (
                 <>
-                  {/* Market index card — floats above the heatmap */}
-                  <div style={{
-                    position: 'fixed',
-                    top: 'calc(var(--header-height) + 4px)',
-                    left: '1.5rem',
-                    right: '1.5rem',
-                    zIndex: 200,
-                    pointerEvents: 'auto',
-                  }}>
-                    <MarketIndexCard />
-                  </div>
                   {/* Heatmap fills the rest */}
-                  <div className="heatmap-wrapper" style={{ top: 'calc(var(--header-height) + 96px)' } as any}>
+                  <div className="heatmap-wrapper" style={{ top: 'calc(var(--header-height) + 8px)' } as any}>
                     <StockHeatmap />
                   </div>
                 </>
