@@ -31,13 +31,20 @@ const LiveTicker: React.FC = () => {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
                 }
+                @keyframes slideDownQuick {
+                    from { opacity: 0; transform: translateY(-5px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
                 .ticker-content {
                     display: flex;
-                    animation: ticker 30s linear infinite;
+                    animation: ticker 45s linear infinite;
                     white-space: nowrap;
                 }
                 .ticker-content:hover {
                     animation-play-state: paused;
+                }
+                .panel-expansion {
+                    animation: slideDownQuick 0.3s ease-out;
                 }
                 `}
             </style>

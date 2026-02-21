@@ -222,18 +222,20 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
 
             {/* Panel Body */}
             {expanded && (
-                <div style={{
-                    border: '1px solid rgba(99,102,241,0.25)',
-                    marginTop: showConfig ? '0.5rem' : '0',
-                    borderTop: 'none',
-                    borderRadius: '0 0 14px 14px',
-                    padding: '1.5rem',
-                    background: 'rgba(10, 10, 20, 0.5)',
-                    backdropFilter: 'blur(10px)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1.25rem',
-                }}>
+                <div
+                    className="panel-expansion"
+                    style={{
+                        border: '1px solid rgba(99,102,241,0.25)',
+                        marginTop: showConfig ? '0.5rem' : '0',
+                        borderTop: 'none',
+                        borderRadius: '0 0 14px 14px',
+                        padding: '1.5rem',
+                        background: 'rgba(10, 10, 20, 0.5)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1.25rem',
+                    }}>
                     {/* Trade Setup */}
                     <TradeSetupCard setup={analysis.setup} />
 
