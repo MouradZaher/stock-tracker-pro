@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Sun, Moon, Shield, List, Briefcase, Activity, Brain, Bell, X, Trash2, Zap, MessageSquare, ChevronDown } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Brain, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
-import HomeIcon from './icons/HomeIcon';
 import type { TabType } from '../types';
 
 interface HeaderProps {
@@ -24,11 +23,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const marketDropdownRef = useRef<HTMLDivElement>(null);
 
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
-        { id: 'search', label: 'Home', icon: HomeIcon, isCustomIcon: true },
-        { id: 'recommendations', label: 'AI', icon: Brain },
-        { id: 'watchlist', label: 'Watch', icon: List },
-        { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
-        { id: 'pulse', label: 'Pulse', icon: Activity },
+        { id: 'search', label: 'Home', icon: LayoutGrid },
+        { id: 'recommendations', label: 'AI', icon: Sparkles },
+        { id: 'watchlist', label: 'Watch', icon: Star },
+        { id: 'portfolio', label: 'Portfolio', icon: Wallet },
+        { id: 'pulse', label: 'Pulse', icon: Zap },
     ];
 
     const handleTabClick = (tabId: TabType) => {
@@ -61,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         switch (type) {
             case 'alert': return <Bell size={14} color="var(--color-error)" />;
             case 'news': return <Shield size={14} color="var(--color-accent)" />;
-            case 'ai': return <Zap size={14} color="var(--color-success)" />;
+            case 'ai': return <Sparkles size={14} color="var(--color-success)" />;
             case 'social': return <MessageSquare size={14} color="#1DA1F2" />;
             default: return <Bell size={14} />;
         }
@@ -121,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 aria-label={`Navigate to ${tab.label}`}
                                 aria-current={activeTab === tab.id ? 'page' : undefined}
                             >
-                                <tab.icon size={18} />
+                                <tab.icon size={20} strokeWidth={2.0} />
                                 {tab.label}
                             </button>
                         ))}
@@ -141,7 +140,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         >
                             <span style={{ fontSize: '1rem' }}>{selectedMarket.flag}</span>
                             <span className="desktop-only">{selectedMarket.shortName}</span>
-                            <ChevronDown size={12} style={{ opacity: 0.6, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                            <ChevronDown size={14} strokeWidth={2.0} style={{ opacity: 0.6, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                         </button>
 
                         {isMarketOpen && (
@@ -211,7 +210,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             aria-label="Open Admin Panel"
                             title="Admin Dashboard"
                         >
-                            <Shield size={16} />
+                            <Shield size={18} strokeWidth={1.8} />
                         </button>
                     )}
 
@@ -222,7 +221,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Notifications"
                         title="Notifications"
                     >
-                        <Bell size={16} />
+                        <Bell size={18} strokeWidth={1.8} />
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
@@ -252,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                         title={`${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
                     >
-                        {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                        {theme === 'dark' ? <Sun size={18} strokeWidth={1.8} /> : <Moon size={18} strokeWidth={1.8} />}
                     </button>
 
                     {/* Logout */}
@@ -262,7 +261,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Sign out"
                         title="Sign Out"
                     >
-                        <LogOut size={16} />
+                        <LogOut size={18} strokeWidth={1.8} />
                         <span className="desktop-only">Sign Out</span>
                     </button>
                 </div>
