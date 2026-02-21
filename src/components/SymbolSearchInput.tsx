@@ -99,8 +99,8 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
 
     return (
         <div className={`symbol-search-input-container ${className}`} ref={containerRef} style={{ position: 'relative', width: '100%' }}>
-            <div className="search-input-wrapper glass-effect" style={{ borderRadius: 'var(--radius-md)', padding: '0 12px', display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)' }}>
-                <Search size={16} style={{ opacity: 0.5, marginRight: '8px' }} />
+            <div className="search-input-wrapper glass-effect" style={{ borderRadius: 'var(--radius-md)', padding: `0 var(--spacing-sm)`, display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)' }}>
+                <Search size={16} style={{ opacity: 0.5, marginRight: 'var(--spacing-xs)' }} />
                 <input
                     type="text"
                     className="form-input"
@@ -116,7 +116,7 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                     style={{
                         background: 'transparent',
                         border: 'none',
-                        padding: '10px 0',
+                        padding: 'var(--spacing-xs) 0',
                         flex: 1,
                         outline: 'none',
                         color: isSearching ? 'var(--color-text-tertiary)' : 'inherit',
@@ -140,9 +140,9 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                     left: 0,
                     right: 0,
                     zIndex: 100,
-                    marginTop: '4px',
+                    marginTop: 'var(--spacing-xs)',
                     borderRadius: 'var(--radius-md)',
-                    padding: '4px',
+                    padding: 'var(--spacing-xs)',
                     maxHeight: '240px',
                     overflowY: 'auto',
                     boxShadow: 'var(--shadow-lg)',
@@ -153,7 +153,7 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                             key={result.symbol}
                             className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
                             style={{
-                                padding: '8px 12px',
+                                padding: 'var(--spacing-xs) var(--spacing-sm)',
                                 borderRadius: 'var(--radius-sm)',
                                 cursor: 'pointer',
                                 background: index === selectedIndex ? 'rgba(255,255,255,0.1)' : 'transparent',

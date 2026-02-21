@@ -162,9 +162,9 @@ const PinLoginPage: React.FC = () => {
     return (
         <div className="landing-page">
             <TopBar />
-            <nav className="landing-nav" style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
-                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', fontWeight: 700 }}>
-                    <div style={{ background: 'var(--gradient-primary)', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <nav className="landing-nav" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-lg)', fontWeight: 700 }}>
+                    <div style={{ background: 'var(--gradient-primary)', width: 'var(--spacing-xl)', height: 'var(--spacing-xl)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
                         </svg>
@@ -172,9 +172,9 @@ const PinLoginPage: React.FC = () => {
                     <span>StockTracker <span className="gradient-text">Pro</span></span>
                 </div>
                 <div className="landing-nav-actions" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', background: 'rgba(255,255,255,0.05)', padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <Lock size={10} color="var(--color-warning)" />
-                        <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
                             Private Access
                         </span>
                     </div>
@@ -190,8 +190,8 @@ const PinLoginPage: React.FC = () => {
                             background: 'rgba(255, 255, 255, 0.05)',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
                             borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
+                            width: 'var(--spacing-xl)',
+                            height: 'var(--spacing-xl)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -213,7 +213,7 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div className="login-form-wrapper glass-card" style={{ marginTop: '1.5rem', padding: '1.5rem', borderRadius: '1.5rem' }}>
+                    <div className="login-form-wrapper glass-card" style={{ marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-lg)', borderRadius: 'var(--radius-xl)' }}>
                         <div className="login-form" style={{ minHeight: 'auto' }}>
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (
@@ -275,11 +275,11 @@ const PinLoginPage: React.FC = () => {
                                             style={{
                                                 background: 'rgba(255,255,255,0.05)',
                                                 border: '1px solid var(--glass-border)',
-                                                borderRadius: '8px',
-                                                padding: '4px 10px',
+                                                borderRadius: 'var(--radius-sm)',
+                                                padding: 'var(--spacing-xs) var(--spacing-sm)',
                                                 color: 'var(--color-text-secondary)',
                                                 cursor: 'pointer',
-                                                fontSize: '0.75rem'
+                                                fontSize: 'var(--font-size-xs)'
                                             }}
                                         >
                                             ← Back
