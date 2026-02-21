@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Brain, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Compass, Cpu, Eye, PieChart, Waves } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Brain, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Compass, Cpu, Eye, PieChart, Activity } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         { id: 'recommendations', label: 'AI', icon: Cpu },
         { id: 'watchlist', label: 'Watch', icon: Eye },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
-        { id: 'pulse', label: 'Pulse', icon: Waves },
+        { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 
     const handleTabClick = (tabId: TabType) => {
