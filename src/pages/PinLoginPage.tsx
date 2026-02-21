@@ -170,8 +170,8 @@ const PinLoginPage: React.FC = () => {
                     </div>
                     <span>StockTracker <span className="gradient-text">Pro</span></span>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="landing-nav-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <Lock size={12} color="var(--color-warning)" />
                         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Private Access Only
@@ -206,8 +206,7 @@ const PinLoginPage: React.FC = () => {
             <div className="hero-section">
                 <div className="hero-content">
                     <h1 className="hero-title">
-                        Master the Market <br />
-                        <span className="gradient-text">with Precision.</span>
+                        Master the Market <span className="gradient-text">with Precision.</span>
                     </h1>
                     <p className="hero-subtitle">
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
