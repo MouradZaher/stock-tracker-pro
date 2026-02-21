@@ -1893,7 +1893,7 @@ h6 {
   .watchlist-page,
   .portfolio-container,
   .stock-detail {
-    padding: 0 var(--spacing-md) !important;
+    padding: var(--spacing-md) !important;
   }
 }
 

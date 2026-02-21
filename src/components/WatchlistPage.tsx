@@ -11,6 +11,8 @@ import SymbolSearchInput from './SymbolSearchInput';
 import { analyzeSymbol } from '../services/aiRecommendationService';
 import type { StockRecommendation } from '../types';
 
+import FamousHoldings from './FamousHoldings';
+
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
 }
@@ -338,6 +340,11 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                     )}
                 </>
             )}
+
+            {/* Famous Holdings Section */}
+            <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>
+                <FamousHoldings onQuickAdd={(symbol) => addToWatchlist(symbol, user?.id)} />
+            </div>
 
             {alertConfig && (
                 <PriceAlertsModal

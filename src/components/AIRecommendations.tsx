@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
 import { soundService } from '../services/soundService';
 import SearchEngine from './SearchEngine';
-import FamousHoldings from './FamousHoldings';
 import { getAllRecommendations } from '../services/aiRecommendationService';
 import { getStockData, getStockQuote } from '../services/stockDataService';
 
@@ -631,10 +630,6 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             </div>
 
-            {/* Famous Holdings */}
-            <div style={{ marginBottom: '2rem' }}>
-                <FamousHoldings />
-            </div>
 
             {/* Models */}
             {showReportModal !== null && (

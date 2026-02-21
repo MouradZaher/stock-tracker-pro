@@ -124,7 +124,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
         onClose={() => setIsAdminOpen(false)}
       />
 
-      <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: 'var(--header-height)' }}>
+      <main className="main-content" style={{ flex: 1, position: 'relative' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/search" replace />} />
           {/* ===== LOCKED: Desktop Home Tab Layout — DO NOT MODIFY (approved 2026-02-16) ===== */}
