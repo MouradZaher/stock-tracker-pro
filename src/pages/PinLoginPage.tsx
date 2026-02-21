@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 import BenefitsGrid from '../components/BenefitsGrid';
+import AIPerformanceTracker from '../components/AIPerformanceTracker';
 import TopBar from '../components/TopBar';
 import './LandingPage.css';
 
@@ -170,11 +171,11 @@ const PinLoginPage: React.FC = () => {
                     </div>
                     <span>StockTracker <span className="gradient-text">Pro</span></span>
                 </div>
-                <div className="landing-nav-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Lock size={12} color="var(--color-warning)" />
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Private Access Only
+                <div className="landing-nav-actions" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '99px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <Lock size={10} color="var(--color-warning)" />
+                        <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Private Access
                         </span>
                     </div>
 
@@ -212,135 +213,141 @@ const PinLoginPage: React.FC = () => {
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
 
-                    <div className="login-form" style={{ marginTop: '0.5rem', minHeight: '200px' }}>
-                        {/* Step 1: Username Input */}
-                        {mode === 'username' && (
-                            <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
-                                    Enter Username
-                                </label>
-                                <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '400px' }}>
-                                    <div style={{ flex: 1, position: 'relative' }}>
-                                        <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
-                                        <input
-                                            ref={usernameRef}
-                                            type="text"
-                                            className="form-input"
-                                            placeholder="Your username..."
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
-                                            disabled={isLoading}
-                                            autoFocus
+                    <div className="login-form-wrapper glass-card" style={{ marginTop: '1.5rem', padding: '1.5rem', borderRadius: '1.5rem' }}>
+                        <div className="login-form" style={{ minHeight: 'auto' }}>
+                            {/* Step 1: Username Input */}
+                            {mode === 'username' && (
+                                <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
+                                        Enter Username
+                                    </label>
+                                    <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '400px' }}>
+                                        <div style={{ flex: 1, position: 'relative' }}>
+                                            <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                                            <input
+                                                ref={usernameRef}
+                                                type="text"
+                                                className="form-input"
+                                                placeholder="Your username..."
+                                                value={username}
+                                                onChange={(e) => setUsername(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
+                                                disabled={isLoading}
+                                                autoFocus
+                                                style={{
+                                                    paddingLeft: '42px',
+                                                    color: 'var(--color-text-primary)',
+                                                    caretColor: 'var(--color-text-primary)'
+                                                }}
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={handleUsernameSubmit}
+                                            disabled={isLoading || !username.trim()}
+                                            className="btn btn-primary"
                                             style={{
-                                                paddingLeft: '42px',
-                                                color: 'var(--color-text-primary)',
-                                                caretColor: 'var(--color-text-primary)'
+                                                padding: '0.75rem 1.5rem',
+                                                borderRadius: '0.75rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem',
+                                                whiteSpace: 'nowrap'
                                             }}
-                                        />
+                                        >
+                                            {isLoading ? '...' : (
+                                                <>
+                                                    Next
+                                                    <ArrowRight size={18} />
+                                                </>
+                                            )}
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={handleUsernameSubmit}
-                                        disabled={isLoading || !username.trim()}
-                                        className="btn btn-primary"
-                                        style={{
-                                            padding: '0.75rem 1.5rem',
-                                            borderRadius: '0.75rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
-                                        {isLoading ? '...' : (
-                                            <>
-                                                Next
-                                                <ArrowRight size={18} />
-                                            </>
-                                        )}
-                                    </button>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Step 2: PIN Input (Login or Signup) */}
-                        {(mode === 'login' || mode === 'signup') && (
-                            <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                                    <button
-                                        onClick={goBack}
-                                        className="glass-button"
-                                        style={{
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid var(--glass-border)',
-                                            borderRadius: '8px',
-                                            padding: '4px 10px',
-                                            color: 'var(--color-text-secondary)',
-                                            cursor: 'pointer',
-                                            fontSize: '0.75rem'
-                                        }}
-                                    >
-                                        ← Back
-                                    </button>
-                                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {mode === 'signup' ? (
-                                            <>
-                                                <UserPlus size={14} color="var(--color-success)" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                                                New: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                            </>
-                                        ) : (
-                                            <>
-                                                User: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                            </>
-                                        )}
-                                    </span>
-                                </div>
-
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
-                                    {mode === 'signup' ? 'Create a 4-Digit PIN' : 'Enter Your PIN'}
-                                </label>
-                                <div style={{ display: 'flex', gap: '0.65rem', justifyContent: 'flex-start' }}>
-                                    {pin.map((digit, index) => (
-                                        <input
-                                            key={index}
-                                            ref={inputRefs[index]}
-                                            type="text"
-                                            inputMode="numeric"
-                                            maxLength={1}
-                                            value={digit}
-                                            onChange={(e) => handlePinChange(index, e.target.value)}
-                                            onKeyDown={(e) => handleKeyDown(index, e)}
-                                            disabled={isLoading}
-                                            className="landing-input"
+                            {/* Step 2: PIN Input (Login or Signup) */}
+                            {(mode === 'login' || mode === 'signup') && (
+                                <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                                        <button
+                                            onClick={goBack}
+                                            className="glass-button"
                                             style={{
-                                                width: '50px',
-                                                height: '55px',
-                                                fontSize: '1.5rem',
-                                                textAlign: 'center',
-                                                padding: 0
+                                                background: 'rgba(255,255,255,0.05)',
+                                                border: '1px solid var(--glass-border)',
+                                                borderRadius: '8px',
+                                                padding: '4px 10px',
+                                                color: 'var(--color-text-secondary)',
+                                                cursor: 'pointer',
+                                                fontSize: '0.75rem'
                                             }}
-                                            onFocus={(e) => e.target.select()}
-                                        />
-                                    ))}
-                                </div>
-                                {mode === 'signup' && (
-                                    <p style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
-                                        Create your PIN for next time.
-                                    </p>
-                                )}
-                            </div>
-                        )}
+                                        >
+                                            ← Back
+                                        </button>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {mode === 'signup' ? (
+                                                <>
+                                                    <UserPlus size={14} color="var(--color-success)" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                                                    New: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    User: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                                </>
+                                            )}
+                                        </span>
+                                    </div>
 
-                        <p className="form-note" style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Shield size={12} color="var(--color-success)" />
-                            Enterprise-grade security
-                        </p>
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
+                                        {mode === 'signup' ? 'Create a 4-Digit PIN' : 'Enter Your PIN'}
+                                    </label>
+                                    <div style={{ display: 'flex', gap: '0.65rem', justifyContent: 'flex-start' }}>
+                                        {pin.map((digit, index) => (
+                                            <input
+                                                key={index}
+                                                ref={inputRefs[index]}
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength={1}
+                                                value={digit}
+                                                onChange={(e) => handlePinChange(index, e.target.value)}
+                                                onKeyDown={(e) => handleKeyDown(index, e)}
+                                                disabled={isLoading}
+                                                className="landing-input"
+                                                style={{
+                                                    width: '50px',
+                                                    height: '55px',
+                                                    fontSize: '1.5rem',
+                                                    textAlign: 'center',
+                                                    padding: 0
+                                                }}
+                                                onFocus={(e) => e.target.select()}
+                                            />
+                                        ))}
+                                    </div>
+                                    {mode === 'signup' && (
+                                        <p style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
+                                            Create your PIN for next time.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            <p className="form-note" style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Shield size={12} color="var(--color-success)" />
+                                Enterprise-grade security
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 <div className="hero-visual">
                     <BenefitsGrid />
                 </div>
+            </div>
+
+            <div className="landing-content-extra" style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '0 2rem 4rem' }}>
+                <AIPerformanceTracker />
             </div>
 
             <footer className="landing-footer">

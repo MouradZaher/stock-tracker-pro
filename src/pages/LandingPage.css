@@ -254,31 +254,33 @@
   }
 
   .landing-nav {
-    padding: 0.75rem 1rem !important;
+    padding: 0.5rem 1rem !important;
   }
 
   .logo {
-    font-size: 1rem !important;
+    font-size: 0.95rem !important;
     gap: 6px !important;
   }
 
   .logo div {
-    width: 24px !important;
-    height: 24px !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 6px !important;
   }
 
   .logo svg {
-    width: 14px !important;
-    height: 14px !important;
+    width: 12px !important;
+    height: 12px !important;
   }
 
   .access-badge {
-    padding: 4px 10px !important;
+    padding: 3px 8px !important;
     gap: 4px !important;
   }
 
   .access-badge span {
-    font-size: 0.65rem !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0 !important;
   }
 
   .hero-section {
@@ -287,7 +289,11 @@
     padding: 1rem 1.5rem;
     overflow-y: visible;
     min-height: auto;
-    padding-bottom: 4rem;
+    padding-bottom: 2rem;
+  }
+
+  .landing-content-extra {
+    padding: 0 1rem 4rem !important;
   }
 
   .hero-content {
@@ -300,6 +306,12 @@
   .hero-title {
     font-size: 2.25rem;
     white-space: normal;
+  }
+
+  .login-form-wrapper {
+    width: 100%;
+    padding: 1.25rem !important;
+    margin-top: 1rem !important;
   }
 
   .hero-visual {
@@ -320,7 +332,8 @@
   }
 
   .hero-subtitle {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   .login-form {
@@ -332,20 +345,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
   }
 
   .input-group {
     flex-direction: column;
     width: 100%;
+    gap: 0.75rem;
   }
 
   .landing-input {
-    width: 100%;
+    width: 100% !important;
+    font-size: 0.9rem !important;
+    padding: 0.75rem 1rem !important;
   }
 
   .hero-section {
     padding: 1rem;
-    padding-bottom: 6rem;
+    padding-bottom: 3rem;
   }
 }
 
@@ -356,8 +373,8 @@
   }
 
   .hero-section {
-    padding-top: 1rem;
-    padding-bottom: 4rem;
+    padding-top: 0.75rem;
+    padding-bottom: 2rem;
   }
 }
 
