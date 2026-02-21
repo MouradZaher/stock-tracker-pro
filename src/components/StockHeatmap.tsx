@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { RefreshCw, AlertTriangle, Zap, Activity } from 'lucide-react';
+import { RefreshCw, AlertTriangle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useMarket } from '../contexts/MarketContext';
 import { socialFeedService } from '../services/SocialFeedService';
 
 const StockHeatmap: React.FC = () => {
@@ -9,6 +10,7 @@ const StockHeatmap: React.FC = () => {
     const [retryKey, setRetryKey] = useState(0);
     const [sentiment, setSentiment] = useState<{ score: number; label: string; count: number } | null>(null);
     const { theme } = useTheme();
+    const { effectiveMarket } = useMarket();
 
     useEffect(() => {
         socialFeedService.getGlobalFeed().then(() => {
@@ -28,7 +30,6 @@ const StockHeatmap: React.FC = () => {
 
             const rect = container.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) {
-                // accessing offsetParent can sometimes give a better hint if hidden
                 if (!container.offsetParent) return;
             }
 
@@ -41,7 +42,7 @@ const StockHeatmap: React.FC = () => {
                 script.type = 'text/javascript';
                 script.innerHTML = JSON.stringify({
                     "exchanges": [],
-                    "dataSource": "SPX500",
+                    "dataSource": effectiveMarket.heatmapDataSource,
                     "grouping": "sector",
                     "blockSize": "market_cap_basic",
                     "blockColor": "change",
@@ -74,8 +75,7 @@ const StockHeatmap: React.FC = () => {
             }
         };
 
-        // Initial load with delay to ensure layout is ready
-        // 200ms is usually enough for the absolute positioning to resolve
+        // Short delay so layout is resolved before TradingView measures dimensions
         const timer = setTimeout(initWidget, 200);
 
         return () => {
@@ -84,7 +84,7 @@ const StockHeatmap: React.FC = () => {
                 container.innerHTML = '';
             }
         };
-    }, [retryKey, theme]);
+    }, [retryKey, theme, effectiveMarket.id]);   // Re-init when market changes (hover or select)
 
     // ===== LOCKED: Heatmap Container Layout — DO NOT MODIFY (approved 2026-02-16) =====
     return (
@@ -129,8 +129,7 @@ const StockHeatmap: React.FC = () => {
                     }}
                 />
             )}
-
-        </div >
+        </div>
     );
 };
 

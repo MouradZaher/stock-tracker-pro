@@ -4,7 +4,8 @@ import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, Trendin
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote, getMultipleQuotes } from '../services/stockDataService';
-import { formatCurrency, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
+import { formatCurrency, formatCurrencyForMarket, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
+import { useMarket } from '../contexts/MarketContext';
 import { checkAllocationLimits, calculateAllocation } from '../utils/calculations';
 import { getSectorForSymbol } from '../data/sectors';
 import SymbolSearchInput from './SymbolSearchInput';
@@ -21,6 +22,9 @@ interface PortfolioProps {
 
 const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
+    const { selectedMarket } = useMarket();
+    // Currency formatter shorthand
+    const fmt = (v: number) => formatCurrencyForMarket(v, selectedMarket.currency);
     // ... existing hooks ...
     const { positions, addPosition, removePosition, updatePosition, getSummary, updatePrice } = usePortfolioStore();
     const [showModal, setShowModal] = useState(false);
@@ -343,12 +347,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             <div className="portfolio-summary">
                 <div className="summary-card glass-card">
                     <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total Value</div>
-                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>{formatCurrency(summary.totalValue)}</div>
+                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>{fmt(summary.totalValue)}</div>
                 </div>
                 <div className={`summary-card glass-card ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`}>
                     <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total P/L</div>
                     <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>
-                        {formatCurrency(summary.totalProfitLoss)} ({formatPercent(summary.totalProfitLossPercent)})
+                        {fmt(summary.totalProfitLoss)} ({formatPercent(summary.totalProfitLossPercent)})
                     </div>
                 </div>
                 <div className="summary-card glass-card">
@@ -442,7 +446,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         <th style={{ textAlign: 'right' }}>Avg Cost</th>
                                         <th style={{ textAlign: 'right' }}>Current Price</th>
                                         <th style={{ textAlign: 'right' }}>Market Value</th>
-                                        <th style={{ textAlign: 'right' }}>P/L ($)</th>
+                                        <th style={{ textAlign: 'right' }}>P/L ({selectedMarket.currencySymbol.trim()})</th>
                                         <th style={{ textAlign: 'right' }}>P/L (%)</th>
                                         <th style={{ textAlign: 'center' }}>AI Strategy</th>
                                         <th style={{ textAlign: 'right' }}>Allocation</th>
@@ -484,11 +488,11 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                     {position.name}
                                                 </td>
                                                 <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
-                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</td>
-                                                <td style={{ textAlign: 'right' }}>{formatCurrency(position.currentPrice)}</td>
-                                                <td style={{ textAlign: 'right' }}><strong>{formatCurrency(position.marketValue)}</strong></td>
+                                                <td style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</td>
+                                                <td style={{ textAlign: 'right' }}>{fmt(position.currentPrice)}</td>
+                                                <td style={{ textAlign: 'right' }}><strong>{fmt(position.marketValue)}</strong></td>
                                                 <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
-                                                    {formatCurrency(position.profitLoss)}
+                                                    {fmt(position.profitLoss)}
                                                 </td>
                                                 <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
                                                     {formatPercent(position.profitLossPercent)}
@@ -599,7 +603,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                 <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontWeight: 600 }}>{formatCurrency(position.currentPrice)}</div>
+                                                <div style={{ fontWeight: 600 }}>{fmt(position.currentPrice)}</div>
                                                 <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
                                                     {formatPercent(position.profitLossPercent)}
                                                 </span>
@@ -637,13 +641,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                             <div style={{ textAlign: 'right' }}>{position.units}</div>
 
                                             <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
-                                            <div style={{ textAlign: 'right' }}>{formatCurrency(position.avgCost)}</div>
+                                            <div style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</div>
 
                                             <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
-                                            <div style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(position.marketValue)}</div>
+                                            <div style={{ textAlign: 'right', fontWeight: 600 }}>{fmt(position.marketValue)}</div>
 
                                             <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
-                                            <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{formatCurrency(position.profitLoss)}</div>
+                                            <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{fmt(position.profitLoss)}</div>
                                         </div>
 
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>

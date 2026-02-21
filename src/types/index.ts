@@ -68,6 +68,7 @@ export interface PortfolioPosition {
   profitLossPercent: number;
   sector: string;
   dividends: Dividend[];
+  currency?: string;  // ISO 4217 — 'USD' | 'EGP' | 'AED' etc.
 }
 
 export interface PortfolioSummary {

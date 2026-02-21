@@ -18,7 +18,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick }) => {
     const { theme, toggleTheme } = useTheme();
     const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
-    const { selectedMarket, setMarket } = useMarket();
+    const { selectedMarket, setMarket, setHoverMarket } = useMarket();
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [isMarketOpen, setIsMarketOpen] = useState(false);
     const marketDropdownRef = useRef<HTMLDivElement>(null);
@@ -160,13 +160,16 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '4px',
-                            }}>
+                            }}
+                                onMouseLeave={() => setHoverMarket(null)}
+                            >
                                 <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
                                     Select Market
                                 </div>
                                 {MARKETS.map(m => (
                                     <button
                                         key={m.id}
+                                        onMouseEnter={() => setHoverMarket(m.id as MarketId)}
                                         onClick={() => { setMarket(m.id as MarketId); setIsMarketOpen(false); soundService.playTap(); }}
                                         style={{
                                             display: 'flex',

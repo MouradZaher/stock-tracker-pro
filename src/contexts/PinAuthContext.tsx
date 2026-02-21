@@ -23,8 +23,30 @@ interface PinAuthContextType {
 
 const PinAuthContext = createContext<PinAuthContextType | undefined>(undefined);
 
+// ─── SHA-256 PIN hashing via WebCrypto ──────────────────────────────────────
+async function hashPin(pin: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(pin);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ─── Compare PIN against stored hash ─────────────────────────────────────────
+async function verifyPin(plain: string, stored: string): Promise<boolean> {
+    // Support legacy plain-text PINs (4-6 digit numbers)
+    // A hex SHA-256 hash is always 64 chars; plain PINs are 4-10 chars
+    if (stored.length < 32) {
+        // Legacy plain-text comparison — still works for existing users
+        return stored === plain;
+    }
+    const hashed = await hashPin(plain);
+    return hashed === stored;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    console.log('🛡️ PinAuthProvider rendering...');
     const [user, setUser] = useState<User | null>(null);
     const { setCustomUser, signOut } = useAuth();
     const { loadFromSupabase, syncWithSupabase, initRealtimeSubscription, clearPositions } = usePortfolioStore();
@@ -32,14 +54,11 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Helper: start listening to realtime changes for a user
     const startSync = (userId: string) => {
-        // Unsubscribe any existing channel first
         if (unsubRef.current) {
             unsubRef.current();
             unsubRef.current = null;
         }
-        // Load from DB immediately
         loadFromSupabase(userId);
-        // Subscribe to realtime changes
         unsubRef.current = initRealtimeSubscription(userId);
     };
 
@@ -56,14 +75,12 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     role: loggedInUser.role,
                     name: loggedInUser.username
                 });
-                // Immediately sync portfolio on session restore
                 startSync(loggedInUser.id);
             } catch (e) {
                 console.error('Failed to parse saved user', e);
                 localStorage.removeItem('pin_auth_user');
             }
         }
-        // Cleanup realtime on unmount
         return () => { unsubRef.current?.(); };
     }, []);
 
@@ -76,9 +93,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 .eq('username', username.toLowerCase())
                 .single();
 
-            if (error || !data) {
-                return { exists: false };
-            }
+            if (error || !data) return { exists: false };
 
             return {
                 exists: true,
@@ -95,7 +110,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    // Login with username + PIN
+    // Login with username + PIN (supports both legacy plain-text and SHA-256 hashed)
     const login = async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
         try {
             const { data, error } = await supabase
@@ -108,9 +123,19 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 return { success: false, error: 'User not found. Please sign up first.' };
             }
 
-            // Check PIN (simple comparison - in production use proper hashing)
-            if (data.pin_hash !== pin) {
+            // Verify PIN — supports legacy plain-text AND hashed PINs
+            const pinValid = await verifyPin(pin, data.pin_hash);
+            if (!pinValid) {
                 return { success: false, error: 'Incorrect PIN. Please try again.' };
+            }
+
+            // Opportunistically upgrade plain-text PIN to hashed on successful login
+            if (data.pin_hash.length < 32) {
+                const hashed = await hashPin(pin);
+                await supabase
+                    .from('profiles')
+                    .update({ pin_hash: hashed })
+                    .eq('id', data.id);
             }
 
             const loggedInUser: User = {
@@ -121,7 +146,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 isApproved: data.is_approved
             };
 
-            // Legacy users might have null is_approved. Treat null as approved for backward compatibility.
+            // Legacy users might have null is_approved — treat as approved for backward compat
             const isApproved = loggedInUser.isApproved === true || loggedInUser.isApproved === null || loggedInUser.isApproved === undefined;
 
             if (!isApproved && loggedInUser.role !== 'admin') {
@@ -131,7 +156,6 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setUser(loggedInUser);
             localStorage.setItem('pin_auth_user', JSON.stringify(loggedInUser));
 
-            // Sync with main AuthContext
             setCustomUser({
                 id: loggedInUser.id,
                 email: loggedInUser.email || `${loggedInUser.username}@stocktracker.local`,
@@ -139,9 +163,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 name: loggedInUser.username
             });
 
-            // Start portfolio sync + realtime subscription
             startSync(loggedInUser.id);
-
             return { success: true };
         } catch (err) {
             console.error('Login error:', err);
@@ -149,19 +171,17 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    // Register new user
+    // Register new user — stores SHA-256 hash of the PIN, never plain text
     const register = async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            // Check if username already exists
             const existing = await checkUser(username);
             if (existing.exists) {
                 return { success: false, error: 'Username already taken. Please choose another.' };
             }
 
-            // Generate unique ID
             const newId = `user-${Date.now()}`;
+            const hashedPin = await hashPin(pin);
 
-            // Insert new profile
             const { error } = await supabase
                 .from('profiles')
                 .insert({
@@ -169,7 +189,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     username: username.toLowerCase(),
                     email: `${username.toLowerCase()}@stocktracker.local`,
                     role: 'user',
-                    pin_hash: pin,
+                    pin_hash: hashedPin,   // ← stored as SHA-256 hex, never plain text
                     is_approved: false
                 });
 
@@ -178,17 +198,6 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 return { success: false, error: 'Registration failed. Please try again.' };
             }
 
-            // Auto-login after registration
-            const newUser: User = {
-                id: newId,
-                username: username.toLowerCase(),
-                role: 'user',
-                email: `${username.toLowerCase()}@stocktracker.local`,
-                isApproved: false
-            };
-
-            // Do NOT auto-login new users anymore, they need approval
-            // return { success: true, message: 'Registration successful. Pending admin approval.' };
             return { success: true };
         } catch (err) {
             console.error('Registration error:', err);
@@ -199,7 +208,6 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const logout = () => {
         setUser(null);
         localStorage.removeItem('pin_auth_user');
-        // Unsubscribe realtime and clear local portfolio cache
         if (unsubRef.current) {
             unsubRef.current();
             unsubRef.current = null;

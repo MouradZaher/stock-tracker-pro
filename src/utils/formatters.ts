@@ -1,4 +1,4 @@
-// Format currency in USD
+// Format currency — supports multi-currency (USD, EGP, AED)
 export const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -6,6 +6,35 @@ export const formatCurrency = (value: number): string => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(value);
+};
+
+/**
+ * Format a number as currency for the given market currency code.
+ * - USD  → $1,234.56
+ * - EGP  → EGP 1,234.56
+ * - AED  → AED 1,234.56
+ */
+export const formatCurrencyForMarket = (value: number, currency: string): string => {
+    if (!currency || currency === 'USD') return formatCurrency(value);
+    try {
+        // EGP and AED use Latin numerals with 2 decimal places
+        const formatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            // currencyDisplay: 'symbol' gives '£', 'د.إ' — we override with plain code below
+            currencyDisplay: 'code',
+        }).format(value);
+        // "EGP 1,234.56" is already correct — just trim extra spaces
+        return formatted.trim();
+    } catch {
+        // Fallback: manual prefix
+        const abs = Math.abs(value);
+        const sign = value < 0 ? '-' : '';
+        const num = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return `${sign}${currency} ${num}`;
+    }
 };
 
 // Format percentage
