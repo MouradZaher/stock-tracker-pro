@@ -202,15 +202,15 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     );
 
     return (
-        <div className="watchlist-page" style={{ padding: '0 var(--spacing-xl)', paddingBottom: '100px' }}>
+        <div className="watchlist-page" style={{ padding: '0 var(--spacing-md)', paddingBottom: 'var(--spacing-2xl)' }}>
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '1.5rem',
+                marginBottom: 'var(--spacing-md)',
                 flexWrap: 'wrap',
-                gap: '1rem',
-                paddingTop: '1rem'
+                gap: 'var(--spacing-sm)',
+                paddingTop: 'var(--spacing-sm)'
             }}>
                 <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
                     <Star size={24} fill="currentColor" className="text-warning" />
@@ -251,18 +251,18 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                         key={symbol}
                                         className="watchlist-card glass-card"
                                         style={{
-                                            padding: '1.5rem',
+                                            padding: 'var(--spacing-md)',
                                             cursor: 'pointer',
                                             position: 'relative'
                                         }}
                                         onClick={() => onSelectSymbol(symbol)}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{symbol}</h3>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+                                                <h3 style={{ fontSize: 'var(--font-size-base)', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{symbol}</h3>
                                                 <button
                                                     className="btn-icon glass-button"
-                                                    style={{ padding: '2px', borderRadius: '50%', color: 'var(--color-text-tertiary)' }}
+                                                    style={{ padding: '4px', borderRadius: 'var(--radius-full)', color: 'var(--color-text-tertiary)' }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setAlertConfig({ symbol, price: stock.price });
@@ -271,11 +271,11 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                 >
                                                     <Bell size={14} />
                                                 </button>
-                                                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', marginLeft: 'auto' }}>{stock.name}</p>
+                                                <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', marginLeft: 'auto' }}>{stock.name}</p>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
-                                                <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.875rem', fontWeight: 600 }}>
+                                                <div style={{ fontSize: 'var(--font-size-base)', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
+                                                <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>
                                                     {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                                     {formatPercent(stock.changePercent)}
                                                 </div>

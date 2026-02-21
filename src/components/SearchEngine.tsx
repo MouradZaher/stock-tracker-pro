@@ -187,17 +187,17 @@ const SearchEngine: React.FC<SearchEngineProps> = ({ onSelectSymbol }) => {
     }, [tradeAnalysis]);
 
     return (
-        <div className="search-engine-container" style={{ padding: '0.5rem 1rem' }}>
+        <div className="search-engine-container" style={{ padding: 'var(--spacing-xs) var(--spacing-md)' }}>
             {/* Search Header */}
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: 'var(--spacing-md)' }}>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.75rem',
-                    marginBottom: '0.75rem'
+                    gap: 'var(--spacing-sm)',
+                    marginBottom: 'var(--spacing-sm)'
                 }}>
                     <BarChart3 size={20} style={{ color: 'var(--color-accent)' }} />
-                    <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>
+                    <h2 style={{ margin: 0, fontSize: 'var(--font-size-lg)', fontWeight: 600 }}>
                         AI Trade <span className="gradient-text">Analysis</span>
                     </h2>
                 </div>
