@@ -33,20 +33,20 @@ const VolumeAnalysis: React.FC<VolumeAnalysisProps> = ({ volume }) => {
     return (
         <div className="volume-analysis glass-effect" style={{
             borderRadius: 'var(--radius-lg)',
-            padding: '1rem',
+            padding: 'var(--spacing-md)',
             border: '1px solid var(--glass-border)',
             flex: 1
         }}>
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
-                marginBottom: '0.75rem'
+                gap: 'var(--spacing-xs)',
+                marginBottom: 'var(--spacing-sm)'
             }}>
                 <BarChart3 size={16} style={{ color: 'var(--color-accent)' }} />
                 <h4 style={{
                     margin: 0,
-                    fontSize: '0.9rem',
+                    fontSize: 'var(--font-size-xs)',
                     color: 'var(--color-accent)',
                     fontWeight: 600,
                     textTransform: 'uppercase'
@@ -55,7 +55,7 @@ const VolumeAnalysis: React.FC<VolumeAnalysisProps> = ({ volume }) => {
                 </h4>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
                     <span style={{ opacity: 0.7 }}>Current Vol</span>
                     <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{formatVolume(volume.currentVolume)}</span>

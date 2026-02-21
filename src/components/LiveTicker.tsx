@@ -17,7 +17,7 @@ const LiveTicker: React.FC = () => {
     return (
         <div style={{
             width: '100%',
-            height: '46px',
+            height: 'clamp(40px, 6vh, 48px)',
             overflow: 'hidden',
             borderBottom: '1px solid var(--color-border)',
             background: 'var(--color-bg-secondary)', // Solid background as requested
@@ -47,9 +47,9 @@ const LiveTicker: React.FC = () => {
                     <div key={index} style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '0 2rem',
-                        fontSize: '0.9rem',
+                        gap: 'var(--spacing-xs)',
+                        padding: '0 var(--spacing-lg)',
+                        fontSize: 'var(--font-size-sm)',
                         borderRight: '1px solid var(--color-border-light)'
                     }}>
                         <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{item.symbol}</span>

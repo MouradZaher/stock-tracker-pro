@@ -121,19 +121,19 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             setIsNotifyOpen(!isNotifyOpen);
                             if (!isNotifyOpen) markAllAsRead();
                         }}
-                        style={{ width: '32px', height: '32px', position: 'relative' }}
+                        style={{ width: 'auto', height: 'auto', padding: 'var(--spacing-xs)', position: 'relative' }}
                     >
-                        <Bell size={16} />
+                        <Bell size={18} />
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
-                                top: '-2px',
-                                right: '-2px',
+                                top: '-4px',
+                                right: '-4px',
                                 background: 'var(--color-error)',
                                 color: 'white',
-                                borderRadius: '50%',
-                                width: '16px',
-                                height: '16px',
+                                borderRadius: 'var(--radius-full)',
+                                width: '18px',
+                                height: '18px',
                                 fontSize: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
