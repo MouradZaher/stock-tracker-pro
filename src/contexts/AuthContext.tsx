@@ -261,10 +261,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(sessionObj);
         setRole(customUser.role);
         setIsApproved(true);
-
-        // Trigger initial sync
-        syncUserData(userObj.id);
-    }, [syncUserData]);
+        // NOTE: Do NOT call syncUserData here — PinAuthContext.startSync() handles
+        // loadFromSupabase + initRealtimeSubscription. Calling both causes a race condition.
+    }, []);
 
     const signOut = useCallback(async () => {
         localStorage.removeItem(BYPASS_STORAGE_KEY);
