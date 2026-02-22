@@ -197,14 +197,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                     </button>
                 </div>
 
-                <div style={{ flex: 1, overflowY: 'auto', padding: window.innerWidth < 768 ? '1rem' : '1.5rem' }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--spacing-md)' }}>
                     {/* System Pulse Grid - High Tech Version */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: window.innerWidth < 480 ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
-                        gap: '1rem',
-                        marginBottom: '2rem'
-                    }}>
+                    <div className="admin-status-grid">
                         <div className="glass-card" style={{
                             padding: '1.25rem',
                             display: 'flex',
@@ -269,7 +264,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="admin-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2.5rem' }}>
+                    <div className="admin-stats-grid">
                         <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                             <div style={{ position: 'absolute', top: -5, right: -5, opacity: 0.05 }}><Users size={40} /></div>
                             <div style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-accent)' }}>{profiles.length}</div>
