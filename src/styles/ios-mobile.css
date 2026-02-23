@@ -202,8 +202,8 @@
 @media (max-width: 768px) {
     .heatmap-wrapper {
         position: fixed;
-        top: calc(60px + var(--safe-area-top));
-        bottom: var(--mobile-nav-height);
+        top: calc(56px + var(--safe-area-top));
+        bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
         left: 0;
         right: 0;
         z-index: 1;

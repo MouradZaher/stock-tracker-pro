@@ -7,6 +7,7 @@ export interface Market {
     name: string;
     shortName: string;
     flag: string;
+    flagUrl: string;            // SVG flag image URL (emoji flags don't render on Windows)
     indexName: string;
     indexSymbol: string;
     currency: string;
@@ -22,6 +23,7 @@ export const MARKETS: Market[] = [
         name: 'United States',
         shortName: 'US',
         flag: '🇺🇸',
+        flagUrl: 'https://flagcdn.com/w40/us.png',
         indexName: 'S&P 500',
         indexSymbol: '%5EGSPC',
         currency: 'USD',
@@ -35,6 +37,7 @@ export const MARKETS: Market[] = [
         name: 'Egypt',
         shortName: 'EGY',
         flag: '🇪🇬',
+        flagUrl: 'https://flagcdn.com/w40/eg.png',
         indexName: 'EGX 30',
         indexSymbol: '%5ECASE30',
         currency: 'EGP',
@@ -48,6 +51,7 @@ export const MARKETS: Market[] = [
         name: 'Abu Dhabi',
         shortName: 'ADX',
         flag: '🇦🇪',
+        flagUrl: 'https://flagcdn.com/w40/ae.png',
         indexName: 'FTSE ADX 15',
         indexSymbol: 'FADGI.AD',
         currency: 'AED',

@@ -77,9 +77,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '6px 8px',
+        padding: '5px 7px',
         transition: 'var(--transition-fast)',
-        gap: '6px',
+        gap: '4px',
         fontSize: '0.75rem',
         fontWeight: 600,
         whiteSpace: 'nowrap' as const,
@@ -134,14 +134,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     {/* Market Selector */}
                     <div style={{ position: 'relative' }} ref={marketDropdownRef}>
                         <button
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, color: selectedMarket.color }}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '5px 8px' }}
                             onClick={() => { soundService.playTap(); setIsMarketOpen(v => !v); }}
                             title="Select Market"
                             aria-label="Select market"
                         >
-                            <span style={{ fontSize: '1rem' }}>{selectedMarket.flag}</span>
-                            <span className="desktop-only">{selectedMarket.shortName}</span>
-                            <ChevronDown size={14} strokeWidth={2.0} style={{ opacity: 0.6, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '20px', height: '14px', borderRadius: '2px', objectFit: 'cover' }} />
+                            <ChevronDown size={10} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
                         </button>
 
                         {isMarketOpen && (
@@ -185,7 +184,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                             width: '100%',
                                         }}
                                     >
-                                        <span style={{ fontSize: '1.2rem' }}>{m.flag}</span>
+                                        <img src={m.flagUrl} alt={m.shortName} style={{ width: '28px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} />
                                         <div>
                                             <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedMarket.id === m.id ? m.color : 'var(--color-text-primary)' }}>
                                                 {m.name}
@@ -211,7 +210,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             aria-label="Open Admin Panel"
                             title="Admin Dashboard"
                         >
-                            <Shield size={18} strokeWidth={1.8} />
+                            <Shield size={15} strokeWidth={1.8} />
                         </button>
                     )}
 
@@ -222,7 +221,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Notifications"
                         title="Notifications"
                     >
-                        <Bell size={18} strokeWidth={1.8} />
+                        <Bell size={15} strokeWidth={1.8} />
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
@@ -252,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                         title={`${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
                     >
-                        {theme === 'dark' ? <Sun size={18} strokeWidth={1.8} /> : <Moon size={18} strokeWidth={1.8} />}
+                        {theme === 'dark' ? <Sun size={15} strokeWidth={1.8} /> : <Moon size={15} strokeWidth={1.8} />}
                     </button>
 
                     {/* Logout */}
@@ -262,7 +261,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Sign out"
                         title="Sign Out"
                     >
-                        <LogOut size={18} strokeWidth={1.8} />
+                        <LogOut size={15} strokeWidth={1.8} />
                         <span className="desktop-only">Sign Out</span>
                     </button>
                 </div>
