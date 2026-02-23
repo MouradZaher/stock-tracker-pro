@@ -23,7 +23,7 @@ import MobileNav from './components/MobileNav';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
-import { LogOut, Shield } from 'lucide-react';
+
 import { NotificationProvider } from './contexts/NotificationContext';
 import { usePortfolioStore } from './hooks/usePortfolio';
 import { useWatchlist } from './hooks/useWatchlist';
@@ -193,11 +193,8 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
   );
 }
 
-// ... imports
-import { useContentProtection } from './hooks/useContentProtection';
 
 function App() {
-  // useContentProtection();
   return (
     <AuthProvider>
       <PinAuthProvider>

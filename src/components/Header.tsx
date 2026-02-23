@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Brain, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Compass, Cpu, Eye, PieChart, Activity } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity } from 'lucide-react';
+import BrainIcon from './icons/BrainIcon';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -23,8 +24,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const marketDropdownRef = useRef<HTMLDivElement>(null);
 
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
-        { id: 'search', label: 'Home', icon: Compass },
-        { id: 'recommendations', label: 'AI', icon: Cpu },
+        { id: 'search', label: 'Home', icon: Home },
+        { id: 'recommendations', label: 'AI', icon: BrainIcon },
         { id: 'watchlist', label: 'Watch', icon: Eye },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
         { id: 'pulse', label: 'Pulse', icon: Activity },
@@ -120,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 aria-label={`Navigate to ${tab.label}`}
                                 aria-current={activeTab === tab.id ? 'page' : undefined}
                             >
-                                <tab.icon size={20} strokeWidth={2.0} />
+                                <tab.icon size={18} strokeWidth={1.8} />
                                 {tab.label}
                             </button>
                         ))}
