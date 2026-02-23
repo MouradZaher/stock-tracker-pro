@@ -111,6 +111,87 @@
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+.hero-form-container {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.landing-section {
+  width: 100%;
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.section-container {
+  max-width: 1400px;
+  width: 100%;
+}
+
+.input-with-icon {
+  position: relative;
+  flex: 1;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+}
+
+.form-input.landing-input {
+  padding-left: 42px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-primary);
+}
+
+.pin-input-group {
+  display: flex;
+  gap: 0.65rem;
+  justify-content: flex-start;
+}
+
+.pin-field {
+  width: 50px;
+  height: 55px;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 0;
+}
+
+.form-back-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.user-indicator {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form-note {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* ═══════════════════════════════════════════════════
    RESPONSIVE — Tablet (≤1200px)
 ═══════════════════════════════════════════════════ */
@@ -129,15 +210,20 @@
    RESPONSIVE — Mobile (≤1024px)
 ═══════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
+
+  html,
+  body,
+  body.landing-scrolling {
+    overflow-y: auto !important;
+    height: auto !important;
+    position: relative !important;
+  }
+
   .landing-page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 100dvh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: visible;
   }
 
   .landing-nav {
@@ -191,14 +277,17 @@
   }
 
   .hero-title {
-    font-size: 1.85rem;
+    font-size: 1.5rem;
     white-space: normal;
+    letter-spacing: -0.01em;
   }
 
   .hero-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     line-height: 1.4;
     margin: 0 auto;
+    max-width: 260px;
+    opacity: 0.7;
   }
 
   .login-form-wrapper {
@@ -238,13 +327,45 @@
   }
 
   .hero-section {
-    padding: 0.75rem 1rem 2.5rem;
+    padding: 0.75rem 1rem 3.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .landing-footer {
+    padding: 1.5rem 1rem 3rem;
+    font-size: 0.65rem;
+  }
+
+  .footer-links {
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-link {
+    font-size: 0.65rem;
+    opacity: 0.7;
+  }
+
+  .next-button {
+    padding: 0.7rem 1.25rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .icon-btn.glass-button {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .icon-btn.glass-button svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .login-form {
     width: 100%;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .form-step-container {
@@ -274,8 +395,22 @@
 
   .form-step-container button {
     width: 100% !important;
+    max-width: 200px !important;
     justify-content: center !important;
-    padding: 0.85rem !important;
+    padding: 0.65rem !important;
+    font-size: 0.85rem !important;
+    margin: 0 auto;
+    border-radius: 10px !important;
+  }
+
+  .icon-btn.glass-button {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .icon-btn.glass-button svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 }
 

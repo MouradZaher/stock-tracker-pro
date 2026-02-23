@@ -47,6 +47,12 @@ const PinLoginPage: React.FC = () => {
     useEffect(() => {
         // Focus username input on mount
         usernameRef.current?.focus();
+
+        // Enable scrolling for landing page
+        document.body.classList.add('landing-scrolling');
+        return () => {
+            document.body.classList.remove('landing-scrolling');
+        };
     }, []);
 
     // Check if username exists when user submits
@@ -212,52 +218,34 @@ const PinLoginPage: React.FC = () => {
                     <p className="hero-subtitle" style={{ animation: 'slideUp 0.8s ease-out 0.4s both' }}>
                         The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
                     </p>
+                </div>
 
-                    <div className="login-form-wrapper glass-card" style={{
-                        marginTop: 'var(--spacing-lg)',
-                        padding: 'var(--spacing-lg)',
-                        borderRadius: 'var(--radius-xl)',
-                        animation: 'slideUp 0.8s ease-out 0.6s both'
-                    }}>
-                        <div className="login-form" style={{ minHeight: 'auto' }}>
+                <div className="hero-form-container">
+                    <div className="login-form-wrapper glass-card">
+                        <div className="login-form">
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (
-                                <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
-                                        Enter Username
-                                    </label>
-                                    <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '460px' }}>
-                                        <div style={{ flex: 1, position: 'relative' }}>
-                                            <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+                                <div className="form-step-container">
+                                    <label className="form-label">Enter Username</label>
+                                    <div className="input-group">
+                                        <div className="input-with-icon">
+                                            <User size={18} className="input-icon" />
                                             <input
                                                 ref={usernameRef}
                                                 type="text"
-                                                className="form-input"
+                                                className="form-input landing-input"
                                                 placeholder="Your username..."
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                                 disabled={isLoading}
                                                 autoFocus
-                                                style={{
-                                                    paddingLeft: '42px',
-                                                    color: 'var(--color-text-primary)',
-                                                    caretColor: 'var(--color-text-primary)'
-                                                }}
                                             />
                                         </div>
                                         <button
                                             onClick={handleUsernameSubmit}
                                             disabled={isLoading || !username.trim()}
-                                            className="btn btn-primary"
-                                            style={{
-                                                padding: '0.75rem 1.5rem',
-                                                borderRadius: '0.75rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                whiteSpace: 'nowrap'
-                                            }}
+                                            className="btn btn-primary next-button"
                                         >
                                             {isLoading ? '...' : (
                                                 <>
@@ -272,24 +260,10 @@ const PinLoginPage: React.FC = () => {
 
                             {/* Step 2: PIN Input (Login or Signup) */}
                             {(mode === 'login' || mode === 'signup') && (
-                                <div className="form-step-container" style={{ animation: 'fadeIn 0.3s ease' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                                        <button
-                                            onClick={goBack}
-                                            className="glass-button"
-                                            style={{
-                                                background: 'rgba(255,255,255,0.05)',
-                                                border: '1px solid var(--glass-border)',
-                                                borderRadius: 'var(--radius-sm)',
-                                                padding: 'var(--spacing-xs) var(--spacing-sm)',
-                                                color: 'var(--color-text-secondary)',
-                                                cursor: 'pointer',
-                                                fontSize: 'var(--font-size-xs)'
-                                            }}
-                                        >
-                                            ← Back
-                                        </button>
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <div className="form-step-container">
+                                    <div className="form-back-selector">
+                                        <button onClick={goBack} className="glass-button back-btn">← Back</button>
+                                        <span className="user-indicator">
                                             {mode === 'signup' ? (
                                                 <>
                                                     <UserPlus size={14} color="var(--color-success)" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
@@ -303,10 +277,10 @@ const PinLoginPage: React.FC = () => {
                                         </span>
                                     </div>
 
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
+                                    <label className="form-label">
                                         {mode === 'signup' ? 'Create a 4-Digit PIN' : 'Enter Your PIN'}
                                     </label>
-                                    <div style={{ display: 'flex', gap: '0.65rem', justifyContent: 'flex-start' }}>
+                                    <div className="pin-input-group">
                                         {pin.map((digit, index) => (
                                             <input
                                                 key={index}
@@ -318,41 +292,33 @@ const PinLoginPage: React.FC = () => {
                                                 onChange={(e) => handlePinChange(index, e.target.value)}
                                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                                 disabled={isLoading}
-                                                className="landing-input"
-                                                style={{
-                                                    width: '50px',
-                                                    height: '55px',
-                                                    fontSize: '1.5rem',
-                                                    textAlign: 'center',
-                                                    padding: 0
-                                                }}
+                                                className="landing-input pin-field"
                                                 onFocus={(e) => e.target.select()}
                                             />
                                         ))}
                                     </div>
-                                    {mode === 'signup' && (
-                                        <p style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
-                                            Create your PIN for next time.
-                                        </p>
-                                    )}
                                 </div>
                             )}
 
-                            <p className="form-note" style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <p className="form-note">
                                 <Shield size={12} color="var(--color-success)" />
                                 Enterprise-grade security
                             </p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="hero-visual">
+            <div className="landing-section benefits-section">
+                <div className="section-container">
                     <BenefitsGrid />
                 </div>
             </div>
 
-            <div className="landing-content-extra" style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '0 2rem 4rem' }}>
-                <AIPerformanceTracker />
+            <div className="landing-section performance-section">
+                <div className="section-container">
+                    <AIPerformanceTracker />
+                </div>
             </div>
 
             <footer className="landing-footer">
@@ -364,7 +330,6 @@ const PinLoginPage: React.FC = () => {
                 <p>&copy; {new Date().getFullYear()} StockTracker Pro</p>
             </footer>
 
-            {/* Footer Modal */}
             {activeModal && (
                 <div className="modal-overlay glass-blur" onClick={() => setActiveModal(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
                     <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 'clamp(320px, 90vw, 500px)', width: '90%', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)', padding: '0', overflow: 'hidden', boxShadow: 'var(--shadow-xl)' }}>
