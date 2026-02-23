@@ -226,7 +226,7 @@ const PinLoginPage: React.FC = () => {
                                     <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>
                                         Enter Username
                                     </label>
-                                    <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '400px' }}>
+                                    <div style={{ display: 'flex', gap: '0.75rem', maxWidth: '460px' }}>
                                         <div style={{ flex: 1, position: 'relative' }}>
                                             <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
                                             <input
