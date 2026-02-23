@@ -20,48 +20,48 @@ const AIPerformanceTracker: React.FC = () => {
     ];
 
     return (
-        <div className="ai-performance-tracker glass-card" style={{ padding: window.innerWidth < 768 ? '1.5rem' : '2.5rem', marginBottom: '2rem', border: '1px solid var(--glass-border-bright)', background: 'linear-gradient(180deg, rgba(20, 20, 30, 0.4) 0%, rgba(10, 10, 15, 0.8) 100%)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1.5rem' }}>
+        <div className="ai-performance-tracker glass-card" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--glass-border-bright)', background: 'linear-gradient(180deg, rgba(20, 20, 30, 0.4) 0%, rgba(10, 10, 15, 0.8) 100%)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
-                        <Zap size={28} fill="currentColor" style={{ color: 'var(--color-accent)' }} />
+                    <h2 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 900, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.4rem', letterSpacing: '-0.02em' }}>
+                        <Zap size={24} fill="currentColor" style={{ color: 'var(--color-accent)' }} />
                         AI Alpha Engine
                     </h2>
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', fontWeight: 500 }}>
-                        High-frequency technical & fundamental benchmarking vs. S&P 500 Benchmark.
+                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', fontWeight: 500 }}>
+                        High-frequency benchmarking vs. S&P 500 Index.
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '16px', padding: '10px 16px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', fontWeight: 700 }}>
-                        <div style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '2px', boxShadow: '0 0 10px var(--color-accent)' }}></div>
-                        <span style={{ color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>Proprietary AI</span>
+                <div style={{ display: 'flex', gap: '12px', padding: '8px 12px', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', fontWeight: 700 }}>
+                        <div style={{ width: '6px', height: '6px', background: 'var(--color-accent)', borderRadius: '2px', boxShadow: '0 0 8px var(--color-accent)' }}></div>
+                        <span style={{ color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>AI</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', fontWeight: 700 }}>
-                        <div style={{ width: '8px', height: '8px', background: 'rgba(255,255,255,0.2)', borderRadius: '2px' }}></div>
-                        <span style={{ color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>S&P 500 Index</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', fontWeight: 700 }}>
+                        <div style={{ width: '6px', height: '6px', background: 'rgba(255,255,255,0.2)', borderRadius: '2px' }}></div>
+                        <span style={{ color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>S&P 500</span>
                     </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 1024 ? '1fr' : '1fr 320px', gap: '2.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
                 {/* Visual Chart Area - Premium Redesign */}
                 <div style={{
-                    height: '240px',
+                    height: '200px',
                     position: 'relative',
                     padding: '1rem 0',
                     background: 'rgba(255,255,255,0.01)',
                     borderRadius: '16px',
                     border: '1px solid rgba(255,255,255,0.03)'
                 }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '0 20px' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '0 10px' }}>
                         {performanceData.map((d, i) => {
                             const aiHeight = (d.ai / 140) * 100;
                             const spHeight = (d.sp500 / 140) * 100;
                             return (
-                                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', flex: 1, maxWidth: '60px' }}>
-                                    <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-end', height: '180px', width: '100%', justifyContent: 'center' }}>
+                                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flex: 1, maxWidth: '50px' }}>
+                                    <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end', height: '140px', width: '100%', justifyContent: 'center' }}>
                                         <div style={{
-                                            width: '14px',
+                                            width: '10px',
                                             height: `${aiHeight}%`,
                                             background: 'linear-gradient(to top, #4338ca 0%, var(--color-accent) 50%, #818cf8 100%)',
                                             borderRadius: '4px 4px 0 0',
@@ -73,7 +73,7 @@ const AIPerformanceTracker: React.FC = () => {
                                             <div className="shimmer" style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.1)', transform: 'skewX(-20deg)' }}></div>
                                         </div>
                                         <div style={{
-                                            width: '14px',
+                                            width: '10px',
                                             height: `${spHeight}%`,
                                             background: 'rgba(255,255,255,0.05)',
                                             borderRadius: '4px 4px 0 0',
@@ -91,44 +91,44 @@ const AIPerformanceTracker: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Tactical Stats Grid - Mission Control Style */}
-                <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 480 ? '1fr' : 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                {/* Tactical Stats Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
                     {stats.map((s, i) => (
                         <div key={i} className="glass-card" style={{
-                            padding: '1.25rem',
+                            padding: '1rem',
                             background: 'rgba(255,255,255,0.01)',
                             border: '1px solid var(--glass-border)',
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '4px'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                                 <div style={{ opacity: 0.8 }}>{s.icon}</div>
-                                <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800 }}>{s.label}</span>
+                                <span style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800 }}>{s.label}</span>
                             </div>
-                            <div style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>{s.value}</div>
-                            <div style={{ fontSize: '0.7rem', color: s.label.includes('Alpha') ? 'var(--color-success)' : 'var(--color-text-tertiary)', fontWeight: 600 }}>{s.detail}</div>
+                            <div style={{ fontSize: '1.45rem', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>{s.value}</div>
+                            <div style={{ fontSize: '0.65rem', color: s.label.includes('Alpha') ? 'var(--color-success)' : 'var(--color-text-tertiary)', fontWeight: 600 }}>{s.detail}</div>
                         </div>
                     ))}
                 </div>
             </div>
 
             <div style={{
-                marginTop: '2.5rem',
-                padding: '1.25rem',
+                marginTop: '1.5rem',
+                padding: '1rem',
                 background: 'rgba(99, 102, 241, 0.03)',
-                borderRadius: '14px',
+                borderRadius: '12px',
                 border: '1px solid rgba(99, 102, 241, 0.1)',
                 display: 'flex',
-                gap: '12px',
+                gap: '10px',
                 alignItems: 'center',
                 position: 'relative',
                 overflow: 'hidden'
             }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--color-accent)' }}></div>
-                <Info size={18} color="var(--color-accent)" style={{ flexShrink: 0 }} />
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
-                    <strong style={{ color: 'var(--color-text-primary)' }}>Tactical Alpha Insight:</strong> The model identified 12 opportunistic volatility clusters in Q1, contributing to our 16.2% outperformance. Risk neutral parameters maintained at σ=1.4.
+                <Info size={16} color="var(--color-accent)" style={{ flexShrink: 0 }} />
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                    <strong style={{ color: 'var(--color-text-primary)' }}>Alpha Insight:</strong> Model identified 12 volatility clusters in Q1. σ=1.4.
                 </p>
             </div>
         </div>
