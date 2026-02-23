@@ -344,7 +344,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             </div>
 
             {/* Summary Cards */}
-            <div className="portfolio-summary">
+            <div className="portfolio-summary-grid">
                 <div className="summary-card glass-card">
                     <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total Value</div>
                     <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>{fmt(summary.totalValue)}</div>
@@ -376,8 +376,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-                        <div style={{ flex: '1.5', minWidth: '240px' }}>
+                    <div className="portfolio-risk-audit-grid">
+                        <div className="portfolio-risk-audit-main">
                             <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Sector Diversification</div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 {sectorAllocations.map((sa, idx) => (
@@ -401,7 +401,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             </div>
                         </div>
 
-                        <div style={{ flex: '1', minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="portfolio-risk-audit-side">
                             <div className="glass-card" style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)' }}>
                                 <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Highest Overexposure</div>
                                 {stockAllocations.length > 0 ? (
