@@ -41,9 +41,9 @@ const StockHeatmap: React.FC = () => {
                 script.async = true;
                 script.type = 'text/javascript';
                 script.innerHTML = JSON.stringify({
-                    "exchanges": [],
+                    "exchanges": effectiveMarket.heatmapExchanges,
                     "dataSource": effectiveMarket.heatmapDataSource,
-                    "grouping": "sector",
+                    "grouping": effectiveMarket.heatmapExchanges.length > 0 ? "no_group" : "sector",
                     "blockSize": "market_cap_basic",
                     "blockColor": "change",
                     "locale": "en",

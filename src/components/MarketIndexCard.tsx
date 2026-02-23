@@ -73,7 +73,7 @@ const MarketIndexCard: React.FC = () => {
             }}>
                 {/* Market Identity */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <span style={{ fontSize: '2rem', lineHeight: 1 }}>{selectedMarket.flag}</span>
+                    <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '40px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} />
                 </div>
 
                 {/* Index Value */}

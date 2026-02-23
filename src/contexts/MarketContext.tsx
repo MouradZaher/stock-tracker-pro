@@ -14,6 +14,7 @@ export interface Market {
     currencySymbol: string;     // Display prefix: "$", "EGP ", "AED "
     currencyLocale: string;     // BCP47 locale for Intl.NumberFormat
     heatmapDataSource: string;  // TradingView heatmap dataSource id
+    heatmapExchanges: string[]; // TradingView exchanges filter (empty = all)
     color: string;
 }
 
@@ -30,6 +31,7 @@ export const MARKETS: Market[] = [
         currencySymbol: '$',
         currencyLocale: 'en-US',
         heatmapDataSource: 'SPX500',
+        heatmapExchanges: [],
         color: '#6366f1',
     },
     {
@@ -43,7 +45,8 @@ export const MARKETS: Market[] = [
         currency: 'EGP',
         currencySymbol: 'EGP ',
         currencyLocale: 'ar-EG',
-        heatmapDataSource: 'EGX',
+        heatmapDataSource: 'EGXEGX30',
+        heatmapExchanges: [],
         color: '#f59e0b',
     },
     {
@@ -57,7 +60,8 @@ export const MARKETS: Market[] = [
         currency: 'AED',
         currencySymbol: 'AED ',
         currencyLocale: 'ar-AE',
-        heatmapDataSource: 'ADX',
+        heatmapDataSource: 'ADXFADX15',
+        heatmapExchanges: [],
         color: '#10b981',
     },
 ];

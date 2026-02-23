@@ -49,10 +49,10 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 setIsNotifyOpen(false);
             }
         };
-        document.addEventListener('mousedown', clickHandler);
+        document.addEventListener('click', clickHandler);
         document.addEventListener('keydown', keyHandler);
         return () => {
-            document.removeEventListener('mousedown', clickHandler);
+            document.removeEventListener('click', clickHandler);
             document.removeEventListener('keydown', keyHandler);
         };
     }, []);
