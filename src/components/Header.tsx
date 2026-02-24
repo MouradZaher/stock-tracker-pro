@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity } from 'lucide-react';
 import BrainIcon from './icons/BrainIcon';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -21,7 +22,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const { selectedMarket, setMarket, setHoverMarket } = useMarket();
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [isMarketOpen, setIsMarketOpen] = useState(false);
-    const marketDropdownRef = useRef<HTMLDivElement>(null);
+    const marketBtnRef = useRef<HTMLButtonElement>(null);
+    const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
 
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: Home },
@@ -36,25 +38,28 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         onTabChange(tabId);
     };
 
-    // Close market dropdown on outside click or Escape key
+    // Close dropdowns on Escape key
     useEffect(() => {
-        const clickHandler = (e: MouseEvent) => {
-            if (marketDropdownRef.current && !marketDropdownRef.current.contains(e.target as Node)) {
-                setIsMarketOpen(false);
-            }
-        };
         const keyHandler = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 setIsMarketOpen(false);
                 setIsNotifyOpen(false);
             }
         };
-        document.addEventListener('click', clickHandler);
         document.addEventListener('keydown', keyHandler);
-        return () => {
-            document.removeEventListener('click', clickHandler);
-            document.removeEventListener('keydown', keyHandler);
-        };
+        return () => document.removeEventListener('keydown', keyHandler);
+    }, []);
+
+    // Calculate dropdown position from button bounding rect
+    const openMarketDropdown = useCallback(() => {
+        soundService.playTap();
+        setIsMarketOpen(prev => {
+            if (!prev && marketBtnRef.current) {
+                const rect = marketBtnRef.current.getBoundingClientRect();
+                setDropdownPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+            }
+            return !prev;
+        });
     }, []);
 
     const getNotificationIcon = (type: string) => {
@@ -132,23 +137,32 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
 
                     {/* Market Selector */}
-                    <div style={{ position: 'relative' }} ref={marketDropdownRef}>
+                    <div style={{ position: 'relative' }}>
                         <button
+                            ref={marketBtnRef}
                             style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '5px 8px' }}
-                            onClick={() => { soundService.playTap(); setIsMarketOpen(v => !v); }}
+                            onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
                         >
                             <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '20px', height: '14px', borderRadius: '2px', objectFit: 'cover' }} />
                             <ChevronDown size={10} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
                         </button>
+                    </div>
 
-                        {isMarketOpen && (
+                    {/* Market Dropdown Portal — rendered outside header stacking context */}
+                    {isMarketOpen && dropdownPos && ReactDOM.createPortal(
+                        <>
+                            {/* Transparent backdrop to close dropdown on outside click */}
+                            <div
+                                onClick={() => setIsMarketOpen(false)}
+                                style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+                            />
                             <div style={{
-                                position: 'absolute',
-                                top: 'calc(100% + 8px)',
-                                right: 0,
-                                zIndex: 2000,
+                                position: 'fixed',
+                                top: dropdownPos.top,
+                                right: dropdownPos.right,
+                                zIndex: 9999,
                                 background: 'rgba(10,10,18,0.97)',
                                 border: '1px solid rgba(255,255,255,0.08)',
                                 borderRadius: 'var(--radius-lg)',
@@ -182,6 +196,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                             textAlign: 'left',
                                             transition: 'all 0.15s',
                                             width: '100%',
+                                            color: 'inherit',
+                                            font: 'inherit',
                                         }}
                                     >
                                         <img src={m.flagUrl} alt={m.shortName} style={{ width: '28px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} />
@@ -199,8 +215,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                     </button>
                                 ))}
                             </div>
-                        )}
-                    </div>
+                        </>,
+                        document.body
+                    )}
 
                     {/* Admin icon */}
                     {showAdmin && (
