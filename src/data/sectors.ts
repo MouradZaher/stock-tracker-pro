@@ -17,6 +17,66 @@ export const SECTORS = [
 
 export type Sector = typeof SECTORS[number];
 
+// Regional Indices Stocks (LOCKED: approved 2026-02-25)
+export const STOCKS_BY_INDEX: Record<string, { symbol: string; name: string }[]> = {
+    'S&P 500': [
+        { symbol: 'AAPL', name: 'Apple Inc.' },
+        { symbol: 'MSFT', name: 'Microsoft Corp.' },
+        { symbol: 'NVDA', name: 'NVIDIA Corp.' },
+        { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+        { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+        { symbol: 'META', name: 'Meta Platforms' },
+        { symbol: 'TSLA', name: 'Tesla Inc.' },
+        { symbol: 'BRK.B', name: 'Berkshire Hathaway' },
+        { symbol: 'LLY', name: 'Eli Lilly & Co.' },
+        { symbol: 'AVGO', name: 'Broadcom Inc.' },
+        { symbol: 'JPM', name: 'JPMorgan Chase' },
+        { symbol: 'UNH', name: 'UnitedHealth Group' },
+        { symbol: 'V', name: 'Visa Inc.' },
+        { symbol: 'MA', name: 'Mastercard Inc.' },
+        { symbol: 'HD', name: 'Home Depot' },
+        { symbol: 'PG', name: 'Procter & Gamble' },
+        { symbol: 'COST', name: 'Costco Wholesale' },
+        { symbol: 'JNJ', name: 'Johnson & Johnson' },
+        { symbol: 'ABBV', name: 'AbbVie Inc.' },
+        { symbol: 'MRK', name: 'Merck & Co.' },
+    ],
+    'EGX 30': [
+        { symbol: 'COMI', name: 'Commercial Intl Bank' },
+        { symbol: 'TMGH', name: 'Talaat Moustafa Group' },
+        { symbol: 'HRHO', name: 'EFG Hermes' },
+        { symbol: 'EAST', name: 'Eastern Company' },
+        { symbol: 'EFID', name: 'e-finance' },
+        { symbol: 'EMFD', name: 'Emaar Misr' },
+        { symbol: 'ADIB', name: 'ADIB Egypt' },
+        { symbol: 'ETEL', name: 'Telecom Egypt' },
+        { symbol: 'ABUK', name: 'Abu Qir Fertilizers' },
+        { symbol: 'FWRY', name: 'Fawry' },
+        { symbol: 'SWDY', name: 'Elsewedy Electric' },
+        { symbol: 'ORAS', name: 'Orascom Construction' },
+        { symbol: 'RAYA', name: 'Raya Holding' },
+        { symbol: 'PHDC', name: 'Palm Hills' },
+        { symbol: 'CLHO', name: 'Cleopatra Hospitals' },
+    ],
+    'FTSE ADX 15': [
+        { symbol: 'IHC', name: 'International Holding Co.' },
+        { symbol: 'FAB', name: 'First Abu Dhabi Bank' },
+        { symbol: 'ETISALAT', name: 'e& (Etisalat)' },
+        { symbol: 'ADNOCDIST', name: 'ADNOC Distribution' },
+        { symbol: 'ALDAR', name: 'Aldar Properties' },
+        { symbol: 'ADCB', name: 'Abu Dhabi Comm. Bank' },
+        { symbol: 'MULTIPLY', name: 'Multiply Group' },
+        { symbol: 'ADNOCDRILL', name: 'ADNOC Drilling' },
+        { symbol: 'PRESIGHT', name: 'Presight AI' },
+        { symbol: 'FERTIGLBE', name: 'Fertiglobe' },
+        { symbol: 'DANA', name: 'Dana Gas' },
+        { symbol: 'AGTHIA', name: 'Agthia Group' },
+        { symbol: 'YAHSAT', name: 'Al Yah Satellite' },
+        { symbol: 'ALPHADHABI', name: 'Alpha Dhabi Holding' },
+        { symbol: 'RAKPROP', name: 'RAK Properties' },
+    ]
+};
+
 // Popular stocks by sector (for autocomplete and recommendations)
 export const STOCKS_BY_SECTOR: Record<string, { symbol: string; name: string }[]> = {
     'Technology': [

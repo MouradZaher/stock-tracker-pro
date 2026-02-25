@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity } from 'lucide-react';
-import BrainIcon from './icons/BrainIcon';
+import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity, Brain } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -27,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: Home },
-        { id: 'recommendations', label: 'AI', icon: BrainIcon },
+        { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: Eye },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
         { id: 'pulse', label: 'Pulse', icon: Activity },
@@ -76,19 +75,19 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const iconBtn: React.CSSProperties = {
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
-        borderRadius: '8px',
+        borderRadius: '6px',
         color: 'var(--color-text-secondary)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2px 6px',
+        padding: '2px 4px',
         transition: 'var(--transition-fast)',
-        gap: '4px',
-        fontSize: '0.65rem',
+        gap: '3px',
+        fontSize: '0.6rem',
         fontWeight: 600,
         whiteSpace: 'nowrap' as const,
-        height: '32px', // Fixed height for alignment
+        height: '26px', // Ultra-compact fixed height
     };
 
     return (
@@ -105,15 +104,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 boxSizing: 'border-box'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
-                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div className="logo-icon" style={{ padding: '3px', borderRadius: '5px' }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div className="logo-icon" style={{ padding: '2px', borderRadius: '4px' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                             <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
                             <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
                         </svg>
                     </div>
-                    <span className="logo-text" style={{ fontSize: '0.95rem', fontWeight: 800 }}>
+                    <span className="logo-text" style={{ fontSize: '0.85rem', fontWeight: 800 }}>
                         StockTracker <span style={{ color: 'var(--color-accent)', marginLeft: '1px' }}>PRO</span>
                     </span>
                 </div>
@@ -131,12 +130,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '5px',
-                                    padding: '4px 12px',
-                                    fontSize: '0.75rem'
+                                    gap: '4px',
+                                    padding: '2px 10px',
+                                    fontSize: '0.7rem',
+                                    height: '28px'
                                 }}
                             >
-                                <tab.icon size={14} strokeWidth={2.0} />
+                                <tab.icon size={12} strokeWidth={2.0} />
                                 {tab.label}
                             </button>
                         ))}
@@ -150,13 +150,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '2px 5px', height: '32px' }}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '2px 4px', height: '26px' }}
                             onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
                         >
-                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '16px', height: '11px', borderRadius: '1px', objectFit: 'cover' }} />
-                            <ChevronDown size={10} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
+                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '14px', height: '10px', borderRadius: '1px', objectFit: 'cover' }} />
+                            <ChevronDown size={8} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
                         </button>
                     </div>
 
@@ -283,13 +283,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
                     {/* Logout */}
                     <button
-                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)', height: '32px' }}
+                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)', height: '26px' }}
                         onClick={() => { soundService.playTap(); onLogout(); }}
                         aria-label="Sign out"
                         title="Sign Out"
                     >
-                        <LogOut size={14} strokeWidth={2.0} />
-                        <span className="desktop-only" style={{ marginLeft: '4px' }}>Sign Out</span>
+                        <LogOut size={12} strokeWidth={2.0} />
+                        <span className="desktop-only" style={{ marginLeft: '3px' }}>Sign Out</span>
                     </button>
                 </div>
             </header>

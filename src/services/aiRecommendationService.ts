@@ -1,7 +1,7 @@
 import { getStockData } from './stockDataService';
 import { getStockNews } from './newsService';
 import type { StockRecommendation, NewsArticle } from '../types';
-import { STOCKS_BY_SECTOR, SECTORS, getAllSymbols } from '../data/sectors';
+import { STOCKS_BY_SECTOR, SECTORS, getAllSymbols, STOCKS_BY_INDEX } from '../data/sectors';
 import { calculateRSI, calculateSMA } from '../utils/calculations';
 import { socialFeedService } from './SocialFeedService';
 
@@ -13,52 +13,39 @@ export const getRecommendationsForSector = async (
     const stocksInSector = STOCKS_BY_SECTOR[sector] || [];
     if (stocksInSector.length === 0) return [];
 
+    // Use the unified recommendation engine
+    const allRecs = await getRecommendationsForStocks(stocksInSector.slice(0, 10));
+
+    // Sort and return top N
+    return allRecs.sort((a, b) => b.score - a.score).slice(0, topN);
+};
+
+// Get recommendations for a specific list of stocks (LOCKED: approved 2026-02-25)
+export const getRecommendationsForStocks = async (
+    stocks: { symbol: string, name: string }[]
+): Promise<StockRecommendation[]> => {
     const recommendations: StockRecommendation[] = [];
 
-    for (const stock of stocksInSector.slice(0, Math.min(10, stocksInSector.length))) {
+    // Process in batches of 5 to avoid overwhelming
+    for (const stock of stocks) {
         try {
             let { stock: stockData } = await getStockData(stock.symbol);
-            const news = await getStockNews(stock.symbol, 3);
+            const news = await getStockNews(stock.symbol, 2); // 2 news items for speed
 
-            if (!stockData.price || stockData.price === 0) {
-                continue; // Skip stocks without real price data
-            }
+            if (!stockData.price || stockData.price === 0) continue;
 
-            // Technical indicators - Use real data points if available
-            // Note: Since we don't have full history, we use real comparative metrics
-            const rsi = null; // RSI requires volume/price history series
-            const ma50 = stockData.previousClose; // Use prev close as a proxy for very short-term MA
+            const rsi = null;
+            const ma50 = stockData.previousClose;
             const ma200 = stockData.fiftyTwoWeekHigh ? (stockData.fiftyTwoWeekHigh + stockData.fiftyTwoWeekLow) / 2 : null;
-
-            // Get social sentiment
             const socialSentiment = socialFeedService.getSentimentScore(stock.symbol);
 
-            // Calculate score
             const score = calculateRecommendationScore({
                 price: stockData.price,
                 change: stockData.change,
                 changePercent: stockData.changePercent,
-                rsi,
-                ma50,
-                ma200,
+                rsi, ma50, ma200,
                 peRatio: stockData.peRatio,
                 eps: stockData.eps,
-                news,
-                socialSentiment,
-            });
-
-            // Determine recommendation
-            const recommendation = getRecommendationType(score);
-
-            // Generate reasoning
-            const reasoning = generateReasoning({
-                score,
-                rsi,
-                ma50,
-                ma200,
-                price: stockData.price,
-                peRatio: stockData.peRatio,
-                changePercent: stockData.changePercent,
                 news,
                 socialSentiment,
             });
@@ -66,53 +53,28 @@ export const getRecommendationsForSector = async (
             recommendations.push({
                 symbol: stock.symbol,
                 name: stock.name,
-                sector,
+                sector: 'Index Constituent',
                 price: stockData.price,
                 score,
-                recommendation,
-                suggestedAllocation: 0, // Will be calculated later
-                reasoning,
-                news,
-                technicalIndicators: {
-                    rsi,
-                    ma50,
-                    ma200,
-                },
-                fundamentals: {
+                recommendation: getRecommendationType(score),
+                suggestedAllocation: 0,
+                reasoning: generateReasoning({
+                    score, rsi, ma50, ma200,
+                    price: stockData.price,
                     peRatio: stockData.peRatio,
-                    epsGrowth: null, // Would need historical data
-                },
+                    changePercent: stockData.changePercent,
+                    news, socialSentiment,
+                }),
+                news,
+                technicalIndicators: { rsi, ma50, ma200 },
+                fundamentals: { peRatio: stockData.peRatio, epsGrowth: null },
             });
         } catch (error) {
-            console.error(`Failed to get recommendation for ${stock.symbol}:`, error);
+            console.error(`Error analyzing ${stock.symbol}:`, error);
         }
     }
 
-    // Sort by score and take top N
-    recommendations.sort((a, b) => b.score - a.score);
-    const topRecommendations = recommendations.slice(0, topN);
-
-    // Initial allocation based on score within sector limits
-    const maxSectorAllocation = 20; // Maximum 20% per sector
-    const maxStockAllocation = 5;  // Maximum 5% per stock
-
-    // We allocate the 20% sector budget among the top N stocks
-    const totalSectorScore = topRecommendations.reduce((sum, r) => sum + r.score, 0);
-
-    topRecommendations.forEach((rec) => {
-        if (totalSectorScore > 0) {
-            const scoreRatio = rec.score / totalSectorScore;
-            // Distribute the 20% sector budget proportionally
-            let allocation = maxSectorAllocation * scoreRatio;
-            // Cap at 5% per stock
-            allocation = Math.min(allocation, maxStockAllocation);
-            rec.suggestedAllocation = parseFloat(allocation.toFixed(1));
-        } else {
-            rec.suggestedAllocation = 0;
-        }
-    });
-
-    return topRecommendations;
+    return recommendations;
 };
 
 // Analyze a specific symbol on demand
@@ -252,32 +214,18 @@ export const getTacticalRebalancing = async (positions: any[]): Promise<Rebalanc
     return actions;
 };
 
-// Get all recommendations with global optimization
-export const getAllRecommendations = async (): Promise<StockRecommendation[]> => {
-    // Process sectors in smaller chunks to avoid overwhelming the API/Network
-    const allRecommendations: StockRecommendation[] = [];
+// Get all recommendations with global optimization (Restricted to Indices)
+export const getAllRecommendations = async (indexName: string = 'S&P 500'): Promise<StockRecommendation[]> => {
+    const stocks = STOCKS_BY_INDEX[indexName] || STOCKS_BY_INDEX['S&P 500'];
 
-    // Use a subset of sectors for a "Quick Scan" if scanning all is too slow, 
-    // but here we'll try all with a slight delay or concurrency limit if needed.
-    // For now, let's just make it robust.
+    // Scan all stocks in the index (limited to ~20 for performance in this demo)
+    const candidates = stocks.slice(0, 20);
+    const allRecommendations = await getRecommendationsForStocks(candidates);
 
-    const sectorPromises = SECTORS.map(async (sector) => {
-        try {
-            return await getRecommendationsForSector(sector, 2); // 2 per sector for better distribution
-        } catch (e) {
-            console.error(`Error scanning sector ${sector}:`, e);
-            return [];
-        }
-    });
-
-    const results = await Promise.all(sectorPromises);
-    results.forEach(recs => allRecommendations.push(...recs));
-
-    // Final global sort and limit to top 15-20 meaningful recs
+    // Final global sort
     allRecommendations.sort((a, b) => b.score - a.score);
 
-    // Final Global Allocation Normalization
-    // Ensure the sum of all allocations doesn't exceed 100%
+    // Final Global Allocation Normalization (Cap at 100%)
     const currentTotal = allRecommendations.reduce((sum, r) => sum + r.suggestedAllocation, 0);
     if (currentTotal > 100) {
         const multiplier = 100 / currentTotal;

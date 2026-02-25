@@ -207,7 +207,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         toast.success(`Market scan complete for ${selectedMarket.indexName}. 12 setups found.`);
 
         try {
-            const freshRecs = await getAllRecommendations();
+            const freshRecs = await getAllRecommendations(selectedMarket.indexName);
             setActiveRecs(freshRecs);
             setDetailSymbol(null);
         } catch {

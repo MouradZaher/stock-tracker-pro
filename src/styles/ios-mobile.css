@@ -24,6 +24,7 @@
         min-height: 100%;
         overflow-x: hidden;
         overflow-y: hidden;
+        /* LOCKED: Lock viewport for internal tab scrolling per user request 2026-02-25 */
         position: relative;
         width: 100%;
         -webkit-overflow-scrolling: touch;
@@ -40,6 +41,7 @@
     #root {
         height: 100%;
         overflow: hidden;
+        /* LOCKED: Prevent nested scrolling conflicts */
     }
 
     .app {
@@ -48,6 +50,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        /* LOCKED: Prevent nested scrolling conflicts */
     }
 
     /* Mobile Header — single row, fixed */
@@ -56,12 +59,12 @@
         flex-wrap: nowrap;
         align-items: center;
         justify-content: space-between;
-        height: calc(52px + var(--safe-area-top));
-        min-height: calc(52px + var(--safe-area-top));
-        max-height: calc(52px + var(--safe-area-top));
-        padding: 0 0.65rem;
-        padding-top: var(--safe-area-top);
-        gap: 0.3rem;
+        height: calc(44px + var(--safe-area-top));
+        min-height: calc(44px + var(--safe-area-top));
+        max-height: calc(44px + var(--safe-area-top));
+        padding: 0 0.5rem !important;
+        padding-top: var(--safe-area-top) !important;
+        gap: 0.25rem;
         overflow: visible;
         position: fixed;
         top: 0;
@@ -104,9 +107,9 @@
     /* Main content area */
     .main-content {
         flex: 1;
-        padding-top: calc(56px + var(--safe-area-top));
+        padding-top: calc(44px + var(--safe-area-top));
         padding-bottom: var(--mobile-nav-height);
-        overflow: hidden;
+        overflow: visible;
         position: relative;
     }
 
@@ -214,7 +217,8 @@
 @media (max-width: 768px) {
     .heatmap-wrapper {
         position: fixed;
-        top: calc(56px + var(--safe-area-top));
+        top: calc(44px + var(--safe-area-top));
+        /* LOCKED: Exact 44px alignment with Mobile Header */
         bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
         left: 0;
         right: 0;

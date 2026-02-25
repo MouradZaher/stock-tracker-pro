@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, List, Briefcase, Activity, Sparkles } from 'lucide-react';
+import { LayoutDashboard, List, Briefcase, Activity, Brain } from 'lucide-react';
 import { soundService } from '../services/soundService';
 import { useHaptics } from '../hooks/useHaptics';
 import type { TabType } from '../types';
@@ -14,7 +14,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
 
     const navItems: { id: TabType; label: string; icon: React.ElementType }[] = [
         { id: 'search', label: 'Home', icon: LayoutDashboard },
-        { id: 'recommendations', label: 'AI', icon: Sparkles },
+        { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
         { id: 'pulse', label: 'Pulse', icon: Activity },
