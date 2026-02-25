@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, TrendingUp, Minus, X, BarChart3, Zap, ArrowRight, Check, Plus, Clock, Globe } from 'lucide-react';
+import { RefreshCw, X, BarChart3, Zap, ArrowRight, Check, Globe } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -7,7 +7,9 @@ import { soundService } from '../services/soundService';
 import SearchEngine from './SearchEngine';
 import { getAllRecommendations } from '../services/aiRecommendationService';
 import { getStockData } from '../services/stockDataService';
-import { useMarket, MarketId } from '../contexts/MarketContext';
+import { useMarket } from '../contexts/MarketContext';
+import type { MarketId } from '../contexts/MarketContext';
+import AIPerformanceTracker from './AIPerformanceTracker';
 
 interface MarketSession {
     code: string;
@@ -143,8 +145,6 @@ const SCAN_LOGS: Record<MarketId, string[]> = {
 interface AIRecommendationsProps {
     onSelectStock?: (symbol: string) => void;
 }
-
-import AIPerformanceTracker from './AIPerformanceTracker';
 
 const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) => {
     const { addNotification } = useNotifications();

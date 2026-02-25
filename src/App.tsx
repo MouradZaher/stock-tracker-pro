@@ -196,10 +196,10 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
 
 function App() {
   return (
-    <AuthProvider>
-      <PinAuthProvider>
-        <NotificationProvider>
-          <MarketProvider>
+    <MarketProvider>
+      <AuthProvider>
+        <PinAuthProvider>
+          <NotificationProvider>
             <QueryClientProvider client={queryClient}>
               <Toaster
                 position="top-center"
@@ -215,10 +215,10 @@ function App() {
               <PriceAlertManager />
               <AppContent />
             </QueryClientProvider>
-          </MarketProvider>
-        </NotificationProvider>
-      </PinAuthProvider>
-    </AuthProvider>
+          </NotificationProvider>
+        </PinAuthProvider>
+      </AuthProvider>
+    </MarketProvider>
   );
 }
 
