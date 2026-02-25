@@ -48,6 +48,7 @@ const AIMarketTicker: React.FC = () => {
             studies: [
                 'PivotPointsHighLow@tv-basicstudies',
                 'PivotPointsStandard@tv-basicstudies',
+                'RSI@tv-basicstudies',
             ],
         });
 
