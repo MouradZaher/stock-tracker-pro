@@ -49,6 +49,8 @@ const AIMarketTicker: React.FC = () => {
                 'PivotPointsHighLow@tv-basicstudies',
                 'PivotPointsStandard@tv-basicstudies',
                 'RSI@tv-basicstudies',
+                'MASimple@tv-basicstudies',   // SMA 50
+                'MAExp@tv-basicstudies',       // EMA 20
             ],
         });
 
