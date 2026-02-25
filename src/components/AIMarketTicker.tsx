@@ -41,40 +41,12 @@ const AIMarketTicker: React.FC = () => {
             save_image: false,
             calendar: false,
             support_host: 'https://www.tradingview.com',
-
-            // ── Indicators ───────────────────────────────────────
             studies: [
-                'PivotPointsStandard@tv-basicstudies',
-                'RSI@tv-basicstudies',
-                'MASimple@tv-basicstudies',
-                'MAExp@tv-basicstudies',
+                'STD;RSI',
+                'STD;SMA',
+                'STD;EMA',
+                'STD;Pivot%1Points%1Standard',
             ],
-
-            // ── Customise study defaults ─────────────────────────
-            studies_overrides: {
-                // Pivot Points: show only up to S3/R3, hide S4/S5/R4/R5
-                'PivotPointsStandard@tv-basicstudies.showS4': false,
-                'PivotPointsStandard@tv-basicstudies.showS5': false,
-                'PivotPointsStandard@tv-basicstudies.showR4': false,
-                'PivotPointsStandard@tv-basicstudies.showR5': false,
-
-                // SMA → 50-period, more visible
-                'MASimple@tv-basicstudies.length': 50,
-
-                // EMA → 20-period
-                'MAExp@tv-basicstudies.length': 20,
-            },
-
-            // Less transparency on all overlay lines
-            overrides: {
-                'mainSeriesProperties.candleStyle.upColor': '#10b981',
-                'mainSeriesProperties.candleStyle.downColor': '#ef4444',
-                'mainSeriesProperties.candleStyle.borderUpColor': '#10b981',
-                'mainSeriesProperties.candleStyle.borderDownColor': '#ef4444',
-                'mainSeriesProperties.candleStyle.wickUpColor': '#10b981',
-                'mainSeriesProperties.candleStyle.wickDownColor': '#ef4444',
-                'scalesProperties.lineColor': 'rgba(255,255,255,0.12)',
-            },
         });
 
         const widget = document.createElement('div');
@@ -118,7 +90,7 @@ const AIMarketTicker: React.FC = () => {
                 {selectedMarket.indexName} — LIVE
             </div>
 
-            {/* TradingView chart — tall enough for RSI sub-panel */}
+            {/* TradingView chart — 500px for RSI sub-panel room */}
             <div
                 className="tradingview-widget-container"
                 ref={containerRef}
