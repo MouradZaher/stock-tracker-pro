@@ -3116,3 +3116,66 @@ body,
   border-color: rgba(239, 68, 68, 0.3) !important;
   transform: scale(1.1);
 }
+/* ═══════════════════════════════════════════════════════
+   iPhone 13 Pro (390px) — Tab Popup & Modal Sizing
+   LOCKED: Approved 2026-02-25
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Modals: anchor to bottom for thumb-reachable UX */
+  [role="dialog"] {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  /* Modal inner card: bottom-sheet style, rounded top corners only */
+  [role="dialog"] > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 88svh !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+  }
+
+  /* Close buttons: always big enough to tap */
+  button[aria-label="Close"],
+  button[aria-label="close"],
+  .modal-close-btn {
+    min-width:  40px !important;
+    min-height: 40px !important;
+    border-radius: 12px !important;
+    touch-action: manipulation;
+  }
+
+  /* Watchlist sidebar: full-width on mobile */
+  .watchlist-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* AI signal cards: single column on 390px */
+  .ai-signal-card {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Portfolio summary grid: 2 columns on 390px */
+  .portfolio-summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+  }
+
+  /* Prevent iOS input zoom */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Thin scrollbars on mobile */
+  ::-webkit-scrollbar {
+    height: 2px;
+    width: 2px;
+  }
+}

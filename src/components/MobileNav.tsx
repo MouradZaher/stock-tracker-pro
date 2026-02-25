@@ -30,9 +30,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const [isDesktop, setIsDesktop] = React.useState(window.innerWidth >= 768);
 
     React.useEffect(() => {
-        const handleResize = () => {
-            setIsDesktop(window.innerWidth >= 768);
-        };
+        const handleResize = () => setIsDesktop(window.innerWidth >= 768);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -40,142 +38,100 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     if (isDesktop) return null;
 
     return (
-        <nav className="mobile-nav-container" role="navigation" aria-label="Main navigation">
-            {/* Glassmorphism Pill Container */}
-            <div className="mobile-nav-pill">
+        <nav
+            className="mobile-nav-container"
+            role="navigation"
+            aria-label="Main navigation"
+            style={{
+                /* ─── LOCKED: pinned to absolute bottom of viewport ─── */
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                width: '100%',
+                zIndex: 1001,
+                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                background: 'var(--glass-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                WebkitBackdropFilter: 'var(--glass-blur)',
+                borderTop: '1px solid var(--glass-border)',
+                boxShadow: '0 -4px 24px rgba(0,0,0,0.3)',
+            }}
+        >
+            {/* Nav pill — equal-width tabs across 390px */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-around',
+                padding: '5px 0',
+                width: '100%',
+            }}>
                 {navItems.map((item) => {
                     const isActive = activeTab === item.id;
                     const isAI = item.id === 'recommendations';
                     const IconComponent = item.icon;
 
+                    const accentColor = isAI ? '#c084fc' : 'var(--color-accent)';
+                    const accentBg = isAI
+                        ? 'linear-gradient(135deg, rgba(139,92,246,0.28), rgba(168,85,247,0.28))'
+                        : 'var(--color-accent-light)';
+                    const accentShadow = isAI
+                        ? '0 0 16px rgba(168,85,247,0.35)'
+                        : '0 0 14px rgba(99,102,241,0.3)';
+
                     return (
                         <button
                             key={item.id}
-                            className={`mobile-nav-btn ${isActive ? 'active' : ''} ${isAI ? 'ai-btn' : ''}`}
                             onClick={() => handleTabClick(item.id)}
                             aria-label={item.label}
                             aria-current={isActive ? 'page' : undefined}
+                            style={{
+                                /* Flex child — equal share of 390px width */
+                                flex: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '3px',
+                                padding: '4px 2px',
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                WebkitTapHighlightColor: 'transparent',
+                                transition: 'transform 0.15s ease',
+                            }}
                         >
-                            <div className={`nav-icon-wrapper ${isActive ? 'active' : ''} ${isAI && isActive ? 'ai-active' : ''}`}>
-                                <IconComponent size={18} strokeWidth={isActive ? 2.5 : 2} />
+                            {/* Icon container */}
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '30px',
+                                height: '26px',
+                                borderRadius: '8px',
+                                background: isActive ? accentBg : 'transparent',
+                                color: isActive ? accentColor : 'var(--color-text-tertiary)',
+                                boxShadow: isActive ? accentShadow : 'none',
+                                transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+                            }}>
+                                <IconComponent size={17} strokeWidth={isActive ? 2.5 : 1.8} />
                             </div>
-                            <span className="nav-label">{item.label}</span>
+
+                            {/* Label */}
+                            <span style={{
+                                fontSize: '0.58rem',
+                                fontWeight: isActive ? 700 : 500,
+                                color: isActive ? accentColor : 'var(--color-text-tertiary)',
+                                letterSpacing: '0.01em',
+                                transition: 'color 0.2s ease',
+                                lineHeight: 1,
+                            }}>
+                                {item.label}
+                            </span>
                         </button>
                     );
                 })}
             </div>
-
-            <style>{`
-                .mobile-nav-container {
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    width: 100%;
-                    z-index: 1001;
-                    padding-bottom: env(safe-area-inset-bottom, 0px);
-                    background: var(--glass-bg);
-                    backdrop-filter: var(--glass-blur);
-                    -webkit-backdrop-filter: var(--glass-blur);
-                    border-top: 1px solid var(--glass-border);
-                    box-shadow: var(--glass-shadow);
-                }
-
-                .mobile-nav-pill {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-around;
-                    padding: 6px 0;
-                    width: 100%;
-                    background: transparent;
-                    border: none;
-                    border-radius: 0;
-                    box-shadow: none;
-                }
-
-                .mobile-nav-btn {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 4px;
-                    padding: 4px 6px;
-                    background: transparent;
-                    border: none;
-                    cursor: pointer;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    min-width: 50px;
-                }
-
-                .nav-icon-wrapper {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 10px;
-                    background: transparent;
-                    color: var(--color-text-tertiary);
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .nav-icon-wrapper.active {
-                    background: var(--color-accent-light);
-                    color: var(--color-accent);
-                    box-shadow: 0 0 16px var(--color-accent-light);
-                }
-
-                .nav-icon-wrapper.ai-active {
-                    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.3));
-                    color: #c084fc;
-                    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-                }
-
-                .nav-label {
-                    font-size: 0.65rem;
-                    font-weight: 500;
-                    color: var(--color-text-tertiary);
-                    letter-spacing: 0.01em;
-                    transition: color 0.3s ease;
-                }
-
-                @media (max-width: 360px) {
-                    .mobile-nav-btn {
-                        min-width: 45px;
-                        padding: 4px 2px;
-                    }
-                    .nav-icon-wrapper {
-                        width: 28px;
-                        height: 28px;
-                    }
-                    .nav-label {
-                        font-size: 0.6rem;
-                    }
-                }
-
-                .mobile-nav-btn.active .nav-label {
-                    color: var(--color-accent);
-                }
-
-                .mobile-nav-btn.ai-btn.active .nav-label {
-                    color: #c084fc;
-                }
-
-                .mobile-nav-btn:hover .nav-icon-wrapper:not(.active) {
-                    background: var(--color-surface-hover);
-                    color: var(--color-text-secondary);
-                }
-
-                .mobile-nav-btn:active {
-                    transform: scale(0.95);
-                }
-
-                @media (min-width: 768px) {
-                    .mobile-nav-container {
-                        display: none !important;
-                    }
-                }
-            `}</style>
         </nav>
     );
 };

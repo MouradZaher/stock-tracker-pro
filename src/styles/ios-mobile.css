@@ -1,36 +1,40 @@
-/* =========================================
+/* =========================================================
    iOS MOBILE RESPONSIVE FIXES
-   iPhone 13 Pro (390×844) Optimized
-   ========================================= */
+   iPhone 13 Pro (390×844 CSS px) — Chrome Browser
+   Usable viewport: 390×704px (Chrome toolbar ~72px top + ~68px bottom)
+   Safe-area-top: 47px (notch), Safe-area-bottom: 34px (home bar)
+   ========================================================= */
 
-/* iOS Safe Area Support */
+/* iOS Safe Area Env Variables */
 :root {
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     --safe-area-left: env(safe-area-inset-left, 0px);
     --safe-area-right: env(safe-area-inset-right, 0px);
-    --mobile-nav-height: 80px;
+
+    /* Mobile header reduced to 38px for iPhone 13 Pro compactness */
+    --mobile-header-height: 38px;
+    --mobile-nav-height: 68px;
 }
 
-/* =========================================
-   MOBILE LAYOUT (max-width: 768px)
-   ========================================= */
+/* =========================================================
+   BASE MOBILE LAYOUT  (≤ 768px)
+   ========================================================= */
 @media (max-width: 768px) {
 
-    /* Root scrolling — prevent overscroll on body */
+    /* --- Viewport lock: only inner .tab-content scrolls --- */
     html,
     body {
         height: 100%;
         min-height: 100%;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        /* LOCKED: Lock viewport for internal tab scrolling per user request 2026-02-25 */
-        position: relative;
         width: 100%;
+        overflow: hidden;
+        position: relative;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: none;
+        overscroll-behavior: none;
     }
 
+    /* Allow landing page to scroll naturally */
     body.landing-scrolling,
     html:has(body.landing-scrolling) {
         overflow-y: auto !important;
@@ -41,7 +45,6 @@
     #root {
         height: 100%;
         overflow: hidden;
-        /* LOCKED: Prevent nested scrolling conflicts */
     }
 
     .app {
@@ -50,22 +53,28 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        /* LOCKED: Prevent nested scrolling conflicts */
     }
 
-    /* Mobile Header — single row, fixed */
+    /* ---------------------------------------------------------
+       HEADER — iPhone 13 Pro optimised (38px, smaller icons)
+       LOCKED: Approved 2026-02-25
+       --------------------------------------------------------- */
     .header {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: center;
-        justify-content: space-between;
-        height: calc(44px + var(--safe-area-top));
-        min-height: calc(44px + var(--safe-area-top));
-        max-height: calc(44px + var(--safe-area-top));
-        padding: 0 0.5rem !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+
+        /* 38px content + safe-area-top for notch */
+        height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
+        min-height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
+        max-height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
+
+        padding: 0 8px !important;
         padding-top: var(--safe-area-top) !important;
-        gap: 0.25rem;
+        gap: 4px;
         overflow: visible;
+
         position: fixed;
         top: 0;
         left: 0;
@@ -73,47 +82,68 @@
         z-index: 1002;
     }
 
-    /* Logo — no shrink */
+    /* Logo: tighter, smaller text */
     .header-logo {
         flex-shrink: 0;
         margin-bottom: 0;
     }
 
     .logo-text {
-        font-size: 0.9rem;
+        font-size: 0.75rem !important;
+        letter-spacing: -0.01em;
     }
 
-    /* Header actions */
+    /* All action icon buttons: 22px tall, 11px icons, 3px gap */
     .header-actions {
         flex-shrink: 0;
         flex-wrap: nowrap;
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        gap: 4px;
     }
 
-    /* All icon buttons in header — compact on mobile */
     .header-actions button {
-        padding: 4px 6px;
-        font-size: 0.65rem;
-        border-radius: 10px;
+        height: 22px !important;
+        min-width: 22px;
+        padding: 2px 4px !important;
+        font-size: 0.6rem !important;
+        border-radius: 8px !important;
+        line-height: 1;
     }
 
-    /* Hide text labels in header on mobile */
-    .header-actions .desktop-only {
-        display: none;
+    /* Force icon sizing inside action buttons */
+    .header-actions button svg {
+        width: 11px !important;
+        height: 11px !important;
     }
 
-    /* Main content area */
+    /* Flag image (market selector) */
+    .header-actions button img {
+        width: 13px !important;
+        height: 9px !important;
+    }
+
+    /* Hide all text-labels inside header on mobile */
+    .header-actions .desktop-only,
+    .header-center {
+        display: none !important;
+    }
+
+    /* ---------------------------------------------------------
+       MAIN CONTENT AREA
+       --------------------------------------------------------- */
     .main-content {
         flex: 1;
-        padding-top: calc(44px + var(--safe-area-top));
+        padding-top: calc(var(--mobile-header-height) + var(--safe-area-top));
         padding-bottom: var(--mobile-nav-height);
         overflow: visible;
         position: relative;
+        min-height: 0;
     }
 
-    /* Unified Tab content scrolling */
+    /* ---------------------------------------------------------
+       TAB CONTENT — scrollable region
+       --------------------------------------------------------- */
     .tab-content {
         height: 100%;
         width: 100%;
@@ -121,16 +151,18 @@
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-y: contain;
-        padding-bottom: calc(var(--mobile-nav-height) + 20px + var(--safe-area-bottom));
+        padding-bottom: calc(var(--mobile-nav-height) + 16px + var(--safe-area-bottom));
         scroll-behavior: smooth;
     }
 
-    /* Home tab */
+    /* Home tab pan gesture support */
     .home-tab-content {
         touch-action: pan-y pinch-zoom;
     }
 
-    /* Mobile Nav */
+    /* ---------------------------------------------------------
+       MOBILE BOTTOM NAV
+       --------------------------------------------------------- */
     .mobile-nav-container {
         position: fixed;
         bottom: 0;
@@ -148,17 +180,46 @@
     .mobile-nav-pill {
         width: 100%;
         border-radius: 0;
-        padding: 8px 0;
+        padding: 6px 0;
         justify-content: space-around;
         background: transparent;
         border: none;
         box-shadow: none;
     }
 
-    /* Prevent text overflow in cards */
+    /* Mobile nav buttons: even spacing across 390px */
+    .mobile-nav-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 6px 2px;
+        font-size: 0.6rem;
+    }
+
+    .mobile-nav-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* ---------------------------------------------------------
+       CARDS & CONTENT
+       --------------------------------------------------------- */
     .glass-card {
         word-break: break-word;
         overflow-wrap: break-word;
+    }
+
+    /* Prevent iOS input zoom (must be 16px+) */
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    /* Remove tap highlight */
+    button,
+    a,
+    .mobile-nav-btn {
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Admin modal — full screen on mobile */
@@ -170,55 +231,35 @@
         max-height: 100%;
     }
 
-    /* iPhone SE / Mini (≤375px) */
-    @media (max-width: 375px) {
-        :root {
-            --spacing-xl: 0.85rem;
-            --spacing-lg: 0.65rem;
-            --spacing-md: 0.45rem;
-            --font-size-lg: 0.9rem;
-            --font-size-base: 0.85rem;
-            --font-size-sm: 0.75rem;
-            --font-size-xs: 0.65rem;
-        }
+    /* Portfolio table — horizontal scroll container */
+    .portfolio-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 
-        .logo-text {
-            font-size: 0.8rem;
-        }
+    /* AI signal cards grid: single column on 390px */
+    .ai-signal-card {
+        min-width: 0;
+    }
 
-        .header-tab {
-            padding: 0.25rem 0.4rem;
-            font-size: 0.65rem;
-            margin: 0 2px !important;
-        }
+    /* Hide keyboard-visible bottom nav */
+    .keyboard-open .mobile-nav-container {
+        display: none;
+    }
 
-        .glass-card {
-            padding: 0.65rem;
-        }
-
-        .btn {
-            padding: 0.4rem 0.65rem;
-            font-size: 0.7rem;
-        }
-
-        .header-actions {
-            gap: 0.25rem;
-        }
-
-        .header-actions button {
-            padding: 4px 5px;
-        }
+    .keyboard-open .main-content {
+        padding-bottom: 0;
     }
 }
 
-/* =========================================
-   HEATMAP LOCKING (FIXED OVERLAY)
-   ========================================= */
+/* =========================================================
+   HEATMAP FIXED OVERLAY  (≤ 768px)
+   LOCKED: Exact alignment with 38px mobile header 2026-02-25
+   ========================================================= */
 @media (max-width: 768px) {
     .heatmap-wrapper {
         position: fixed;
-        top: calc(44px + var(--safe-area-top));
-        /* LOCKED: Exact 44px alignment with Mobile Header */
+        top: calc(var(--mobile-header-height) + var(--safe-area-top));
         bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
         left: 0;
         right: 0;
@@ -235,38 +276,53 @@
         border: none;
     }
 
-    /* Hide text labels when heatmap is full-screen */
+    /* Hide surrounding text while heatmap is full-screen */
     .home-tab-content h2,
     .home-tab-content p {
         display: none;
     }
 }
 
-/* =========================================
-   FORM & INTERACTION FIXES
-   ========================================= */
-@media (max-width: 768px) {
-
-    /* Prevent iOS zoom on input focus */
-    input,
-    select,
-    textarea {
-        font-size: 16px;
+/* =========================================================
+   iPhone SE / Mini  (≤ 375px) — extra-compact overrides
+   ========================================================= */
+@media (max-width: 375px) {
+    :root {
+        --mobile-header-height: 36px;
+        --spacing-xl: 0.8rem;
+        --spacing-lg: 0.6rem;
+        --spacing-md: 0.4rem;
+        --font-size-lg: 0.88rem;
+        --font-size-base: 0.82rem;
+        --font-size-sm: 0.72rem;
+        --font-size-xs: 0.62rem;
     }
 
-    /* Remove tap highlight */
-    button,
-    a,
-    .mobile-nav-btn {
-        -webkit-tap-highlight-color: transparent;
+    .logo-text {
+        font-size: 0.7rem !important;
     }
 
-    /* Hide nav when keyboard is open */
-    .keyboard-open .mobile-nav-container {
-        display: none;
+    .header-actions button {
+        height: 20px !important;
+        padding: 2px 3px !important;
+        font-size: 0.55rem !important;
     }
 
-    .keyboard-open .main-content {
-        padding-bottom: 0;
+    .header-actions button svg {
+        width: 10px !important;
+        height: 10px !important;
+    }
+
+    .glass-card {
+        padding: 0.6rem;
+    }
+
+    .btn {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.7rem;
+    }
+
+    .header-actions {
+        gap: 3px;
     }
 }
