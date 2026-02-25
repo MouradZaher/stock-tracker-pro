@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 const INDEX_SYMBOL: Record<MarketId, string> = {
     us: 'FOREXCOM:SPXUSD',
     egypt: 'EGX:EGX30',
-    abudhabi: 'ADX:ADSMI',
+    abudhabi: 'ADX:FADX15',
 };
 
 const AIMarketTicker: React.FC = () => {
