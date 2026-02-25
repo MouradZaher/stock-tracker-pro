@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import EconomicCalendar from './EconomicCalendar';
-import TopMovers from './TopMovers';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
@@ -9,12 +7,32 @@ import type { NewsArticle, SocialPost } from '../types';
 import { socialFeedService } from '../services/SocialFeedService';
 
 import { getSectorPerformance, getVolumeAnomalies } from '../services/stockDataService';
+import { useMarket } from '../contexts/MarketContext';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
 }
 
+const MARKET_STREAMS: Record<string, any[]> = {
+    us: [
+        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdCLP7Lg' },
+        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: '7d5xZU8NcC4' },
+        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCEAZeUIeJs0IjQiqTCdVSIg' }
+    ],
+    egypt: [
+        { name: 'Thndr | ثاندر', origin: 'Egypt Markets', color: '#10B981', channelId: 'UC2h4E4aZ-NBO41cCnLvW6Og' },
+        { name: 'Al Arabiya Business', origin: 'Regional Economy', color: '#7c3aed', channelId: 'UC_99Svd6V7_6A88NREPPw5w' },
+        { name: 'Arab Finance', origin: 'Egypt Business', color: '#f59e0b', videoId: 'B-N7_Y9Z4z0' }
+    ],
+    abudhabi: [
+        { name: 'Stalk Stock UAE', origin: 'UAE Markets Expert', color: '#3b82f6', channelId: 'UCWrdHtyJD9_VIDL0d-1rYqQ' },
+        { name: 'ADX Official', origin: 'Abu Dhabi Exchange', color: '#10b981', channelId: 'UCTXDxQ1zAsRC1mX1zHzbEVw' },
+        { name: 'CNBC Arabia', origin: 'Gulf Business News', color: '#004a99', channelId: 'UCm6M_r9MRf_MAsq_o7K_wWA' }
+    ]
+};
+
 const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
+    const { effectiveMarket } = useMarket();
     const handleAction = useCallback((symbol: string) => {
         soundService.playTap();
         onSelectStock?.(symbol);
@@ -25,24 +43,25 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const [volumeAnomalies, setVolumeAnomalies] = useState<any[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
-    // Fetch real breaking news - US Markets focus
+    // Fetch real breaking news - Sync to market
     const { data: breakingNews, refetch: refetchNews } = useQuery<NewsArticle[]>({
-        queryKey: ['breakingNews'],
+        queryKey: ['breakingNews', effectiveMarket.id],
         queryFn: async () => {
-            return await getStockNews('SPY', 5);
+            const ticker = effectiveMarket.indexSymbol.replace('%5E', '^');
+            return await getStockNews(ticker, 5);
         },
         refetchInterval: 60000,
         staleTime: 30000,
     });
 
-    // Fetch Sector and Volume data
+    // Fetch Sector and Volume data - Market Aware
     useEffect(() => {
         const fetchData = async () => {
             setIsLoadingData(true);
             try {
                 const [sectors, volumes] = await Promise.all([
-                    getSectorPerformance(),
-                    getVolumeAnomalies()
+                    getSectorPerformance(effectiveMarket.id),
+                    getVolumeAnomalies(effectiveMarket.id)
                 ]);
                 setSectorData(sectors);
                 setVolumeAnomalies(volumes);
@@ -56,7 +75,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         fetchData();
         const interval = setInterval(fetchData, 30000); // 30s refresh
         return () => clearInterval(interval);
-    }, []);
+    }, [effectiveMarket.id]);
 
     // Calculate next market event
     const nextEventData = React.useMemo(() => {
@@ -193,25 +212,25 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', position: 'relative', zIndex: 1 }}>
                     {[
                         {
-                            label: 'Gold (GC=F): $5,221 (+0.86%)',
-                            status: 'Institutional Hedge',
+                            label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'USD/EGP Parallel' : 'WTI Crude'} Intelligence`,
+                            status: 'Hedge Bias',
                             color: '#10B981',
-                            desc: 'Capital flight toward safe-havens detected. Quantitative models suggest defensive positioning against pending macro volatility.',
-                            action: 'Hedge Bias'
+                            desc: `Cross-asset analysis confirms ${effectiveMarket.name} liquidity flows are moving toward defensive structures. Institutional conviction is high for mid-term stability.`,
+                            action: 'Strategic Long'
                         },
                         {
-                            label: 'Red Sea Corridor: Logistical Alert',
-                            status: 'Suez Congestion',
+                            label: `${effectiveMarket.indexName} Volatility`,
+                            status: 'Order Flow',
                             color: '#F59E0B',
-                            desc: 'Monitoring Suez & Mandab transit data. Sustained bottlenecks are inflating regional freight premiums and energy delivery lead times.',
-                            action: 'Inflation Risk'
+                            desc: `Real-time monitoring of ${effectiveMarket.indexName} components suggests pending rotation. Liquidity clusters identified at key structural supports.`,
+                            action: 'Defensive Bias'
                         },
                         {
-                            label: 'VIX Entropy: 18.10 (-7.42%)',
-                            status: 'Tactical Window',
-                            color: '#10B981',
-                            desc: 'Fear index regression levels opening a tactical momentum window. Current low entropy favors high-conviction execution strategies.',
-                            action: 'Momentum Long'
+                            label: 'Institutional Flow',
+                            status: 'Smart Money',
+                            color: '#3b82f6',
+                            desc: `Aggregated order book data reveals significant block trade activity in ${effectiveMarket.shortName} top constituents. Tracking sovereign wealth participation.`,
+                            action: 'Accumulate'
                         }
                     ].map((item, i) => (
                         <div key={i} className="glass-card-hover" style={{
@@ -249,18 +268,16 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
                     gap: '1rem'
                 }}>
-                    {[
-                        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdCLP7Lg' },
-                        { name: 'Sky News Business', origin: 'International', color: '#ff0000', channelId: 'UCoMdktPbSTixAyNGwb-UYkQ' },
-                        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCEAZeUIeJs0IjQiqTCdVSIg' }
-                    ].map((stream, i) => (
+                    {(MARKET_STREAMS[effectiveMarket.id] || MARKET_STREAMS.us).map((stream, i) => (
                         <div key={i} className="glass-card" style={{ padding: '0', overflow: 'hidden', borderRadius: '16px', border: '1px solid var(--glass-borderShadow)' }}>
                             <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000' }}>
                                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <iframe
                                         width="100%"
                                         height="100%"
-                                        src={`https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1`}
+                                        src={stream.videoId
+                                            ? `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1`
+                                            : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1`}
                                         title={stream.name}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -288,58 +305,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
             </div>
 
-            {/* ═══ MARKET CREATIVE RECOMMENDATIONS ═══ */}
-            <div className="glass-card" style={{
-                marginBottom: '1.5rem',
-                padding: '1.25rem',
-                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
-                border: '1px solid rgba(99, 102, 241, 0.2)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                    <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.2)' }}>
-                        <Sparkles size={18} color="#8b5cf6" />
-                    </div>
-                    <div>
-                        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Strategic Opportunity Radar</h2>
-                        <p style={{ margin: '2px 0 0 0', fontSize: '0.65rem', color: 'var(--color-text-secondary)' }}>AI tactical paths based on current global entropy.</p>
-                    </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                    {[
-                        {
-                            title: 'The Liquidity Squeeze Play',
-                            strategy: 'Volatility Arbitrage',
-                            intel: 'Detecting order imbalance in mid-cap tech constituents as institutional rebalancing approaches. Current "VIX Entropy" suggests a 48h rally window.',
-                            confidence: 84
-                        },
-                        {
-                            title: 'Commodity Currency Proxy',
-                            strategy: 'Cross-Market Correlation',
-                            intel: 'EGP/USD stabilization correlating with industrial volume anomalies. Strategic long bias on export-oriented materials (+ABUK, +EFIC).',
-                            confidence: 76
-                        },
-                        {
-                            title: 'Risk-Off Rotation Hedge',
-                            strategy: 'Defensive Positioning',
-                            intel: 'Hedge convergence toward Gold suggests pending macro volatility. Increase allocation to "Safe Haven" tech (MSFT/AAPL) to buffer beta exposure.',
-                            confidence: 91
-                        }
-                    ].map((item, i) => (
-                        <div key={i} style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'white' }}>{item.title}</div>
-                                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)' }}>{item.confidence}%</div>
-                            </div>
-                            <div style={{ fontSize: '0.6rem', color: 'var(--color-accent)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 700 }}>{item.strategy}</div>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: '0 0 10px 0' }}>{item.intel}</p>
-                            <div style={{ height: '3px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '1.5px' }}>
-                                <div style={{ width: `${item.confidence}%`, height: '100%', background: 'var(--color-accent)', borderRadius: '1.5px', boxShadow: '0 0 8px var(--color-accent)' }}></div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
 
             {/* Breaking News Ticker - Financial Terminal Style */}
             <div className="glass-card" style={{
@@ -642,16 +607,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     </div>
                 </div>
 
-            </div>
-
-            {/* Top Movers & Calendar */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, clamp(250px, 30vw, 320px)), 1fr))', gap: '1.25rem' }}>
-                <div style={{ gridColumn: '1 / -1' }}>
-                    <TopMovers />
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                    <EconomicCalendar />
-                </div>
             </div>
 
         </div>

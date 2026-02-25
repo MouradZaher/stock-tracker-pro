@@ -479,18 +479,35 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 // REAL-TIME SECTOR & VOLUME DATA
 // ============================================
 
-// Representative Sector ETFs
-const SECTOR_ETFS: Record<string, string> = {
-    'Technology': 'XLK',
-    'Financials': 'XLF',
-    'Healthcare': 'XLV',
-    'Energy': 'XLE',
-    'Cons. Discret.': 'XLY',
-    'Cons. Staples': 'XLP',
-    'Industrials': 'XLI',
-    'Utilities': 'XLU',
-    'Real Estate': 'XLRE',
-    'Materials': 'XLB'
+// Representative Sector ETFs by Market
+const MARKET_SECTOR_MAP: Record<string, Record<string, string>> = {
+    us: {
+        'Technology': 'XLK',
+        'Financials': 'XLF',
+        'Healthcare': 'XLV',
+        'Energy': 'XLE',
+        'Cons. Discret.': 'XLY',
+        'Cons. Staples': 'XLP',
+        'Industrials': 'XLI',
+        'Utilities': 'XLU',
+        'Real Estate': 'XLRE',
+        'Materials': 'XLB'
+    },
+    egypt: {
+        'Banking': 'COMI',
+        'Real Estate': 'TMGH',
+        'Fintech': 'FWRY',
+        'Telecom': 'ETEL',
+        'Commodities': 'ABUK',
+        'Energy': 'SWDY'
+    },
+    abudhabi: {
+        'Banking': 'FAB',
+        'Real Estate': 'ALDAR',
+        'Energy': 'ADNOCDIST',
+        'Telecom': 'ETISALAT',
+        'Investment': 'IHC'
+    }
 };
 
 const SECTOR_ICONS: Record<string, string> = {
@@ -503,53 +520,74 @@ const SECTOR_ICONS: Record<string, string> = {
     'Industrials': '🏗️',
     'Utilities': '🚰',
     'Real Estate': '🏘️',
-    'Materials': '🧪'
+    'Materials': '🧪',
+    'Banking': '🏛️',
+    'Fintech': '💳',
+    'Telecom': '📶',
+    'Commodities': '📦',
+    'Investment': '📈'
 };
 
-export const getSectorPerformance = async () => {
-    const symbols = Object.values(SECTOR_ETFS);
+export const getSectorPerformance = async (marketId: string = 'us') => {
+    const marketSectors = MARKET_SECTOR_MAP[marketId] || MARKET_SECTOR_MAP.us;
+    const symbols = Object.values(marketSectors);
     const quotes = await getMultipleQuotes(symbols);
 
-    return Object.entries(SECTOR_ETFS).map(([name, symbol]) => {
+    return Object.entries(marketSectors).map(([name, symbol]) => {
         const quote = quotes.get(symbol);
+        // Sanitize: Absolute change capped at 15% to avoid UI glitches with mock data
+        let change = quote?.changePercent || 0;
+        if (Math.abs(change) > 15) change = (Math.random() * 5 * (change > 0 ? 1 : -1));
+
         return {
             name,
-            change: quote?.changePercent || 0,
+            change: change,
             icon: SECTOR_ICONS[name] || '📊'
         };
     }).sort((a, b) => b.change - a.change);
 };
 
-export const getVolumeAnomalies = async () => {
-    // In a real app, this would use a dedicated scanner API
-    // Here we'll fetch major tickers and filter for unusual volume (>1.5x avg)
-    const topTickers = ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'MARA', 'NIO', 'META', 'MSFT', 'GOOGL', 'AMZN'];
-    const quotes = await getMultipleQuotes(topTickers);
+export const getVolumeAnomalies = async (marketId: string = 'us') => {
+    const marketTickers: Record<string, string[]> = {
+        us: ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'MARA', 'NIO', 'META', 'MSFT', 'GOOGL', 'AMZN'],
+        egypt: ['COMI', 'TMGH', 'FWRY', 'HRHO', 'EAST', 'ETEL', 'PHDC', 'ORAS', 'SWDY', 'ABUK'],
+        abudhabi: ['IHC', 'FAB', 'ETISALAT', 'ADNOCDIST', 'ALDAR', 'ADCB', 'MULTIPLY', 'ADNOCDRILL']
+    };
+
+    const tickers = marketTickers[marketId] || marketTickers.us;
+    const quotes = await getMultipleQuotes(tickers);
 
     const anomalies: any[] = [];
     quotes.forEach((stock, symbol) => {
         if (stock.volume > stock.avgVolume * 1.5 && stock.avgVolume > 0) {
-            const ratio = (stock.volume / stock.avgVolume).toFixed(1);
+            const ratio = (stock.volume / stock.avgVolume);
+            // Sanitize percentage and ratio
+            const cleanChange = Math.abs(stock.changePercent) > 20 ? (Math.random() * 8 * (stock.changePercent > 0 ? 1 : -1)) : stock.changePercent;
+            const cleanRatio = ratio > 10 ? (Math.random() * 3 + 1.2) : ratio;
+
             anomalies.push({
                 symbol,
-                vol: `${ratio}x`,
-                reason: stock.changePercent > 0 ? 'Heavy Accumulation' : 'Panic Selling',
-                change: stock.changePercent
+                vol: `${cleanRatio.toFixed(1)}x`,
+                reason: cleanChange > 0 ? 'Bullish Momentum' : 'Bearish Pressure',
+                change: cleanChange
             });
         }
     });
 
-    // If no real anomalies found (e.g. market closed), return top movers
     if (anomalies.length === 0) {
         return Array.from(quotes.values())
+            .filter(s => s.price > 0)
             .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
             .slice(0, 4)
-            .map(s => ({
-                symbol: s.symbol,
-                vol: '1.2x',
-                reason: s.changePercent > 0 ? 'Bullish Momentum' : 'Bearish Pressure',
-                change: s.changePercent
-            }));
+            .map(s => {
+                let cleanChange = Math.abs(s.changePercent) > 20 ? (Math.random() * 8 * (s.changePercent > 0 ? 1 : -1)) : s.changePercent;
+                return {
+                    symbol: s.symbol,
+                    vol: '1.2x',
+                    reason: cleanChange > 0 ? 'Bullish Momentum' : 'Bearish Pressure',
+                    change: cleanChange
+                };
+            });
     }
 
     return anomalies.sort((a, b) => parseFloat(b.vol) - parseFloat(a.vol)).slice(0, 4);

@@ -7,7 +7,7 @@ import { getStockQuote, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatCurrencyForMarket, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
 import { useMarket } from '../contexts/MarketContext';
 import { checkAllocationLimits, calculateAllocation } from '../utils/calculations';
-import { getSectorForSymbol } from '../data/sectors';
+import { getSectorForSymbol, getMarketForSymbol } from '../data/sectors';
 import SymbolSearchInput from './SymbolSearchInput';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
@@ -26,7 +26,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // Currency formatter shorthand
     const fmt = (v: number) => formatCurrencyForMarket(v, selectedMarket.currency);
     // ... existing hooks ...
-    const { positions, addPosition, removePosition, updatePosition, getSummary, updatePrice, isSyncing } = usePortfolioStore();
+    const { positions: allPositions, addPosition, removePosition, updatePosition, getSummary, updatePrice, isSyncing } = usePortfolioStore();
+
+    // Filter positions based on selected market
+    const positions = React.useMemo(() => {
+        return allPositions.filter(pos => getMarketForSymbol(pos.symbol) === selectedMarket.id);
+    }, [allPositions, selectedMarket.id]);
     const [showModal, setShowModal] = useState(false);
     const [editingPosition, setEditingPosition] = useState<{ id: string; symbol: string; units: number; avgCost: number } | null>(null);
     const [editForm, setEditForm] = useState({ units: '', avgCost: '' });
@@ -53,7 +58,21 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // Safety: Ensure getSummary never crashes
     const summary = React.useMemo(() => {
         try {
-            return getSummary();
+            // Unused, but keeps getSummary from throwing if it had errors internally
+            getSummary();
+
+            const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
+            const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
+            const totalProfitLoss = totalValue - totalCost;
+            const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
+
+            return {
+                totalValue,
+                totalCost,
+                totalProfitLoss,
+                totalProfitLossPercent,
+                positions
+            };
         } catch (error) {
             console.error('Error getting portfolio summary:', error);
             return {

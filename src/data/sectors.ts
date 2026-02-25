@@ -230,6 +230,21 @@ export const getSectorForSymbol = (symbol: string): string => {
     return 'Unknown';
 };
 
+// Get market for a symbol based on predefined indices
+export const getMarketForSymbol = (symbol: string): 'us' | 'egypt' | 'abudhabi' => {
+    if (STOCKS_BY_INDEX['EGX 30']?.some(s => s.symbol === symbol)) return 'egypt';
+    if (STOCKS_BY_INDEX['FTSE ADX 15']?.some(s => s.symbol === symbol)) return 'abudhabi';
+
+    // Explicit list fallback just in case
+    const egyptSymbols = ['COMI', 'TMGH', 'FWRY', 'HRHO', 'EAST', 'ETEL', 'PHDC', 'ORAS', 'SWDY', 'ABUK', 'CLHO', 'EMFD', 'EFID', 'ADIB', 'RAYA'];
+    if (egyptSymbols.includes(symbol)) return 'egypt';
+
+    const adxSymbols = ['IHC', 'FAB', 'ETISALAT', 'ADNOCDIST', 'ALDAR', 'ADCB', 'MULTIPLY', 'ADNOCDRILL', 'PRESIGHT', 'FERTIGLBE', 'DANA', 'AGTHIA', 'YAHSAT', 'ALPHADHABI', 'RAKPROP'];
+    if (adxSymbols.includes(symbol)) return 'abudhabi';
+
+    return 'us';
+};
+
 // Get all symbols for autocomplete
 export const getAllSymbols = (): { symbol: string; name: string; type: string; sector: string }[] => {
     const stocks = Object.entries(STOCKS_BY_SECTOR).flatMap(([sector, stocks]) =>
