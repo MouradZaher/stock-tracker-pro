@@ -4,11 +4,16 @@ import type { MarketId } from '../contexts/MarketContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 // ─── One index symbol per market ────────────────────────────────────────────
+// Using FOREXCOM/OANDA CFD symbols — freely embeddable across all regions.
+// EGX and ADX proper exchange symbols also work in the advanced-chart widget.
 const INDEX_SYMBOL: Record<MarketId, string> = {
-    us: 'SP:SPX',       // S&P 500
-    egypt: 'EGX:EGX30',    // EGX 30
-    abudhabi: 'ADX:ADSMI',    // Abu Dhabi Securities Market Index
+    us: 'FOREXCOM:SPXUSD',   // S&P 500 (CFD — no geo-restriction)
+    egypt: 'EGX:EGX30',         // EGX 30  (Egyptian Exchange)
+    abudhabi: 'ADX:ADSMI',         // Abu Dhabi Securities Market Index
 };
+
+// Interval: 'D' = daily bars for clean intraday view, '60' = 1h
+const INTERVAL = 'D';
 
 const AIMarketTicker: React.FC = () => {
     const { selectedMarket } = useMarket();
@@ -21,25 +26,33 @@ const AIMarketTicker: React.FC = () => {
         container.innerHTML = '';
 
         const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
         script.async = true;
         script.type = 'text/javascript';
+
         script.innerHTML = JSON.stringify({
-            symbol: INDEX_SYMBOL[selectedMarket.id] ?? 'SP:SPX',
-            width: '100%',
-            height: 200,
+            autosize: true,
+            symbol: INDEX_SYMBOL[selectedMarket.id] ?? 'FOREXCOM:SPXUSD',
+            interval: INTERVAL,
+            timezone: 'Etc/UTC',
+            theme: theme === 'dark' ? 'dark' : 'light',
+            style: '3',       // 3 = area / mountain chart — clean look
             locale: 'en',
-            dateRange: '1D',
-            colorTheme: theme === 'dark' ? 'dark' : 'light',
-            isTransparent: true,
-            autosize: false,
-            largeChartUrl: '',
-            chartOnly: false,
-            noTimeScale: false,
+            backgroundColor: 'rgba(0,0,0,0)',
+            gridColor: 'rgba(255,255,255,0.03)',
+            hide_top_toolbar: true,
+            hide_legend: true,
+            hide_side_toolbar: true,
+            allow_symbol_change: false,
+            save_image: false,
+            calendar: false,
+            support_host: 'https://www.tradingview.com',
         });
 
         const widget = document.createElement('div');
         widget.className = 'tradingview-widget-container__widget';
+        widget.style.height = '100%';
+        widget.style.width = '100%';
         container.appendChild(widget);
         widget.appendChild(script);
 
@@ -57,15 +70,14 @@ const AIMarketTicker: React.FC = () => {
                 background: 'var(--glass-bg)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                position: 'relative',
             }}
         >
-            {/* Header label */}
+            {/* Header pill */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 14px 0',
+                padding: '8px 14px 4px',
                 fontSize: '0.6rem',
                 fontWeight: 800,
                 color: selectedMarket.color,
@@ -87,15 +99,15 @@ const AIMarketTicker: React.FC = () => {
                     fontSize: '0.5rem',
                     fontWeight: 900,
                 }}>
-                    1D
+                    DAILY
                 </span>
             </div>
 
-            {/* TradingView mini chart */}
+            {/* TradingView advanced chart — area style, no toolbars */}
             <div
                 className="tradingview-widget-container"
                 ref={containerRef}
-                style={{ width: '100%', height: '200px' }}
+                style={{ width: '100%', height: '220px' }}
             />
         </div>
     );
