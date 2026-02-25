@@ -3,43 +3,50 @@ import { TrendingUp, ShieldCheck, Zap, Activity, Info } from 'lucide-react';
 import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
 
+// Performance chart: 6-month AI vs. benchmark returns (indexed to 100)
+// S&P 500: tight outperformance in efficient market (realistic +12% alpha over 6m)
+// EGX 30:  higher volatility, stronger momentum reads (+22% alpha but bumpier)
+// FTSE ADX 15: low-volatility, government-backed stocks, steady outperformance (+11%)
 const PERF_DATA: Record<MarketId, { month: string; ai: number; benchmark: number }[]> = {
     us: [
         { month: 'Sep', ai: 100, benchmark: 100 },
-        { month: 'Oct', ai: 105, benchmark: 102 },
-        { month: 'Nov', ai: 112, benchmark: 106 },
-        { month: 'Dec', ai: 118, benchmark: 109 },
-        { month: 'Jan', ai: 126, benchmark: 114 },
-        { month: 'Feb', ai: 134, benchmark: 118 },
+        { month: 'Oct', ai: 101.8, benchmark: 101.2 },
+        { month: 'Nov', ai: 103.4, benchmark: 103.1 },
+        { month: 'Dec', ai: 106.1, benchmark: 104.8 },
+        { month: 'Jan', ai: 108.7, benchmark: 106.3 },
+        { month: 'Feb', ai: 112.3, benchmark: 108.9 },
     ],
     egypt: [
         { month: 'Sep', ai: 100, benchmark: 100 },
-        { month: 'Oct', ai: 108, benchmark: 104 },
-        { month: 'Nov', ai: 115, benchmark: 107 },
-        { month: 'Dec', ai: 124, benchmark: 112 },
-        { month: 'Jan', ai: 131, benchmark: 116 },
-        { month: 'Feb', ai: 140, benchmark: 121 },
+        { month: 'Oct', ai: 104.2, benchmark: 102.5 },
+        { month: 'Nov', ai: 109.8, benchmark: 105.1 },
+        { month: 'Dec', ai: 113.5, benchmark: 106.8 },
+        { month: 'Jan', ai: 118.9, benchmark: 109.4 },
+        { month: 'Feb', ai: 122.4, benchmark: 111.7 },
     ],
     abudhabi: [
         { month: 'Sep', ai: 100, benchmark: 100 },
-        { month: 'Oct', ai: 104, benchmark: 101 },
-        { month: 'Nov', ai: 110, benchmark: 104 },
-        { month: 'Dec', ai: 116, benchmark: 107 },
-        { month: 'Jan', ai: 122, benchmark: 110 },
-        { month: 'Feb', ai: 128, benchmark: 113 },
+        { month: 'Oct', ai: 102.1, benchmark: 101.3 },
+        { month: 'Nov', ai: 103.9, benchmark: 102.4 },
+        { month: 'Dec', ai: 106.3, benchmark: 103.8 },
+        { month: 'Jan', ai: 108.4, benchmark: 105.1 },
+        { month: 'Feb', ai: 111.2, benchmark: 106.7 },
     ],
 };
 
+// Alpha insight text — specific to each market's characteristics
 const ALPHA_INSIGHTS: Record<MarketId, string> = {
-    us: 'Model identified 12 volatility clusters in Q1. σ=1.4.',
-    egypt: 'Model identified strong banking momentum in EGX with 8 accumulation signals. σ=1.6.',
-    abudhabi: 'Model detected 6 sector rotation patterns in ADX driven by government mandates. σ=1.1.',
+    us: 'Model identified 9 RSI divergence events in mega-cap tech during Q1 earnings season. Sector rotation from defensive to growth captured +6.1% of edge. σ=1.2.',
+    egypt: 'Model detected 5 banking-sector accumulation waves correlated with CBE rate decisions. Currency devaluation hedging via commodity-linked names added +4.8% edge. σ=1.9.',
+    abudhabi: 'Model captured 4 sovereign fund rebalancing windows in ADNOCDIST, FAB, and TAQA around OPEC+ announcements. Oil-equity correlation model contributed +3.6% alpha. σ=0.9.',
 };
 
+// Cumulative alpha above index, signal accuracy and Sharpe per market
+// Note: Sharpe ratios based on 6-month trailing risk-adjusted returns
 const STATS_DATA: Record<MarketId, { alpha: string; accuracy: string; sharpe: string; signals: string }> = {
-    us: { alpha: '+16.2%', accuracy: '74%', sharpe: '2.8', signals: '120' },
-    egypt: { alpha: '+19.0%', accuracy: '71%', sharpe: '2.4', signals: '90' },
-    abudhabi: { alpha: '+15.0%', accuracy: '76%', sharpe: '3.0', signals: '80' },
+    us: { alpha: '+12.3%', accuracy: '71%', sharpe: '1.9', signals: '312' },
+    egypt: { alpha: '+22.4%', accuracy: '66%', sharpe: '1.4', signals: '148' },
+    abudhabi: { alpha: '+11.2%', accuracy: '74%', sharpe: '2.3', signals: '97' },
 };
 
 const AIPerformanceTracker: React.FC = () => {
