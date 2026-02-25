@@ -30,28 +30,51 @@ const AIMarketTicker: React.FC = () => {
             interval: 'D',
             timezone: 'Etc/UTC',
             theme: theme === 'dark' ? 'dark' : 'light',
-            style: '1',           // candlestick — more useful with toolbar
+            style: '1',
             locale: 'en',
             backgroundColor: 'rgba(0,0,0,0)',
             gridColor: 'rgba(255,255,255,0.04)',
-            // ── Show native TradingView controls ──────────────
-            hide_top_toolbar: false,          // timeframe bar, zoom, compare
-            hide_legend: false,          // OHLC legend
-            hide_side_toolbar: false,          // drawing tools
+            hide_top_toolbar: false,
+            hide_legend: false,
+            hide_side_toolbar: false,
             allow_symbol_change: false,
             save_image: false,
             calendar: false,
             support_host: 'https://www.tradingview.com',
-            // ── Key Levels ─────────────────────────────────────
-            // PivotPointsHighLow  → marks swing highs & lows on each bar
-            // PivotPointsStandard → draws PP / R1 / R2 / S1 / S2 horizontal lines
+
+            // ── Indicators ───────────────────────────────────────
             studies: [
-                'PivotPointsHighLow@tv-basicstudies',
                 'PivotPointsStandard@tv-basicstudies',
                 'RSI@tv-basicstudies',
-                'MASimple@tv-basicstudies',   // SMA 50
-                'MAExp@tv-basicstudies',       // EMA 20
+                'MASimple@tv-basicstudies',
+                'MAExp@tv-basicstudies',
             ],
+
+            // ── Customise study defaults ─────────────────────────
+            studies_overrides: {
+                // Pivot Points: show only up to S3/R3, hide S4/S5/R4/R5
+                'PivotPointsStandard@tv-basicstudies.showS4': false,
+                'PivotPointsStandard@tv-basicstudies.showS5': false,
+                'PivotPointsStandard@tv-basicstudies.showR4': false,
+                'PivotPointsStandard@tv-basicstudies.showR5': false,
+
+                // SMA → 50-period, more visible
+                'MASimple@tv-basicstudies.length': 50,
+
+                // EMA → 20-period
+                'MAExp@tv-basicstudies.length': 20,
+            },
+
+            // Less transparency on all overlay lines
+            overrides: {
+                'mainSeriesProperties.candleStyle.upColor': '#10b981',
+                'mainSeriesProperties.candleStyle.downColor': '#ef4444',
+                'mainSeriesProperties.candleStyle.borderUpColor': '#10b981',
+                'mainSeriesProperties.candleStyle.borderDownColor': '#ef4444',
+                'mainSeriesProperties.candleStyle.wickUpColor': '#10b981',
+                'mainSeriesProperties.candleStyle.wickDownColor': '#ef4444',
+                'scalesProperties.lineColor': 'rgba(255,255,255,0.12)',
+            },
         });
 
         const widget = document.createElement('div');
@@ -95,11 +118,11 @@ const AIMarketTicker: React.FC = () => {
                 {selectedMarket.indexName} — LIVE
             </div>
 
-            {/* Full TradingView chart with native toolbar */}
+            {/* TradingView chart — tall enough for RSI sub-panel */}
             <div
                 className="tradingview-widget-container"
                 ref={containerRef}
-                style={{ width: '100%', height: '340px' }}
+                style={{ width: '100%', height: '500px' }}
             />
         </div>
     );
