@@ -85,7 +85,7 @@
   --glass-blur: blur(24px);
   --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
 
-  --header-height: 48px;
+  --header-height: 64px;
   --mobile-nav-height: 80px;
 
   /* Breakpoints */
@@ -472,12 +472,14 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--spacing-xl) !important;
+  padding: 0 var(--spacing-xl) 6px !important;
   height: var(--header-height) !important;
   background: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border);
   z-index: 1000;
   position: fixed;
+  display: flex;
+  align-items: center;
   top: 0;
   left: 0;
   right: 0;

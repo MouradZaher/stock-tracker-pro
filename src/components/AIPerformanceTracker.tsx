@@ -270,45 +270,23 @@ const AIPerformanceTracker: React.FC = () => {
                         </p>
                     </div>
 
-                    {/* Stress Test Card */}
-                    <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                            <BarChart3 size={18} color={selectedMarket.color} />
-                            <span style={{ fontSize: '0.75rem', fontWeight: 800 }}>Strategy Simulator</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '15px', marginBottom: 'auto' }}>
-                            <div>
-                                <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Win Rate</div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-success)' }}>{ps.winRate}</div>
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>P. Factor</div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: selectedMarket.color }}>{ps.pf}</div>
-                            </div>
-                        </div>
-                        <button
-                            className="btn btn-primary"
-                            style={{ width: '100%', marginTop: '1.25rem', fontSize: '0.7rem', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)' }}
-                            onClick={handleRunBacktest}
-                        >
-                            {ps.stressLabel}
-                        </button>
-                    </div>
                 </div>
+            </div>
 
-                {/* GLOBAL MACRO INTELLIGENCE BAR (WORLDMONITOR SYNC) */}
-                <div style={{
-                    marginTop: '1.25rem',
-                    padding: '0.85rem 1.25rem',
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(59, 130, 246, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}>
+            {/* GLOBAL MACRO INTELLIGENCE BAR (WORLDMONITOR SYNC) */}
+            <div style={{
+                marginTop: '1.25rem',
+                padding: '1.25rem',
+                background: 'rgba(59, 130, 246, 0.08)',
+                borderRadius: '16px',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{
                         padding: '6px',
                         borderRadius: '8px',
@@ -319,81 +297,53 @@ const AIPerformanceTracker: React.FC = () => {
                         animation: 'pulse-blue 3s infinite ease-in-out',
                         boxShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
                     }}>
-                        <Globe size={16} color="#3b82f6" />
+                        <Globe size={18} color="#3b82f6" />
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Macro Intel</div>
+                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Macro Intel</div>
                             <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#3b82f6', opacity: 0.5 }}></div>
-                            <div style={{ fontSize: '0.6rem', color: 'rgba(59, 130, 246, 0.7)', fontWeight: 700 }}>LIVE WORLD MONITOR SYNC</div>
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-primary)', fontWeight: 600, display: 'flex', gap: '15px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ color: 'var(--color-success)' }}>●</span> Gold (GC=F): $5,221 (+0.86%) — Hedge Convergence
-                            </span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ color: 'var(--color-warning)' }}>●</span> Red Sea Corridor: Active Bottleneck Monitor
-                            </span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ color: 'var(--color-success)' }}>●</span> VIX Entropy: 18.10 (-7.42%) — Tactical Window
-                            </span>
+                            <div style={{ fontSize: '0.65rem', color: 'rgba(59, 130, 246, 0.7)', fontWeight: 700 }}>LIVE WORLD MONITOR SYNC</div>
                         </div>
                     </div>
+                    <div style={{ fontSize: '0.6rem', fontWeight: 800, padding: '2px 8px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' }}>ACTIVE FEED</div>
                 </div>
 
-
-                {/* TACTICAL SETUP BAR */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '1.25rem',
-                    background: 'rgba(0,0,0,0.3)',
-                    borderRadius: '16px',
-                    border: '1px solid var(--glass-border)'
-                }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: `${selectedMarket.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Zap size={20} color={selectedMarket.color} fill={selectedMarket.color} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: 800, marginBottom: '2px' }}>{intel.title}</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span>BIAS: <strong style={{ color: 'var(--color-success)' }}>{intel.bias}</strong></span>
-                            <span style={{ width: '1px', height: '10px', background: 'var(--glass-border)' }}></span>
-                            <span>RISK: <strong style={{ color: intel.risk === 'HIGH' ? 'var(--color-error)' : 'var(--color-success)' }}>{intel.risk}</strong></span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginTop: '4px' }}>
+                    {[
+                        {
+                            label: 'Gold (GC=F): $5,221 (+0.86%)',
+                            status: 'Hedge Convergence',
+                            color: 'var(--color-success)',
+                            desc: 'AI detected capital flight toward safe-havens. Institutional hedge convergence suggests defensive positioning against pending macro volatility.'
+                        },
+                        {
+                            label: 'Red Sea Corridor: Logistics Alert',
+                            status: 'Active Bottleneck',
+                            color: 'var(--color-warning)',
+                            desc: 'Monitoring Suez & Mandab transit data. Sustained logistical bottlenecks are inflating regional freight premiums and delivery lead times.'
+                        },
+                        {
+                            label: 'VIX Entropy: 18.10 (-7.42%)',
+                            status: 'Tactical Window',
+                            color: 'var(--color-success)',
+                            desc: 'Fear index regression levels opening a tactical momentum window. Current low entropy favors high-conviction execution strategies.'
+                        }
+                    ].map((item, i) => (
+                        <div key={i} style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', alignItems: 'center' }}>
+                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>{item.label}</div>
+                                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: item.color, background: `${item.color}11`, padding: '1px 6px', borderRadius: '3px', textTransform: 'uppercase' }}>{item.status}</div>
+                            </div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', lineHeight: 1.4, fontWeight: 500 }}>
+                                {item.desc}
+                            </div>
                         </div>
-                    </div>
-                    <ArrowRight size={16} color="var(--color-text-tertiary)" />
+                    ))}
                 </div>
             </div>
 
-            {/* ═══ MARKET SESSIONS ROW ═══ */}
-            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
-                <div className="glass-card" style={{
-                    padding: '12px 24px',
-                    textAlign: 'center',
-                    background: session.isOpen ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.01)',
-                    border: '1px solid var(--glass-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '15px',
-                    minWidth: '280px',
-                    justifyContent: 'center'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '8px', height: '8px', background: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', borderRadius: '50%', boxShadow: session.isOpen ? '0 0 10px var(--color-success)' : 'none' }}></div>
-                        <div style={{ fontSize: '0.8rem', fontWeight: 900, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
-                    </div>
-                    <div style={{ width: '1px', height: '15px', background: 'var(--glass-border)' }}></div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
-                        {session.hours} (CAIRO)
-                    </div>
-                    <div style={{ width: '1px', height: '15px', background: 'var(--glass-border)' }}></div>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 900, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>
-                        {session.isOpen ? 'Active' : 'Closed'}
-                    </div>
-                </div>
-            </div>
+
 
             {/* ═══ EXPLAINER MODAL ═══ */}
             {showExplainerModal && (
