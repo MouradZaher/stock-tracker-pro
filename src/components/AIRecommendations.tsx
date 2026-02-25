@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, X, BarChart3, Zap, ArrowRight, Check, Globe } from 'lucide-react';
+import { RefreshCw, X, Zap, ArrowRight, Check } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -12,81 +12,7 @@ import type { MarketId } from '../contexts/MarketContext';
 import AIPerformanceTracker from './AIPerformanceTracker';
 import AIMarketTicker from './AIMarketTicker';
 
-// ─── Market-Specific Precision Engine & Strategy Simulator Stats ─────────────
-// Numbers reflect each market's real structural characteristics:
-//   S&P 500: highly liquid, efficient → lower alpha, tight spreads, high signal volume
-//   EGX 30:  emerging/volatile → higher momentum alpha potential, fewer signals, wider RR
-//   FTSE ADX 15: oil-driven Gulf market → government-backed stability, moderate signals
-const MARKET_PRECISION_STATS: Record<MarketId, {
-    accuracy: number;      // % circle fill (technical signal hit rate)
-    label: string;         // tag under circle
-    signalCount: number;   // signals in backtesting window
-    modelVersion: string;  // alpha model label
-    winRate: string;       // strategy sim win rate
-    pf: string;            // profit/loss ratio
-    stressDesc: string;    // strategy simulator body text
-    stressLabel: string;   // RUN_STRESS_TEST button label
-}> = {
-    us: {
-        accuracy: 71,
-        label: 'SIGNAL HIT RATE',
-        signalCount: 312,
-        modelVersion: 'Alpha v5.1',
-        winRate: '67.8%',
-        pf: '2.1x',
-        stressDesc: 'Backtested on 5-years of S&P 500 intraday data. Model filters for RSI divergence, earnings momentum, and sector rotation. High-efficiency market limits exploitable edge.',
-        stressLabel: 'RUN_STRESS_TEST',
-    },
-    egypt: {
-        accuracy: 66,
-        label: 'SIGNAL HIT RATE',
-        signalCount: 148,
-        modelVersion: 'Alpha v3.8',
-        winRate: '63.2%',
-        pf: '2.4x',
-        stressDesc: 'Backtested on 3-years of EGX 30 session data. Model capitalises on banking sector momentum, currency-driven volatility spikes, and thin liquidity gaps. Higher reward-to-risk in frontier environment.',
-        stressLabel: 'RUN_STRESS_TEST',
-    },
-    abudhabi: {
-        accuracy: 74,
-        label: 'SIGNAL HIT RATE',
-        signalCount: 97,
-        modelVersion: 'Alpha v4.6',
-        winRate: '71.5%',
-        pf: '2.6x',
-        stressDesc: 'Backtested on 4-years of FTSE ADX 15 data. Model exploits oil-price correlation, sovereign fund rebalancing windows, and low-float price inefficiencies unique to Gulf blue-chips.',
-        stressLabel: 'RUN_STRESS_TEST',
-    },
-};
 
-
-interface MarketSession {
-    code: string;
-    isOpen: boolean;
-    isWeekend?: boolean;
-}
-
-const getMarketSessions = (): MarketSession[] => {
-    const now = new Date();
-    const utcHour = now.getUTCHours();
-    const utcMin = now.getUTCMinutes();
-    const day = now.getUTCDay();
-    const cairoHour = (utcHour + 2) % 24;
-    const cairoMin = utcMin;
-    const cairoDay = (utcHour + 2 >= 24) ? (day + 1) % 7 : day;
-
-    const isTimeInRange = (h: number, m: number, startH: number, startM: number, endH: number, endM: number) => {
-        const current = h * 60 + m;
-        return current >= startH * 60 + startM && current < endH * 60 + endM;
-    };
-
-    return [
-        { code: 'EGX', isOpen: (cairoDay >= 0 && cairoDay <= 4) && isTimeInRange(cairoHour, cairoMin, 10, 0, 14, 30), isWeekend: cairoDay === 5 || cairoDay === 6 },
-        { code: 'LND', isOpen: (day >= 1 && day <= 5) && isTimeInRange(cairoHour, cairoMin, 10, 0, 18, 30), isWeekend: day === 0 || day === 6 },
-        { code: 'NYC', isOpen: (day >= 1 && day <= 5) && isTimeInRange(cairoHour, cairoMin, 16, 30, 23, 0), isWeekend: day === 0 || day === 6 },
-        { code: 'TKY', isOpen: (day >= 1 && day <= 5) && isTimeInRange(cairoHour, cairoMin, 2, 0, 8, 0), isWeekend: day === 0 || day === 6 },
-    ];
-};
 
 // ─── Market-Specific Curated Recommendations ────────────────────────────
 const US_RECS = [
@@ -145,24 +71,7 @@ const ABUDHABI_RECS = [
 
 const RECS_MAP: Record<MarketId, typeof US_RECS> = { us: US_RECS, egypt: EGYPT_RECS, abudhabi: ABUDHABI_RECS };
 
-// ─── Market-specific intelligence ────────────────────────────────────────
-const INTELLIGENCE: Record<MarketId, { title: string; body: string; bias: string; risk: string }> = {
-    us: {
-        title: 'Tactical Setup: Institutional Tech Flow Analysis',
-        body: 'AI models indicate a strong institutional bias toward high-beta tech today. Markets are pricing in a neutral CPI print. Key tactical levels: SPY 502, QQQ 438. Avoid chasing initial gaps; look for the 10:15 AM reversal signal.',
-        bias: 'BULLISH', risk: 'MEDIUM',
-    },
-    egypt: {
-        title: 'Tactical Setup: EGX Banking & Real Estate Flow',
-        body: 'AI models detect renewed foreign institutional flows into Egyptian banking majors (COMI, HRHO). Real estate sector momentum led by TMGH continues on strong quarterly pre-sales. Key level: EGX 30 above 32,500 confirms breakout.',
-        bias: 'BULLISH', risk: 'MEDIUM',
-    },
-    abudhabi: {
-        title: 'Tactical Setup: Abu Dhabi Diversification Play',
-        body: 'AI models highlight continued strength in IHC and Aldar driven by government diversification mandates. Energy sector stable with ADNOC complex holding key levels. Key level: FTSE ADX 15 above 10,200 signals continuation.',
-        bias: 'BULLISH', risk: 'LOW',
-    },
-};
+
 
 const SCAN_LOGS: Record<MarketId, string[]> = {
     us: [
@@ -200,7 +109,6 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     const { selectedMarket } = useMarket();
     const [detailSymbol, setDetailSymbol] = useState<string | null>(null);
     const [showReportModal, setShowReportModal] = useState<number | null>(null);
-    const [showBacktestModal, setShowBacktestModal] = useState(false);
 
     // Scanner State
     const [isScanning, setIsScanning] = useState(false);
@@ -211,8 +119,6 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     const INSTANT_RECS = useMemo(() => {
         return [...(RECS_MAP[selectedMarket.id] || US_RECS)].sort((a, b) => b.score - a.score);
     }, [selectedMarket.id]);
-
-    const currentIntel = INTELLIGENCE[selectedMarket.id] || INTELLIGENCE.us;
 
     // Reset active recommendations when market changes to ensure sync
     useEffect(() => {
@@ -239,7 +145,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         });
     };
 
-    const handleRunBacktest = () => { soundService.playSuccess(); setShowBacktestModal(true); };
+
 
     const runScanner = async () => {
         const logs = SCAN_LOGS[selectedMarket.id] || SCAN_LOGS.us;
@@ -312,18 +218,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                         </div>
                     </div>
 
-                    <div style={{ padding: '1rem 0', borderTop: '1px solid var(--glass-border)', marginTop: '1rem' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', fontSize: '0.65rem', textAlign: 'center', marginBottom: '0.5rem' }}>
-                            {getMarketSessions().map(session => (
-                                <div key={session.code} style={{ opacity: session.isOpen ? 1 : 0.4 }}>
-                                    <div style={{ fontWeight: 800, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
-                                    <div style={{ fontSize: '0.55rem', color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', marginTop: '2px' }}>
-                                        {session.isOpen ? '● OPEN' : session.isWeekend ? 'WEEKEND' : 'CLOSED'}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -401,69 +296,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 <SearchEngine onSelectSymbol={handleLocalSelect} />
             </div>
 
-            {/* ═══ TOP STATS ROW ═══ */}
-            {(() => {
-                const ps = MARKET_PRECISION_STATS[selectedMarket.id] || MARKET_PRECISION_STATS.us;
-                const fillOffset = 283 - (283 * (ps.accuracy / 100));
-                return (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
 
-                        {/* ── Precision Engine ─────────── */}
-                        <div className="glass-card" style={{
-                            padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(20, 20, 30, 0.6) 100%)',
-                            position: 'relative', overflow: 'hidden',
-                        }}>
-                            <div style={{ position: 'absolute', top: 10, left: 15, fontSize: '0.6rem', fontWeight: 800, color: 'var(--color-success)', letterSpacing: '0.1em', opacity: 0.8 }}>PRECISION_ENGINE</div>
-                            <div style={{ position: 'relative', width: '90px', height: '90px', marginTop: '0.5rem' }}>
-                                <svg viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', width: '100%', height: '100%' }}>
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--color-success)" strokeWidth="8"
-                                        strokeDasharray="283" strokeDashoffset={fillOffset} strokeLinecap="round"
-                                        style={{ transition: 'stroke-dashoffset 2s ease-out' }}
-                                    />
-                                </svg>
-                                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    <div style={{ fontSize: '1.4rem', fontWeight: 900 }}>{ps.accuracy}%</div>
-                                    <div style={{ fontSize: '0.45rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{ps.label}</div>
-                                </div>
-                            </div>
-                            <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
-                                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                                    <Zap size={10} fill="var(--color-success)" /> {ps.modelVersion}
-                                </div>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>Last {ps.signalCount} Verified Signals</div>
-                            </div>
-                        </div>
-
-                        {/* ── Strategy Simulator ───────── */}
-                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem' }}>
-                                <div style={{ padding: '6px', borderRadius: '8px', background: 'var(--color-accent-light)' }}>
-                                    <BarChart3 size={16} color="var(--color-accent)" />
-                                </div>
-                                <div style={{ fontSize: '0.85rem', fontWeight: 800 }}>Strategy Simulator</div>
-                            </div>
-                            <p style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', marginBottom: '1rem', lineHeight: '1.55' }}>
-                                {ps.stressDesc}
-                            </p>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: 'auto' }}>
-                                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Win Rate</div>
-                                    <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-success)' }}>{ps.winRate}</div>
-                                </div>
-                                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Profit Factor</div>
-                                    <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-accent)' }}>{ps.pf}</div>
-                                </div>
-                            </div>
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', fontSize: '0.75rem', padding: '8px' }} onClick={handleRunBacktest}>
-                                {ps.stressLabel}
-                            </button>
-                        </div>
-                    </div>
-                );
-            })()}
 
             {/* ═══ HOW AI STRATEGY WORKS ═══ */}
             <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.75rem', borderLeft: `4px solid ${selectedMarket.color}` }}>
@@ -495,67 +328,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             {/* ═══ AI PERFORMANCE TRACKER ═══ */}
             <AIPerformanceTracker />
 
-            {/* ═══ MARKET OPEN INTELLIGENCE ═══ */}
-            <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.75rem', borderLeft: `4px solid ${selectedMarket.color}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <h3 style={{ fontSize: '0.85rem', color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Globe size={18} /> Market Open Intelligence
-                    </h3>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>{new Date().toLocaleDateString()}</span>
-                </div>
 
-                <div style={{ background: `${selectedMarket.color}08`, padding: '1.25rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--glass-borderShadow)' }}>
-                    <h4 style={{ fontSize: '1rem', marginBottom: '0.75rem', fontWeight: 700 }}>{currentIntel.title}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '1rem' }}>
-                        {currentIntel.body}
-                    </p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem' }}>
-                        <div style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '8px', border: '1px solid var(--color-success-light)' }}>
-                            <div style={{ fontSize: '0.6rem', color: 'var(--color-success)', textTransform: 'uppercase', marginBottom: '2px' }}>Bias</div>
-                            <div style={{ fontSize: '0.85rem', fontWeight: 800 }}>{currentIntel.bias}</div>
-                        </div>
-                        <div style={{ padding: '0.75rem', background: currentIntel.risk === 'LOW' ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)', borderRadius: '8px', border: `1px solid ${currentIntel.risk === 'LOW' ? 'var(--color-success-light)' : 'var(--color-error-light)'}` }}>
-                            <div style={{ fontSize: '0.6rem', color: currentIntel.risk === 'LOW' ? 'var(--color-success)' : 'var(--color-error)', textTransform: 'uppercase', marginBottom: '2px' }}>Risk</div>
-                            <div style={{ fontSize: '0.85rem', fontWeight: 800 }}>{currentIntel.risk}</div>
-                        </div>
-                    </div>
-
-                    {/* Market Sessions */}
-                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', fontSize: '0.65rem', textAlign: 'center', marginBottom: '0.5rem' }}>
-                            {getMarketSessions().map(session => (
-                                <div key={session.code} style={{ opacity: session.isOpen ? 1 : 0.5, background: session.isOpen ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.02)', padding: '6px 2px', borderRadius: '4px' }}>
-                                    <div style={{ fontWeight: 800, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
-                                    <div style={{ fontSize: '0.5rem', color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', marginTop: '2px', fontWeight: 600 }}>
-                                        {session.isOpen ? 'OPEN' : session.isWeekend ? 'WEEKEND' : 'CLOSED'}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-secondary)', background: 'rgba(0,0,0,0.2)', padding: '6px', borderRadius: '6px', textAlign: 'center' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.5rem' }}>EGX (CAIRO)</span>
-                                    <span style={{ fontWeight: 700 }}>10:00 - 14:30</span>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.5rem' }}>LND (LONDON)</span>
-                                    <span style={{ fontWeight: 700 }}>10:00 - 18:30</span>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.5rem' }}>NYC (N. YORK)</span>
-                                    <span style={{ fontWeight: 700 }}>16:30 - 23:00</span>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.5rem' }}>TKY (TOKYO)</span>
-                                    <span style={{ fontWeight: 700 }}>02:00 - 08:00</span>
-                                </div>
-                            </div>
-                            <div style={{ marginTop: '4px', fontSize: '0.5rem', color: selectedMarket.color, fontWeight: 600 }}>ALL TIMES IN CAIRO TIME (UTC+2)</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* ═══ RECOMMENDATIONS TABLE ═══ */}
             <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
@@ -749,66 +522,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             )}
 
-            {showBacktestModal && (
-                <div className="modal-overlay glass-blur" onClick={() => setShowBacktestModal(false)}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '95%' }}>
-                        <div className="modal-header">
-                            <h3 className="modal-title">AI Performance vs {selectedMarket.indexName}</h3>
-                            <button className="btn btn-icon glass-button" onClick={() => setShowBacktestModal(false)}><X size={20} /></button>
-                        </div>
-                        <div className="modal-body" style={{ padding: '1.25rem' }}>
-                            <div style={{
-                                background: `linear-gradient(180deg, ${selectedMarket.color}0d 0%, rgba(16,185,129,0.1) 100%)`,
-                                borderRadius: 'var(--radius-lg)', padding: '1.5rem', marginBottom: '1.5rem',
-                                border: '1px solid var(--glass-borderShadow)', position: 'relative', overflow: 'hidden',
-                            }}>
-                                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60px', opacity: 0.3 }}>
-                                    <svg viewBox="0 0 500 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
-                                        <path d="M0,80 Q50,70 100,75 T200,50 T300,60 T400,30 T500,10 L500,100 L0,100 Z" fill="var(--color-success)" />
-                                        <path d="M0,90 Q50,85 100,88 T200,80 T300,82 T400,75 T500,70 L500,100 L0,100 Z" fill="rgba(255,255,255,0.1)" />
-                                    </svg>
-                                </div>
-                                <div style={{ position: 'relative', zIndex: 1 }}>
-                                    <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-success)', marginBottom: '0.25rem' }}>+27.42%</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Historical Alpha Yield</div>
-                                </div>
-                            </div>
 
-                            <div style={{ padding: '1.25rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>AI Strategy Return</span>
-                                        <span style={{ fontWeight: 800, color: 'var(--color-success)' }}>+38.1%</span>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{selectedMarket.indexName} (Benchmark)</span>
-                                        <span style={{ fontWeight: 600 }}>+10.68%</span>
-                                    </div>
-                                    <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }} />
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Outperformance</span>
-                                        <span style={{ fontWeight: 900, color: selectedMarket.color }}>+27.42%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                                <div className="glass-card" style={{ padding: '0.75rem', textAlign: 'center' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>MAX DRAWDOWN</div>
-                                    <div style={{ fontWeight: 700 }}>-7.2%</div>
-                                </div>
-                                <div className="glass-card" style={{ padding: '0.75rem', textAlign: 'center' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>WIN RATE</div>
-                                    <div style={{ fontWeight: 700, color: 'var(--color-success)' }}>72%</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-primary" onClick={() => setShowBacktestModal(false)}>Close Simulator</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
