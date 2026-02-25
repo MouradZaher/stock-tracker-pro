@@ -10,7 +10,6 @@ import { getStockData } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
 import AIPerformanceTracker from './AIPerformanceTracker';
-import AIMarketTicker from './AIMarketTicker';
 
 
 
@@ -289,8 +288,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     return (
         <div className="portfolio-container" style={{ paddingTop: '0' }}>
 
-            {/* ═══ LIVE MARKET TICKER ═══ */}
-            <AIMarketTicker />
+
 
             <div style={{ marginBottom: '1.5rem' }}>
                 <SearchEngine onSelectSymbol={handleLocalSelect} />

@@ -175,8 +175,15 @@ const AIPerformanceTracker: React.FC = () => {
             {/* ═══ LIVE SYNC HEADER ═══ */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', padding: '0 0.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className="pulse-dot" style={{ width: '8px', height: '8px', background: 'var(--color-success)', borderRadius: '50%', boxShadow: '0 0 10px var(--color-success)' }}></div>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--color-success)' }}>LIVE SYNCED</span>
+                    <div className="pulse-dot" style={{
+                        width: '8px',
+                        height: '8px',
+                        background: 'var(--color-success)',
+                        borderRadius: '50%',
+                        boxShadow: '0 0 15px var(--color-success)',
+                        animation: 'pulse-high 1s infinite alternate'
+                    }}></div>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--color-success)', textShadow: '0 0 8px rgba(16,185,129,0.4)' }}>ALPHA CORE ACTIVE</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: 600 }}>
                     <Clock size={12} />
@@ -288,6 +295,52 @@ const AIPerformanceTracker: React.FC = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* GLOBAL MACRO INTELLIGENCE BAR (WORLDMONITOR SYNC) */}
+                <div style={{
+                    marginTop: '1.25rem',
+                    padding: '0.85rem 1.25rem',
+                    background: 'rgba(59, 130, 246, 0.08)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        padding: '6px',
+                        borderRadius: '8px',
+                        background: 'rgba(59, 130, 246, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        animation: 'pulse-blue 3s infinite ease-in-out',
+                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
+                    }}>
+                        <Globe size={16} color="#3b82f6" />
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Macro Intel</div>
+                            <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#3b82f6', opacity: 0.5 }}></div>
+                            <div style={{ fontSize: '0.6rem', color: 'rgba(59, 130, 246, 0.7)', fontWeight: 700 }}>LIVE WORLD MONITOR SYNC</div>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-primary)', fontWeight: 600, display: 'flex', gap: '15px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ color: 'var(--color-success)' }}>●</span> Gold (GC=F): $5,221 (+0.86%) — Hedge Convergence
+                            </span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ color: 'var(--color-warning)' }}>●</span> Red Sea Corridor: Active Bottleneck Monitor
+                            </span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ color: 'var(--color-success)' }}>●</span> VIX Entropy: 18.10 (-7.42%) — Tactical Window
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
 
                 {/* TACTICAL SETUP BAR */}
                 <div style={{
