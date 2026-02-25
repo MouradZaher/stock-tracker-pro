@@ -57,7 +57,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                             aria-current={isActive ? 'page' : undefined}
                         >
                             <div className={`nav-icon-wrapper ${isActive ? 'active' : ''} ${isAI && isActive ? 'ai-active' : ''}`}>
-                                <IconComponent size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                <IconComponent size={18} strokeWidth={isActive ? 2.5 : 2} />
                             </div>
                             <span className="nav-label">{item.label}</span>
                         </button>
@@ -85,7 +85,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     display: flex;
                     align-items: center;
                     justify-content: space-around;
-                    padding: var(--spacing-xs) 0;
+                    padding: 6px 0;
                     width: 100%;
                     background: transparent;
                     border: none;
@@ -98,22 +98,22 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    gap: var(--spacing-xs);
-                    padding: var(--spacing-xs) var(--spacing-sm);
+                    gap: 4px;
+                    padding: 4px 6px;
                     background: transparent;
                     border: none;
                     cursor: pointer;
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    min-width: 52px;
+                    min-width: 50px;
                 }
 
                 .nav-icon-wrapper {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    width: 36px;
-                    height: 36px;
-                    border-radius: var(--radius-md);
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 10px;
                     background: transparent;
                     color: var(--color-text-tertiary);
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -132,11 +132,25 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                 }
 
                 .nav-label {
-                    font-size: var(--font-size-xs);
+                    font-size: 0.65rem;
                     font-weight: 500;
                     color: var(--color-text-tertiary);
-                    letter-spacing: 0.02em;
+                    letter-spacing: 0.01em;
                     transition: color 0.3s ease;
+                }
+
+                @media (max-width: 360px) {
+                    .mobile-nav-btn {
+                        min-width: 45px;
+                        padding: 4px 2px;
+                    }
+                    .nav-icon-wrapper {
+                        width: 28px;
+                        height: 28px;
+                    }
+                    .nav-label {
+                        font-size: 0.6rem;
+                    }
                 }
 
                 .mobile-nav-btn.active .nav-label {

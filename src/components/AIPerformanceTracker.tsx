@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, ShieldCheck, Zap, Activity, Info } from 'lucide-react';
-import { useMarket, MarketId } from '../contexts/MarketContext';
+import { useMarket } from '../contexts/MarketContext';
+import type { MarketId } from '../contexts/MarketContext';
 
 const PERF_DATA: Record<MarketId, { month: string; ai: number; benchmark: number }[]> = {
     us: [
