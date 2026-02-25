@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
-import SearchEngine from './components/SearchEngine';
+
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
 import { PageSkeleton } from './components/LoadingSkeleton';

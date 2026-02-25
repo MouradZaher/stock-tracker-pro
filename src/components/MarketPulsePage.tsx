@@ -4,7 +4,7 @@ import TopMovers from './TopMovers';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
-import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe } from 'lucide-react';
+import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe, Play, ExternalLink, Info, Sparkles } from 'lucide-react';
 import type { NewsArticle, SocialPost } from '../types';
 import { socialFeedService } from '../services/SocialFeedService';
 
@@ -135,36 +135,224 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
 
     return (
         <div style={{
-            padding: window.innerWidth < 768 ? 'var(--spacing-md)' : 'var(--spacing-md) var(--spacing-xl)',
-            maxWidth: '100vw',
+            maxWidth: '100%',
             margin: '0 auto',
             boxSizing: 'border-box',
             background: 'var(--color-bg-primary)',
-            overflowX: 'hidden'
+            overflowX: 'hidden',
+            padding: '0 0 var(--spacing-xl) 0'
         }}>
 
-            {/* Header Area */}
-            <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 800, letterSpacing: '-0.02em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
+            {/* Header Area - More Compact */}
+            <div style={{ marginBottom: '1rem', padding: '0 0.5rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '-0.02em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
                     Market Pulse
                 </h1>
-                <p style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--font-size-sm)', marginTop: 'var(--spacing-xs)' }}>
+                <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem', marginTop: '0.25rem' }}>
                     Real-time institutional grade market intelligence.
                 </p>
+            </div>
+
+            {/* ═══ GLOBAL MACRO INTELLIGENCE (WORLD MONITOR SYNC) ═══ */}
+            <div style={{
+                marginBottom: '1.25rem',
+                padding: '1.25rem',
+                background: 'rgba(59, 130, 246, 0.08)',
+                borderRadius: '16px',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
+            }}>
+                {/* Background Animation */}
+                <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'rgba(59, 130, 246, 0.1)', filter: 'blur(80px)', borderRadius: '50%', pointerEvents: 'none' }}></div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{
+                            padding: '6px',
+                            borderRadius: '8px',
+                            background: 'rgba(59, 130, 246, 0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            animation: 'pulse-blue 3s infinite ease-in-out',
+                            boxShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
+                        }}>
+                            <Globe size={18} color="#3b82f6" />
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <h2 style={{ fontSize: '0.8rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Global Macro Intelligence</h2>
+                                <span style={{ fontSize: '0.6rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' }}>LIVE MONITOR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', position: 'relative', zIndex: 1 }}>
+                    {[
+                        {
+                            label: 'Gold (GC=F): $5,221 (+0.86%)',
+                            status: 'Institutional Hedge',
+                            color: '#10B981',
+                            desc: 'Capital flight toward safe-havens detected. Quantitative models suggest defensive positioning against pending macro volatility.',
+                            action: 'Hedge Bias'
+                        },
+                        {
+                            label: 'Red Sea Corridor: Logistical Alert',
+                            status: 'Suez Congestion',
+                            color: '#F59E0B',
+                            desc: 'Monitoring Suez & Mandab transit data. Sustained bottlenecks are inflating regional freight premiums and energy delivery lead times.',
+                            action: 'Inflation Risk'
+                        },
+                        {
+                            label: 'VIX Entropy: 18.10 (-7.42%)',
+                            status: 'Tactical Window',
+                            color: '#10B981',
+                            desc: 'Fear index regression levels opening a tactical momentum window. Current low entropy favors high-conviction execution strategies.',
+                            action: 'Momentum Long'
+                        }
+                    ].map((item, i) => (
+                        <div key={i} className="glass-card-hover" style={{
+                            padding: '1.25rem',
+                            background: 'rgba(255,255,255,0.03)',
+                            borderRadius: '16px',
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            transition: 'all 0.3s ease'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
+                                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>{item.label}</div>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: item.color, background: `${item.color}15`, padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase', border: `1px solid ${item.color}30` }}>{item.status}</div>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: '0 0 12px 0', minHeight: '3em' }}>{item.desc}</p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>TACTICAL_ACTION:</div>
+                                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <Zap size={10} /> {item.action}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ═══ LIVE WORLD FINANCIAL NETWORKS ═══ */}
+            <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', padding: '0 0.5rem' }}>
+                    <div className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', boxShadow: '0 0 8px var(--color-error)' }}></div>
+                    <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Live Intelligence Streams</h2>
+                </div>
+
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+                    gap: '1rem'
+                }}>
+                    {[
+                        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdCLP7Lg' },
+                        { name: 'Sky News Business', origin: 'International', color: '#ff0000', channelId: 'UCoMdktPbSTixAyNGwb-UYkQ' },
+                        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCEAZeUIeJs0IjQiqTCdVSIg' }
+                    ].map((stream, i) => (
+                        <div key={i} className="glass-card" style={{ padding: '0', overflow: 'hidden', borderRadius: '16px', border: '1px solid var(--glass-borderShadow)' }}>
+                            <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000' }}>
+                                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <iframe
+                                        width="100%"
+                                        height="100%"
+                                        src={`https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1`}
+                                        title={stream.name}
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        style={{ position: 'absolute', top: 0, left: 0 }}
+                                    ></iframe>
+                                </div>
+                            </div>
+                            <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>{stream.name}</div>
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{stream.origin} Network</div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-secondary)' }}>
+                                        <Play size={14} fill="currentColor" />
+                                    </div>
+                                    <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-secondary)' }}>
+                                        <ExternalLink size={14} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ═══ MARKET CREATIVE RECOMMENDATIONS ═══ */}
+            <div className="glass-card" style={{
+                marginBottom: '1.5rem',
+                padding: '1.25rem',
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
+                border: '1px solid rgba(99, 102, 241, 0.2)'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                    <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.2)' }}>
+                        <Sparkles size={18} color="#8b5cf6" />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Strategic Opportunity Radar</h2>
+                        <p style={{ margin: '2px 0 0 0', fontSize: '0.65rem', color: 'var(--color-text-secondary)' }}>AI tactical paths based on current global entropy.</p>
+                    </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                    {[
+                        {
+                            title: 'The Liquidity Squeeze Play',
+                            strategy: 'Volatility Arbitrage',
+                            intel: 'Detecting order imbalance in mid-cap tech constituents as institutional rebalancing approaches. Current "VIX Entropy" suggests a 48h rally window.',
+                            confidence: 84
+                        },
+                        {
+                            title: 'Commodity Currency Proxy',
+                            strategy: 'Cross-Market Correlation',
+                            intel: 'EGP/USD stabilization correlating with industrial volume anomalies. Strategic long bias on export-oriented materials (+ABUK, +EFIC).',
+                            confidence: 76
+                        },
+                        {
+                            title: 'Risk-Off Rotation Hedge',
+                            strategy: 'Defensive Positioning',
+                            intel: 'Hedge convergence toward Gold suggests pending macro volatility. Increase allocation to "Safe Haven" tech (MSFT/AAPL) to buffer beta exposure.',
+                            confidence: 91
+                        }
+                    ].map((item, i) => (
+                        <div key={i} style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'white' }}>{item.title}</div>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)' }}>{item.confidence}%</div>
+                            </div>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-accent)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 700 }}>{item.strategy}</div>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: '0 0 10px 0' }}>{item.intel}</p>
+                            <div style={{ height: '3px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '1.5px' }}>
+                                <div style={{ width: `${item.confidence}%`, height: '100%', background: 'var(--color-accent)', borderRadius: '1.5px', boxShadow: '0 0 8px var(--color-accent)' }}></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Breaking News Ticker - Financial Terminal Style */}
             <div className="glass-card" style={{
                 padding: '0 var(--spacing-xs)',
-                marginBottom: 'var(--spacing-lg)',
+                marginBottom: '1rem',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0',
                 overflow: 'hidden',
                 background: 'rgba(0, 0, 0, 0.4)',
                 border: '1px solid var(--glass-border-bright)',
-                borderRadius: 'var(--radius-md)',
-                height: 'clamp(40px, 5vh, 48px)'
+                borderRadius: '12px',
+                height: '36px'
             }}>
                 <div style={{
                     background: 'var(--color-error)',
@@ -201,13 +389,14 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     GLOBAL_INTELLIGENCE_FLOW
                 </div>
 
-                <div style={{ whiteSpace: 'nowrap', fontSize: '0.85rem', color: 'var(--color-text-primary)', flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                <div style={{ whiteSpace: 'nowrap', fontSize: '0.8rem', color: 'var(--color-text-primary)', flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
                     <div style={{
                         display: 'inline-block',
                         animation: 'scroll-news 45s linear infinite',
                         paddingLeft: '20px',
                         fontWeight: 500,
-                        letterSpacing: '0.02em'
+                        letterSpacing: '0.02em',
+                        color: 'var(--color-success)'
                     }}>
                         {newsTickerText}
                     </div>
@@ -217,13 +406,13 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             {/* Main Grid */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, clamp(250px, 30vw, 320px)), 1fr))',
-                gap: '1.25rem',
-                marginBottom: '1.5rem'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+                gap: '1rem',
+                marginBottom: '1rem'
             }}>
 
                 {/* Market Psychological Gauge (Fear & Greed) */}
-                <div className="glass-card" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+                <div className="glass-card" style={{ padding: '1.25rem', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                         <div>
                             <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -288,12 +477,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
 
                 {/* Next Event Timer */}
                 <div className="glass-card" style={{
-                    padding: '1.5rem',
+                    padding: '1.25rem',
                     background: 'var(--glass-bg)',
                     border: '1px solid var(--glass-borderShadow)'
                 }}>
-                    <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Timer size={16} /> Next Major Event
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Timer size={14} /> Next Major Event
                     </h3>
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '1rem' }}>{nextEventData.name}</div>
@@ -320,9 +509,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 {/* Industry Rotation */}
-                <div className="glass-card" style={{ padding: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Layers size={16} /> Industry Rotation
+                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Layers size={14} /> Industry Rotation
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                         {sectorData.map(sector => (
@@ -353,9 +542,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 {/* Volume Anomalies */}
-                <div className="glass-card" style={{ padding: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <BarChart2 size={16} /> Volume Anomalies
+                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <BarChart2 size={14} /> Volume Anomalies
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {volumeAnomalies.map(stock => (
@@ -390,14 +579,14 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 {/* X Pulse / Social Feed */}
-                <div className="glass-card x-pulse-card" style={{ padding: '1.5rem', gridColumn: 'span 2' }}>
+                <div className="glass-card x-pulse-card" style={{ padding: '1.25rem', gridColumn: 'span 2' }}>
                     <style>{`
                         @media (max-width: 1024px) {
                             .x-pulse-card { grid-column: span 1 !important; }
                         }
                     `}</style>
-                    <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <MessageSquare size={16} color="#1DA1F2" /> X Market Pulse
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <MessageSquare size={14} color="#1DA1F2" /> X Market Pulse
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                         {socialPosts.map(post => (

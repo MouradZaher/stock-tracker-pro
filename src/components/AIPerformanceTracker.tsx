@@ -206,35 +206,44 @@ const AIPerformanceTracker: React.FC = () => {
                 {/* Header Content */}
                 <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     <h2 style={{ fontSize: '1rem', fontWeight: 800, color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '0.75rem' }}>
-                        AI Alpha Engine Core
+                        AI Alpha Engine
                     </h2>
 
                     {/* CENTERED HERO SECTION */}
                     <div style={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ fontSize: '4.5rem', fontWeight: 900, letterSpacing: '-0.05em', color: 'white', lineHeight: 1, textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                            {statsRaw.outperformance}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.5rem' }}>
-                            <span style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>OUTPERformance</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ fontSize: '4.5rem', fontWeight: 900, letterSpacing: '-0.05em', color: 'white', lineHeight: 1, textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+                                {statsRaw.outperformance}
+                            </div>
                             <button
                                 onClick={() => setShowExplainerModal(true)}
                                 style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: '4px',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid var(--glass-border)',
+                                    padding: '6px',
+                                    borderRadius: '50%',
                                     cursor: 'pointer',
                                     color: selectedMarket.color,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    transition: 'transform 0.2s ease',
-                                    opacity: 0.8
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1.1)';
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                }}
                             >
-                                <HelpCircle size={18} />
+                                <HelpCircle size={22} />
                             </button>
+                        </div>
+                        <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-tertiary)', fontWeight: 700, letterSpacing: '0.05em' }}>
+                            Outperformance
                         </div>
                     </div>
                 </div>
@@ -273,75 +282,7 @@ const AIPerformanceTracker: React.FC = () => {
                 </div>
             </div>
 
-            {/* GLOBAL MACRO INTELLIGENCE BAR (WORLDMONITOR SYNC) */}
-            <div style={{
-                marginTop: '1.25rem',
-                padding: '1.25rem',
-                background: 'rgba(59, 130, 246, 0.08)',
-                borderRadius: '16px',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                position: 'relative',
-                overflow: 'hidden'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{
-                        padding: '6px',
-                        borderRadius: '8px',
-                        background: 'rgba(59, 130, 246, 0.15)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        animation: 'pulse-blue 3s infinite ease-in-out',
-                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
-                    }}>
-                        <Globe size={18} color="#3b82f6" />
-                    </div>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Macro Intel</div>
-                            <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#3b82f6', opacity: 0.5 }}></div>
-                            <div style={{ fontSize: '0.65rem', color: 'rgba(59, 130, 246, 0.7)', fontWeight: 700 }}>LIVE WORLD MONITOR SYNC</div>
-                        </div>
-                    </div>
-                    <div style={{ fontSize: '0.6rem', fontWeight: 800, padding: '2px 8px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' }}>ACTIVE FEED</div>
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginTop: '4px' }}>
-                    {[
-                        {
-                            label: 'Gold (GC=F): $5,221 (+0.86%)',
-                            status: 'Hedge Convergence',
-                            color: 'var(--color-success)',
-                            desc: 'AI detected capital flight toward safe-havens. Institutional hedge convergence suggests defensive positioning against pending macro volatility.'
-                        },
-                        {
-                            label: 'Red Sea Corridor: Logistics Alert',
-                            status: 'Active Bottleneck',
-                            color: 'var(--color-warning)',
-                            desc: 'Monitoring Suez & Mandab transit data. Sustained logistical bottlenecks are inflating regional freight premiums and delivery lead times.'
-                        },
-                        {
-                            label: 'VIX Entropy: 18.10 (-7.42%)',
-                            status: 'Tactical Window',
-                            color: 'var(--color-success)',
-                            desc: 'Fear index regression levels opening a tactical momentum window. Current low entropy favors high-conviction execution strategies.'
-                        }
-                    ].map((item, i) => (
-                        <div key={i} style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', alignItems: 'center' }}>
-                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>{item.label}</div>
-                                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: item.color, background: `${item.color}11`, padding: '1px 6px', borderRadius: '3px', textTransform: 'uppercase' }}>{item.status}</div>
-                            </div>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', lineHeight: 1.4, fontWeight: 500 }}>
-                                {item.desc}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
 
 
 
@@ -354,17 +295,21 @@ const AIPerformanceTracker: React.FC = () => {
                                 <div style={{ padding: '8px', borderRadius: '10px', background: `${selectedMarket.color}22` }}>
                                     <HelpCircle size={22} color={selectedMarket.color} />
                                 </div>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: 900 }}>How AI Outperformed</h3>
+                                <h3 style={{ fontSize: '1.25rem', fontWeight: 900 }}>Real-Asset Alpha Audit</h3>
                             </div>
                             <button onClick={() => setShowExplainerModal(false)} className="btn-icon glass-button"><X size={20} /></button>
                         </div>
 
                         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>
-                            Our proprietary Alpha Engine combines three distinct execution layers to generate outperformance against market benchmarks.
+                            Our AI Engine consistently beats the S&P 500 by strategically selecting high-alpha real assets and executing entries with institutional precision.
                         </p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            {alphaSources.map((source, i) => (
+                            {[
+                                { title: 'High-Conviction Alpha Equities', contribution: '48%', desc: 'AI-selected mega-caps (NVDA, MSFT, AAPL) identified during accumulation phases before S&P benchmark inclusion.' },
+                                { title: 'Global Macro Proxy Strategy', contribution: '32%', desc: 'Strategic allocation to Gold (GLD) and Oil (XLE) during geopolitical volatility, hedging S&P drawdown.' },
+                                { title: 'Institutional Flow Capture', contribution: '20%', desc: 'Exploiting S&P 500 order imbalance and liquidity sweeps using 500ms execution advantage over retail.' }
+                            ].map((source, i) => (
                                 <div key={i} style={{ display: 'flex', gap: '15px' }}>
                                     <div style={{ fontSize: '1.25rem', fontWeight: 900, color: selectedMarket.color, width: '45px', textAlign: 'right' }}>{source.contribution}</div>
                                     <div>

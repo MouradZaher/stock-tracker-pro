@@ -218,8 +218,8 @@ export const getTacticalRebalancing = async (positions: any[]): Promise<Rebalanc
 export const getAllRecommendations = async (indexName: string = 'S&P 500'): Promise<StockRecommendation[]> => {
     const stocks = STOCKS_BY_INDEX[indexName] || STOCKS_BY_INDEX['S&P 500'];
 
-    // Scan all stocks in the index (limited to ~20 for performance in this demo)
-    const candidates = stocks.slice(0, 20);
+    // Scan more stocks in the index for a broader search
+    const candidates = stocks.slice(0, 50);
     const allRecommendations = await getRecommendationsForStocks(candidates);
 
     // Final global sort
@@ -234,7 +234,7 @@ export const getAllRecommendations = async (indexName: string = 'S&P 500'): Prom
         });
     }
 
-    return allRecommendations.slice(0, 15);
+    return allRecommendations.slice(0, 30);
 };
 
 // Generate mock price history (DEPRECATED - Returning empty to ensure no fake data)

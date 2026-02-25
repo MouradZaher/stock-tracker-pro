@@ -1,47 +1,77 @@
-import React, { useState } from 'react';
-import { User, Briefcase, Plus, ExternalLink, Calendar } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { User, Briefcase, Plus, Zap, Target, LineChart, TrendingUp, TrendingDown, Star, ShieldCheck, Gem, Info } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 
-// Data for Famous Portfolios
+// ─── Data Enrichment ────────────────────────────────────────────────────────
 const FAMOUS_PORTFOLIOS = [
     {
         id: 'nancy',
-        name: "Nancy Pelosi's Picks",
+        name: "Pelosi's Alpha Loop",
         owner: "Nancy Pelosi",
-        description: "High-conviction tech & semi-conductor plays.",
+        description: "Focus on AI sovereignty and legislative-adjacent Tech plays.",
+        strategy: "High-Conviction Sector Rotation",
+        icon: Zap,
+        color: "#6366f1",
+        tags: ["Alpha Loop", "Tech Proxy"],
         holdings: [
-            { symbol: 'NVDA', name: 'NVIDIA Corp', price: 887.00, change: 4.5, allocation: '28%', type: 'Tech', lastUpdated: '2025-01-15' },
-            { symbol: 'MSFT', name: 'Microsoft Corp', price: 415.50, change: 1.2, allocation: '18%', type: 'Tech', lastUpdated: '2025-01-15' },
-            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '15%', type: 'Tech', lastUpdated: '2025-01-20' },
-            { symbol: 'AVGO', name: 'Broadcom Inc.', price: 1285.30, change: -0.8, allocation: '12%', type: 'Semis', lastUpdated: '2025-02-10' },
-            { symbol: 'CRWD', name: 'CrowdStrike', price: 320.10, change: 2.1, allocation: '10%', type: 'Cyber', lastUpdated: '2025-02-12' },
+            { symbol: 'NVDA', name: 'NVIDIA Corp', price: 834.12, change: 4.82, allocation: 28.5, conviction: 98, type: 'Generative AI', intel: 'Strategic Semi positioning.' },
+            { symbol: 'PLTR', name: 'Palantir', price: 24.15, change: 3.21, allocation: 15.2, conviction: 92, type: 'Defense AI', intel: 'Gov contract acceleration.' },
+            { symbol: 'MSFT', name: 'Microsoft Corp', price: 412.30, change: 1.15, allocation: 18.4, conviction: 89, type: 'Enterprise Cloud', intel: 'Copilot monetization.' },
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 182.45, change: 0.45, allocation: 12.1, conviction: 85, type: 'Hardware', intel: 'Service revenue moat.' },
+            { symbol: 'PANW', name: 'Palo Alto Networks', price: 342.10, change: 2.10, allocation: 8.5, conviction: 94, type: 'Cyber', intel: 'Institutional spend lead.' },
         ]
     },
     {
         id: 'warren',
-        name: "Buffett's Core",
+        name: "Buffett's Fortress",
         owner: "Warren Buffett",
-        description: "Value investing staples with strong moats.",
+        description: "Deep value, infinite moats, and cash-flow machines.",
+        strategy: "Indefinite Hold Infrastructure",
+        icon: ShieldCheck,
+        color: "#10b981",
+        tags: ["Value Core", "Cash Moat"],
         holdings: [
-            { symbol: 'AAPL', name: 'Apple Inc.', price: 172.50, change: 0.5, allocation: '40%', type: 'Tech', lastUpdated: '2025-01-01' },
-            { symbol: 'BAC', name: 'Bank of America', price: 36.80, change: 1.1, allocation: '12%', type: 'Finance', lastUpdated: '2025-01-01' },
-            { symbol: 'AXP', name: 'American Express', price: 235.40, change: 0.9, allocation: '10%', type: 'Finance', lastUpdated: '2025-01-01' },
-            { symbol: 'KO', name: 'Coca-Cola', price: 62.20, change: -0.1, allocation: '8%', type: 'Consumer', lastUpdated: '2025-01-01' },
-            { symbol: 'CVX', name: 'Chevron Corp', price: 160.10, change: 0.4, allocation: '6%', type: 'Energy', lastUpdated: '2025-01-01' },
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 182.45, change: 0.45, allocation: 42.4, conviction: 95, type: 'Consumer Eco', intel: 'Brand pricing power.' },
+            { symbol: 'BAC', name: 'Bank of America', price: 37.12, change: 1.25, allocation: 10.8, conviction: 88, type: 'Retail Banking', intel: 'NII sensitivity play.' },
+            { symbol: 'AXP', name: 'American Express', price: 242.00, change: 0.82, allocation: 9.5, conviction: 91, type: 'Payments', intel: 'Premium credit tier.' },
+            { symbol: 'KO', name: 'Coca-Cola', price: 63.45, change: -0.15, allocation: 7.2, conviction: 99, type: 'Staples', intel: 'Inflation hedge.' },
+            { symbol: 'XYL', name: 'Xylem Inc.', price: 128.50, change: 0.45, allocation: 5.4, conviction: 82, type: 'Water Infra', intel: 'Long-term utility.' },
         ]
     },
     {
-        id: 'burry',
-        name: "Burry's Big Short",
-        owner: "Michael Burry",
-        description: "Contrarian value & deep OTM puts.",
+        id: 'cathie',
+        name: "Cathie's Moonshots",
+        owner: "Cathie Wood",
+        description: "Disruptive innovation and exponential technology curves.",
+        strategy: "Hyper-Growth Innovation",
+        icon: Target,
+        color: "#f59e0b",
+        tags: ["Moonshot", "Innovation"],
         holdings: [
-            { symbol: 'JD', name: 'JD.com', price: 28.50, change: 2.1, allocation: '15%', type: 'China Tech', lastUpdated: '2025-01-15' },
-            { symbol: 'BABA', name: 'Alibaba Group', price: 78.30, change: -0.2, allocation: '14%', type: 'China Tech', lastUpdated: '2025-01-15' },
-            { symbol: 'HCA', name: 'HCA Healthcare', price: 320.10, change: 0.4, allocation: '10%', type: 'Health', lastUpdated: '2025-01-15' },
-            { symbol: 'C', name: 'Citigroup', price: 55.20, change: 1.5, allocation: '8%', type: 'Finance', lastUpdated: '2025-01-15' },
+            { symbol: 'TSLA', name: 'Tesla Inc.', price: 195.40, change: -2.15, allocation: 14.8, conviction: 99, type: 'Autonomy', intel: 'FSD V12 adoption.' },
+            { symbol: 'COIN', name: 'Coinbase Global', price: 182.30, change: 5.42, allocation: 12.1, conviction: 94, type: 'Digital Assets', intel: 'ETF flow gateway.' },
+            { symbol: 'SQ', name: 'Block Inc.', price: 78.45, change: 1.85, allocation: 9.5, conviction: 87, type: 'Fintech', intel: 'Bitcoin ecosystem.' },
+            { symbol: 'ROKU', name: 'Roku Inc.', price: 68.12, change: -3.45, allocation: 8.2, conviction: 82, type: 'Ad-Tech', intel: 'Connected TV lead.' },
+            { symbol: 'U', name: 'Unity Software', price: 32.40, change: 1.12, allocation: 5.5, conviction: 78, type: 'RT3D', intel: 'Metaverse foundations.' },
+        ]
+    },
+    {
+        id: 'ackman',
+        name: "Ackman's Tactical",
+        owner: "Bill Ackman",
+        description: "Concentrated long/short bets and activist plays.",
+        strategy: "Opportunistic Activism",
+        icon: LineChart,
+        color: "#ec4899",
+        tags: ["Activist", "Concentrated"],
+        holdings: [
+            { symbol: 'CMG', name: 'Chipotle', price: 2845.20, change: 1.25, allocation: 18.5, conviction: 96, type: 'Retail', intel: 'Throughput optimization.' },
+            { symbol: 'HLT', name: 'Hilton Worldwide', price: 212.30, change: 0.85, allocation: 15.2, conviction: 92, type: 'Hospitality', intel: 'Asst-light compounding.' },
+            { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 145.42, change: 2.15, allocation: 12.4, conviction: 89, type: 'AI Infrastructure', intel: 'Search dominance.' },
+            { symbol: 'LOW', name: 'Lowes Cos', price: 235.10, change: -0.45, allocation: 9.8, conviction: 87, type: 'Housing', intel: 'Remodel cycle proxy.' },
+            { symbol: 'QSR', name: 'Restaurant Brands', price: 78.12, change: 0.12, allocation: 8.5, conviction: 84, type: 'Consumer', intel: 'Global franchise scale.' },
         ]
     }
 ];
@@ -53,7 +83,9 @@ interface FamousHoldingsProps {
 const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
     const [activeTab, setActiveTab] = useState('nancy');
 
-    const activePortfolio = FAMOUS_PORTFOLIOS.find(p => p.id === activeTab) || FAMOUS_PORTFOLIOS[0];
+    const activePortfolio = useMemo(() =>
+        FAMOUS_PORTFOLIOS.find(p => p.id === activeTab) || FAMOUS_PORTFOLIOS[0],
+        [activeTab]);
 
     const handleCopyTrade = (symbol: string, name: string, price: number) => {
         soundService.playTap();
@@ -64,158 +96,223 @@ const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
         }
     };
 
+    const getConvictionColor = (score: number) => {
+        if (score >= 95) return 'var(--color-success)';
+        if (score >= 90) return 'var(--color-accent)';
+        if (score >= 80) return 'var(--color-warning)';
+        return 'var(--color-text-tertiary)';
+    };
+
     return (
-        <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-            <div style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--glass-border)' }}>
-                <h3 style={{ margin: 0, fontSize: 'var(--font-size-base)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
-                    <Briefcase size={18} color="var(--color-accent)" /> Famous Portfolio Holdings
-                </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* ── Title Section ─────────────────────────── */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div>
+                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Gem size={22} style={{ color: 'var(--color-warning)' }} />
+                        Institutional <span className="gradient-text">Whale Watch</span>
+                    </h3>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
+                        Tracking real-time tactical positioning of global capital leaders.
+                    </p>
+                </div>
             </div>
 
-            {/* Tabs - Improved Scroll Handling */}
-            <div style={{
-                display: 'flex',
-                borderBottom: '1px solid var(--glass-border)',
-                overflowX: 'auto',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch',
-                padding: '0 4px',
-                gap: '2px'
-            }}>
-                {FAMOUS_PORTFOLIOS.map(portfolio => (
-                    <button
-                        key={portfolio.id}
-                        onClick={() => setActiveTab(portfolio.id)}
-                        style={{
-                            flex: 1,
-                            padding: 'var(--spacing-md)',
-                            background: activeTab === portfolio.id ? 'rgba(255,255,255,0.05)' : 'transparent',
-                            border: 'none',
-                            borderBottom: activeTab === portfolio.id ? '2px solid var(--color-accent)' : '2px solid transparent',
-                            color: activeTab === portfolio.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                            fontWeight: activeTab === portfolio.id ? 600 : 400,
-                            cursor: 'pointer',
-                            minWidth: 'clamp(120px, 15vw, 150px)',
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-xs)' }}>
-                            <User size={14} /> {portfolio.owner}
-                        </div>
-                    </button>
-                ))}
-            </div>
-
-            <div style={{ padding: 'var(--spacing-md)' }}>
-                <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                    <h4 style={{ margin: '0 0 var(--spacing-xs) 0', fontSize: 'var(--font-size-lg)' }}>{activePortfolio.name}</h4>
-                    <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{activePortfolio.description}</div>
-                </div>
-
-                {/* Desktop Table - Hidden on very small screens */}
-                <div style={{ overflowX: 'auto', display: window.innerWidth < 640 ? 'none' : 'block' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '550px' }}>
-                        <thead>
-                            <tr style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                <th style={{ paddingBottom: '0.75rem' }}>Asset</th>
-                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Price</th>
-                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Alloc</th>
-                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Update</th>
-                                <th style={{ paddingBottom: '0.75rem', textAlign: 'right' }}>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {activePortfolio.holdings.map((stock) => (
-                                <tr key={stock.symbol} style={{ borderTop: '1px solid var(--glass-border)' }}>
-                                    <td style={{ padding: '0.75rem 0' }}>
-                                        <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{stock.symbol}</div>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{stock.type}</div>
-                                    </td>
-                                    <td style={{ padding: '0.75rem 0', textAlign: 'right' }}>
-                                        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{formatCurrency(stock.price)}</div>
-                                        <div style={{ fontSize: '0.7rem', color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            {stock.change > 0 ? '+' : ''}{stock.change}%
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 600, fontSize: '0.9rem' }}>
-                                        {stock.allocation}
-                                    </td>
-                                    <td style={{ padding: '0.75rem 0', textAlign: 'right', color: 'var(--color-text-tertiary)', fontSize: '0.75rem' }}>
-                                        {stock.lastUpdated.split('-').slice(1).join('/')}
-                                    </td>
-                                    <td style={{ padding: '0.75rem 0', textAlign: 'right' }}>
-                                        <button
-                                            className="glass-button"
-                                            style={{
-                                                padding: '6px 10px',
-                                                borderRadius: '8px',
-                                                fontSize: '0.7rem',
-                                                fontWeight: 700,
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '4px'
-                                            }}
-                                            onClick={() => handleCopyTrade(stock.symbol, stock.name, stock.price)}
-                                        >
-                                            <Plus size={14} /> COPY
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Mobile Card Grid - Visible on small screens */}
-                <div style={{ display: window.innerWidth < 640 ? 'flex' : 'none', flexDirection: 'column', gap: '0.75rem' }}>
-                    {activePortfolio.holdings.map((stock) => (
-                        <div key={stock.symbol} className="glass-card" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                <div>
-                                    <div style={{ fontWeight: 800, fontSize: '1rem' }}>{stock.symbol}</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{stock.type}</div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>{formatCurrency(stock.price)}</div>
-                                    <div style={{ fontSize: '0.75rem', color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                        {stock.change > 0 ? '+' : ''}{stock.change}%
-                                    </div>
-                                </div>
+            <div className="glass-card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+                {/* ── Tabs: Persona Selector ─────────────────── */}
+                <div style={{
+                    display: 'flex',
+                    background: 'rgba(0,0,0,0.2)',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    padding: '8px',
+                    gap: '8px'
+                }}>
+                    {FAMOUS_PORTFOLIOS.map(portfolio => (
+                        <button
+                            key={portfolio.id}
+                            onClick={() => { setActiveTab(portfolio.id); soundService.playTap(); }}
+                            style={{
+                                flex: 1,
+                                minWidth: '140px',
+                                padding: '12px 16px',
+                                background: activeTab === portfolio.id ? 'rgba(255,255,255,0.06)' : 'transparent',
+                                border: '1px solid',
+                                borderColor: activeTab === portfolio.id ? portfolio.color + '44' : 'transparent',
+                                borderRadius: '12px',
+                                color: activeTab === portfolio.id ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px'
+                            }}
+                        >
+                            <div style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '8px',
+                                background: activeTab === portfolio.id ? portfolio.color + '22' : 'rgba(255,255,255,0.03)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: activeTab === portfolio.id ? portfolio.color : 'inherit'
+                            }}>
+                                <portfolio.icon size={18} />
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <div>
-                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Weight</div>
-                                        <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{stock.allocation}</div>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Updated</div>
-                                        <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{stock.lastUpdated.split('-').slice(1).join('/')}</div>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => handleCopyTrade(stock.symbol, stock.name, stock.price)}
-                                    style={{
-                                        padding: '6px 12px',
-                                        borderRadius: '8px',
-                                        background: 'var(--color-accent)',
-                                        border: 'none',
-                                        color: 'white',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 800,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px'
-                                    }}
-                                >
-                                    <Plus size={14} /> COPY
-                                </button>
+                            <div style={{ textAlign: 'left' }}>
+                                <div style={{ fontSize: '0.85rem', fontWeight: 800 }}>{portfolio.owner}</div>
+                                <div style={{ fontSize: '0.65rem', opacity: 0.6 }}>{portfolio.tags[0]}</div>
                             </div>
-                        </div>
+                        </button>
                     ))}
                 </div>
+
+                {/* ── Active Portfolio Header ────────────────── */}
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--glass-border)', background: 'linear-gradient(to right, rgba(0,0,0,0.2), transparent)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div style={{ flex: 1, minWidth: '240px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900 }}>{activePortfolio.name}</h4>
+                                <span style={{
+                                    fontSize: '0.65rem',
+                                    padding: '2px 8px',
+                                    borderRadius: '20px',
+                                    background: activePortfolio.color + '22',
+                                    color: activePortfolio.color,
+                                    fontWeight: 700,
+                                    border: `1px solid ${activePortfolio.color}44`
+                                }}>
+                                    {activePortfolio.strategy.toUpperCase()}
+                                </span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                                {activePortfolio.description}
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                            {activePortfolio.tags.map(tag => (
+                                <span key={tag} style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', padding: '2px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: '4px' }}>#{tag}</span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Holdings Grid ─────────────────────────── */}
+                <div style={{ padding: '1rem' }}>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+                            <thead>
+                                <tr style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                    <th style={{ textAlign: 'left', padding: '0 12px' }}>Holding</th>
+                                    <th style={{ textAlign: 'right', padding: '0 12px' }}>Conviction</th>
+                                    <th style={{ textAlign: 'right', padding: '0 12px' }}>Weight</th>
+                                    <th style={{ textAlign: 'left', padding: '0 12px' }}>Tactical Intel</th>
+                                    <th style={{ textAlign: 'right', padding: '0 12px' }}>Sync</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {activePortfolio.holdings.map((stock) => (
+                                    <tr key={stock.symbol} className="holding-row" style={{ background: 'rgba(255,255,255,0.02)', transition: 'background 0.2s' }}>
+                                        <td style={{ padding: '12px', borderRadius: '12px 0 0 12px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <div style={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    borderRadius: '10px',
+                                                    background: 'rgba(0,0,0,0.3)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontWeight: 900,
+                                                    fontSize: '0.8rem',
+                                                    color: 'var(--color-text-primary)',
+                                                    border: '1px solid var(--glass-border)'
+                                                }}>
+                                                    {stock.symbol[0]}
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{stock.symbol}</div>
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        <span className={stock.change >= 0 ? 'text-success' : 'text-error'} style={{ fontWeight: 700 }}>
+                                                            {stock.change > 0 ? '↑' : '↓'} {Math.abs(stock.change)}%
+                                                        </span>
+                                                        • {stock.type}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '12px', textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                                <div style={{ fontSize: '0.85rem', fontWeight: 900, color: getConvictionColor(stock.conviction) }}>
+                                                    {stock.conviction}%
+                                                </div>
+                                                <div style={{ width: '40px', height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                    <div style={{ width: `${stock.conviction}%`, height: '100%', background: getConvictionColor(stock.conviction) }} />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '12px', textAlign: 'right' }}>
+                                            <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{stock.allocation}%</div>
+                                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Portfolio</div>
+                                        </td>
+                                        <td style={{ padding: '12px' }}>
+                                            <div style={{
+                                                fontSize: '0.75rem',
+                                                color: 'var(--color-text-secondary)',
+                                                background: 'rgba(255,255,255,0.03)',
+                                                padding: '6px 10px',
+                                                borderRadius: '8px',
+                                                border: '1px dotted var(--glass-border)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                maxWidth: '200px'
+                                            }}>
+                                                <Info size={12} style={{ flexShrink: 0 }} />
+                                                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stock.intel}</span>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '12px', textAlign: 'right', borderRadius: '0 12px 12px 0' }}>
+                                            <button
+                                                className="btn btn-icon glass-button highlight-on-hover"
+                                                style={{ width: '32px', height: '32px', borderRadius: '8px', color: 'var(--color-accent)' }}
+                                                onClick={() => handleCopyTrade(stock.symbol, stock.name, stock.price)}
+                                                title="Sync Holding to Portfolio"
+                                            >
+                                                <Plus size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* ── Footer Stats ──────────────────────────── */}
+                <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
+                    <div style={{ display: 'flex', gap: '1.5rem' }}>
+                        <span>LATEST UPDATED: <strong style={{ color: 'var(--color-text-secondary)' }}>2026-02-25</strong></span>
+                        <span>SOURCE: <strong style={{ color: 'var(--color-text-secondary)' }}>F13 SEC FILINGS</strong></span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }} />
+                        LIVE INTELLIGENCE SYNC
+                    </div>
+                </div>
             </div>
+
+            <style>{`
+                .holding-row:hover {
+                    background: rgba(255,255,255,0.05) !important;
+                }
+                .highlight-on-hover:hover {
+                    background: var(--color-accent) !important;
+                    color: white !important;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+                }
+            `}</style>
         </div>
     );
 };

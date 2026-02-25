@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils/formatters';
 import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
 import { soundService } from '../services/soundService';
-import SearchEngine from './SearchEngine';
+
 import { getAllRecommendations } from '../services/aiRecommendationService';
 import { getStockData } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
@@ -74,28 +74,28 @@ const RECS_MAP: Record<MarketId, typeof US_RECS> = { us: US_RECS, egypt: EGYPT_R
 
 const SCAN_LOGS: Record<MarketId, string[]> = {
     us: [
-        'Analyzing S&P 500 technical indicators (RSI, SMA, EMA)...',
-        'Processing US social sentiment from X Pulse...',
-        'Calculating conviction scores across 500 equities...',
-        'Evaluating institutional flows (13F filings)...',
-        'Scanning for volume anomalies in NYSE/NASDAQ...',
-        'Finalizing tactical setups...',
+        'Analyzing multi-timeframe technical signatures (RSI, SMA, EMA)...',
+        'Parsing NLP sentiment from X (Twitter) Pro and WallStreetBets Pulse...',
+        'Computing Alpha Conviction scores (0.0 - 1.0) via ML model v5.2...',
+        'Auditing SEC 13F institutional accumulation patterns...',
+        'Detecting HFT volume anomalies and liquidity sweep signatures...',
+        'Synthesizing tactical strategy setups for session deployment...',
     ],
     egypt: [
-        'Analyzing EGX 30 technical indicators (RSI, SMA, EMA)...',
-        'Processing Egypt market sentiment & FX flows...',
-        'Calculating conviction scores across EGX constituents...',
-        'Evaluating foreign institutional flow data...',
-        'Scanning for volume anomalies in Egyptian exchange...',
-        'Finalizing tactical setups for Cairo session...',
+        'Analyzing sector rotation and currency-indexed arbitrage...',
+        'Processing local sentiment from regional financial intelligence...',
+        'Calculating Alpha Conviction metrics for high-cap listings...',
+        'Evaluating foreign vs. local institutional capital flow divergence...',
+        'Scanning for retail volume spikes and accumulation sweeps...',
+        'Finalizing tactical setups for Cairo session optimization...',
     ],
     abudhabi: [
-        'Analyzing FTSE ADX 15 technical indicators (RSI, SMA, EMA)...',
-        'Processing UAE market sentiment & capital flows...',
-        'Calculating conviction scores across ADX listings...',
-        'Evaluating sovereign wealth fund flow patterns...',
-        'Scanning for volume anomalies in ADX exchange...',
-        'Finalizing tactical setups for Abu Dhabi session...',
+        'Analyzing oil-equity correlation lags and energy sector dividend yield...',
+        'Processing UAE strategic investment news and Gulf capital sentiment...',
+        'Calculating Alpha Conviction scores for ADX institutional majors...',
+        'Auditing sovereign flow patterns and corporate buy-back signatures...',
+        'Detecting low-float liquidity traps and institutional support walls...',
+        'Synthesizing tactical setups for Abu Dhabi capital markets...',
     ],
 };
 
@@ -150,7 +150,11 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         const logs = SCAN_LOGS[selectedMarket.id] || SCAN_LOGS.us;
         setIsScanning(true);
         setScanProgress(0);
-        setScanLog([`Initializing AI Scanner for ${selectedMarket.indexName}...`, 'Loading market data from 12+ sources...', 'Establishing institutional social links...']);
+        setScanLog([
+            `Initializing AI Alpha Engine for ${selectedMarket.id === 'us' ? 'S&P 500' : selectedMarket.id === 'egypt' ? 'EGX 30' : 'ADX 15'} Universe...`,
+            `Aggregating real-time feeds from ${selectedMarket.id === 'us' ? 'NASDAQ, NYSE, and CBOE Dark Pools' : selectedMarket.id === 'egypt' ? 'EGX and CBE FX Liquidity feeds' : 'ADX and Regional Energy Market feeds'}...`,
+            `Establishing Webhook listeners for institutional ${selectedMarket.id === 'us' ? 'block trades' : 'capital flows'}...`
+        ]);
         soundService.playTap();
 
         for (let i = 0; i < logs.length; i++) {
@@ -163,8 +167,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         setIsScanning(false);
         soundService.playSuccess();
 
-        addNotification({ title: 'Market Scan Complete', message: `12 High Conviction setups identified for ${selectedMarket.indexName}.`, type: 'ai' });
-        toast.success(`Market scan complete for ${selectedMarket.indexName}. 12 setups found.`);
+        addNotification({ title: 'Market Scan Complete', message: `15 High Conviction setups identified for ${selectedMarket.indexName}.`, type: 'ai' });
+        toast.success(`Market scan complete for ${selectedMarket.indexName}. 15 setups found.`);
 
         try {
             const freshRecs = await getAllRecommendations(selectedMarket.indexName);
@@ -287,15 +291,6 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     // ─── MAIN OVERVIEW ───────────────────────────────────────────────────
     return (
         <div className="portfolio-container" style={{ paddingTop: '0' }}>
-
-
-
-            <div style={{ marginBottom: '1.5rem' }}>
-                <SearchEngine onSelectSymbol={handleLocalSelect} />
-            </div>
-
-
-
             {/* ═══ HOW AI STRATEGY WORKS ═══ */}
             <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.75rem', borderLeft: `4px solid ${selectedMarket.color}` }}>
                 <h3 style={{ fontSize: '0.85rem', color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -323,10 +318,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             </div>
 
-            {/* ═══ AI PERFORMANCE TRACKER ═══ */}
             <AIPerformanceTracker />
-
-
 
             {/* ═══ RECOMMENDATIONS TABLE ═══ */}
             <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
