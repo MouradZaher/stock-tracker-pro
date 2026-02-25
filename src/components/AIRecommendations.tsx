@@ -10,6 +10,7 @@ import { getStockData } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
 import AIPerformanceTracker from './AIPerformanceTracker';
+import AIMarketTicker from './AIMarketTicker';
 
 // ─── Market-Specific Precision Engine & Strategy Simulator Stats ─────────────
 // Numbers reflect each market's real structural characteristics:
@@ -392,6 +393,10 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     // ─── MAIN OVERVIEW ───────────────────────────────────────────────────
     return (
         <div className="portfolio-container" style={{ paddingTop: '0' }}>
+
+            {/* ═══ LIVE MARKET TICKER ═══ */}
+            <AIMarketTicker />
+
             <div style={{ marginBottom: '1.5rem' }}>
                 <SearchEngine onSelectSymbol={handleLocalSelect} />
             </div>
