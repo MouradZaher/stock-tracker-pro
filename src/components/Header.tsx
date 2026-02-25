@@ -76,16 +76,16 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const iconBtn: React.CSSProperties = {
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
-        borderRadius: '10px',
+        borderRadius: '8px',
         color: 'var(--color-text-secondary)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '4px 6px',
+        padding: '3px 5px',
         transition: 'var(--transition-fast)',
         gap: '4px',
-        fontSize: '0.7rem',
+        fontSize: '0.65rem',
         fontWeight: 600,
         whiteSpace: 'nowrap' as const,
     };
@@ -97,27 +97,27 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0.5rem 1rem',
+                padding: '0 var(--spacing-xl)',
                 height: 'var(--header-height)',
                 gap: '0.5rem'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
-                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className="logo-icon" style={{ padding: '4px', borderRadius: '6px' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div className="logo-icon" style={{ padding: '3px', borderRadius: '5px' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                             <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
                             <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
                         </svg>
                     </div>
-                    <span className="logo-text" style={{ fontSize: '1rem', fontWeight: 800 }}>
-                        StockTracker <span style={{ color: 'var(--color-accent)', marginLeft: '2px' }}>PRO</span>
+                    <span className="logo-text" style={{ fontSize: '0.95rem', fontWeight: 800 }}>
+                        StockTracker <span style={{ color: 'var(--color-accent)', marginLeft: '1px' }}>PRO</span>
                     </span>
                 </div>
 
                 {/* ── Center Nav (desktop only) ─────────── */}
                 <div className="header-center desktop-only" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-                    <nav className="header-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }} role="navigation" aria-label="Main navigation">
+                    <nav className="header-nav" style={{ display: 'flex', alignItems: 'center', gap: '3px' }} role="navigation" aria-label="Main navigation">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
@@ -128,12 +128,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '5px 10px',
-                                    fontSize: '0.8rem'
+                                    gap: '5px',
+                                    padding: '4px 12px',
+                                    fontSize: '0.75rem'
                                 }}
                             >
-                                <tab.icon size={16} strokeWidth={2.0} />
+                                <tab.icon size={14} strokeWidth={2.0} />
                                 {tab.label}
                             </button>
                         ))}
@@ -147,12 +147,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '4px 6px' }}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '3px 5px' }}
                             onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
                         >
-                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '18px', height: '12px', borderRadius: '1px', objectFit: 'cover' }} />
+                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '16px', height: '11px', borderRadius: '1px', objectFit: 'cover' }} />
                             <ChevronDown size={10} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
                         </button>
                     </div>
@@ -286,7 +286,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         title="Sign Out"
                     >
                         <LogOut size={14} strokeWidth={2.0} />
-                        <span className="desktop-only">Sign Out</span>
+                        <span className="desktop-only" style={{ marginLeft: '2px' }}>Sign Out</span>
                     </button>
                 </div>
             </header>
