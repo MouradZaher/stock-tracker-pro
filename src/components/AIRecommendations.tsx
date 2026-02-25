@@ -165,6 +165,12 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     const currentIntel = INTELLIGENCE[selectedMarket.id] || INTELLIGENCE.us;
 
+    // Reset active recommendations when market changes to ensure sync
+    useEffect(() => {
+        setActiveRecs([]);
+        setDetailSymbol(null);
+    }, [selectedMarket.id]);
+
     // Fetch real recommendations ONLY on demand (Run AI Scan)
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
 
@@ -544,48 +550,122 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             )}
 
-            {/* Recommendations Table */}
-            <div className="glass-card" style={{ padding: '0', marginBottom: '2rem', border: '1px solid var(--glass-border)' }}>
-                <div style={{ overflowX: 'auto', width: '100%' }}>
-                    <table className="portfolio-table" style={{ minWidth: '400px', width: '100%' }}>
-                        <thead>
-                            <tr>
-                                <th style={{ paddingLeft: '1.25rem' }}>Symbol</th>
-                                <th style={{ textAlign: 'right' }}>Score</th>
-                                <th style={{ textAlign: 'center' }}>Rec</th>
-                                <th style={{ textAlign: 'right', paddingRight: '1.25rem' }}>Aloc %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec) => (
-                                <tr key={rec.symbol} onClick={() => handleLocalSelect(rec.symbol)} style={{ cursor: 'pointer' }}>
-                                    <td style={{ paddingLeft: '1.25rem' }}>
-                                        <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{rec.symbol}</div>
-                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{rec.sector}</div>
-                                    </td>
-                                    <td style={{ textAlign: 'right' }}>
-                                        <span style={{ color: getScoreColor(rec.score), fontWeight: 800 }}>{rec.score}</span>
-                                    </td>
-                                    <td style={{ textAlign: 'center' }}>
-                                        <span style={{
-                                            padding: '4px 10px', borderRadius: '6px',
-                                            background: rec.score >= 75 ? 'rgba(16, 185, 129, 0.15)' : (rec.score >= 50 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)'),
-                                            color: rec.score >= 75 ? 'var(--color-success)' : (rec.score >= 50 ? 'var(--color-warning)' : 'var(--color-error)'),
-                                            fontWeight: 700, fontSize: '0.75rem',
-                                        }}>
-                                            {rec.recommendation?.toUpperCase() || 'HOLD'}
-                                        </span>
-                                    </td>
-                                    <td style={{ textAlign: 'right', fontWeight: 700, paddingRight: '1.25rem', color: selectedMarket.color }}>
-                                        {typeof rec.suggestedAllocation === 'number' && rec.suggestedAllocation > 0
-                                            ? `${rec.suggestedAllocation.toFixed(1)}%`
-                                            : rec.score >= 75 ? '4.5%' : rec.score >= 60 ? '3.0%' : '1.5%'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+            {/* Recommendations Grid (LOCKED: Design Revamp 2026-02-25) */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: '1.25rem',
+                marginBottom: '3rem'
+            }}>
+                {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec, idx) => (
+                    <div
+                        key={`${rec.symbol}-${idx}`}
+                        className="glass-card ai-signal-card"
+                        onClick={() => handleLocalSelect(rec.symbol)}
+                        style={{
+                            padding: '1.25rem',
+                            cursor: 'pointer',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            border: `1px solid ${rec.score >= 75 ? 'rgba(16, 185, 129, 0.2)' : 'var(--glass-border)'}`,
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '1rem'
+                        }}
+                    >
+                        {/* Card Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{rec.symbol}</span>
+                                    <span style={{
+                                        fontSize: '0.65rem',
+                                        padding: '2px 6px',
+                                        borderRadius: '4px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        color: 'var(--color-text-tertiary)',
+                                        textTransform: 'uppercase',
+                                        fontWeight: 800
+                                    }}>{rec.sector}</span>
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{rec.name}</div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{
+                                    fontSize: '0.85rem',
+                                    fontWeight: 900,
+                                    color: getScoreColor(rec.score),
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                    gap: '4px'
+                                }}>
+                                    <Zap size={14} fill={getScoreColor(rec.score)} />
+                                    {rec.score}%
+                                </div>
+                                <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conviction</div>
+                            </div>
+                        </div>
+
+                        {/* Conviction Gauge */}
+                        <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{
+                                width: `${rec.score}%`,
+                                height: '100%',
+                                background: `linear-gradient(90deg, ${getScoreColor(rec.score)}dd, ${getScoreColor(rec.score)})`,
+                                transition: 'width 1s ease-out'
+                            }} />
+                        </div>
+
+                        {/* Signal Content */}
+                        <div style={{ flex: 1 }}>
+                            <div style={{
+                                padding: '8px 12px',
+                                background: rec.score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (rec.score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
+                                borderRadius: '8px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                marginBottom: '0.75rem'
+                            }}>
+                                <span style={{
+                                    fontSize: '0.75rem',
+                                    fontWeight: 900,
+                                    color: rec.score >= 75 ? 'var(--color-success)' : (rec.score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
+                                }}>
+                                    {rec.recommendation?.toUpperCase() || 'HOLD'} SIGNAL
+                                </span>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                                {rec.reasoning || `AI models indicate ${rec.score}% historical alpha probability based on recent volume cluster analysis.`}
+                            </p>
+                        </div>
+
+                        {/* Footer Info */}
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            paddingTop: '0.75rem',
+                            borderTop: '1px solid var(--glass-border)',
+                            fontSize: '0.7rem'
+                        }}>
+                            <div>
+                                <span style={{ color: 'var(--color-text-tertiary)' }}>Allocation:</span>
+                                <span style={{ marginLeft: '4px', fontWeight: 800, color: selectedMarket.color }}>
+                                    {typeof rec.suggestedAllocation === 'number' && rec.suggestedAllocation > 0
+                                        ? `${rec.suggestedAllocation.toFixed(1)}%`
+                                        : rec.score >= 75 ? '5.0%' : '2.5%'}
+                                </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-accent)' }}>
+                                <span style={{ fontWeight: 700 }}>Analysis</span>
+                                <ArrowRight size={12} />
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* ═══ MODALS ═══ */}

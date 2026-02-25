@@ -61,8 +61,10 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                     // Sync to Supabase only if user is logged in AND not a bypass user
                     if (userId && !userId.startsWith('bypass-')) {
+                        set({ isSyncing: true });
                         try {
                             const success = await portfolioService.savePosition(userId, newPosition);
+                            set({ isSyncing: false });
                             if (!success) {
                                 // Rollback on failure
                                 set((state) => ({
@@ -76,6 +78,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             set((state) => ({
                                 positions: state.positions.filter(p => p.id !== id),
                                 error: 'Failed to save position',
+                                isSyncing: false
                             }));
                         }
                     }
@@ -107,10 +110,12 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                     // Sync to Supabase only if user is logged in AND not a bypass user
                     if (userId && oldPosition && !userId.startsWith('bypass-')) {
+                        set({ isSyncing: true });
                         try {
                             const updatedPosition = get().positions.find(p => p.id === id);
                             if (updatedPosition) {
                                 const success = await portfolioService.savePosition(userId, updatedPosition);
+                                set({ isSyncing: false });
                                 if (!success) {
                                     // Rollback on failure
                                     set((state) => ({
@@ -125,6 +130,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             set((state) => ({
                                 positions: state.positions.map(p => p.id === id ? oldPosition : p),
                                 error: 'Failed to update position',
+                                isSyncing: false
                             }));
                         }
                     }
@@ -141,8 +147,10 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                     // Sync to Supabase only if user is logged in AND not a bypass user
                     if (userId && !userId.startsWith('bypass-')) {
+                        set({ isSyncing: true });
                         try {
                             const success = await portfolioService.deletePosition(userId, symbol);
+                            set({ isSyncing: false });
                             if (!success) {
                                 // Rollback on failure
                                 set({
@@ -156,6 +164,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             set({
                                 positions: oldPositions,
                                 error: 'Failed to delete position',
+                                isSyncing: false
                             });
                         }
                     }

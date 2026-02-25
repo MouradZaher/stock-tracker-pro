@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save } from 'lucide-react';
+import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save, Cloud, CheckCircle, RefreshCw } from 'lucide-react';
 
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
@@ -26,7 +26,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // Currency formatter shorthand
     const fmt = (v: number) => formatCurrencyForMarket(v, selectedMarket.currency);
     // ... existing hooks ...
-    const { positions, addPosition, removePosition, updatePosition, getSummary, updatePrice } = usePortfolioStore();
+    const { positions, addPosition, removePosition, updatePosition, getSummary, updatePrice, isSyncing } = usePortfolioStore();
     const [showModal, setShowModal] = useState(false);
     const [editingPosition, setEditingPosition] = useState<{ id: string; symbol: string; units: number; avgCost: number } | null>(null);
     const [editForm, setEditForm] = useState({ units: '', avgCost: '' });
@@ -322,8 +322,34 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     return (
         <div className="portfolio-container">
             {/* ... existing header and summary ... */}
-            <div className="portfolio-header">
-                <h2>My Portfolio</h2>
+            <div className="portfolio-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <h2 style={{ margin: 0 }}>My Portfolio</h2>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '4px 10px',
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '20px',
+                        border: '1px solid var(--glass-border)',
+                        fontSize: '0.7rem',
+                        color: isSyncing ? 'var(--color-accent)' : 'var(--color-success)',
+                        transition: 'all 0.3s ease'
+                    }}>
+                        {isSyncing ? (
+                            <>
+                                <RefreshCw size={12} className="animate-spin" />
+                                <span style={{ fontWeight: 600 }}>Syncing...</span>
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle size={12} />
+                                <span style={{ fontWeight: 600 }}>Cloud Synced</span>
+                            </>
+                        )}
+                    </div>
+                </div>
                 <button
                     className="btn btn-primary"
                     onClick={() => setShowModal(true)}
