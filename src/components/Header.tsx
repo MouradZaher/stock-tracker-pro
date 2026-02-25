@@ -76,16 +76,16 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const iconBtn: React.CSSProperties = {
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
-        borderRadius: 'var(--radius-md)',
+        borderRadius: '10px',
         color: 'var(--color-text-secondary)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '5px 7px',
+        padding: '4px 6px',
         transition: 'var(--transition-fast)',
         gap: '4px',
-        fontSize: '0.75rem',
+        fontSize: '0.7rem',
         fontWeight: 600,
         whiteSpace: 'nowrap' as const,
     };
@@ -102,22 +102,22 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 gap: '0.5rem'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
-                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
-                    <div className="logo-icon" style={{ padding: 'var(--spacing-xs)' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="logo-icon" style={{ padding: '4px', borderRadius: '6px' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                             <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
                             <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
                         </svg>
                     </div>
-                    <span className="logo-text" style={{ fontSize: 'var(--font-size-lg)' }}>
-                        StockTracker <span>PRO</span>
+                    <span className="logo-text" style={{ fontSize: '1rem', fontWeight: 800 }}>
+                        StockTracker <span style={{ color: 'var(--color-accent)', marginLeft: '2px' }}>PRO</span>
                     </span>
                 </div>
 
                 {/* ── Center Nav (desktop only) ─────────── */}
-                <div className="header-center desktop-only" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--spacing-xs)', flex: 1, overflow: 'hidden' }}>
-                    <nav className="header-nav" style={{ padding: 'var(--spacing-xs)', display: 'flex', justifyContent: 'center', gap: 'var(--spacing-xs)' }} role="navigation" aria-label="Main navigation">
+                <div className="header-center desktop-only" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                    <nav className="header-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }} role="navigation" aria-label="Main navigation">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
@@ -125,8 +125,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 onClick={() => handleTabClick(tab.id)}
                                 aria-label={`Navigate to ${tab.label}`}
                                 aria-current={activeTab === tab.id ? 'page' : undefined}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '5px 10px',
+                                    fontSize: '0.8rem'
+                                }}
                             >
-                                <tab.icon size={18} strokeWidth={1.8} />
+                                <tab.icon size={16} strokeWidth={2.0} />
                                 {tab.label}
                             </button>
                         ))}
@@ -140,12 +147,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '5px 8px' }}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '4px 6px' }}
                             onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
                         >
-                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '20px', height: '14px', borderRadius: '2px', objectFit: 'cover' }} />
+                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '18px', height: '12px', borderRadius: '1px', objectFit: 'cover' }} />
                             <ChevronDown size={10} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
                         </button>
                     </div>
@@ -227,7 +234,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             aria-label="Open Admin Panel"
                             title="Admin Dashboard"
                         >
-                            <Shield size={15} strokeWidth={1.8} />
+                            <Shield size={14} strokeWidth={2.0} />
                         </button>
                     )}
 
@@ -238,7 +245,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Notifications"
                         title="Notifications"
                     >
-                        <Bell size={15} strokeWidth={1.8} />
+                        <Bell size={14} strokeWidth={2.0} />
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
@@ -268,7 +275,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                         title={`${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
                     >
-                        {theme === 'dark' ? <Sun size={15} strokeWidth={1.8} /> : <Moon size={15} strokeWidth={1.8} />}
+                        {theme === 'dark' ? <Sun size={14} strokeWidth={2.0} /> : <Moon size={14} strokeWidth={2.0} />}
                     </button>
 
                     {/* Logout */}
@@ -278,7 +285,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Sign out"
                         title="Sign Out"
                     >
-                        <LogOut size={15} strokeWidth={1.8} />
+                        <LogOut size={14} strokeWidth={2.0} />
                         <span className="desktop-only">Sign Out</span>
                     </button>
                 </div>

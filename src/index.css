@@ -85,7 +85,7 @@
   --glass-blur: blur(24px);
   --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
 
-  --header-height: clamp(64px, 8vh, 80px);
+  --header-height: clamp(56px, 7vh, 72px);
   --mobile-nav-height: 80px;
 
   /* Breakpoints */
@@ -493,27 +493,28 @@ h6 {
 
 .header-tab {
   position: relative;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: 6px 14px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   background: rgba(255, 255, 255, 0.02);
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-base) !important;
-  border-radius: var(--radius-md);
+  transition: all var(--transition-fast) !important;
+  border-radius: 10px;
   white-space: nowrap;
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  margin: 0 4px;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 3px;
 }
 
 @media (min-width: 1024px) {
   .header-tab {
-    padding: var(--spacing-xs) var(--spacing-md);
-    margin: 0 var(--spacing-xs);
+    padding: 6px 16px;
+    margin: 0 4px;
   }
 }
 
