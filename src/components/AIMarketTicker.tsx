@@ -42,6 +42,13 @@ const AIMarketTicker: React.FC = () => {
             save_image: false,
             calendar: false,
             support_host: 'https://www.tradingview.com',
+            // ── Key Levels ─────────────────────────────────────
+            // PivotPointsHighLow  → marks swing highs & lows on each bar
+            // PivotPointsStandard → draws PP / R1 / R2 / S1 / S2 horizontal lines
+            studies: [
+                'PivotPointsHighLow@tv-basicstudies',
+                'PivotPointsStandard@tv-basicstudies',
+            ],
         });
 
         const widget = document.createElement('div');
