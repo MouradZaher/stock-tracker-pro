@@ -59,10 +59,8 @@
         height: calc(52px + var(--safe-area-top));
         min-height: calc(52px + var(--safe-area-top));
         max-height: calc(52px + var(--safe-area-top));
-        padding-top: calc(0.35rem + var(--safe-area-top));
-        padding-bottom: 0.35rem;
-        padding-left: 0.65rem;
-        padding-right: 0.65rem;
+        padding: 0 0.65rem;
+        padding-top: var(--safe-area-top);
         gap: 0.3rem;
         overflow: visible;
         position: fixed;

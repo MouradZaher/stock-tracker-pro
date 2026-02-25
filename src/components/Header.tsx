@@ -82,12 +82,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '3px 5px',
+        padding: '2px 6px',
         transition: 'var(--transition-fast)',
         gap: '4px',
         fontSize: '0.65rem',
         fontWeight: 600,
         whiteSpace: 'nowrap' as const,
+        height: '32px', // Fixed height for alignment
     };
 
     return (
@@ -99,7 +100,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 justifyContent: 'space-between',
                 padding: '0 var(--spacing-xl)',
                 height: 'var(--header-height)',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                borderBottom: '1px solid var(--color-border)',
+                boxSizing: 'border-box'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
                 <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -147,7 +150,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '3px 5px' }}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '2px 5px', height: '32px' }}
                             onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
@@ -280,13 +283,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
                     {/* Logout */}
                     <button
-                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)' }}
+                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)', height: '32px' }}
                         onClick={() => { soundService.playTap(); onLogout(); }}
                         aria-label="Sign out"
                         title="Sign Out"
                     >
                         <LogOut size={14} strokeWidth={2.0} />
-                        <span className="desktop-only" style={{ marginLeft: '2px' }}>Sign Out</span>
+                        <span className="desktop-only" style={{ marginLeft: '4px' }}>Sign Out</span>
                     </button>
                 </div>
             </header>
