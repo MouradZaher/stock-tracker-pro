@@ -27,12 +27,6 @@ const StockHeatmap: React.FC = () => {
 
         const initWidget = () => {
             if (!container) return;
-
-            const rect = container.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) {
-                if (!container.offsetParent) return;
-            }
-
             container.innerHTML = '';
 
             try {
@@ -75,42 +69,44 @@ const StockHeatmap: React.FC = () => {
             }
         };
 
-        // Longer delay on iOS: layout must fully resolve before TradingView measures dimensions
+        // iOS needs extra time for layout to settle; desktop 200ms is fine
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-        const timer = setTimeout(initWidget, isIOS ? 600 : 200);
+        const timer = setTimeout(initWidget, isIOS ? 700 : 200);
 
         return () => {
             clearTimeout(timer);
-            if (container) {
-                container.innerHTML = '';
-            }
+            if (container) container.innerHTML = '';
         };
-    }, [retryKey, theme, effectiveMarket.id]);   // Re-init when market changes (hover or select)
+    }, [retryKey, theme, effectiveMarket.id]);
 
-    // ===== LOCKED: Heatmap Container Layout — DO NOT MODIFY (approved 2026-02-16) =====
     return (
-        <div className="heatmap-container" style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            padding: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '12px',
-            border: '1px solid var(--glass-border)'
-        }}>
+        // ===== LOCKED: Heatmap Container Layout — DO NOT MODIFY (approved 2026-02-16) =====
+        <div
+            className="heatmap-container"
+            style={{
+                position: 'absolute',
+                top: 0, left: 0, right: 0, bottom: 0,
+                padding: 0,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: '12px',
+                border: '1px solid var(--glass-border)',
+            }}
+        >
             {error ? (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-primary)' }}>
+                <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--color-text-primary)',
+                }}>
                     <AlertTriangle size={48} className="text-warning" style={{ marginBottom: '1rem' }} />
                     <p style={{ marginBottom: '1rem' }}>Failed to load market map</p>
                     <button
-                        onClick={() => {
-                            setError(false);
-                            setRetryKey(k => k + 1);
-                        }}
+                        onClick={() => { setError(false); setRetryKey(k => k + 1); }}
                         className="glass-button"
                         style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
@@ -127,9 +123,7 @@ const StockHeatmap: React.FC = () => {
                         height: '100%',
                         position: 'relative',
                         overflow: 'hidden',
-                        // iOS: allow touch events inside the iframe
                         touchAction: 'pan-x pan-y',
-                        WebkitOverflowScrolling: 'touch',
                         pointerEvents: 'auto',
                     }}
                 />

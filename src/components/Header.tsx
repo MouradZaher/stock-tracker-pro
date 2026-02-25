@@ -23,6 +23,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const [isMarketOpen, setIsMarketOpen] = useState(false);
     const marketBtnRef = useRef<HTMLButtonElement>(null);
     const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
+    // Detect mobile viewport to pass smaller icon sizes directly to Lucide
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+    const iconSize = isMobile ? 11 : 14;
+    const btnH = isMobile ? '20px' : '26px';
 
     const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: Home },
@@ -71,7 +80,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         }
     };
 
-    // --- Icon button shared style ---
     const iconBtn: React.CSSProperties = {
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
@@ -81,13 +89,14 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2px 4px',
+        padding: isMobile ? '2px 3px' : '2px 4px',
         transition: 'var(--transition-fast)',
         gap: '3px',
         fontSize: '0.6rem',
         fontWeight: 600,
         whiteSpace: 'nowrap' as const,
-        height: '26px', // Ultra-compact fixed height
+        height: btnH,
+        minWidth: btnH,
     };
 
     return (
@@ -150,13 +159,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: '2px 4px', height: '26px' }}
+                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: isMobile ? '2px 3px' : '2px 4px' }}
                             onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
                         >
-                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '14px', height: '10px', borderRadius: '1px', objectFit: 'cover' }} />
-                            <ChevronDown size={8} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
+                            <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: isMobile ? '12px' : '14px', height: isMobile ? '8px' : '10px', borderRadius: '1px', objectFit: 'cover' }} />
+                            <ChevronDown size={isMobile ? 7 : 8} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
                         </button>
                     </div>
 
@@ -237,7 +246,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                             aria-label="Open Admin Panel"
                             title="Admin Dashboard"
                         >
-                            <Shield size={14} strokeWidth={2.0} />
+                            <Shield size={iconSize} strokeWidth={2.0} />
                         </button>
                     )}
 
@@ -248,7 +257,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label="Notifications"
                         title="Notifications"
                     >
-                        <Bell size={14} strokeWidth={2.0} />
+                        <Bell size={iconSize} strokeWidth={2.0} />
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
@@ -257,9 +266,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                 background: 'var(--color-error)',
                                 color: 'white',
                                 borderRadius: 'var(--radius-full)',
-                                width: '16px',
-                                height: '16px',
-                                fontSize: '9px',
+                                width: isMobile ? '12px' : '16px',
+                                height: isMobile ? '12px' : '16px',
+                                fontSize: '8px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -278,17 +287,17 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                         title={`${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
                     >
-                        {theme === 'dark' ? <Sun size={14} strokeWidth={2.0} /> : <Moon size={14} strokeWidth={2.0} />}
+                        {theme === 'dark' ? <Sun size={iconSize} strokeWidth={2.0} /> : <Moon size={iconSize} strokeWidth={2.0} />}
                     </button>
 
                     {/* Logout */}
                     <button
-                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)', height: '26px' }}
+                        style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)' }}
                         onClick={() => { soundService.playTap(); onLogout(); }}
                         aria-label="Sign out"
                         title="Sign Out"
                     >
-                        <LogOut size={12} strokeWidth={2.0} />
+                        <LogOut size={iconSize} strokeWidth={2.0} />
                         <span className="desktop-only" style={{ marginLeft: '3px' }}>Sign Out</span>
                     </button>
                 </div>
