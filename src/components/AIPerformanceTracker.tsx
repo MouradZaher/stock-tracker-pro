@@ -54,14 +54,14 @@ const PERF_DATA: Record<MarketId, { month: string; ai: number; benchmark: number
 
 const ALPHA_SOURCES: Record<MarketId, { title: string; desc: string; contribution: string }[]> = {
     us: [
-        { title: 'Technical Arbitrage', desc: 'Capturing pips via HFT-style order flow analysis and RSI divergence.', contribution: '42%' },
-        { title: 'Sector Rotation', desc: 'Predictive flow analysis between defensive and growth tech baskets.', contribution: '35%' },
-        { title: 'Sentiment Delta', desc: 'Real-time headline processing vs. institutional positioning.', contribution: '23%' },
+        { title: 'Quantitative Momentum Feed', desc: 'Machine learning models processing tick-by-tick momentum and RSI divergence in mega-cap tech.', contribution: '42%' },
+        { title: 'Sector Relative Valuation', desc: 'Arbitraging capital flows between defensive consumer staples and high-growth semiconductors.', contribution: '35%' },
+        { title: 'Institutional Sentiment Mapping', desc: 'Real-time NLP analysis of earnings calls and headline delta vs. dark pool positioning.', contribution: '23%' },
     ],
     egypt: [
-        { title: 'Liquidity Filtering', desc: 'Exploiting thin order books in EGX blue-chips during volatility.', contribution: '51%' },
-        { title: 'Currency Correlation', desc: 'Hedging EGP devaluation via commodity and export majors.', contribution: '28%' },
-        { title: 'Sector Momentum', desc: 'Tracking banking and real-estate capital waves.', contribution: '21%' },
+        { title: 'FX-Indexed Arbitrage', desc: 'Exploiting price inefficiencies in commodity and export-oriented EGX majors during currency volatility.', contribution: '51%' },
+        { title: 'Order Book Imbalance', desc: 'Detecting institutional accumulation waves in banking and real-estate sectors through thin liquidity filtering.', contribution: '28%' },
+        { title: 'Macro-Catalyst Convergence', desc: 'Mapping CBE policy shifts and foreign direct investment news to high-conviction momentum plays.', contribution: '21%' },
     ],
     abudhabi: [
         { title: 'Sovereign Flow Sync', desc: 'Model captures rebalancing windows of major sovereign funds.', contribution: '48%' },
@@ -94,25 +94,54 @@ const MARKET_INTEL: Record<MarketId, { title: string; body: string; bias: string
     },
 };
 
-interface MarketSession { code: string; isOpen: boolean; isWeekend?: boolean; }
+const SESSION_CONFIG: Record<MarketId, { code: string; name: string; hours: string; startH: number; startM: number; endH: number; endM: number; dayRange: [number, number] }> = {
+    us: {
+        code: 'NYC',
+        name: 'NYC (N. YORK)',
+        hours: '16:30 - 23:00',
+        startH: 16, startM: 30, endH: 23, endM: 0,
+        dayRange: [1, 5] // Mon-Fri
+    },
+    egypt: {
+        code: 'EGX',
+        name: 'EGX (CAIRO)',
+        hours: '10:00 - 14:30',
+        startH: 10, startM: 0, endH: 14, endM: 30,
+        dayRange: [0, 4] // Sun-Thu
+    },
+    abudhabi: {
+        code: 'ADX',
+        name: 'ADX (A. DHABI)',
+        hours: '08:00 - 13:00',
+        startH: 8, startM: 0, endH: 13, endM: 0,
+        dayRange: [1, 5] // Mon-Fri (UAE shifted to Mon-Fri in 2022)
+    }
+};
 
-const getMarketSessions = (): MarketSession[] => {
+const getMarketSessionStatus = (marketId: MarketId): { code: string; name: string; hours: string; isOpen: boolean } => {
+    const config = SESSION_CONFIG[marketId];
     const now = new Date();
     const utcHour = now.getUTCHours();
-    const utcMin = now.getUTCMinutes();
     const day = now.getUTCDay();
+
+    // Cairo time (UTC+2)
     const cairoHour = (utcHour + 2) % 24;
-    const cairoMin = utcMin;
+    const cairoMin = now.getUTCMinutes();
     const cairoDay = (utcHour + 2 >= 24) ? (day + 1) % 7 : day;
-    const inRange = (h: number, m: number, sH: number, sM: number, eH: number, eM: number) => {
-        const c = h * 60 + m; return c >= sH * 60 + sM && c < eH * 60 + eM;
+
+    const currentMinutes = cairoHour * 60 + cairoMin;
+    const startMinutes = config.startH * 60 + config.startM;
+    const endMinutes = config.endH * 60 + config.endM;
+
+    const isDayMatch = (cairoDay >= config.dayRange[0] && cairoDay <= config.dayRange[1]);
+    const isOpen = isDayMatch && currentMinutes >= startMinutes && currentMinutes < endMinutes;
+
+    return {
+        code: config.code,
+        name: config.name,
+        hours: config.hours,
+        isOpen
     };
-    return [
-        { code: 'EGX', isOpen: (cairoDay >= 0 && cairoDay <= 4) && inRange(cairoHour, cairoMin, 10, 0, 14, 30), isWeekend: [5, 6].includes(cairoDay) },
-        { code: 'LND', isOpen: (day >= 1 && day <= 5) && inRange(cairoHour, cairoMin, 10, 0, 18, 30), isWeekend: [0, 6].includes(day) },
-        { code: 'NYC', isOpen: (day >= 1 && day <= 5) && inRange(cairoHour, cairoMin, 16, 30, 23, 0), isWeekend: [0, 6].includes(day) },
-        { code: 'TKY', isOpen: (day >= 1 && day <= 5) && inRange(cairoHour, cairoMin, 2, 0, 8, 0), isWeekend: [0, 6].includes(day) },
-    ];
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -134,7 +163,7 @@ const AIPerformanceTracker: React.FC = () => {
     const statsRaw = STATS_DATA[selectedMarket.id] || STATS_DATA.us;
     const alphaSources = ALPHA_SOURCES[selectedMarket.id] || ALPHA_SOURCES.us;
     const intel = MARKET_INTEL[selectedMarket.id] || MARKET_INTEL.us;
-    const sessions = getMarketSessions();
+    const session = getMarketSessionStatus(selectedMarket.id);
 
     const handleRunBacktest = () => {
         setShowBacktestModal(true);
@@ -286,21 +315,31 @@ const AIPerformanceTracker: React.FC = () => {
             </div>
 
             {/* ═══ MARKET SESSIONS ROW ═══ */}
-            <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.75rem' }}>
-                {sessions.map(session => (
-                    <div key={session.code} className="glass-card" style={{
-                        padding: '10px',
-                        textAlign: 'center',
-                        background: session.isOpen ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.01)',
-                        border: '1px solid var(--glass-border)',
-                        opacity: session.isOpen ? 1 : 0.6
-                    }}>
-                        <div style={{ fontSize: '0.65rem', fontWeight: 900, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
-                        <div style={{ fontSize: '0.5rem', fontWeight: 700, marginTop: '2px', color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>
-                            {session.isOpen ? 'ACTIVE' : 'CLOSED'}
-                        </div>
+            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+                <div className="glass-card" style={{
+                    padding: '12px 24px',
+                    textAlign: 'center',
+                    background: session.isOpen ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.01)',
+                    border: '1px solid var(--glass-border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '15px',
+                    minWidth: '280px',
+                    justifyContent: 'center'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '8px', height: '8px', background: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', borderRadius: '50%', boxShadow: session.isOpen ? '0 0 10px var(--color-success)' : 'none' }}></div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 900, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>{session.code}</div>
                     </div>
-                ))}
+                    <div style={{ width: '1px', height: '15px', background: 'var(--glass-border)' }}></div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                        {session.hours} (CAIRO)
+                    </div>
+                    <div style={{ width: '1px', height: '15px', background: 'var(--glass-border)' }}></div>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 900, color: session.isOpen ? 'var(--color-success)' : 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>
+                        {session.isOpen ? 'Active' : 'Closed'}
+                    </div>
+                </div>
             </div>
 
             {/* ═══ EXPLAINER MODAL ═══ */}
