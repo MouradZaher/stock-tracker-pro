@@ -3,34 +3,11 @@ import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
 import { useTheme } from '../contexts/ThemeContext';
 
-// ─── TradingView Ticker Tape Symbols Per Market ──────────────────────────────
-// Index is always the first symbol (shown as "primary").
-// Then the 5 largest-cap stocks in each index.
-const MARKET_SYMBOLS: Record<MarketId, { proName: string; title: string }[]> = {
-    us: [
-        { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500' },
-        { proName: 'NASDAQ:NVDA', title: 'NVDA' },
-        { proName: 'NASDAQ:AAPL', title: 'AAPL' },
-        { proName: 'NASDAQ:MSFT', title: 'MSFT' },
-        { proName: 'NASDAQ:AMZN', title: 'AMZN' },
-        { proName: 'NASDAQ:GOOGL', title: 'GOOGL' },
-    ],
-    egypt: [
-        { proName: 'EGX:EGX30', title: 'EGX 30' },
-        { proName: 'EGX:COMI', title: 'CIB' },
-        { proName: 'EGX:HRHO', title: 'HRHO' },
-        { proName: 'EGX:TMGH', title: 'TMGH' },
-        { proName: 'EGX:EAST', title: 'EAST' },
-        { proName: 'EGX:EFIH', title: 'EFG' },
-    ],
-    abudhabi: [
-        { proName: 'ADX:FABN', title: 'FAB' },
-        { proName: 'ADX:ADNOCDIST', title: 'ADNOC Dist.' },
-        { proName: 'ADX:ETISALAT', title: 'e&' },
-        { proName: 'ADX:IHC', title: 'IHC' },
-        { proName: 'ADX:ALDAR', title: 'Aldar' },
-        { proName: 'ADX:TAQA', title: 'TAQA' },
-    ],
+// ─── One index symbol per market ────────────────────────────────────────────
+const INDEX_SYMBOL: Record<MarketId, string> = {
+    us: 'SP:SPX',       // S&P 500
+    egypt: 'EGX:EGX30',    // EGX 30
+    abudhabi: 'ADX:ADSMI',    // Abu Dhabi Securities Market Index
 };
 
 const AIMarketTicker: React.FC = () => {
@@ -44,22 +21,27 @@ const AIMarketTicker: React.FC = () => {
         container.innerHTML = '';
 
         const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
         script.async = true;
         script.type = 'text/javascript';
         script.innerHTML = JSON.stringify({
-            symbols: MARKET_SYMBOLS[selectedMarket.id] || MARKET_SYMBOLS.us,
-            showSymbolLogo: true,
-            isTransparent: true,
-            displayMode: 'adaptive',
-            colorTheme: theme === 'dark' ? 'dark' : 'light',
+            symbol: INDEX_SYMBOL[selectedMarket.id] ?? 'SP:SPX',
+            width: '100%',
+            height: 200,
             locale: 'en',
+            dateRange: '1D',
+            colorTheme: theme === 'dark' ? 'dark' : 'light',
+            isTransparent: true,
+            autosize: false,
+            largeChartUrl: '',
+            chartOnly: false,
+            noTimeScale: false,
         });
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'tradingview-widget-container__widget';
-        container.appendChild(wrapper);
-        wrapper.appendChild(script);
+        const widget = document.createElement('div');
+        widget.className = 'tradingview-widget-container__widget';
+        container.appendChild(widget);
+        widget.appendChild(script);
 
         return () => { container.innerHTML = ''; };
     }, [selectedMarket.id, theme]);
@@ -69,36 +51,51 @@ const AIMarketTicker: React.FC = () => {
             style={{
                 width: '100%',
                 marginBottom: '1.25rem',
-                borderRadius: '12px',
+                borderRadius: '14px',
                 overflow: 'hidden',
-                border: `1px solid ${selectedMarket.color}33`,
+                border: `1px solid ${selectedMarket.color}44`,
                 background: 'var(--glass-bg)',
-                backdropFilter: 'blur(12px)',
-                minHeight: '52px',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                position: 'relative',
             }}
         >
-            {/* Market label pill */}
+            {/* Header label */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '5px 12px 0',
+                padding: '8px 14px 0',
                 fontSize: '0.6rem',
                 fontWeight: 800,
                 color: selectedMarket.color,
                 textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                opacity: 0.85,
+                letterSpacing: '0.12em',
             }}>
-                <img src={selectedMarket.flagUrl} alt="" style={{ width: '13px', height: '9px', borderRadius: '1px', objectFit: 'cover' }} />
+                <img
+                    src={selectedMarket.flagUrl}
+                    alt=""
+                    style={{ width: '13px', height: '9px', borderRadius: '1px', objectFit: 'cover' }}
+                />
                 {selectedMarket.indexName} — LIVE
+                <span style={{
+                    marginLeft: 'auto',
+                    background: `${selectedMarket.color}22`,
+                    color: selectedMarket.color,
+                    padding: '1px 6px',
+                    borderRadius: '4px',
+                    fontSize: '0.5rem',
+                    fontWeight: 900,
+                }}>
+                    1D
+                </span>
             </div>
 
-            {/* TradingView ticker tape */}
+            {/* TradingView mini chart */}
             <div
                 className="tradingview-widget-container"
                 ref={containerRef}
-                style={{ width: '100%', minHeight: '44px' }}
+                style={{ width: '100%', height: '200px' }}
             />
         </div>
     );
