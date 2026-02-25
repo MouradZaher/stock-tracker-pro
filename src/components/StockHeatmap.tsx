@@ -75,8 +75,9 @@ const StockHeatmap: React.FC = () => {
             }
         };
 
-        // Short delay so layout is resolved before TradingView measures dimensions
-        const timer = setTimeout(initWidget, 200);
+        // Longer delay on iOS: layout must fully resolve before TradingView measures dimensions
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        const timer = setTimeout(initWidget, isIOS ? 600 : 200);
 
         return () => {
             clearTimeout(timer);
@@ -125,7 +126,11 @@ const StockHeatmap: React.FC = () => {
                         width: '100%',
                         height: '100%',
                         position: 'relative',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        // iOS: allow touch events inside the iframe
+                        touchAction: 'pan-x pan-y',
+                        WebkitOverflowScrolling: 'touch',
+                        pointerEvents: 'auto',
                     }}
                 />
             )}

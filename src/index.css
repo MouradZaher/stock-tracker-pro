@@ -3179,3 +3179,30 @@ body,
     width: 2px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   HEATMAP WRAPPER — Desktop baseline positioning
+   Mobile overrides are in ios-mobile.css
+   ═══════════════════════════════════════════════════════ */
+.heatmap-wrapper {
+  position: fixed;
+  top: var(--header-height);   /* 48px on desktop */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+}
+
+/* Ensure TradingView iframe fills wrapper correctly on all platforms */
+.heatmap-wrapper iframe,
+.heatmap-container iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  display: block;
+  pointer-events: auto;
+  touch-action: pan-x pan-y;
+  -webkit-touch-callout: none;
+}

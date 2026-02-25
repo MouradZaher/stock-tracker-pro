@@ -141,8 +141,8 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             >
               {!selectedSymbol ? (
                 <>
-                  {/* Heatmap fills the rest */}
-                  <div className="heatmap-wrapper" style={{ top: 'var(--header-height)' } as React.CSSProperties}>
+                  {/* Heatmap fills the rest — top controlled by CSS media queries */}
+                  <div className="heatmap-wrapper">
                     <StockHeatmap />
                   </div>
                 </>
