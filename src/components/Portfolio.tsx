@@ -339,6 +339,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const riskLabel = riskScore > 80 ? 'Conservative' : riskScore > 60 ? 'Moderate' : 'Aggressive';
     const riskColor = riskScore > 80 ? 'var(--color-success)' : riskScore > 60 ? 'var(--color-warning)' : 'var(--color-error)';
 
+    const groupedPositions = React.useMemo(() => {
+        const groups: Record<string, typeof positions> = {};
+        positions.forEach(pos => {
+            const sector = pos.sector || 'Uncategorized';
+            if (!groups[sector]) groups[sector] = [];
+            groups[sector].push(pos);
+        });
+        return Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
+    }, [positions]);
+
     return (
         <div className="portfolio-container">
             {/* ... existing header and summary ... */}
@@ -494,242 +504,266 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {positions.map((position) => {
-                                            const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                            const allocationCheck = checkAllocationLimits(allocation, 'stock');
-
-                                            return (
-                                                <tr
-                                                    key={position.id}
-                                                    onClick={() => handleRowClick(position.symbol)}
-                                                    style={{
-                                                        cursor: 'pointer',
-                                                        background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                                                        transition: 'background 1s ease'
-                                                    }}
-                                                >
-                                                    <td>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                            <strong>{position.symbol}</strong>
-                                                            <button
-                                                                className="btn-icon"
-                                                                style={{ padding: '4px', borderRadius: '4px', color: 'var(--color-text-tertiary)' }}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
-                                                                }}
-                                                                title="Set Price Alert"
-                                                            >
-                                                                <Bell size={14} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {position.name}
-                                                    </td>
-                                                    <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
-                                                    <td style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</td>
-                                                    <td style={{ textAlign: 'right' }}>{fmt(position.currentPrice)}</td>
-                                                    <td style={{ textAlign: 'right' }}><strong>{fmt(position.marketValue)}</strong></td>
-                                                    <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
-                                                        {fmt(position.profitLoss)}
-                                                    </td>
-                                                    <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
-                                                        {formatPercent(position.profitLossPercent)}
-                                                    </td>
-                                                    <td style={{ textAlign: 'center' }}>
-                                                        {aiRecs[position.symbol] ? (
-                                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                                                                <div style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '4px',
-                                                                    padding: '2px 6px',
-                                                                    background: aiRecs[position.symbol].score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (aiRecs[position.symbol].score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                                                                    borderRadius: '4px',
-                                                                    border: `1px solid ${aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')}`
-                                                                }}>
-                                                                    {getRecIcon(aiRecs[position.symbol].recommendation)}
-                                                                    <span style={{ fontSize: '0.7rem', fontWeight: 800, color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)') }}>
-                                                                        {aiRecs[position.symbol].recommendation?.toUpperCase()}
-                                                                    </span>
-                                                                </div>
-                                                                <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>
-                                                                    Score: {aiRecs[position.symbol].score}
-                                                                </span>
-                                                            </div>
-                                                        ) : (
-                                                            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>Analyzing...</span>
-                                                        )}
-                                                    </td>
-                                                    <td style={{ textAlign: 'right' }}>
-                                                        <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
-                                                            {allocation.toFixed(1)}%
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <div style={{ display: 'flex', gap: '4px' }}>
-                                                            <button
-                                                                className="btn btn-icon btn-small"
-                                                                onClick={(e) => handleEditClick(position, e)}
-                                                                title="Edit Position"
-                                                                style={{
-                                                                    background: 'rgba(99, 102, 241, 0.1)',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '4px',
-                                                                    padding: '4px 8px',
-                                                                    borderRadius: '6px',
-                                                                    color: 'var(--color-accent)',
-                                                                }}
-                                                            >
-                                                                <Pencil size={13} />
-                                                                <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Edit</span>
-                                                            </button>
-                                                            <button
-                                                                className="btn btn-icon btn-small text-error"
-                                                                onClick={(e) => handleRemove(position.id, position.symbol, e)}
-                                                                style={{
-                                                                    background: 'rgba(239, 68, 68, 0.1)',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '4px',
-                                                                    padding: '4px 8px',
-                                                                    borderRadius: '6px'
-                                                                }}
-                                                            >
-                                                                <Trash2 size={13} />
-                                                                <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
-                                                            </button>
-                                                        </div>
+                                        {groupedPositions.map(([sector, sectorPositions]) => (
+                                            <React.Fragment key={sector}>
+                                                <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                                    <td colSpan={11} style={{
+                                                        padding: '0.75rem 1.25rem',
+                                                        fontWeight: 800,
+                                                        color: 'var(--color-text-secondary)',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.05em',
+                                                        borderBottom: '1px solid var(--glass-border)',
+                                                        borderTop: '1px solid var(--glass-border)'
+                                                    }}>
+                                                        {sector} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600, marginLeft: '4px' }}>({sectorPositions.length})</span>
                                                     </td>
                                                 </tr>
-                                            );
-                                        })}
+                                                {sectorPositions.map((position) => {
+                                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                                    const allocationCheck = checkAllocationLimits(allocation, 'stock');
+
+                                                    return (
+                                                        <tr
+                                                            key={position.id}
+                                                            onClick={() => handleRowClick(position.symbol)}
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                                                                transition: 'background 1s ease'
+                                                            }}
+                                                        >
+                                                            <td>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                    <strong>{position.symbol}</strong>
+                                                                    <button
+                                                                        className="btn-icon"
+                                                                        style={{ padding: '4px', borderRadius: '4px', color: 'var(--color-text-tertiary)' }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
+                                                                        }}
+                                                                        title="Set Price Alert"
+                                                                    >
+                                                                        <Bell size={14} />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                                {position.name}
+                                                            </td>
+                                                            <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
+                                                            <td style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</td>
+                                                            <td style={{ textAlign: 'right' }}>{fmt(position.currentPrice)}</td>
+                                                            <td style={{ textAlign: 'right' }}><strong>{fmt(position.marketValue)}</strong></td>
+                                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
+                                                                {fmt(position.profitLoss)}
+                                                            </td>
+                                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
+                                                                {formatPercent(position.profitLossPercent)}
+                                                            </td>
+                                                            <td style={{ textAlign: 'center' }}>
+                                                                {aiRecs[position.symbol] ? (
+                                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                                                        <div style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '4px',
+                                                                            padding: '2px 6px',
+                                                                            background: aiRecs[position.symbol].score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (aiRecs[position.symbol].score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
+                                                                            borderRadius: '4px',
+                                                                            border: `1px solid ${aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')}`
+                                                                        }}>
+                                                                            {getRecIcon(aiRecs[position.symbol].recommendation)}
+                                                                            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)') }}>
+                                                                                {aiRecs[position.symbol].recommendation?.toUpperCase()}
+                                                                            </span>
+                                                                        </div>
+                                                                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>
+                                                                            Score: {aiRecs[position.symbol].score}
+                                                                        </span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>Analyzing...</span>
+                                                                )}
+                                                            </td>
+                                                            <td style={{ textAlign: 'right' }}>
+                                                                <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
+                                                                    {allocation.toFixed(1)}%
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                                    <button
+                                                                        className="btn btn-icon btn-small"
+                                                                        onClick={(e) => handleEditClick(position, e)}
+                                                                        title="Edit Position"
+                                                                        style={{
+                                                                            background: 'rgba(99, 102, 241, 0.1)',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '4px',
+                                                                            padding: '4px 8px',
+                                                                            borderRadius: '6px',
+                                                                            color: 'var(--color-accent)',
+                                                                        }}
+                                                                    >
+                                                                        <Pencil size={13} />
+                                                                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Edit</span>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-icon btn-small text-error"
+                                                                        onClick={(e) => handleRemove(position.id, position.symbol, e)}
+                                                                        style={{
+                                                                            background: 'rgba(239, 68, 68, 0.1)',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '4px',
+                                                                            padding: '4px 8px',
+                                                                            borderRadius: '6px'
+                                                                        }}
+                                                                    >
+                                                                        <Trash2 size={13} />
+                                                                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </React.Fragment>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
 
                             {/* Mobile Card View */}
                             <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
-                                {positions.map((position) => {
-                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                    return (
-                                        <div
-                                            key={position.id}
-                                            className="glass-card"
-                                            style={{
-                                                padding: '1rem',
-                                                background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)',
-                                                transition: 'background 1s ease'
-                                            }}
-                                            onClick={() => handleRowClick(position.symbol)}
-                                        >
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                                <div>
-                                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        {position.symbol}
+                                {groupedPositions.map(([sector, sectorPositions]) => (
+                                    <React.Fragment key={sector}>
+                                        <div style={{ padding: '0.5rem 0', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--glass-border)' }}>
+                                            {sector} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600, marginLeft: '4px' }}>({sectorPositions.length})</span>
+                                        </div>
+                                        {sectorPositions.map((position) => {
+                                            const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                            return (
+                                                <div
+                                                    key={position.id}
+                                                    className="glass-card"
+                                                    style={{
+                                                        padding: '1rem',
+                                                        background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)',
+                                                        transition: 'background 1s ease'
+                                                    }}
+                                                    onClick={() => handleRowClick(position.symbol)}
+                                                >
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                                        <div>
+                                                            <div style={{ fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                {position.symbol}
+                                                                <button
+                                                                    className="btn-icon glass-button"
+                                                                    style={{ padding: '2px', borderRadius: '50%' }}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
+                                                                    }}
+                                                                >
+                                                                    <Bell size={14} />
+                                                                </button>
+                                                            </div>
+                                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
+                                                        </div>
+                                                        <div style={{ textAlign: 'right' }}>
+                                                            <div style={{ fontWeight: 600 }}>{fmt(position.currentPrice)}</div>
+                                                            <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                                                {formatPercent(position.profitLossPercent)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Mobile AI Badge */}
+                                                    {aiRecs[position.symbol] && (
+                                                        <div style={{
+                                                            margin: '0 -1rem 0.75rem -1rem',
+                                                            padding: '4px 1rem',
+                                                            background: 'rgba(99, 102, 241, 0.05)',
+                                                            borderTop: '1px solid var(--glass-border)',
+                                                            borderBottom: '1px solid var(--glass-border)',
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center'
+                                                        }}>
+                                                            <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Strategy Signal</span>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                <span style={{
+                                                                    fontSize: '0.7rem',
+                                                                    fontWeight: 800,
+                                                                    color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
+                                                                }}>
+                                                                    {aiRecs[position.symbol].recommendation?.toUpperCase()} ({aiRecs[position.symbol].score})
+                                                                </span>
+                                                                {getRecIcon(aiRecs[position.symbol].recommendation)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
+                                                        <div style={{ textAlign: 'right' }}>{position.units}</div>
+
+                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
+                                                        <div style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</div>
+
+                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
+                                                        <div style={{ textAlign: 'right', fontWeight: 600 }}>{fmt(position.marketValue)}</div>
+
+                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
+                                                        <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{fmt(position.profitLoss)}</div>
+                                                    </div>
+
+                                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
                                                         <button
-                                                            className="btn-icon glass-button"
-                                                            style={{ padding: '2px', borderRadius: '50%' }}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
+                                                            className="btn btn-icon btn-small"
+                                                            onClick={(e) => handleEditClick(position, e)}
+                                                            style={{
+                                                                background: 'rgba(99, 102, 241, 0.1)',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                padding: '6px 12px',
+                                                                borderRadius: '8px',
+                                                                color: 'var(--color-accent)',
+                                                                flex: 1,
+                                                                justifyContent: 'center',
                                                             }}
                                                         >
-                                                            <Bell size={14} />
+                                                            <Pencil size={15} />
+                                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Edit</span>
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-icon btn-small text-error"
+                                                            onClick={(e) => handleRemove(position.id, position.symbol, e)}
+                                                            style={{
+                                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                padding: '6px 12px',
+                                                                borderRadius: '8px',
+                                                                flex: 1,
+                                                                justifyContent: 'center',
+                                                            }}
+                                                        >
+                                                            <Trash2 size={15} />
+                                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete</span>
                                                         </button>
                                                     </div>
-                                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
                                                 </div>
-                                                <div style={{ textAlign: 'right' }}>
-                                                    <div style={{ fontWeight: 600 }}>{fmt(position.currentPrice)}</div>
-                                                    <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                        {formatPercent(position.profitLossPercent)}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Mobile AI Badge */}
-                                            {aiRecs[position.symbol] && (
-                                                <div style={{
-                                                    margin: '0 -1rem 0.75rem -1rem',
-                                                    padding: '4px 1rem',
-                                                    background: 'rgba(99, 102, 241, 0.05)',
-                                                    borderTop: '1px solid var(--glass-border)',
-                                                    borderBottom: '1px solid var(--glass-border)',
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center'
-                                                }}>
-                                                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Strategy Signal</span>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                        <span style={{
-                                                            fontSize: '0.7rem',
-                                                            fontWeight: 800,
-                                                            color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
-                                                        }}>
-                                                            {aiRecs[position.symbol].recommendation?.toUpperCase()} ({aiRecs[position.symbol].score})
-                                                        </span>
-                                                        {getRecIcon(aiRecs[position.symbol].recommendation)}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
-                                                <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
-                                                <div style={{ textAlign: 'right' }}>{position.units}</div>
-
-                                                <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
-                                                <div style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</div>
-
-                                                <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
-                                                <div style={{ textAlign: 'right', fontWeight: 600 }}>{fmt(position.marketValue)}</div>
-
-                                                <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
-                                                <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{fmt(position.profitLoss)}</div>
-                                            </div>
-
-                                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
-                                                <button
-                                                    className="btn btn-icon btn-small"
-                                                    onClick={(e) => handleEditClick(position, e)}
-                                                    style={{
-                                                        background: 'rgba(99, 102, 241, 0.1)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px',
-                                                        padding: '6px 12px',
-                                                        borderRadius: '8px',
-                                                        color: 'var(--color-accent)',
-                                                        flex: 1,
-                                                        justifyContent: 'center',
-                                                    }}
-                                                >
-                                                    <Pencil size={15} />
-                                                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Edit</span>
-                                                </button>
-                                                <button
-                                                    className="btn btn-icon btn-small text-error"
-                                                    onClick={(e) => handleRemove(position.id, position.symbol, e)}
-                                                    style={{
-                                                        background: 'rgba(239, 68, 68, 0.1)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px',
-                                                        padding: '6px 12px',
-                                                        borderRadius: '8px',
-                                                        flex: 1,
-                                                        justifyContent: 'center',
-                                                    }}
-                                                >
-                                                    <Trash2 size={15} />
-                                                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                                            )
+                                        })}
+                                    </React.Fragment>
+                                ))}
                             </div>
                         </>
                     )}

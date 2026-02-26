@@ -23,7 +23,6 @@ export default defineConfig({
           // Vendor chunks
           'react-vendor': ['react', 'react-dom'],
           'query-vendor': ['@tanstack/react-query'],
-          'chart-vendor': ['recharts'],
         },
       },
     },
