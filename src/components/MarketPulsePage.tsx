@@ -20,14 +20,14 @@ const MARKET_STREAMS: Record<string, any[]> = {
         { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCEAZeUIeJs0IjQiqTCdVSIg' }
     ],
     egypt: [
-        { name: 'Thndr | ثاندر', origin: 'Egypt Markets', color: '#10B981', channelId: 'UC2h4E4aZ-NBO41cCnLvW6Og' },
-        { name: 'Al Arabiya Business', origin: 'Regional Economy', color: '#7c3aed', channelId: 'UC_99Svd6V7_6A88NREPPw5w' },
-        { name: 'Arab Finance', origin: 'Egypt Business', color: '#f59e0b', videoId: 'B-N7_Y9Z4z0' }
+        { name: 'Thndr | Latest Update 1', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 0 },
+        { name: 'Thndr | Latest Update 2', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 1 },
+        { name: 'Thndr | Latest Update 3', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 2 }
     ],
     abudhabi: [
-        { name: 'Stalk Stock UAE', origin: 'UAE Markets Expert', color: '#3b82f6', channelId: 'UCWrdHtyJD9_VIDL0d-1rYqQ' },
-        { name: 'ADX Official', origin: 'Abu Dhabi Exchange', color: '#10b981', channelId: 'UCTXDxQ1zAsRC1mX1zHzbEVw' },
-        { name: 'CNBC Arabia', origin: 'Gulf Business News', color: '#004a99', channelId: 'UCm6M_r9MRf_MAsq_o7K_wWA' }
+        { name: 'Stalk Stock UAE Latest', origin: 'UAE Markets Expert', color: '#3b82f6', playlistId: 'UUWrdHtyJD9_VIDL0d-1rYqQ', index: 0 },
+        { name: 'ADX Official Latest', origin: 'Abu Dhabi Exchange', color: '#10b981', playlistId: 'UUTXDxQ1zAsRC1mX1zHzbEVw', index: 0 },
+        { name: 'CNBC Arabia Latest', origin: 'Gulf Business News', color: '#004a99', playlistId: 'UUm6M_r9MRf_MAsq_o7K_wWA', index: 0 }
     ]
 };
 
@@ -275,9 +275,11 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                     <iframe
                                         width="100%"
                                         height="100%"
-                                        src={stream.videoId
-                                            ? `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1`
-                                            : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1`}
+                                        src={stream.playlistId
+                                            ? `https://www.youtube.com/embed?listType=playlist&list=${stream.playlistId}&index=${stream.index}&autoplay=0&mute=1&controls=1`
+                                            : stream.videoId
+                                                ? `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1`
+                                                : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1`}
                                         title={stream.name}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -219,25 +219,24 @@ html[data-theme='light'] {
 
 /* Heatmap Responsive Wrapper */
 .heatmap-wrapper {
-  position: absolute !important;
-  top: 0 !important;
+  position: fixed !important;
+  top: var(--header-height) !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: 0 !important;
+  bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) !important;
   border-radius: 0;
   overflow: hidden;
-  z-index: 100;
+  z-index: 90;
   background: var(--color-bg-primary);
   border: none;
 }
 
 @media (min-width: 768px) {
   .heatmap-wrapper {
-    position: fixed !important;
     left: 1.5rem !important;
     right: 1.5rem !important;
     bottom: 1rem !important;
-    top: var(--header-height) !important;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -248,26 +247,19 @@ html[data-theme='light'] {
    ============================================================ */
 @media (min-width: 1025px) {
   body:has(.home-tab-content) {
-    overflow-y: auto !important;
+    overflow-y: hidden !important;
   }
 
   .main-content:has(.home-tab-content) {
     padding: 0 !important;
-    padding-top: var(--header-height) !important;
     overflow: hidden !important;
   }
 
   .home-tab-content {
     overflow: hidden !important;
-    height: calc(100vh - var(--header-height)) !important;
-    max-height: calc(100vh - var(--header-height)) !important;
-    max-width: 100% !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
     padding: 0 !important;
-  }
-
-  .home-tab-content .heatmap-wrapper {
-    width: auto !important;
-    height: auto !important;
   }
 }
 
