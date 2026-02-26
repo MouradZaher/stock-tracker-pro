@@ -46,12 +46,11 @@ const fetchFromProxy = async (symbol: string): Promise<StockQuote | null> => {
         const response = await api.get('/multi-quote', { params: { symbols: symbol } });
         const result = response.data?.quoteResponse?.result?.[0];
         if (result && result.price > 0) {
-
             return result as StockQuote;
         }
         return null;
-    } catch (error: any) {
-        console.warn(`⚠️ Proxy failed for ${symbol}:`, error.message);
+    } catch (error) {
+        console.warn(`⚠️ Proxy failed for ${symbol}:`, (error as Error).message);
         return null;
     }
 };
@@ -71,7 +70,7 @@ const fetchFromFinnhub = async (symbol: string): Promise<StockQuote | null> => {
             return quote;
         }
         return null;
-    } catch (error) {
+    } catch {
         markProviderFailed('finnhub');
         return null;
     }
@@ -96,7 +95,7 @@ const fetchFromAlphaVantage = async (symbol: string): Promise<StockQuote | null>
             return quote;
         }
         return null;
-    } catch (error) {
+    } catch {
         markProviderFailed('alphaVantage');
         return null;
     }
@@ -117,7 +116,7 @@ const fetchFromTwelveData = async (symbol: string): Promise<StockQuote | null> =
             return quote;
         }
         return null;
-    } catch (error) {
+    } catch {
         markProviderFailed('twelveData');
         return null;
     }
@@ -138,7 +137,7 @@ const fetchFromFMP = async (symbol: string): Promise<StockQuote | null> => {
             return quote;
         }
         return null;
-    } catch (error) {
+    } catch {
         markProviderFailed('fmp');
         return null;
     }
@@ -364,7 +363,7 @@ const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | nul
 };
 
 // Search symbols from local data
-export const searchSymbols = async (query: string): Promise<any[]> => {
+export const searchSymbols = async (query: string): Promise<Record<string, unknown>[]> => {
     if (!query || query.length < 1) return [];
     const allSymbols = getAllSymbols();
 
@@ -429,8 +428,8 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
             }
         }
 
-    } catch (error: any) {
-        console.error(`❌ Batch fetch failed:`, error.message);
+    } catch (error) {
+        console.error(`❌ Batch fetch failed:`, (error as Error).message);
     }
 
     // Fill in missing symbols individually
@@ -557,7 +556,7 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
     const tickers = marketTickers[marketId] || marketTickers.us;
     const quotes = await getMultipleQuotes(tickers);
 
-    const anomalies: any[] = [];
+    const anomalies: { symbol: string, vol: string, reason: string, change: number }[] = [];
     quotes.forEach((stock, symbol) => {
         if (stock.volume > stock.avgVolume * 1.5 && stock.avgVolume > 0) {
             const ratio = (stock.volume / stock.avgVolume);
@@ -580,7 +579,7 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
             .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
             .slice(0, 4)
             .map(s => {
-                let cleanChange = Math.abs(s.changePercent) > 20 ? (Math.random() * 8 * (s.changePercent > 0 ? 1 : -1)) : s.changePercent;
+                const cleanChange = Math.abs(s.changePercent) > 20 ? (Math.random() * 8 * (s.changePercent > 0 ? 1 : -1)) : s.changePercent;
                 return {
                     symbol: s.symbol,
                     vol: '1.2x',

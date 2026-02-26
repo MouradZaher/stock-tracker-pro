@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { yahooFinanceApi, getCachedData, setCachedData } from './api';
 import type { NewsArticle } from '../types';
 
@@ -30,8 +29,8 @@ export const getStockNews = async (symbol: string, limit: number = 5): Promise<N
             throw new Error('No news items found');
         }
 
-        const news: NewsArticle[] = items.slice(0, limit).map((item: any, index: number) => ({
-            id: item.uuid || `news-${symbol}-${index}`,
+        const news: NewsArticle[] = items.slice(0, limit).map((item: Record<string, any>, index: number) => ({
+            id: (item.uuid as string) || `news-${symbol}-${index}`,
             headline: item.title,
             summary: item.summary || item.description || 'No summary available.',
             source: item.publisher || item.author_name || 'Yahoo Finance',
