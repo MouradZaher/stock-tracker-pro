@@ -26,6 +26,9 @@ export const STOCKS_BY_INDEX: Record<string, { symbol: string; name: string }[]>
         { symbol: 'TSM', name: 'Taiwan Semiconductor' },
         { symbol: 'ASML', name: 'ASML Holding N.V.' },
         { symbol: 'LRCX', name: 'Lam Research Corp.' },
+        { symbol: 'BABA', name: 'Alibaba Group' },
+        { symbol: 'SNDK', name: 'SanDisk Corp' },
+        { symbol: 'UUUU', name: 'Energy Fuels Inc.' },
         { symbol: 'GOOGL', name: 'Alphabet Inc.' },
         { symbol: 'AMZN', name: 'Amazon.com Inc.' },
         { symbol: 'META', name: 'Meta Platforms' },
@@ -109,6 +112,7 @@ export const STOCKS_BY_SECTOR: Record<string, { symbol: string; name: string }[]
         { symbol: 'ADBE', name: 'Adobe Inc.' },
         { symbol: 'CRM', name: 'Salesforce Inc.' },
         { symbol: 'MU', name: 'Micron Technology' },
+        { symbol: 'SNDK', name: 'SanDisk Corp' },
         { symbol: 'WDC', name: 'Western Digital' },
         { symbol: 'INTC', name: 'Intel Corporation' },
         { symbol: 'TXN', name: 'Texas Instruments' },
@@ -155,6 +159,7 @@ export const STOCKS_BY_SECTOR: Record<string, { symbol: string; name: string }[]
     'Consumer Cyclical': [
         { symbol: 'AMZN', name: 'Amazon.com Inc.' },
         { symbol: 'TSLA', name: 'Tesla Inc.' },
+        { symbol: 'BABA', name: 'Alibaba Group' },
         { symbol: 'HD', name: 'The Home Depot' },
         { symbol: 'NKE', name: 'Nike Inc.' },
         { symbol: 'MCD', name: 'McDonald\'s Corporation' },
@@ -223,6 +228,7 @@ export const STOCKS_BY_SECTOR: Record<string, { symbol: string; name: string }[]
         { symbol: 'LIN', name: 'Linde plc' },
         { symbol: 'APD', name: 'Air Products and Chemicals' },
         { symbol: 'FCX', name: 'Freeport-McMoRan' },
+        { symbol: 'UUUU', name: 'Energy Fuels Inc.' },
     ],
     'Transportation': [
         { symbol: 'UPS', name: 'United Parcel Service' },
