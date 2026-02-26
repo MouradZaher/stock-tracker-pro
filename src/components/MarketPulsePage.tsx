@@ -16,7 +16,7 @@ interface MarketPulsePageProps {
 const MARKET_STREAMS: Record<string, any[]> = {
     us: [
         { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdCLP7Lg' },
-        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'y60wDzZt8yg' },
+        { name: 'Sky News Business', origin: 'International', color: '#ff0000', channelId: 'UCoMdktPbSTixAyNGWB-UYkQ' },
         { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCs_s-CgoS1C-Pt0p5PHg_SQ' }
     ],
     egypt: [
@@ -279,7 +279,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                             ? `https://www.youtube.com/embed?listType=playlist&list=${stream.playlistId}&index=${stream.index}&autoplay=0&mute=1&controls=1`
                                             : stream.videoId
                                                 ? `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1`
-                                                : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1`}
+                                                : `https://www.youtube.com/embed/live_stream?channel_id=${stream.channelId}&autoplay=0&mute=1&controls=1`}
                                         title={stream.name}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
