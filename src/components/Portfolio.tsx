@@ -33,7 +33,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         return allPositions.filter(pos => getMarketForSymbol(pos.symbol) === selectedMarket.id);
     }, [allPositions, selectedMarket.id]);
     const [showModal, setShowModal] = useState(false);
-    const [editingPosition, setEditingPosition] = useState<{ id: string; symbol: string; units: number; avgCost: number } | null>(null);
+    const [editingPosition, setEditingPosition] = useState<{ id: string; symbol: string; name: string; units: number; avgCost: number; currentPrice: number } | null>(null);
     const [editForm, setEditForm] = useState({ units: '', avgCost: '' });
     const [isSavingEdit, setIsSavingEdit] = useState(false);
     const [activeSubTab, setActiveSubTab] = useState<'positions' | 'intelligence'>('positions');
@@ -285,7 +285,14 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const handleEditClick = (position: typeof positions[0], e: React.MouseEvent) => {
         e.stopPropagation();
         soundService.playTap();
-        setEditingPosition({ id: position.id, symbol: position.symbol, units: position.units, avgCost: position.avgCost });
+        setEditingPosition({
+            id: position.id,
+            symbol: position.symbol,
+            name: position.name,
+            units: position.units,
+            avgCost: position.avgCost,
+            currentPrice: position.currentPrice
+        });
         setEditForm({ units: position.units.toString(), avgCost: position.avgCost.toString() });
     };
 
@@ -352,33 +359,54 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     return (
         <div className="portfolio-container">
             {/* ... existing header and summary ... */}
-            <div className="portfolio-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <h2 style={{ margin: 0 }}>My Portfolio</h2>
-                    <div style={{
+            <div className="portfolio-header" style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                marginBottom: '2rem',
+                paddingBottom: '1rem',
+                borderBottom: '1px solid rgba(255,255,255,0.05)'
+            }}>
+                <div>
+                    <h2 style={{
+                        margin: 0,
+                        fontSize: '1.75rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.02em',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        padding: '4px 10px',
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: '20px',
-                        border: '1px solid var(--glass-border)',
-                        fontSize: '0.7rem',
-                        color: isSyncing ? 'var(--color-accent)' : 'var(--color-success)',
-                        transition: 'all 0.3s ease'
+                        gap: '12px'
                     }}>
-                        {isSyncing ? (
-                            <>
-                                <RefreshCw size={12} className="animate-spin" />
-                                <span style={{ fontWeight: 600 }}>Syncing...</span>
-                            </>
-                        ) : (
-                            <>
-                                <CheckCircle size={12} />
-                                <span style={{ fontWeight: 600 }}>Cloud Synced</span>
-                            </>
-                        )}
-                    </div>
+                        Portfolio Assets
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 10px',
+                            background: isSyncing ? 'rgba(99, 102, 241, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                            borderRadius: '20px',
+                            border: `1px solid ${isSyncing ? 'rgba(99, 102, 241, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                            fontSize: '0.65rem',
+                            color: isSyncing ? 'var(--color-accent)' : 'var(--color-success)',
+                            transition: 'all 0.3s ease',
+                            height: 'fit-content'
+                        }}>
+                            {isSyncing ? (
+                                <>
+                                    <RefreshCw size={10} className="animate-spin" />
+                                    <span style={{ fontWeight: 800, textTransform: 'uppercase' }}>Syncing</span>
+                                </>
+                            ) : (
+                                <>
+                                    <CheckCircle size={10} />
+                                    <span style={{ fontWeight: 800, textTransform: 'uppercase' }}>Cloud Secure</span>
+                                </>
+                            )}
+                        </div>
+                    </h2>
+                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
+                        Manage your positions and track real-time performance
+                    </p>
                 </div>
                 <button
                     className="btn btn-primary"
@@ -386,35 +414,143 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     style={{
                         background: 'var(--gradient-primary)',
                         border: 'none',
-                        boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
-                        padding: 'var(--spacing-sm) var(--spacing-lg)',
-                        borderRadius: 'var(--radius-full)',
+                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                        padding: '0.75rem 1.5rem',
+                        borderRadius: '12px',
                         fontWeight: 700,
-                        letterSpacing: '0.02em',
-                        transition: 'var(--transition-base)'
+                        fontSize: '0.9rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transformOrigin: 'center'
                     }}
                 >
-                    <Plus size={18} />
-                    Add Position
+                    <Plus size={18} strokeWidth={3} />
+                    <span>Add position</span>
                 </button>
             </div>
 
             {/* Summary Cards */}
-            <div className="portfolio-summary-grid" style={{ marginBottom: '1.5rem' }}>
-                <div className="summary-card glass-card">
-                    <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total Value</div>
-                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>{fmt(summary.totalValue)}</div>
-                </div>
-                <div className={`summary-card glass-card ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`}>
-                    <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Total P/L</div>
-                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)' }}>
-                        {fmt(summary.totalProfitLoss)} ({formatPercent(summary.totalProfitLossPercent)})
+            <div className="portfolio-summary-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '1.25rem',
+                marginBottom: '2rem'
+            }}>
+                <div className="summary-card glass-card" style={{
+                    padding: '1.25rem',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid var(--glass-border-bright)'
+                }}>
+                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
+                        <BarChart2 size={100} />
+                    </div>
+                    <div className="summary-label" style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-tertiary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        fontWeight: 700,
+                        marginBottom: '0.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}>
+                        <BarChart2 size={14} /> Total Portfolio Value
+                    </div>
+                    <div className="summary-value" style={{
+                        fontSize: '1.75rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.02em',
+                        color: 'var(--color-text-primary)'
+                    }}>
+                        {fmt(summary.totalValue)}
                     </div>
                 </div>
-                <div className="summary-card glass-card">
-                    <div className="summary-label" style={{ fontSize: 'var(--font-size-xs)' }}>Portfolio Health</div>
-                    <div className="summary-value" style={{ fontSize: 'var(--font-size-lg)', color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)' }}>
-                        {!hasAllocationWarnings ? 'Diversified Optimized' : 'Allocation Warning'}
+
+                <div className={`summary-card glass-card ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`} style={{
+                    padding: '1.25rem',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid var(--glass-border-bright)',
+                    background: summary.totalProfitLoss >= 0 ? 'rgba(16, 185, 129, 0.03)' : 'rgba(239, 68, 68, 0.03)'
+                }}>
+                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
+                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={100} /> : <TrendingDown size={100} />}
+                    </div>
+                    <div className="summary-label" style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-tertiary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        fontWeight: 700,
+                        marginBottom: '0.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}>
+                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        Total Profit / Loss
+                    </div>
+                    <div className="summary-value" style={{
+                        fontSize: '1.75rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.02em',
+                        color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: '8px'
+                    }}>
+                        {fmt(summary.totalProfitLoss)}
+                        <span style={{ fontSize: '1rem', fontWeight: 600, opacity: 0.8 }}>
+                            ({formatPercent(summary.totalProfitLossPercent)})
+                        </span>
+                    </div>
+                </div>
+
+                <div className="summary-card glass-card" style={{
+                    padding: '1.25rem',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid var(--glass-border-bright)'
+                }}>
+                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
+                        <ShieldCheck size={100} />
+                    </div>
+                    <div className="summary-label" style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-tertiary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        fontWeight: 700,
+                        marginBottom: '0.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}>
+                        <ShieldCheck size={14} /> Portfolio Health
+                    </div>
+                    <div className="summary-value" style={{
+                        fontSize: '1.5rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.02em',
+                        color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
+                        {!hasAllocationWarnings ? 'Optimized' : 'Rebalance Required'}
+                        <div style={{
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            fontSize: '0.7rem',
+                            background: !hasAllocationWarnings ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                            border: `1px solid ${!hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)'}44`
+                        }}>
+                            {riskScore}/100
+                        </div>
                     </div>
                 </div>
             </div>
@@ -486,37 +622,43 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     ) : (
                         <>
                             {/* Desktop Table */}
-                            <div className="table-container glass-card desktop-only" style={{ padding: '0', marginBottom: '1.5rem', maxHeight: '600px', overflowY: 'auto' }}>
+                            <div className="table-container glass-card desktop-only" style={{
+                                padding: '0',
+                                marginBottom: '1.5rem',
+                                maxHeight: '700px',
+                                overflowY: 'auto',
+                                border: '1px solid var(--glass-border-bright)'
+                            }}>
                                 <table className="portfolio-table sticky-header">
                                     <thead>
                                         <tr>
-                                            <th>Symbol</th>
-                                            <th>Name</th>
+                                            <th style={{ paddingLeft: '1.5rem' }}>Asset</th>
                                             <th style={{ textAlign: 'right' }}>Units</th>
                                             <th style={{ textAlign: 'right' }}>Avg Cost</th>
-                                            <th style={{ textAlign: 'right' }}>Current Price</th>
+                                            <th style={{ textAlign: 'right' }}>Price</th>
                                             <th style={{ textAlign: 'right' }}>Market Value</th>
-                                            <th style={{ textAlign: 'right' }}>P/L ({selectedMarket.currencySymbol.trim()})</th>
-                                            <th style={{ textAlign: 'right' }}>P/L (%)</th>
+                                            <th style={{ textAlign: 'right' }}>P/L Total</th>
+                                            <th style={{ textAlign: 'right' }}>P/L %</th>
                                             <th style={{ textAlign: 'center' }}>AI Strategy</th>
-                                            <th style={{ textAlign: 'right' }}>Allocation</th>
-                                            <th>Actions</th>
+                                            <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Allocation</th>
+                                            <th style={{ textAlign: 'center' }}>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {groupedPositions.map(([sector, sectorPositions]) => (
                                             <React.Fragment key={sector}>
-                                                <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                                    <td colSpan={11} style={{
-                                                        padding: '0.75rem 1.25rem',
+                                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                    <td colSpan={10} style={{
+                                                        padding: '0.6rem 1.5rem',
                                                         fontWeight: 800,
-                                                        color: 'var(--color-text-secondary)',
+                                                        color: 'var(--color-text-tertiary)',
                                                         textTransform: 'uppercase',
-                                                        letterSpacing: '0.05em',
+                                                        letterSpacing: '0.08em',
+                                                        fontSize: '0.65rem',
                                                         borderBottom: '1px solid var(--glass-border)',
                                                         borderTop: '1px solid var(--glass-border)'
                                                     }}>
-                                                        {sector} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600, marginLeft: '4px' }}>({sectorPositions.length})</span>
+                                                        {sector} — {sectorPositions.length} position{sectorPositions.length !== 1 ? 's' : ''}
                                                     </td>
                                                 </tr>
                                                 {sectorPositions.map((position) => {
@@ -527,104 +669,115 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                         <tr
                                                             key={position.id}
                                                             onClick={() => handleRowClick(position.symbol)}
+                                                            className="portfolio-row"
                                                             style={{
                                                                 cursor: 'pointer',
                                                                 background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                                                                transition: 'background 1s ease'
+                                                                transition: 'all 0.2s ease'
                                                             }}
                                                         >
-                                                            <td>
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                    <strong>{position.symbol}</strong>
+                                                            <td style={{ paddingLeft: '1.5rem' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                                    <div style={{
+                                                                        width: '32px',
+                                                                        height: '32px',
+                                                                        borderRadius: '8px',
+                                                                        background: 'rgba(255,255,255,0.05)',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        fontSize: '0.75rem',
+                                                                        fontWeight: 800,
+                                                                        color: 'var(--color-accent)'
+                                                                    }}>
+                                                                        {position.symbol.substring(0, 1)}
+                                                                    </div>
+                                                                    <div>
+                                                                        <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{position.symbol}</div>
+                                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{position.name}</div>
+                                                                    </div>
                                                                     <button
-                                                                        className="btn-icon"
-                                                                        style={{ padding: '4px', borderRadius: '4px', color: 'var(--color-text-tertiary)' }}
+                                                                        className="btn-icon glass-button"
+                                                                        style={{ padding: '4px', borderRadius: '50%', color: 'var(--color-text-tertiary)' }}
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
                                                                             setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
                                                                         }}
                                                                         title="Set Price Alert"
                                                                     >
-                                                                        <Bell size={14} />
+                                                                        <Bell size={12} />
                                                                     </button>
                                                                 </div>
                                                             </td>
-                                                            <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                                {position.name}
-                                                            </td>
-                                                            <td style={{ textAlign: 'right' }}>{position.units.toLocaleString()}</td>
-                                                            <td style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</td>
-                                                            <td style={{ textAlign: 'right' }}>{fmt(position.currentPrice)}</td>
-                                                            <td style={{ textAlign: 'right' }}><strong>{fmt(position.marketValue)}</strong></td>
-                                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLoss)}>
+                                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{position.units.toLocaleString()}</td>
+                                                            <td style={{ textAlign: 'right', color: 'var(--color-text-secondary)' }}>{fmt(position.avgCost)}</td>
+                                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{fmt(position.currentPrice)}</td>
+                                                            <td style={{ textAlign: 'right' }}><strong style={{ color: 'var(--color-text-primary)' }}>{fmt(position.marketValue)}</strong></td>
+                                                            <td style={{ textAlign: 'right', fontWeight: 700 }} className={getChangeClass(position.profitLoss)}>
                                                                 {fmt(position.profitLoss)}
                                                             </td>
-                                                            <td style={{ textAlign: 'right' }} className={getChangeClass(position.profitLossPercent)}>
-                                                                {formatPercent(position.profitLossPercent)}
+                                                            <td style={{ textAlign: 'right' }}>
+                                                                <span style={{
+                                                                    padding: '4px 8px',
+                                                                    borderRadius: '6px',
+                                                                    fontSize: '0.8rem',
+                                                                    fontWeight: 800,
+                                                                    background: position.profitLossPercent >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                                    color: position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                                                                    border: `1px solid ${position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)'}22`
+                                                                }}>
+                                                                    {formatPercent(position.profitLossPercent)}
+                                                                </span>
                                                             </td>
                                                             <td style={{ textAlign: 'center' }}>
                                                                 {aiRecs[position.symbol] ? (
-                                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                                                    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
                                                                         <div style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
                                                                             gap: '4px',
-                                                                            padding: '2px 6px',
+                                                                            padding: '3px 8px',
                                                                             background: aiRecs[position.symbol].score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (aiRecs[position.symbol].score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                                                                            borderRadius: '4px',
-                                                                            border: `1px solid ${aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')}`
+                                                                            borderRadius: '6px',
+                                                                            border: `1px solid ${aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')}44`
                                                                         }}>
                                                                             {getRecIcon(aiRecs[position.symbol].recommendation)}
-                                                                            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)') }}>
+                                                                            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)') }}>
                                                                                 {aiRecs[position.symbol].recommendation?.toUpperCase()}
                                                                             </span>
                                                                         </div>
-                                                                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>
-                                                                            Score: {aiRecs[position.symbol].score}
-                                                                        </span>
                                                                     </div>
                                                                 ) : (
-                                                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>Analyzing...</span>
+                                                                    <div className="animate-pulse" style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', margin: '0 auto' }} />
                                                                 )}
                                                             </td>
-                                                            <td style={{ textAlign: 'right' }}>
-                                                                <span style={{ color: allocationCheck.valid ? 'inherit' : 'var(--color-error)' }}>
-                                                                    {allocation.toFixed(1)}%
-                                                                </span>
+                                                            <td style={{ textAlign: 'right', paddingRight: '1.5rem' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                                                                    <div style={{ width: '40px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                                        <div style={{ width: `${Math.min(allocation, 100)}%`, height: '100%', background: allocationCheck.valid ? 'var(--color-accent)' : 'var(--color-error)' }} />
+                                                                    </div>
+                                                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: allocationCheck.valid ? 'var(--color-text-secondary)' : 'var(--color-error)' }}>
+                                                                        {allocation.toFixed(1)}%
+                                                                    </span>
+                                                                </div>
                                                             </td>
                                                             <td>
-                                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
                                                                     <button
-                                                                        className="btn btn-icon btn-small"
+                                                                        className="btn-icon glass-button"
                                                                         onClick={(e) => handleEditClick(position, e)}
                                                                         title="Edit Position"
-                                                                        style={{
-                                                                            background: 'rgba(99, 102, 241, 0.1)',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: '4px',
-                                                                            padding: '4px 8px',
-                                                                            borderRadius: '6px',
-                                                                            color: 'var(--color-accent)',
-                                                                        }}
+                                                                        style={{ padding: '6px', borderRadius: '8px', color: 'var(--color-accent)' }}
                                                                     >
-                                                                        <Pencil size={13} />
-                                                                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Edit</span>
+                                                                        <Pencil size={14} />
                                                                     </button>
                                                                     <button
-                                                                        className="btn btn-icon btn-small text-error"
+                                                                        className="btn-icon glass-button text-error"
                                                                         onClick={(e) => handleRemove(position.id, position.symbol, e)}
-                                                                        style={{
-                                                                            background: 'rgba(239, 68, 68, 0.1)',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: '4px',
-                                                                            padding: '4px 8px',
-                                                                            borderRadius: '6px'
-                                                                        }}
+                                                                        title="Remove Position"
+                                                                        style={{ padding: '6px', borderRadius: '8px' }}
                                                                     >
-                                                                        <Trash2 size={13} />
-                                                                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Delete</span>
+                                                                        <Trash2 size={14} />
                                                                     </button>
                                                                 </div>
                                                             </td>
@@ -651,116 +804,136 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                     key={position.id}
                                                     className="glass-card"
                                                     style={{
-                                                        padding: '1rem',
+                                                        padding: '1.25rem',
                                                         background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)',
-                                                        transition: 'background 1s ease'
+                                                        transition: 'all 0.3s ease',
+                                                        border: '1px solid var(--glass-border-bright)'
                                                     }}
                                                     onClick={() => handleRowClick(position.symbol)}
                                                 >
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                                        <div>
-                                                            <div style={{ fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                {position.symbol}
-                                                                <button
-                                                                    className="btn-icon glass-button"
-                                                                    style={{ padding: '2px', borderRadius: '50%' }}
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
-                                                                    }}
-                                                                >
-                                                                    <Bell size={14} />
-                                                                </button>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                            <div style={{
+                                                                width: '40px',
+                                                                height: '40px',
+                                                                borderRadius: '10px',
+                                                                background: 'rgba(255,255,255,0.05)',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                fontSize: '1rem',
+                                                                fontWeight: 800,
+                                                                color: 'var(--color-accent)'
+                                                            }}>
+                                                                {position.symbol.substring(0, 1)}
                                                             </div>
-                                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{position.name}</div>
+                                                            <div>
+                                                                <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>{position.symbol}</div>
+                                                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>{position.name}</div>
+                                                            </div>
                                                         </div>
                                                         <div style={{ textAlign: 'right' }}>
-                                                            <div style={{ fontWeight: 600 }}>{fmt(position.currentPrice)}</div>
-                                                            <span style={{ fontSize: '0.75rem', color: getChangeClass(position.profitLoss) === 'positive' ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                                {formatPercent(position.profitLossPercent)}
-                                                            </span>
+                                                            <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{fmt(position.currentPrice)}</div>
+                                                            <div style={{
+                                                                fontSize: '0.75rem',
+                                                                fontWeight: 700,
+                                                                color: position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)'
+                                                            }}>
+                                                                {position.profitLossPercent >= 0 ? '+' : ''}{formatPercent(position.profitLossPercent)}
+                                                            </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Mobile AI Badge */}
                                                     {aiRecs[position.symbol] && (
                                                         <div style={{
-                                                            margin: '0 -1rem 0.75rem -1rem',
-                                                            padding: '4px 1rem',
-                                                            background: 'rgba(99, 102, 241, 0.05)',
+                                                            margin: '0 -1.25rem 1rem -1.25rem',
+                                                            padding: '6px 1.25rem',
+                                                            background: 'rgba(99, 102, 241, 0.03)',
                                                             borderTop: '1px solid var(--glass-border)',
                                                             borderBottom: '1px solid var(--glass-border)',
                                                             display: 'flex',
                                                             justifyContent: 'space-between',
                                                             alignItems: 'center'
                                                         }}>
-                                                            <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Strategy Signal</span>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                <Zap size={12} color="var(--color-accent)" />
+                                                                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI SIGNAL</span>
+                                                            </div>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                                 <span style={{
-                                                                    fontSize: '0.7rem',
-                                                                    fontWeight: 800,
+                                                                    fontSize: '0.75rem',
+                                                                    fontWeight: 900,
                                                                     color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
                                                                 }}>
-                                                                    {aiRecs[position.symbol].recommendation?.toUpperCase()} ({aiRecs[position.symbol].score})
+                                                                    {aiRecs[position.symbol].recommendation?.toUpperCase()}
                                                                 </span>
                                                                 {getRecIcon(aiRecs[position.symbol].recommendation)}
                                                             </div>
                                                         </div>
                                                     )}
 
-                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
-                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Units:</div>
-                                                        <div style={{ textAlign: 'right' }}>{position.units}</div>
-
-                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Avg Cost:</div>
-                                                        <div style={{ textAlign: 'right' }}>{fmt(position.avgCost)}</div>
-
-                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>Value:</div>
-                                                        <div style={{ textAlign: 'right', fontWeight: 600 }}>{fmt(position.marketValue)}</div>
-
-                                                        <div style={{ color: 'var(--color-text-tertiary)' }}>P/L:</div>
-                                                        <div className={getChangeClass(position.profitLoss)} style={{ textAlign: 'right' }}>{fmt(position.profitLoss)}</div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '0.75rem', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                            <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>Position</span>
+                                                            <span style={{ fontWeight: 600 }}>{position.units} @ {fmt(position.avgCost)}</span>
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
+                                                            <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>Market Value</span>
+                                                            <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--color-text-primary)' }}>{fmt(position.marketValue)}</span>
+                                                        </div>
                                                     </div>
 
-                                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--glass-border)' }}>
+                                                    <div style={{ display: 'flex', gap: '10px' }}>
                                                         <button
-                                                            className="btn btn-icon btn-small"
-                                                            onClick={(e) => handleEditClick(position, e)}
+                                                            className="btn glass-button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleEditClick(position, e);
+                                                            }}
                                                             style={{
-                                                                background: 'rgba(99, 102, 241, 0.1)',
+                                                                flex: 1,
                                                                 display: 'flex',
                                                                 alignItems: 'center',
-                                                                gap: '6px',
-                                                                padding: '6px 12px',
-                                                                borderRadius: '8px',
-                                                                color: 'var(--color-accent)',
-                                                                flex: 1,
                                                                 justifyContent: 'center',
+                                                                gap: '8px',
+                                                                padding: '10px',
+                                                                borderRadius: '10px',
+                                                                fontSize: '0.85rem',
+                                                                fontWeight: 700,
+                                                                color: 'var(--color-accent)',
+                                                                border: '1px solid rgba(99, 102, 241, 0.2)'
                                                             }}
                                                         >
-                                                            <Pencil size={15} />
-                                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Edit</span>
+                                                            <Pencil size={14} />
+                                                            Edit
                                                         </button>
                                                         <button
-                                                            className="btn btn-icon btn-small text-error"
-                                                            onClick={(e) => handleRemove(position.id, position.symbol, e)}
+                                                            className="btn glass-button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRemove(position.id, position.symbol, e);
+                                                            }}
                                                             style={{
-                                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                                flex: 1,
                                                                 display: 'flex',
                                                                 alignItems: 'center',
-                                                                gap: '6px',
-                                                                padding: '6px 12px',
-                                                                borderRadius: '8px',
-                                                                flex: 1,
                                                                 justifyContent: 'center',
+                                                                gap: '8px',
+                                                                padding: '10px',
+                                                                borderRadius: '10px',
+                                                                fontSize: '0.85rem',
+                                                                fontWeight: 700,
+                                                                color: 'var(--color-error)',
+                                                                border: '1px solid rgba(239, 68, 68, 0.2)'
                                                             }}
                                                         >
-                                                            <Trash2 size={15} />
-                                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Delete</span>
+                                                            <Trash2 size={14} />
+                                                            Delete
                                                         </button>
                                                     </div>
                                                 </div>
-                                            )
+                                            );
                                         })}
                                     </React.Fragment>
                                 ))}
@@ -774,114 +947,161 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {activeSubTab === 'intelligence' && (
                 <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
                     {/* Tactical Risk Audit & Report Section */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
 
                         {/* 1. Tactical Risk Audit Report */}
-                        <div className="glass-card" style={{ padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <ShieldCheck size={20} color="var(--color-accent)" />
-                                    Tactical Risk Audit
-                                </h3>
-                                <div style={{ fontSize: '0.65rem', color: riskColor, fontWeight: 800, padding: '4px 10px', background: `${riskColor}15`, borderRadius: '6px', border: `1px solid ${riskColor}30`, letterSpacing: '0.05em' }}>
-                                    {riskLabel.toUpperCase()} PROFILE
+                        <div className="glass-card" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.03 }}>
+                                <ShieldCheck size={140} />
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                                <div>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <ShieldCheck size={22} color="var(--color-accent)" />
+                                        Tactical Risk Audit
+                                    </h3>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>Exposure & Concentration Analysis</div>
+                                </div>
+                                <div style={{
+                                    fontSize: '0.65rem',
+                                    color: riskColor,
+                                    fontWeight: 900,
+                                    padding: '6px 12px',
+                                    background: `${riskColor}10`,
+                                    borderRadius: '8px',
+                                    border: `1px solid ${riskColor}22`,
+                                    letterSpacing: '0.05em',
+                                    textTransform: 'uppercase'
+                                }}>
+                                    {riskLabel} Profile
                                 </div>
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: '1rem' }}>Sector Diversification</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {sectorAllocations.map((sa, idx) => (
+                            <div style={{ marginBottom: '2rem' }}>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Sector Diversification</span>
+                                    <span>Institutional Limit: 20%</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    {sectorAllocations.length > 0 ? sectorAllocations.map((sa, idx) => (
                                         <div key={idx}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '6px' }}>
-                                                <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>{sa.sector}</span>
-                                                <span style={{ fontWeight: 800, color: sa.valid.valid ? 'var(--color-text-primary)' : 'var(--color-error)' }}>
-                                                    {sa.allocation.toFixed(1)}%
-                                                </span>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px', alignItems: 'baseline' }}>
+                                                <span style={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>{sa.sector}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    {!sa.valid.valid && <AlertTriangle size={12} color="var(--color-warning)" />}
+                                                    <span style={{ fontWeight: 800, color: sa.valid.valid ? 'var(--color-text-primary)' : 'var(--color-warning)' }}>
+                                                        {sa.allocation.toFixed(1)}%
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.02)' }}>
                                                 <div style={{
                                                     width: `${Math.min(sa.allocation, 100)}%`,
                                                     height: '100%',
-                                                    background: sa.valid.valid ? 'var(--gradient-primary)' : 'var(--color-error)',
-                                                    boxShadow: sa.valid.valid ? '0 0 10px rgba(99, 102, 241, 0.3)' : 'none',
-                                                    transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                                                    background: sa.valid.valid ? 'var(--gradient-primary)' : 'linear-gradient(90deg, #f59e0b, #d97706)',
+                                                    boxShadow: sa.valid.valid ? '0 0 12px rgba(99, 102, 241, 0.2)' : '0 0 12px rgba(245, 158, 11, 0.2)',
+                                                    transition: 'width 1s cubic-bezier(0.16, 1, 0.3, 1)'
                                                 }} />
                                             </div>
                                         </div>
-                                    ))}
+                                    )) : (
+                                        <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                                            Add positions to see sector analysis
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 700 }}>Highest Overexposure</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.25fr', gap: '1rem' }}>
+                                <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>Tail Risk Alpha</div>
                                     {stockAllocations.length > 0 ? (
-                                        <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'white' }}>
-                                            {stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].symbol}
-                                            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--color-error)', marginLeft: '6px' }}>
-                                                ({stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].allocation.toFixed(1)}%)
-                                            </span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Highest Impact:</div>
+                                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                {stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].symbol}
+                                                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: !stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].valid.valid ? 'var(--color-error)' : 'var(--color-text-tertiary)' }}>
+                                                    {stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].allocation.toFixed(1)}%
+                                                </span>
+                                            </div>
                                         </div>
                                     ) : (
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)' }}>No positions</div>
+                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)' }}>No data</div>
                                     )}
                                 </div>
-                                <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 700 }}>Risk Intelligence</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>
-                                        {hasAllocationWarnings ? 'Risk identified in concentration limits. Consider rebalancing to institutional 5% rules.' : 'Portfolio is currently within optimized risk parameters.'}
+                                <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>Risk Intelligence</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, fontWeight: 500 }}>
+                                        {hasAllocationWarnings
+                                            ? 'Concentration threshold breached. Systematic rebalancing recommended to maintain 5/20 institutional rules.'
+                                            : 'Portfolio structure is highly optimized with professional-grade diversification metrics.'}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* 2. Risk Meter & Strategy Profile */}
-                        <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <Zap size={20} color="var(--color-warning)" fill="var(--color-warning)" style={{ opacity: 0.8 }} />
-                                <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0 }}>Strategic Intelligence</h3>
+                        <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.03 }}>
+                                <Zap size={140} />
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', padding: '1rem 0' }}>
-                                <div style={{ position: 'relative', width: '120px', height: '70px' }}>
-                                    <svg width="120" height="70" viewBox="0 0 120 70">
-                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" strokeLinecap="round" />
-                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke={riskColor} strokeWidth="10" strokeLinecap="round" strokeDasharray="157" strokeDashoffset={157 - (riskScore / 100 * 157)} style={{ transition: 'stroke-dashoffset 1s ease-out' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.5rem' }}>
+                                <Zap size={22} color="var(--color-warning)" fill="var(--color-warning)" style={{ opacity: 0.8 }} />
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Strategic Intelligence</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', padding: '1.5rem 0', background: 'rgba(255,255,255,0.01)', borderRadius: '20px', margin: '0 -0.5rem', border: '1px solid rgba(255,255,255,0.02)' }}>
+                                <div style={{ position: 'relative', width: '130px', height: '75px', marginLeft: '1.5rem' }}>
+                                    <svg width="130" height="75" viewBox="0 0 120 70">
+                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" strokeLinecap="round" />
+                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke={riskColor} strokeWidth="12" strokeLinecap="round" strokeDasharray="157" strokeDashoffset={157 - (riskScore / 100 * 157)} style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
                                     </svg>
-                                    <div style={{ position: 'absolute', bottom: '5px', left: '50%', transform: 'translateX(-50%)', fontWeight: 900, fontSize: '1.5rem', color: riskColor, letterSpacing: '-0.02em' }}>
-                                        {riskScore}%
+                                    <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', fontWeight: 900, fontSize: '1.75rem', color: 'white', letterSpacing: '-0.03em' }}>
+                                        {riskScore}<span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '2px' }}>%</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.1em' }}>Strategy Profile</div>
-                                    <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white', margin: '2px 0' }}>{riskLabel}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-                                        Based on sector concentration and asset volatility.
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.12em' }}>Strategy Health</div>
+                                    <div style={{ fontSize: '1.6rem', fontWeight: 950, color: 'white', margin: '2px 0', letterSpacing: '-0.02em' }}>{riskLabel}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, maxWidth: '180px' }}>
+                                        Calculated based on asset volatility and sector dynamics.
                                     </div>
                                 </div>
                             </div>
 
                             {/* Benchmarking */}
-                            <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '1.25rem', alignItems: 'center' }}>
-                                    <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 600 }}>Performance vs S&P 500 (1Y)</span>
-                                    <span style={{ color: 'var(--color-success)', fontWeight: 800, background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '4px' }}>OUTPERFORMING</span>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{ width: '70px', fontSize: '0.7rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Portfolio</div>
-                                        <div style={{ flex: 1, height: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', overflow: 'hidden' }}>
-                                            <div style={{ width: '92%', height: '100%', background: 'var(--gradient-primary)', borderRadius: '5px' }} />
-                                        </div>
-                                        <div style={{ width: '45px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-success)', textAlign: 'right' }}>+24%</div>
+                            <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', marginTop: 'auto' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '1.5rem', alignItems: 'center' }}>
+                                    <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Performance Benchmark (1Y)</span>
+                                    <div style={{
+                                        color: 'var(--color-success)',
+                                        fontWeight: 900,
+                                        fontSize: '0.65rem',
+                                        background: 'rgba(16, 185, 129, 0.1)',
+                                        padding: '4px 10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid rgba(16, 185, 129, 0.2)',
+                                        textTransform: 'uppercase'
+                                    }}>
+                                        Outperforming
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{ width: '70px', fontSize: '0.7rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>S&P 500</div>
-                                        <div style={{ flex: 1, height: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', overflow: 'hidden' }}>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                                        <div style={{ width: '80px', fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 700 }}>Portfolio</div>
+                                        <div style={{ flex: 1, height: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', overflow: 'hidden' }}>
+                                            <div style={{ width: '92%', height: '100%', background: 'var(--gradient-primary)', borderRadius: '5px', boxShadow: '0 0 10px rgba(99, 102, 241, 0.3)' }} />
+                                        </div>
+                                        <div style={{ width: '50px', fontSize: '0.9rem', fontWeight: 900, color: 'var(--color-success)', textAlign: 'right' }}>+24.2%</div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                                        <div style={{ width: '80px', fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 700 }}>S&P 500</div>
+                                        <div style={{ flex: 1, height: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', overflow: 'hidden' }}>
                                             <div style={{ width: '70%', height: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: '5px' }} />
                                         </div>
-                                        <div style={{ width: '45px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-tertiary)', textAlign: 'right' }}>+18%</div>
+                                        <div style={{ width: '50px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-text-tertiary)', textAlign: 'right' }}>+18.5%</div>
                                     </div>
                                 </div>
                             </div>
@@ -891,44 +1111,59 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     {/* Warnings and AI Analysis Button */}
                     {hasAllocationWarnings && (
                         <div style={{
-                            padding: '1.25rem',
-                            background: 'rgba(245, 158, 11, 0.08)',
-                            border: '1px solid rgba(245, 158, 11, 0.2)',
-                            borderRadius: '16px',
+                            padding: '1.5rem',
+                            background: 'rgba(245, 158, 11, 0.05)',
+                            border: '1px solid rgba(245, 158, 11, 0.15)',
+                            borderRadius: '20px',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             flexWrap: 'wrap',
-                            gap: '1rem',
-                            marginBottom: '2rem'
+                            gap: '1.5rem',
+                            marginBottom: '2rem',
+                            backdropFilter: 'blur(10px)'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <AlertTriangle size={20} color="var(--color-warning)" />
-                                <span style={{ fontSize: '0.85rem', color: 'var(--color-warning)', fontWeight: 600 }}>
-                                    ⚠️ Warning: Some positions exceed allocation limits (5% per stock, 20% per sector)
-                                </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <div style={{
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '12px',
+                                    background: 'rgba(245, 158, 11, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <AlertTriangle size={24} color="var(--color-warning)" />
+                                </div>
+                                <div>
+                                    <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--color-warning)' }}>Risk Exposure Alert</h4>
+                                    <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'rgba(245, 158, 11, 0.8)', fontWeight: 500 }}>
+                                        Positions exceed institutional limits (5% per asset / 20% per sector).
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 className="btn btn-primary ai-pulse-button"
                                 style={{
-                                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                    background: 'var(--gradient-warning)',
                                     color: '#000',
                                     fontWeight: 900,
-                                    fontSize: '0.75rem',
-                                    padding: '8px 20px',
+                                    fontSize: '0.8rem',
+                                    padding: '12px 28px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '8px',
+                                    gap: '10px',
                                     border: 'none',
-                                    boxShadow: '0 8px 20px rgba(245, 158, 11, 0.3)',
-                                    borderRadius: '25px',
-                                    transition: 'all 0.3s ease',
+                                    boxShadow: '0 10px 25px rgba(245, 158, 11, 0.25)',
+                                    borderRadius: '14px',
+                                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                                     textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
+                                    letterSpacing: '0.05em',
+                                    cursor: 'pointer'
                                 }}
                                 onClick={() => setShowAIAdvice(true)}
                             >
-                                <Zap size={16} fill="currentColor" /> AI Recommendation Analysis Portfolio
+                                <Zap size={18} fill="currentColor" /> Analyze Portfolio Optimization
                             </button>
                         </div>
                     )}
@@ -939,92 +1174,144 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {/* AI Advice Modal */}
             {showAIAdvice && (
                 <div className="modal-overlay glass-blur" onClick={() => setShowAIAdvice(false)}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
-                        <div className="modal-header">
-                            <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Zap size={20} color="var(--color-warning)" /> Portfolio Optimization Advice
-                            </h3>
-                            <button className="btn btn-icon glass-button" onClick={() => setShowAIAdvice(false)}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px', width: '95%', border: '1px solid var(--glass-border-bright)' }}>
+                        <div className="modal-header" style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--glass-border)' }}>
+                            <div>
+                                <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', fontWeight: 800 }}>
+                                    <Zap size={22} color="var(--color-warning)" fill="var(--color-warning)" style={{ opacity: 0.8 }} />
+                                    Strategic Portfolio Optimization
+                                </h3>
+                                <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: 500 }}>
+                                    AI-driven rebalancing recommendations based on risk exposure
+                                </p>
+                            </div>
+                            <button className="btn btn-icon glass-button" onClick={() => setShowAIAdvice(false)} style={{ borderRadius: '50%', padding: '0.5rem' }}>
                                 <X size={20} />
                             </button>
                         </div>
-                        <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', paddingBottom: '80px' }}>
-                            <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid var(--color-accent-light)' }}>
-                                <h4 style={{ fontSize: '1rem', color: 'var(--color-accent)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <Zap size={16} fill="currentColor" /> AI Alpha Intelligence Advice
-                                </h4>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                                    Your portfolio is being analyzed against institutional 5% single-asset and 20% sector-weighted safety rules.
-                                </p>
+                        <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', padding: '2rem' }}>
+                            <div className="glass-card" style={{
+                                padding: '1.25rem',
+                                marginBottom: '2rem',
+                                background: 'rgba(99, 102, 241, 0.05)',
+                                border: '1px solid rgba(99, 102, 241, 0.2)',
+                                borderRadius: '16px'
+                            }}>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                    <ShieldCheck size={24} color="var(--color-accent)" style={{ marginTop: '2px' }} />
+                                    <div>
+                                        <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-accent)', marginBottom: '4px' }}>
+                                            Institutional Safety Rules
+                                        </h4>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                                            Analysis baseline: <strong>5% maximum single-asset weighting</strong> and <strong>20% maximum sector concentration</strong> to mitigate tail-risk.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             {rebalancingActions.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-success)' }}>
-                                    <ShieldCheck size={40} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-                                    <p>Your portfolio perfectly aligns with AI Alpha risk parameters.</p>
+                                <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+                                    <div style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        borderRadius: '50%',
+                                        background: 'rgba(16, 185, 129, 0.05)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        margin: '0 auto 1.5rem'
+                                    }}>
+                                        <CheckCircle size={40} color="var(--color-success)" style={{ opacity: 0.6 }} />
+                                    </div>
+                                    <h4 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '8px' }}>Portfolio Optimized</h4>
+                                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem' }}>
+                                        All assets currently adhere to risk management protocols.
+                                    </p>
                                 </div>
                             ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                     {rebalancingActions.map((action, idx) => (
-                                        <div key={idx} className="glass-card" style={{
-                                            padding: '1.25rem',
-                                            borderLeft: `4px solid ${action.action === 'Trim' ? 'var(--color-error)' : (action.action === 'Add' ? 'var(--color-success)' : 'var(--color-warning)')}`,
-                                            background: 'rgba(255,255,255,0.02)'
+                                        <div key={idx} className="glass-card recommendation-card" style={{
+                                            padding: '1.5rem',
+                                            borderLeft: `5px solid ${action.action === 'Trim' ? 'var(--color-error)' : (action.action === 'Add' ? 'var(--color-success)' : 'var(--color-warning)')}`,
+                                            background: 'rgba(255,255,255,0.02)',
+                                            borderRadius: '12px',
+                                            transition: 'transform 0.2s ease'
                                         }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                                <div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{action.symbol}</span>
-                                                        <span style={{
-                                                            fontSize: '0.65rem',
-                                                            padding: '2px 8px',
-                                                            borderRadius: '10px',
-                                                            background: action.priority === 'High' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)',
-                                                            color: action.priority === 'High' ? 'var(--color-error)' : 'var(--color-text-tertiary)',
-                                                            border: '1px solid currentColor'
-                                                        }}>
-                                                            {action.priority} Priority
-                                                        </span>
-                                                    </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                     <div style={{
+                                                        width: '36px',
+                                                        height: '36px',
+                                                        borderRadius: '8px',
+                                                        background: 'rgba(255,255,255,0.05)',
                                                         display: 'flex',
                                                         alignItems: 'center',
-                                                        gap: '6px',
-                                                        marginTop: '4px',
-                                                        color: action.action === 'Trim' ? 'var(--color-error)' : 'var(--color-success)',
-                                                        fontWeight: 700,
-                                                        fontSize: '0.85rem'
+                                                        justifyContent: 'center',
+                                                        fontSize: '0.9rem',
+                                                        fontWeight: 900,
+                                                        color: 'white'
                                                     }}>
-                                                        {action.action === 'Trim' ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
-                                                        {action.action.toUpperCase()} ACTION RECOMMENDED
+                                                        {action.symbol.substring(0, 1)}
+                                                    </div>
+                                                    <div>
+                                                        <span style={{ fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.01em' }}>{action.symbol}</span>
+                                                        <div style={{
+                                                            fontSize: '0.6rem',
+                                                            fontWeight: 900,
+                                                            color: action.priority === 'High' ? 'var(--color-error)' : 'var(--color-text-tertiary)',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.05em',
+                                                            marginTop: '2px'
+                                                        }}>
+                                                            {action.priority} Priority
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
-                                                    Strategic Setup
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    padding: '6px 12px',
+                                                    background: action.action === 'Trim' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                                                    borderRadius: '8px',
+                                                    border: `1px solid ${action.action === 'Trim' ? 'var(--color-error)' : 'var(--color-success)'}33`,
+                                                    color: action.action === 'Trim' ? 'var(--color-error)' : 'var(--color-success)',
+                                                    fontWeight: 800,
+                                                    fontSize: '0.75rem',
+                                                    textTransform: 'uppercase'
+                                                }}>
+                                                    {action.action === 'Trim' ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+                                                    {action.action}
                                                 </div>
                                             </div>
-                                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '1rem', lineHeight: 1.5 }}>
-                                                {action.reason} {action.impact}
+                                            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                                                {action.reason} <span style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>{action.impact}</span>
                                             </p>
-                                            <div style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                padding: '8px 12px',
-                                                background: 'rgba(255,255,255,0.03)',
-                                                borderRadius: '6px',
-                                                fontSize: '0.8rem'
-                                            }}>
-                                                <span style={{ color: 'var(--color-text-tertiary)' }}>Rebalance Execution</span>
-                                                <ArrowRight size={14} />
-                                            </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
                         </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-primary" onClick={() => setShowAIAdvice(false)}>Apply Strategy</button>
+                        <div className="modal-footer" style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center' }}>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => setShowAIAdvice(false)}
+                                style={{
+                                    background: 'var(--gradient-primary)',
+                                    padding: '0.8rem 2.5rem',
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    fontSize: '0.95rem',
+                                    border: 'none',
+                                    boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
+                                    width: '100%',
+                                    maxWidth: '300px'
+                                }}
+                            >
+                                Acknowledge Strategy
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1033,64 +1320,86 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {/* Add Position Modal */}
             {showModal && (
                 <div className="modal-overlay glass-blur" onClick={() => setShowModal(false)}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ border: '1px solid var(--glass-border-bright)' }}>
-                        <div className="modal-header">
-                            <h3 className="modal-title">Add Position</h3>
-                            <button className="btn btn-icon glass-button" onClick={() => setShowModal(false)} style={{ borderRadius: '50%', padding: '4px' }}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px', border: '1px solid var(--glass-border-bright)', borderRadius: '24px' }}>
+                        <div className="modal-header" style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--glass-border)' }}>
+                            <h3 className="modal-title" style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em' }}>New Asset Position</h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setShowModal(false)} style={{ borderRadius: '50%', padding: '0.5rem' }}>
                                 <X size={20} />
                             </button>
                         </div>
 
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label className="form-label">Symbol</label>
+                        <div className="modal-body" style={{ padding: '2rem' }}>
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                                <label className="form-label" style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--color-text-tertiary)', marginBottom: '0.75rem', display: 'block' }}>Asset Search</label>
                                 <SymbolSearchInput
-                                    placeholder="Search e.g. AAPL, BTC, NVDA"
+                                    placeholder="Search e.g. AAPL, BTC, ETH"
                                     onSelect={(symbol) => setFormData({ ...formData, symbol })}
                                     initialValue={formData.symbol}
                                     autoFocus
                                 />
                             </div>
 
-                            <div className="form-group">
-                                <label className="form-label">Units</label>
-                                <input
-                                    type="number"
-                                    className="form-input"
-                                    placeholder="e.g., 10"
-                                    value={formData.units}
-                                    onChange={(e) => setFormData({ ...formData, units: e.target.value })}
-                                />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.5rem' }}>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--color-text-tertiary)', marginBottom: '0.75rem', display: 'block' }}>Units</label>
+                                    <input
+                                        type="number"
+                                        className="form-input"
+                                        placeholder="0.00"
+                                        value={formData.units}
+                                        onChange={(e) => setFormData({ ...formData, units: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: 600 }}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--color-text-tertiary)', marginBottom: '0.75rem', display: 'block' }}>Avg Cost</label>
+                                    <input
+                                        type="number"
+                                        className="form-input"
+                                        placeholder="0.00"
+                                        step="0.01"
+                                        value={formData.avgCost}
+                                        onChange={(e) => setFormData({ ...formData, avgCost: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontWeight: 600 }}
+                                    />
+                                </div>
                             </div>
 
-                            <div className="form-group">
-                                <label className="form-label">Average Cost</label>
-                                <input
-                                    type="number"
-                                    className="form-input"
-                                    placeholder="e.g., 150.00"
-                                    step="0.01"
-                                    value={formData.avgCost}
-                                    onChange={(e) => setFormData({ ...formData, avgCost: e.target.value })}
-                                />
-                            </div>
-
-                            {formData.units && formData.avgCost && (
-                                <div style={{ marginTop: 'var(--spacing-md)', padding: 'var(--spacing-md)', background: 'var(--color-bg-tertiary)', borderRadius: 'var(--radius-md)' }}>
-                                    <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>Purchase Value</div>
-                                    <div style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '0.25rem' }}>
+                            {formData.units && formData.avgCost && !isNaN(parseFloat(formData.units) * parseFloat(formData.avgCost)) && (
+                                <div className="glass-card" style={{ padding: '1rem 1.25rem', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>Purchase Value</div>
+                                    <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-accent)' }}>
                                         {formatCurrency(parseFloat(formData.units) * parseFloat(formData.avgCost))}
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" onClick={() => setShowModal(false)} disabled={isSubmitting}>
+                        <div className="modal-footer" style={{ padding: '0 2rem 2rem', border: 'none', display: 'flex', gap: '1rem' }}>
+                            <button
+                                className="btn btn-secondary glass-button"
+                                onClick={() => setShowModal(false)}
+                                disabled={isSubmitting}
+                                style={{ flex: 1, padding: '0.8rem', borderRadius: '12px', fontWeight: 700 }}
+                            >
                                 Cancel
                             </button>
-                            <button className="btn btn-primary" onClick={handleAddPosition} disabled={isSubmitting}>
-                                {isSubmitting ? 'Adding...' : 'Add Position'}
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleAddPosition}
+                                disabled={isSubmitting || !formData.symbol || !formData.units || !formData.avgCost}
+                                style={{
+                                    flex: 2,
+                                    padding: '0.8rem',
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    background: 'var(--gradient-primary)',
+                                    border: 'none',
+                                    boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)'
+                                }}
+                            >
+                                {isSubmitting ? <RefreshCw className="animate-spin" size={18} /> : 'Secure Position'}
                             </button>
                         </div>
                     </div>
@@ -1100,128 +1409,111 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
             {/* Edit Position Modal */}
             {editingPosition && (
-                <div
-                    style={{
-                        position: 'fixed', inset: 0, zIndex: 3000,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)',
-                        padding: '1rem',
-                    }}
-                    onClick={() => setEditingPosition(null)}
-                >
-                    <div
-                        className="glass-card"
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                            width: '100%', maxWidth: '400px',
-                            background: 'rgba(8,8,16,0.98)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: 'var(--radius-xl)',
-                            padding: '1.75rem',
-                            boxShadow: '0 32px 80px rgba(0,0,0,0.7)',
-                            animation: 'slideUp 0.2s ease-out both',
-                        }}
-                    >
-                        {/* Header */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div className="modal-overlay glass-blur" onClick={() => setEditingPosition(null)}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px', border: '1px solid var(--glass-border-bright)', borderRadius: '24px' }}>
+                        <div className="modal-header" style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--glass-border)' }}>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Edit Position</h3>
-                                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
-                                    {editingPosition.symbol} — update units or average cost
+                                <h3 className="modal-title" style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Modify Position</h3>
+                                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 500 }}>
+                                    {editingPosition.symbol} — {editingPosition.name}
                                 </p>
                             </div>
-                            <button
-                                onClick={() => setEditingPosition(null)}
-                                style={{
-                                    background: 'rgba(255,255,255,0.06)', border: 'none',
-                                    borderRadius: '8px', width: '30px', height: '30px',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer', color: 'var(--color-text-secondary)',
-                                }}
-                            >
-                                <X size={16} />
+                            <button className="btn btn-icon glass-button" onClick={() => setEditingPosition(null)} style={{ borderRadius: '50%', padding: '0.5rem' }}>
+                                <X size={20} />
                             </button>
                         </div>
 
-                        {/* Fields */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.4rem' }}>
-                                    Units (Shares / Qty)
-                                </label>
+                        <div className="modal-body" style={{ padding: '2rem' }}>
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                                <label className="form-label" style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--color-text-tertiary)', marginBottom: '0.75rem', display: 'block' }}>Units (Quantity)</label>
                                 <input
                                     type="number"
-                                    min="0.0001"
+                                    min="0"
                                     step="any"
                                     value={editForm.units}
                                     onChange={(e) => setEditForm(f => ({ ...f, units: e.target.value }))}
                                     style={{
-                                        width: '100%', padding: '0.8rem 1rem',
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(255,255,255,0.08)',
-                                        borderRadius: 'var(--radius-md)',
-                                        color: 'var(--color-text-primary)',
-                                        fontSize: '1rem', fontFamily: 'inherit', outline: 'none',
-                                        transition: 'border-color 0.2s',
+                                        width: '100%',
+                                        padding: '0.85rem 1.15rem',
+                                        borderRadius: '12px',
+                                        background: 'rgba(255,255,255,0.03)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        fontSize: '1rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s ease'
                                     }}
                                     autoFocus
                                 />
                             </div>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.4rem' }}>
-                                    Average Cost (per unit)
-                                </label>
+
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                                <label className="form-label" style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--color-text-tertiary)', marginBottom: '0.75rem', display: 'block' }}>Average Purchase Cost</label>
                                 <input
                                     type="number"
-                                    min="0.0001"
+                                    min="0"
                                     step="any"
                                     value={editForm.avgCost}
                                     onChange={(e) => setEditForm(f => ({ ...f, avgCost: e.target.value }))}
                                     style={{
-                                        width: '100%', padding: '0.8rem 1rem',
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(255,255,255,0.08)',
-                                        borderRadius: 'var(--radius-md)',
-                                        color: 'var(--color-text-primary)',
-                                        fontSize: '1rem', fontFamily: 'inherit', outline: 'none',
-                                        transition: 'border-color 0.2s',
+                                        width: '100%',
+                                        padding: '0.85rem 1.15rem',
+                                        borderRadius: '12px',
+                                        background: 'rgba(255,255,255,0.03)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        fontSize: '1rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s ease'
                                     }}
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); }}
                                 />
                             </div>
+
+                            <div className="glass-card" style={{ padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '4px' }}>Current Price</div>
+                                    <div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{fmt(editingPosition.currentPrice)}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '4px' }}>Market Value</div>
+                                    <div style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--color-accent)' }}>
+                                        {editForm.units ? fmt(parseFloat(editForm.units) * editingPosition.currentPrice) : '—'}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Actions */}
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                        <div className="modal-footer" style={{ padding: '0 2rem 2rem', border: 'none', display: 'flex', gap: '1rem' }}>
                             <button
+                                className="btn btn-secondary glass-button"
                                 onClick={() => setEditingPosition(null)}
-                                style={{
-                                    flex: 1, padding: '0.8rem',
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    borderRadius: 'var(--radius-md)', cursor: 'pointer',
-                                    color: 'var(--color-text-secondary)', fontWeight: 600,
-                                    fontSize: '0.9rem',
-                                }}
+                                style={{ flex: 1, padding: '0.85rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.9rem' }}
                             >
                                 Cancel
                             </button>
                             <button
+                                className="btn btn-primary"
                                 onClick={handleSaveEdit}
                                 disabled={isSavingEdit}
                                 style={{
-                                    flex: 2, padding: '0.8rem',
-                                    background: isSavingEdit ? 'rgba(99,102,241,0.4)' : 'var(--gradient-primary)',
-                                    border: 'none', borderRadius: 'var(--radius-md)',
-                                    cursor: isSavingEdit ? 'not-allowed' : 'pointer',
-                                    color: 'white', fontWeight: 700, fontSize: '0.9rem',
-                                    display: 'flex', alignItems: 'center',
-                                    justifyContent: 'center', gap: '0.5rem',
-                                    boxShadow: '0 4px 15px rgba(99,102,241,0.4)',
+                                    flex: 2,
+                                    padding: '0.85rem',
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    fontSize: '0.9rem',
+                                    background: 'var(--gradient-primary)',
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)'
                                 }}
                             >
-                                <Save size={16} />
-                                {isSavingEdit ? 'Saving…' : 'Save Changes'}
+                                {isSavingEdit ? <RefreshCw className="animate-spin" size={16} /> : <><Save size={16} /> Update Position</>}
                             </button>
                         </div>
                     </div>
