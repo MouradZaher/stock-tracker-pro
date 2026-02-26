@@ -384,142 +384,104 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
             )}
 
-            {/* Recommendations Grid By Sector (LOCKED: Design Revamp 2026-02-25) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginBottom: '3rem' }}>
-                {groupedRecs.map(([sector, recs]) => (
-                    <div key={sector}>
-                        <h3 style={{
-                            fontSize: '1rem',
-                            fontWeight: 800,
-                            marginBottom: '1.25rem',
-                            color: 'var(--color-text-secondary)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            borderBottom: '1px solid var(--glass-border)',
-                            paddingBottom: '0.5rem'
-                        }}>
-                            {sector} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600 }}>({recs.length})</span>
-                        </h3>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                            gap: '1.25rem'
-                        }}>
-                            {recs.map((rec, idx) => (
-                                <div
-                                    key={`${rec.symbol}-${idx}`}
-                                    className="glass-card ai-signal-card"
-                                    onClick={() => handleLocalSelect(rec.symbol)}
-                                    style={{
-                                        padding: '1.25rem',
-                                        cursor: 'pointer',
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        border: `1px solid ${rec.score >= 75 ? 'rgba(16, 185, 129, 0.2)' : 'var(--glass-border)'}`,
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '1rem'
-                                    }}
-                                >
-                                    {/* Card Header */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <div>
+            {/* Recommendations Table By Sector (LOCKED: Design Revamp 2026-02-25) */}
+            <div className="table-container glass-card" style={{ padding: '0', marginBottom: '3rem', overflowX: 'auto' }}>
+                <table className="portfolio-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                        <tr>
+                            <th style={{ textAlign: 'left', padding: '1rem 1.25rem' }}>Asset</th>
+                            <th style={{ textAlign: 'center', padding: '1rem' }}>Signal</th>
+                            <th style={{ textAlign: 'center', padding: '1rem' }}>Conviction</th>
+                            <th style={{ textAlign: 'center', padding: '1rem' }}>Allocation</th>
+                            <th style={{ textAlign: 'left', padding: '1rem' }}>AI Reasoning</th>
+                            <th style={{ textAlign: 'right', padding: '1rem 1.25rem' }}>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {groupedRecs.map(([sector, recs]) => (
+                            <React.Fragment key={sector}>
+                                {/* Sector Header Row */}
+                                <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                    <td colSpan={6} style={{
+                                        padding: '0.75rem 1.25rem',
+                                        fontWeight: 800,
+                                        color: 'var(--color-text-secondary)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        borderBottom: '1px solid var(--glass-border)',
+                                        borderTop: '1px solid var(--glass-border)'
+                                    }}>
+                                        {sector} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600, marginLeft: '4px' }}>({recs.length})</span>
+                                    </td>
+                                </tr>
+                                {/* Rows for this Sector */}
+                                {recs.map((rec, idx) => (
+                                    <tr
+                                        key={`${rec.symbol}-${idx}`}
+                                        className="table-row-hover"
+                                        onClick={() => handleLocalSelect(rec.symbol)}
+                                        style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)' }}
+                                    >
+                                        <td style={{ padding: '1rem 1.25rem' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{rec.symbol}</span>
-                                                <span style={{
-                                                    fontSize: '0.65rem',
-                                                    padding: '2px 6px',
-                                                    borderRadius: '4px',
-                                                    background: 'rgba(255,255,255,0.05)',
-                                                    color: 'var(--color-text-tertiary)',
-                                                    textTransform: 'uppercase',
-                                                    fontWeight: 800
-                                                }}>{rec.sector}</span>
+                                                <span style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{rec.symbol}</span>
                                             </div>
                                             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{rec.name}</div>
-                                        </div>
-                                        <div style={{ textAlign: 'right' }}>
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
                                             <div style={{
-                                                fontSize: '0.85rem',
+                                                padding: '4px 10px',
+                                                background: rec.score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (rec.score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
+                                                borderRadius: '6px',
+                                                display: 'inline-block'
+                                            }}>
+                                                <span style={{
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 900,
+                                                    color: rec.score >= 75 ? 'var(--color-success)' : (rec.score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
+                                                }}>
+                                                    {rec.recommendation?.toUpperCase() || 'HOLD'}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <div style={{
+                                                fontSize: '0.9rem',
                                                 fontWeight: 900,
                                                 color: getScoreColor(rec.score),
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'flex-end',
+                                                justifyContent: 'center',
                                                 gap: '4px'
                                             }}>
                                                 <Zap size={14} fill={getScoreColor(rec.score)} />
                                                 {rec.score}%
                                             </div>
-                                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conviction</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Conviction Gauge */}
-                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                                        <div style={{
-                                            width: `${rec.score}%`,
-                                            height: '100%',
-                                            background: `linear-gradient(90deg, ${getScoreColor(rec.score)}dd, ${getScoreColor(rec.score)})`,
-                                            transition: 'width 1s ease-out'
-                                        }} />
-                                    </div>
-
-                                    {/* Signal Content */}
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{
-                                            padding: '8px 12px',
-                                            background: rec.score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (rec.score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                                            borderRadius: '8px',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            marginBottom: '0.75rem'
-                                        }}>
-                                            <span style={{
-                                                fontSize: '0.75rem',
-                                                fontWeight: 900,
-                                                color: rec.score >= 75 ? 'var(--color-success)' : (rec.score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
-                                            }}>
-                                                {rec.recommendation?.toUpperCase() || 'HOLD'} SIGNAL
-                                            </span>
-                                        </div>
-                                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                                            {rec.reasoning || `AI models indicate ${rec.score}% historical alpha probability based on recent volume cluster analysis.`}
-                                        </p>
-                                    </div>
-
-                                    {/* Footer Info */}
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        paddingTop: '0.75rem',
-                                        borderTop: '1px solid var(--glass-border)',
-                                        fontSize: '0.7rem'
-                                    }}>
-                                        <div>
-                                            <span style={{ color: 'var(--color-text-tertiary)' }}>Allocation:</span>
-                                            <span style={{ marginLeft: '4px', fontWeight: 800, color: selectedMarket.color }}>
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <span style={{ fontWeight: 800, color: selectedMarket.color, fontSize: '0.9rem' }}>
                                                 {typeof rec.suggestedAllocation === 'number' && rec.suggestedAllocation > 0
                                                     ? `${rec.suggestedAllocation.toFixed(1)}%`
                                                     : rec.score >= 75 ? '5.0%' : '2.5%'}
                                             </span>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-accent)' }}>
-                                            <span style={{ fontWeight: 700 }}>Analysis</span>
-                                            <ArrowRight size={12} />
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ))}
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: 0, maxWidth: '350px' }}>
+                                                {rec.reasoning || `AI models indicate ${rec.score}% historical alpha probability based on recent volume cluster analysis.`}
+                                            </p>
+                                        </td>
+                                        <td style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>
+                                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--color-accent)', fontSize: '0.8rem' }}>
+                                                <span style={{ fontWeight: 700 }}>Analysis</span>
+                                                <ArrowRight size={14} />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
             {/* ═══ MODALS ═══ */}
