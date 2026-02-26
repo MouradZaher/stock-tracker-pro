@@ -15,9 +15,9 @@ interface MarketPulsePageProps {
 
 const MARKET_STREAMS: Record<string, any[]> = {
     us: [
-        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', playlistId: 'UUIALMKvObZNtJ6AmdCLP7Lg', index: 0 },
-        { name: 'Sky News Business', origin: 'International', color: '#ff0000', playlistId: 'UUoMdktPbSTixAyNGWB-UYkQ', index: 0 },
-        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', playlistId: 'UUEAZeUIeJs0IjQiqTCdVSIg', index: 0 }
+        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdCLP7Lg' },
+        { name: 'Sky News Business', origin: 'International', color: '#ff0000', channelId: 'UCoMdktPbSTixAyNGWB-UYkQ' },
+        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCEAZeUIeJs0IjQiqTCdVSIg' }
     ],
     egypt: [
         { name: 'Thndr | Latest Update 1', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 0 },
