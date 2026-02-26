@@ -1,5 +1,27 @@
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+/* Dynamic Color & Font Classes for Market Numbers */
+.positive {
+  color: #10b981 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.negative {
+  color: #ef4444 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.neutral {
+  color: #7b7d8f !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 500 !important;
+}
 
 /* CSS Variables - Dark Mode Design System */
 * {

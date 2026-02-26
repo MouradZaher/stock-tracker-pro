@@ -39,7 +39,10 @@ export const formatCurrencyForMarket = (value: number, currency: string): string
 
 // Format percentage
 export const formatPercent = (value: number, decimals: number = 2): string => {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
+    const symbol = value >= 0 ? '+' : '';
+    const formatted = `${symbol}${value.toFixed(decimals)}%`;
+    const emoji = value > 0 ? '📈' : value < 0 ? '📉' : '➖';
+    return `${emoji} ${formatted}`;
 };
 
 // Format large numbers with abbreviations
