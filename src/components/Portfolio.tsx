@@ -163,13 +163,17 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             const sector = p.sector || 'Other';
             sectorTotals[sector] = (sectorTotals[sector] || 0) + allocation;
 
-            if (allocation > 5) {
+            // Relaxed rules for hedging assets (GLD, SLV, VOO)
+            const isHedgingAsset = ['GLD', 'SLV', 'VOO'].includes(p.symbol);
+            const limit = isHedgingAsset ? 30 : 5;
+
+            if (allocation > limit) {
                 actions.push({
                     symbol: p.symbol,
                     action: 'Trim',
-                    reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the 5% limit.`,
-                    impact: `Trim to ~5% to reduce concentration risk.`,
-                    priority: allocation > 10 ? 'High' : 'Medium'
+                    reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the ${limit}% ${isHedgingAsset ? 'strategic hedging' : 'institutional'} limit.`,
+                    impact: `Trim to ~${limit}% to maintain balanced exposure.`,
+                    priority: allocation > (limit + 10) ? 'High' : 'Medium'
                 });
             }
 
@@ -186,13 +190,17 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         }
 
         for (const [sector, allocation] of Object.entries(sectorTotals)) {
-            if (allocation > 20) {
+            // Relaxed rules for Commodities and Diversified sectors
+            const isHedgingSector = ['Commodities', 'Diversified'].includes(sector);
+            const sectorLimit = isHedgingSector ? 40 : 20;
+
+            if (allocation > sectorLimit) {
                 actions.push({
                     symbol: sector,
                     action: 'Trim',
-                    reason: `${sector} is ${allocation.toFixed(1)}% of portfolio — exceeds 20% sector cap.`,
-                    impact: `Improve diversification across sectors.`,
-                    priority: allocation > 30 ? 'High' : 'Medium'
+                    reason: `${sector} is ${allocation.toFixed(1)}% of portfolio — exceeds ${sectorLimit}% sector cap.`,
+                    impact: `Improve diversification across other sectors.`,
+                    priority: allocation > (sectorLimit + 10) ? 'High' : 'Medium'
                 });
             }
         }
@@ -201,8 +209,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             actions.push({
                 symbol: 'PORTFOLIO',
                 action: 'Hold',
-                reason: 'All positions within institutional risk limits (5% stock / 20% sector).',
-                impact: 'No rebalancing required. Portfolio is well-diversified.',
+                reason: 'All positions within strategic/institutional risk limits.',
+                impact: 'No rebalancing required. Portfolio is optimized for current market dynamics.',
                 priority: 'Low'
             });
         }
@@ -322,7 +330,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const stockAllocations = positions.map((pos) => ({
         symbol: pos.symbol,
         allocation: calculateAllocation(pos.marketValue, summary.totalValue),
-        valid: checkAllocationLimits(calculateAllocation(pos.marketValue, summary.totalValue), 'stock'),
+        valid: checkAllocationLimits(calculateAllocation(pos.marketValue, summary.totalValue), 'stock', pos.symbol),
     }));
 
     const sectorAllocations = positions.reduce((acc, pos) => {
@@ -336,7 +344,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }, [] as { sector: string; value: number }[]).map((s) => ({
         ...s,
         allocation: calculateAllocation(s.value, summary.totalValue),
-        valid: checkAllocationLimits(calculateAllocation(s.value, summary.totalValue), 'sector'),
+        valid: checkAllocationLimits(calculateAllocation(s.value, summary.totalValue), 'sector', s.sector),
     }));
 
     const hasAllocationWarnings = stockAllocations.some((a) => !a.valid.valid) || sectorAllocations.some((a) => !a.valid.valid);
@@ -1138,7 +1146,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                 <div>
                                     <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--color-warning)' }}>Risk Exposure Alert</h4>
                                     <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'rgba(245, 158, 11, 0.8)', fontWeight: 500 }}>
-                                        Positions exceed institutional limits (5% per asset / 20% per sector).
+                                        Some positions exceed strategic allocation limits. Institutional rules permit higher 30/40% weighting for hedging assets and diversified indexes.
                                     </p>
                                 </div>
                             </div>
@@ -1204,7 +1212,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                             Institutional Safety Rules
                                         </h4>
                                         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                                            Analysis baseline: <strong>5% maximum single-asset weighting</strong> and <strong>20% maximum sector concentration</strong> to mitigate tail-risk.
+                                            Analysis baseline: <strong>5% cap for individual assets</strong> and <strong>20% cap per sector</strong>. Strategic exceptions (30% asset / 40% sector) apply to hedging assets (Gold, Silver) and diversified indexes (VOO) to mitigate tail-risk.
                                         </p>
                                     </div>
                                 </div>

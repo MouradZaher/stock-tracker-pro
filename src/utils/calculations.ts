@@ -51,9 +51,18 @@ export const calculateAllocation = (value: number, totalValue: number): number =
 // Check if allocation exceeds limits
 export const checkAllocationLimits = (
     allocation: number,
-    type: 'stock' | 'sector'
+    type: 'stock' | 'sector',
+    name?: string
 ): { valid: boolean; limit: number } => {
-    const limit = type === 'stock' ? 5 : 20;
+    let limit = type === 'stock' ? 5 : 20;
+
+    // Relaxation for strategic hedging assets/sectors
+    if (type === 'stock' && name && ['GLD', 'SLV', 'VOO'].includes(name.toUpperCase())) {
+        limit = 30;
+    } else if (type === 'sector' && name && ['Commodities', 'Diversified'].includes(name)) {
+        limit = 40;
+    }
+
     return {
         valid: allocation <= limit,
         limit,
