@@ -35,9 +35,9 @@ const StockHeatmap: React.FC = () => {
                 script.async = true;
                 script.type = 'text/javascript';
                 script.innerHTML = JSON.stringify({
-                    "exchanges": [],
-                    "dataSource": "SPX500", // TradingView heatmap only officially supports SPX500 or strictly defined ones, avoiding black screen crash
-                    "grouping": "sector",
+                    "exchanges": effectiveMarket.heatmapExchanges,
+                    "dataSource": effectiveMarket.heatmapDataSource,
+                    "grouping": effectiveMarket.heatmapExchanges.length > 0 ? "no_group" : "sector",
                     "blockSize": "market_cap_basic",
                     "blockColor": "change",
                     "locale": "en",
