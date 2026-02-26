@@ -66,20 +66,14 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             const success = await portfolioService.savePosition(userId, newPosition);
                             set({ isSyncing: false });
                             if (!success) {
-                                // Rollback on failure
-                                set((state) => ({
-                                    positions: state.positions.filter(p => p.id !== id),
-                                    error: 'Failed to save position to database',
-                                }));
+                                set({ error: 'Failed to sync position to cloud. Saved locally.' });
                             }
                         } catch (error) {
                             console.error('Error saving position:', error);
-                            // Rollback on error
-                            set((state) => ({
-                                positions: state.positions.filter(p => p.id !== id),
-                                error: 'Failed to save position',
+                            set({
+                                error: 'Failed to sync position to cloud. Saved locally.',
                                 isSyncing: false
-                            }));
+                            });
                         }
                     }
                 },
@@ -117,21 +111,15 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                 const success = await portfolioService.savePosition(userId, updatedPosition);
                                 set({ isSyncing: false });
                                 if (!success) {
-                                    // Rollback on failure
-                                    set((state) => ({
-                                        positions: state.positions.map(p => p.id === id ? oldPosition : p),
-                                        error: 'Failed to update position in database',
-                                    }));
+                                    set({ error: 'Failed to sync update to cloud. Saved locally.' });
                                 }
                             }
                         } catch (error) {
                             console.error('Error updating position:', error);
-                            // Rollback on error
-                            set((state) => ({
-                                positions: state.positions.map(p => p.id === id ? oldPosition : p),
-                                error: 'Failed to update position',
+                            set({
+                                error: 'Failed to sync update to cloud. Saved locally.',
                                 isSyncing: false
-                            }));
+                            });
                         }
                     }
                 },
