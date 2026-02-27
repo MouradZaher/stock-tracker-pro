@@ -45,8 +45,8 @@ export const MARKETS: Market[] = [
         currency: 'EGP',
         currencySymbol: 'EGP ',
         currencyLocale: 'ar-EG',
-        heatmapDataSource: 'AllEGY',
-        heatmapExchanges: ['EGX'],
+        heatmapDataSource: 'AllEG',
+        heatmapExchanges: [],
         color: '#f59e0b',
     },
     {
@@ -61,7 +61,7 @@ export const MARKETS: Market[] = [
         currencySymbol: 'AED ',
         currencyLocale: 'ar-AE',
         heatmapDataSource: 'AllARE',
-        heatmapExchanges: ['ADX'],
+        heatmapExchanges: [],
         color: '#10b981',
     },
 ];
