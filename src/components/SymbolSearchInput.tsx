@@ -8,6 +8,7 @@ interface SymbolSearchInputProps {
     className?: string;
     initialValue?: string;
     autoFocus?: boolean;
+    marketId?: string;
 }
 
 const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
@@ -15,7 +16,8 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
     placeholder = "Search symbols...",
     className = "",
     initialValue = "",
-    autoFocus = false
+    autoFocus = false,
+    marketId
 }) => {
     const [query, setQuery] = useState(initialValue);
     const [results, setResults] = useState<any[]>([]);
@@ -51,7 +53,7 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
 
         debounceTimeout.current = window.setTimeout(async () => {
             try {
-                const searchResults = await searchSymbols(query);
+                const searchResults = await searchSymbols(query, marketId);
                 setResults(searchResults);
                 setShowDropdown(searchResults.length > 0);
             } catch (error) {
@@ -67,7 +69,7 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                 window.clearTimeout(debounceTimeout.current);
             }
         };
-    }, [query]);
+    }, [query, marketId]);
 
     const handleSelect = (symbol: string) => {
         setQuery(symbol);

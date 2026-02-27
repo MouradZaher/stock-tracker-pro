@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PROVIDERS, parsers, markProviderFailed, markProviderSuccess, getAvailableProviders, API_KEYS, type StockQuote } from './dataProviders';
 import type { Stock, CompanyProfile, Dividend } from '../types';
-import { getAllSymbols } from '../data/sectors';
+import { getAllSymbols, getMarketForSymbol } from '../data/sectors';
 
 // ============================================
 // MULTI-SOURCE STOCK DATA SERVICE
@@ -363,7 +363,7 @@ const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | nul
 };
 
 // Search symbols from local data
-export const searchSymbols = async (query: string): Promise<Record<string, unknown>[]> => {
+export const searchSymbols = async (query: string, marketId?: string): Promise<Record<string, unknown>[]> => {
     if (!query || query.length < 1) return [];
     const allSymbols = getAllSymbols();
 
@@ -372,9 +372,15 @@ export const searchSymbols = async (query: string): Promise<Record<string, unkno
         s.name.toLowerCase().includes(query.toLowerCase())
     );
 
+    // Filter by market if provided (STRICT FILTER)
+    let filteredMatches = matches;
+    if (marketId) {
+        filteredMatches = matches.filter(s => getMarketForSymbol(s.symbol) === marketId);
+    }
+
     // Deduplicate
     const uniqueMap = new Map();
-    matches.forEach(item => {
+    filteredMatches.forEach(item => {
         if (!uniqueMap.has(item.symbol)) {
             uniqueMap.set(item.symbol, item);
         }

@@ -303,11 +303,34 @@ export const getMarketForSymbol = (symbol: string): 'us' | 'egypt' | 'abudhabi' 
 
 // Get all symbols for autocomplete
 export const getAllSymbols = (): { symbol: string; name: string; type: string; sector: string }[] => {
-    const stocks = Object.entries(STOCKS_BY_SECTOR).flatMap(([sector, stocks]) =>
-        stocks.map(s => ({ ...s, type: 'Stock', sector }))
-    );
+    const symbolsMap = new Map<string, { symbol: string; name: string; type: string; sector: string }>();
 
-    const etfs = POPULAR_ETFS.map(e => ({ ...e, type: 'ETF' }));
+    // Add stocks by sector
+    Object.entries(STOCKS_BY_SECTOR).forEach(([sector, stocks]) => {
+        stocks.forEach(s => {
+            symbolsMap.set(s.symbol, { ...s, type: 'Stock', sector });
+        });
+    });
 
-    return [...stocks, ...etfs];
+    // Add stocks by index (to catch regional ones not in sectors)
+    Object.entries(STOCKS_BY_INDEX).forEach(([indexName, stocks]) => {
+        stocks.forEach(s => {
+            if (!symbolsMap.has(s.symbol)) {
+                symbolsMap.set(s.symbol, {
+                    ...s,
+                    type: 'Stock',
+                    sector: getSectorForSymbol(s.symbol)
+                });
+            }
+        });
+    });
+
+    // Add ETFs
+    POPULAR_ETFS.forEach(e => {
+        if (!symbolsMap.has(e.symbol)) {
+            symbolsMap.set(e.symbol, { ...e, type: 'ETF' });
+        }
+    });
+
+    return Array.from(symbolsMap.values());
 };

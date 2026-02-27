@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import AIRecommendations from './AIRecommendations';
 import PriceAlertsModal from './PriceAlertsModal';
 import TradeAnalysisPanel from './TradeAnalysisPanel';
+import { useMarket } from '../contexts/MarketContext';
 
 interface StockDetailProps {
     symbol: string;
@@ -26,6 +27,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
     const [showAlerts, setShowAlerts] = useState(false);
     const { user } = useAuth();
+    const { selectedMarket } = useMarket();
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
     const { positions } = usePortfolioStore();
 
@@ -64,15 +66,15 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     }
 
     const { stock, profile } = data;
-    const inWatchlist = isInWatchlist(stock.symbol);
+    const inWatchlist = isInWatchlist(stock.symbol, selectedMarket.id);
     const portfolioPosition = positions.find(p => p.symbol === stock.symbol);
 
     const toggleWatchlist = () => {
         if (inWatchlist) {
-            removeFromWatchlist(stock.symbol, user?.id);
+            removeFromWatchlist(stock.symbol, selectedMarket.id, user?.id);
             toast.success(`${stock.symbol} removed from watchlist`);
         } else {
-            addToWatchlist(stock.symbol, user?.id);
+            addToWatchlist(stock.symbol, selectedMarket.id, user?.id);
             toast.success(`${stock.symbol} added to watchlist`);
         }
     };

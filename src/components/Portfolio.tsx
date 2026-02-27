@@ -15,6 +15,7 @@ import { usePriceAlerts } from '../hooks/usePriceAlerts';
 import PriceAlertsModal from './PriceAlertsModal';
 import { analyzeSymbol, getTacticalRebalancing, type RebalancingAction } from '../services/aiRecommendationService';
 import type { StockRecommendation } from '../types';
+import RealTimePrice from './RealTimePrice';
 
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
@@ -719,7 +720,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                             </td>
                                                             <td style={{ textAlign: 'right', fontWeight: 600 }}>{position.units.toLocaleString()}</td>
                                                             <td style={{ textAlign: 'right', color: 'var(--color-text-secondary)' }}>{fmt(position.avgCost)}</td>
-                                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{fmt(position.currentPrice)}</td>
+                                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                                                                <RealTimePrice price={position.currentPrice} showCurrency={false} />
+                                                            </td>
                                                             <td style={{ textAlign: 'right' }}><strong style={{ color: 'var(--color-text-primary)' }}>{fmt(position.marketValue)}</strong></td>
                                                             <td style={{ textAlign: 'right', fontWeight: 700 }} className={getChangeClass(position.profitLoss)}>
                                                                 {fmt(position.profitLoss)}

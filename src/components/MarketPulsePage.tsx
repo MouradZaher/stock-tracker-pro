@@ -161,6 +161,52 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             overflowX: 'hidden',
             padding: '0 0 var(--spacing-xl) 0'
         }}>
+            {/* ── Breaking News Ticker (Smooth Marquee) ── */}
+            {breakingNews && breakingNews.length > 0 && (
+                <div style={{
+                    margin: '0 -1.5rem 1.5rem',
+                    background: 'rgba(99, 102, 241, 0.05)',
+                    borderBottom: '1px solid var(--glass-border)',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    padding: '8px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '2rem'
+                }}>
+                    <div style={{
+                        background: 'var(--color-accent)',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.65rem',
+                        fontWeight: 900,
+                        marginLeft: '1.5rem',
+                        flexShrink: 0,
+                        zIndex: 2
+                    }}>LIVE PULSE</div>
+                    <div style={{
+                        display: 'inline-block',
+                        animation: 'scroll-news 60s linear infinite',
+                        paddingLeft: '100%'
+                    }}>
+                        {breakingNews.map((news, i) => (
+                            <span key={i} style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                marginRight: '4rem',
+                                fontSize: '0.8rem',
+                                color: 'var(--color-text-secondary)',
+                                fontWeight: 500
+                            }}>
+                                <span style={{ color: 'var(--color-accent)', fontWeight: 800 }}>•</span>
+                                {news.headline}
+                                <span style={{ opacity: 0.4, fontSize: '0.7rem' }}>— {news.source}</span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Header Area - More Compact */}
             <div style={{ marginBottom: '1rem', padding: '0 0.5rem' }}>

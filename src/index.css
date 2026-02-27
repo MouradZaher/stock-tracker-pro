@@ -111,6 +111,10 @@
   --header-height: 64px;
   --mobile-nav-height: 80px;
 
+  /* Real-time Visual Feedback */
+  --color-success-glow: rgba(16, 185, 129, 0.4);
+  --color-error-glow: rgba(239, 68, 68, 0.4);
+
   /* Breakpoints */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
@@ -294,15 +298,78 @@ html[data-theme='light'] {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--glass-shadow);
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
   padding: var(--spacing-md);
+  transform: translateZ(0);
+  /* Hardware acceleration */
 }
 
 .glass-card:hover {
   background: var(--glass-bg-hover);
   border-color: var(--glass-border-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* Premium Animations for Real-time Data */
+@keyframes price-flash-up {
+  0% {
+    background-color: transparent;
+  }
+
+  10% {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes price-flash-down {
+  0% {
+    background-color: transparent;
+  }
+
+  10% {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.flash-up {
+  animation: price-flash-up 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.flash-down {
+  animation: price-flash-down 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes pulse-high {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes scroll-news {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .glass-button {

@@ -4,14 +4,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
-import { TrendingUp, TrendingDown, Trash2, Star, Bell, Search, Zap, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Trash2, Star, Bell, Search, Zap, Minus, Activity } from 'lucide-react';
 import { usePriceAlerts } from '../hooks/usePriceAlerts';
 import PriceAlertsModal from './PriceAlertsModal';
 import SymbolSearchInput from './SymbolSearchInput';
 import { analyzeSymbol } from '../services/aiRecommendationService';
 import type { StockRecommendation } from '../types';
+import { useMarket } from '../contexts/MarketContext';
 
+import IndexComponents from './IndexComponents';
 import FamousHoldings from './FamousHoldings';
+import RealTimePrice from './RealTimePrice';
 
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
@@ -108,7 +111,12 @@ const InteractiveSparkline: React.FC<SparklineProps> = ({ data, color }) => {
 
 const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
-    const { watchlist, removeFromWatchlist, addToWatchlist } = useWatchlist();
+    const { selectedMarket } = useMarket();
+    const { marketWatchlists, removeFromWatchlist, addToWatchlist } = useWatchlist();
+
+    // Get watchlist for current market
+    const watchlist = marketWatchlists[selectedMarket.id] || [];
+
     const [stockData, setStockData] = useState<Record<string, Stock>>({});
     const [aiRecs, setAiRecs] = useState<Record<string, StockRecommendation>>({});
     const [loading, setLoading] = useState(false);
@@ -127,13 +135,19 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
 
             setLoading(true);
             try {
+                // Include the market index in the batch request
+                const indexSym = selectedMarket.indexSymbol.replace('%5E', '^');
+                const symbolsToFetch = [...new Set([indexSym, ...watchlist])];
+
                 // Use batch fetching for better performance
-                const quotesMap = await getMultipleQuotes(watchlist);
+                const quotesMap = await getMultipleQuotes(symbolsToFetch);
                 const newData: Record<string, Stock> = {};
                 quotesMap.forEach((value, key) => {
                     newData[key] = value;
-                    // Check price alerts
-                    checkPrice(key, value.price);
+                    // Check price alerts (only for watchlist items)
+                    if (watchlist.includes(key)) {
+                        checkPrice(key, value.price);
+                    }
                 });
                 setStockData(newData);
             } catch (error) {
@@ -214,12 +228,13 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
             }}>
                 <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
                     <Star size={24} fill="currentColor" className="text-warning" />
-                    My Watchlist
+                    {selectedMarket.name} Watchlist
                 </h2>
                 <div style={{ width: '100%', maxWidth: '350px' }}>
                     <SymbolSearchInput
-                        placeholder="Quick add symbol..."
-                        onSelect={(symbol) => addToWatchlist(symbol, user?.id)}
+                        placeholder={`Quick add ${selectedMarket.name} symbol...`}
+                        marketId={selectedMarket.id}
+                        onSelect={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)}
                     />
                 </div>
             </div>
@@ -238,6 +253,48 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                             gap: '1.25rem',
                             paddingBottom: '2rem'
                         }}>
+                            {/* Market Index Insight Card (Always first) */}
+                            {selectedMarket && (
+                                <div
+                                    className="watchlist-card glass-card"
+                                    style={{
+                                        padding: 'var(--spacing-md)',
+                                        border: `1px solid ${selectedMarket.color}44`,
+                                        background: `linear-gradient(135deg, rgba(255,255,255,0.03) 0%, ${selectedMarket.color}0a 100%)`,
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '5rem', opacity: 0.03, pointerEvents: 'none' }}>
+                                        <Activity size={80} />
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                        <div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <Zap size={14} style={{ color: selectedMarket.color }} />
+                                                <span style={{ fontSize: '0.65rem', fontWeight: 900, color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Market Benchmark</span>
+                                            </div>
+                                            <h3 style={{ fontSize: '1.1rem', fontWeight: 900, margin: '4px 0 0 0' }}>{selectedMarket.indexName}</h3>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontSize: 'var(--font-size-base)', fontWeight: '800' }}>
+                                                {stockData[selectedMarket.indexSymbol.replace('%5E', '^')] ? (
+                                                    <RealTimePrice price={stockData[selectedMarket.indexSymbol.replace('%5E', '^')].price} />
+                                                ) : '--'}
+                                            </div>
+                                            {stockData[selectedMarket.indexSymbol.replace('%5E', '^')] && (
+                                                <div className={getChangeClass(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].change)} style={{ fontSize: '0.75rem', fontWeight: 700 }}>
+                                                    {formatPercent(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].changePercent)}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                                        The {selectedMarket.indexName} tracks the broad performance of the {selectedMarket.name} equity market.
+                                    </div>
+                                </div>
+                            )}
+
                             {watchlist.map(symbol => {
                                 const stock = stockData[symbol];
                                 if (!stock) return null;
@@ -274,7 +331,9 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                 <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', marginLeft: 'auto' }}>{stock.name}</p>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: 'var(--font-size-base)', fontWeight: '700', color: 'var(--color-text-primary)' }}>{formatCurrency(stock.price)}</div>
+                                                <div style={{ fontSize: 'var(--font-size-base)', fontWeight: '700', color: 'var(--color-text-primary)' }}>
+                                                    <RealTimePrice price={stock.price} />
+                                                </div>
                                                 <div className={getChangeClass(stock.change)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>
                                                     {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                                     {formatPercent(stock.changePercent)}
@@ -345,7 +404,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                     className="btn-icon delete-btn glass-button"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        removeFromWatchlist(symbol, user?.id);
+                                                        removeFromWatchlist(symbol, selectedMarket.id, user?.id);
                                                     }}
                                                     title="Remove from watchlist"
                                                     style={{ color: 'var(--color-text-tertiary)', borderRadius: '50%', padding: '6px' }}
@@ -362,10 +421,17 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                 </>
             )}
 
-            {/* Famous Holdings Section */}
-            <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>
-                <FamousHoldings onQuickAdd={(symbol) => addToWatchlist(symbol, user?.id)} />
+            {/* Index Components Quick Add Section */}
+            <div style={{ marginTop: '2rem', marginBottom: '3rem' }}>
+                <IndexComponents onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
             </div>
+
+            {/* Famous Holdings Section (Whale Watch) - Keep below index for extra discovery */}
+            {selectedMarket.id === 'us' && (
+                <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--color-border)' }}>
+                    <FamousHoldings onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
+                </div>
+            )}
 
             {alertConfig && (
                 <PriceAlertsModal

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
+import { useMarket } from '../contexts/MarketContext';
 
 interface WatchlistSidebarProps {
     isOpen: boolean;
@@ -14,7 +15,12 @@ interface WatchlistSidebarProps {
 
 const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, onSelectSymbol }) => {
     const { user } = useAuth();
-    const { watchlist, removeFromWatchlist } = useWatchlist();
+    const { selectedMarket } = useMarket();
+    const { marketWatchlists, removeFromWatchlist } = useWatchlist();
+
+    // Get watchlist for current market
+    const watchlist = marketWatchlists[selectedMarket.id] || [];
+
     const [stockData, setStockData] = useState<Record<string, Stock>>({});
 
     useEffect(() => {
@@ -22,8 +28,11 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
             if (watchlist.length === 0) return;
 
             try {
+                const indexSym = selectedMarket.indexSymbol.replace('%5E', '^');
+                const symbolsToFetch = [...new Set([indexSym, ...watchlist])];
+
                 // Fetch all data in one batch request
-                const stocksMap = await getMultipleQuotes(watchlist);
+                const stocksMap = await getMultipleQuotes(symbolsToFetch);
 
                 // Convert Map to Record object for state
                 const newData: Record<string, Stock> = {};
@@ -56,7 +65,7 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
             {/* Sidebar */}
             <div className={`watchlist-sidebar ${isOpen ? 'open' : ''}`}>
                 <div className="watchlist-header">
-                    <h2>My Watchlist</h2>
+                    <h2>{selectedMarket.name} Watchlist</h2>
                     <button className="btn-icon" onClick={onClose}>
                         <X size={24} />
                     </button>
@@ -72,6 +81,41 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                         </div>
                     ) : (
                         <div className="watchlist-list">
+                            {/* Market Index Row */}
+                            {(() => {
+                                const indexSym = selectedMarket.indexSymbol.replace('%5E', '^');
+                                const indexStock = stockData[indexSym];
+                                if (!indexStock) return null;
+                                return (
+                                    <div
+                                        className="watchlist-item"
+                                        style={{
+                                            background: 'rgba(255,255,255,0.02)',
+                                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                            paddingBottom: '12px',
+                                            marginBottom: '8px'
+                                        }}
+                                        onClick={() => {
+                                            onSelectSymbol(indexSym);
+                                            onClose();
+                                        }}
+                                    >
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                                <span style={{ fontWeight: 800, fontSize: '0.75rem', color: selectedMarket.color, textTransform: 'uppercase' }}>{selectedMarket.indexName}</span>
+                                                <span style={{ fontWeight: 700 }}>{formatCurrency(indexStock.price)}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                                                <span style={{ color: 'var(--color-text-tertiary)' }}>Market Index</span>
+                                                <span className={getChangeClass(indexStock.change)} style={{ fontWeight: 600 }}>
+                                                    {formatPercent(indexStock.changePercent)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
                             {watchlist.map(symbol => {
                                 const stock = stockData[symbol];
                                 return (
@@ -102,7 +146,7 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                                             className="btn-icon delete-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                removeFromWatchlist(symbol, user?.id);
+                                                removeFromWatchlist(symbol, selectedMarket.id, user?.id);
                                             }}
                                         >
                                             <Trash2 size={16} />
