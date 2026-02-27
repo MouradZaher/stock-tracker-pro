@@ -117,8 +117,9 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    // Login with username + PIN (supports both legacy plain-text and SHA-256 hashed)
     const login = async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
+        let loggedInUser: User;
+
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -137,7 +138,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
 
             // Opportunistically upgrade plain-text PIN to hashed on successful login
-            if (data.pin_hash.length < 32) {
+            if (data.pin_hash && data.pin_hash.length < 32) {
                 const hashed = await hashPin(pin);
                 await supabase
                     .from('profiles')
@@ -145,7 +146,7 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     .eq('id', data.id);
             }
 
-            const loggedInUser: User = {
+            loggedInUser = {
                 id: data.id,
                 username: data.username,
                 role: data.role as 'admin' | 'user',
@@ -160,6 +161,13 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 return { success: false, error: 'Account pending approval. Please contact administrator.' };
             }
 
+        } catch (err) {
+            console.error('Login validation error:', err);
+            return { success: false, error: 'Login failed due to system error. Please try again.' };
+        }
+
+        // At this point, login is officially successful. Apply state changes safely.
+        try {
             setUser(loggedInUser);
             localStorage.setItem('pin_auth_user', JSON.stringify(loggedInUser));
 
@@ -171,11 +179,11 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
             });
 
             startSync(loggedInUser.id);
-            return { success: true };
         } catch (err) {
-            console.error('Login error:', err);
-            return { success: false, error: 'Login failed. Please try again.' };
+            console.warn('Non-critical error during session finalization:', err);
         }
+
+        return { success: true };
     };
 
     // Register new user — stores SHA-256 hash of the PIN, never plain text
