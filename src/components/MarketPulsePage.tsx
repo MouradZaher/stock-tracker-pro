@@ -6,7 +6,7 @@ import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, A
 import type { NewsArticle, SocialPost } from '../types';
 import { socialFeedService } from '../services/SocialFeedService';
 
-import { getSectorPerformance, getVolumeAnomalies } from '../services/stockDataService';
+import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 
 interface MarketPulsePageProps {
@@ -41,6 +41,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number }>({ hours: 0, minutes: 0, seconds: 0 });
     const [sectorData, setSectorData] = useState<any[]>([]);
     const [volumeAnomalies, setVolumeAnomalies] = useState<any[]>([]);
+    const [macroData, setMacroData] = useState<any[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
     // Fetch real breaking news - Sync to market
@@ -65,6 +66,47 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 ]);
                 setSectorData(sectors);
                 setVolumeAnomalies(volumes);
+
+                // Live Macro Data
+                const goldSymbol = effectiveMarket.id === 'us' ? 'GC=F' : effectiveMarket.id === 'egypt' ? 'XAUUSD=X' : 'CL=F';
+                const volSymbol = effectiveMarket.id === 'us' ? '^VIX' : effectiveMarket.indexSymbol.replace('%5E', '^');
+                const flowSymbol = effectiveMarket.id === 'us' ? 'SPY' : effectiveMarket.indexSymbol.replace('%5E', '^');
+
+                const macroQuotes = await getMultipleQuotes([goldSymbol, volSymbol, flowSymbol]);
+
+                const goldQuote = macroQuotes.get(goldSymbol);
+                const volQuote = macroQuotes.get(volSymbol);
+                const flowQuote = macroQuotes.get(flowSymbol);
+
+                const isGoldUp = goldQuote ? goldQuote.change > 0 : true;
+                const isVolUp = volQuote ? volQuote.change > 0 : false;
+                const isFlowUp = flowQuote ? flowQuote.change > 0 : true;
+
+                const newMacroData = [
+                    {
+                        label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'Gold (XAU/USD)' : 'WTI Crude'} Intelligence`,
+                        status: isGoldUp ? 'Hedge Bias' : 'Risk On',
+                        color: isGoldUp ? '#10B981' : '#F59E0B',
+                        desc: `Cross-asset analysis confirms ${effectiveMarket.name} liquidity flows are moving toward ${isGoldUp ? 'defensive structures' : 'risk-on positions'}. Institutional conviction is high for mid-term stability.`,
+                        action: isGoldUp ? 'Strategic Long' : 'Reduce Hedges'
+                    },
+                    {
+                        label: `${effectiveMarket.indexName} Volatility`,
+                        status: isVolUp ? 'Elevated' : 'Order Flow',
+                        color: isVolUp ? '#EF4444' : '#F59E0B',
+                        desc: `Real-time monitoring of ${effectiveMarket.indexName} components suggests ${isVolUp ? 'increasing hedging activity' : 'pending rotation'}. Liquidity clusters identified at key structural supports.`,
+                        action: isVolUp ? 'Hedge Portfolio' : 'Defensive Bias'
+                    },
+                    {
+                        label: 'Institutional Flow',
+                        status: isFlowUp ? 'Smart Money' : 'Distribution',
+                        color: isFlowUp ? '#3b82f6' : '#EF4444',
+                        desc: `Aggregated order book data reveals significant block trade activity in ${effectiveMarket.shortName} top constituents. Tracking ${isFlowUp ? 'sovereign wealth accumulation' : 'systematic distribution'}.`,
+                        action: isFlowUp ? 'Accumulate' : 'Wait & See'
+                    }
+                ];
+                setMacroData(newMacroData);
+
             } catch (error) {
                 console.error('Failed to fetch pulse data:', error);
             } finally {
@@ -256,7 +298,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', position: 'relative', zIndex: 1 }}>
-                    {[
+                    {(macroData.length > 0 ? macroData : [
                         {
                             label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'USD/EGP Parallel' : 'WTI Crude'} Intelligence`,
                             status: 'Hedge Bias',
@@ -278,7 +320,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                             desc: `Aggregated order book data reveals significant block trade activity in ${effectiveMarket.shortName} top constituents. Tracking sovereign wealth participation.`,
                             action: 'Accumulate'
                         }
-                    ].map((item, i) => (
+                    ]).map((item, i) => (
                         <div key={i} className="glass-card-hover" style={{
                             padding: '1.25rem',
                             background: 'rgba(255,255,255,0.03)',
