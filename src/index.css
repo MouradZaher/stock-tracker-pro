@@ -66,21 +66,21 @@
   --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 
   /* Fluid Typography & Spacing - Premium Scaling */
-  --font-size-xs: clamp(0.7rem, 1vw, 0.75rem);
-  --font-size-sm: clamp(0.8rem, 1.1vw, 0.875rem);
-  --font-size-base: clamp(0.9rem, 1.25vw, 1rem);
-  --font-size-lg: clamp(1.1rem, 1.5vw, 1.25rem);
-  --font-size-xl: clamp(1.35rem, 2vw, 1.75rem);
-  --font-size-2xl: clamp(1.75rem, 3vw, 2.5rem);
-  --font-size-3xl: clamp(2.25rem, 4.5vw, 3.5rem);
+  --font-size-xs: clamp(0.65rem, 0.8vw, 0.7rem);
+  --font-size-sm: clamp(0.75rem, 1vw, 0.8rem);
+  --font-size-base: clamp(0.85rem, 1.1vw, 1rem);
+  --font-size-lg: clamp(1rem, 1.4vw, 1.15rem);
+  --font-size-xl: clamp(1.2rem, 1.8vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 2.5vw, 2.25rem);
+  --font-size-3xl: clamp(2rem, 4vw, 3rem);
 
   /* Spacing */
-  --spacing-xs: clamp(0.25rem, 0.5vw, 0.375rem);
-  --spacing-sm: clamp(0.5rem, 1vw, 0.75rem);
-  --spacing-md: clamp(1rem, 2vw, 1.5rem);
-  --spacing-lg: clamp(1.5rem, 3vw, 2.5rem);
-  --spacing-xl: clamp(2rem, 4vw, 3.5rem);
-  --spacing-2xl: clamp(3rem, 6vw, 5rem);
+  --spacing-xs: clamp(0.2rem, 0.4vw, 0.3rem);
+  --spacing-sm: clamp(0.35rem, 0.8vw, 0.6rem);
+  --spacing-md: clamp(0.75rem, 1.5vw, 1.25rem);
+  --spacing-lg: clamp(1.25rem, 2.5vw, 2rem);
+  --spacing-xl: clamp(1.75rem, 3.5vw, 3rem);
+  --spacing-2xl: clamp(2.5rem, 5vw, 4.5rem);
 
   /* Border Radius */
   --radius-sm: 0.5rem;
@@ -222,18 +222,21 @@ html[data-theme='light'] {
   box-shadow: var(--glass-shadow);
 }
 
-/* Heatmap Responsive Wrapper */
+/* Heatmap Responsive Wrapper — Fixed overlay for mobile, contained for desktop */
 .heatmap-wrapper {
   position: fixed !important;
-  top: var(--header-height) !important;
+  top: calc(var(--header-height) + var(--safe-area-top, 0px)) !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) !important;
+  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom, 0px)) !important;
   border-radius: 0;
   overflow: hidden;
-  z-index: 90;
+  z-index: 50;
+  /* Above tokens, below main nav UI */
   background: var(--color-bg-primary);
   border: none;
+  touch-action: none;
+  /* Let TradingView handle all touch internally */
 }
 
 @media (min-width: 768px) {
@@ -3310,21 +3313,7 @@ body,
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   HEATMAP WRAPPER — Desktop baseline positioning
-   Mobile overrides are in ios-mobile.css
-   ═══════════════════════════════════════════════════════ */
-.heatmap-wrapper {
-  position: fixed;
-  top: var(--header-height);
-  /* 48px on desktop */
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  overflow: hidden;
-  background: var(--color-bg-primary);
-}
+
 
 /* Ensure TradingView iframe fills wrapper correctly on all platforms */
 .heatmap-wrapper iframe,

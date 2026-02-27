@@ -334,14 +334,14 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             <AIPerformanceTracker />
 
             {/* ═══ TOP CONVICTION PICKS ═══ */}
-            <div style={{ marginBottom: '2rem' }}>
-                <h3 style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 0.5rem' }}>
-                    <Sparkles size={16} color="var(--color-warning)" /> Top High-Conviction Picks
+            <div style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', padding: '0 0.25rem' }}>
+                    <Sparkles size={14} color="var(--color-warning)" /> Top High-Conviction Picks
                 </h3>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                    gap: '1rem',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                    gap: '0.75rem',
                     padding: '0 0.25rem'
                 }}>
                     {INSTANT_RECS.slice(0, 3).map((stock, i) => (
@@ -350,8 +350,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                             onClick={() => handleLocalSelect(stock.symbol)}
                             className="glass-card-hover"
                             style={{
-                                padding: '1.5rem',
-                                borderRadius: '20px',
+                                padding: '1rem',
+                                borderRadius: '16px',
                                 background: i === 0
                                     ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
                                     : 'rgba(255, 255, 255, 0.03)',
@@ -364,32 +364,32 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                             {i === 0 && (
                                 <div style={{
                                     position: 'absolute',
-                                    top: '12px',
-                                    right: '12px',
+                                    top: '8px',
+                                    right: '8px',
                                     background: 'var(--color-accent)',
                                     color: 'white',
-                                    padding: '3px 8px',
-                                    borderRadius: '6px',
-                                    fontSize: '0.65rem',
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    fontSize: '0.55rem',
                                     fontWeight: 900,
                                     letterSpacing: '0.05em'
                                 }}>TOP ALPHA</div>
                             )}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                                 <div>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{stock.name}</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{stock.name.split(' ')[0]}</div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '1.25rem', fontWeight: 900, color: getScoreColor(stock.score) }}>{stock.score}%</div>
-                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>SCORE</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: 900, color: getScoreColor(stock.score) }}>{stock.score}%</div>
+                                    <div style={{ fontSize: '0.55rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>SCORE</div>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                <div style={{ fontSize: '0.6rem', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>
                                     {stock.sector}
                                 </div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '4px 8px', borderRadius: '6px', fontWeight: 700 }}>
+                                <div style={{ fontSize: '0.6rem', color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
                                     {stock.recommendation.toUpperCase()}
                                 </div>
                             </div>
@@ -399,16 +399,16 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             </div>
 
             {/* ═══ RECOMMENDATIONS TABLE ═══ */}
-            <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
+            <div style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                     <div>
-                        <h2 style={{ fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <img src={selectedMarket.flagUrl} alt="" style={{ width: '20px', height: '14px', borderRadius: '2px', objectFit: 'cover' }} />
-                            {selectedMarket.indexName} AI Recommendations
+                        <h2 style={{ fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <img src={selectedMarket.flagUrl} alt="" style={{ width: '16px', height: '11px', borderRadius: '2px', objectFit: 'cover' }} />
+                            {selectedMarket.indexName} AI
                             <LiveBadge />
                         </h2>
-                        <p style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>
-                            Following 5% per stock, 20% per sector allocation rules
+                        <p style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>
+                            Rules: 5% stock, 20% sector limit
                         </p>
                     </div>
                 </div>
@@ -416,7 +416,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     className={`btn ${isScanning ? 'btn-secondary' : 'btn-primary'}`}
                     onClick={runScanner}
                     disabled={isScanning}
-                    style={{ position: 'relative', overflow: 'hidden', width: '100%', justifyContent: 'center' }}
+                    style={{ position: 'relative', overflow: 'hidden', width: '100%', justifyContent: 'center', height: '36px', fontSize: '0.8rem' }}
                 >
                     {isScanning ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -497,16 +497,17 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                             </div>
                                             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{rec.name}</div>
                                         </td>
-                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                        <td style={{ padding: '0.75rem', textAlign: 'center' }}>
                                             <div style={{
-                                                padding: '4px 10px',
+                                                padding: '2px 8px',
                                                 background: rec.score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (rec.score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                                                borderRadius: '6px',
-                                                display: 'inline-block'
+                                                borderRadius: '4px',
+                                                display: 'inline-block',
+                                                border: `1px solid ${rec.score >= 75 ? 'rgba(16, 185, 129, 0.2)' : (rec.score >= 50 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(239, 68, 68, 0.2)')}`
                                             }}>
                                                 <span style={{
-                                                    fontSize: '0.7rem',
-                                                    fontWeight: 900,
+                                                    fontSize: '0.6rem',
+                                                    fontWeight: 800,
                                                     color: rec.score >= 75 ? 'var(--color-success)' : (rec.score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
                                                 }}>
                                                     {rec.recommendation?.toUpperCase() || 'HOLD'}

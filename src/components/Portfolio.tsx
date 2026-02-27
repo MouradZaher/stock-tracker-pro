@@ -625,8 +625,56 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         📊 My Positions
                     </h3>
                     {positions.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: 'var(--spacing-2xl)', color: 'var(--color-text-secondary)' }}>
-                            <p>No positions yet. Add your first position to start tracking your portfolio.</p>
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '3rem 1.5rem',
+                            background: 'rgba(255,255,255,0.02)',
+                            borderRadius: '24px',
+                            border: '1px dashed var(--glass-border)',
+                            color: 'var(--color-text-secondary)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '1rem'
+                        }}>
+                            <div style={{
+                                width: '64px',
+                                height: '64px',
+                                borderRadius: '50%',
+                                background: 'rgba(255,255,255,0.05)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--color-text-tertiary)'
+                            }}>
+                                <Plus size={32} strokeWidth={1.5} />
+                            </div>
+                            <div style={{ maxWidth: '300px' }}>
+                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 700, color: 'var(--color-text-primary)' }}>No {selectedMarket.id.toUpperCase()} positions</p>
+                                <p style={{ fontSize: '0.85rem', margin: 0 }}>Select a symbol to add your first position in this market.</p>
+                            </div>
+
+                            {allPositions.length > 0 && (
+                                <div style={{
+                                    marginTop: '1.5rem',
+                                    padding: '1rem',
+                                    background: 'rgba(99, 102, 241, 0.05)',
+                                    borderRadius: '16px',
+                                    border: '1px solid rgba(99, 102, 241, 0.1)',
+                                    fontSize: '0.8rem',
+                                    color: 'var(--color-accent)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px'
+                                }}>
+                                    <AlertTriangle size={16} />
+                                    <span>
+                                        You have <strong>{allPositions.length}</strong> other positions.
+                                        <br />
+                                        Switch the market in the top header to view them.
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <>
@@ -801,153 +849,54 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                 </table>
                             </div>
 
-                            {/* Mobile Card View */}
-                            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
-                                {groupedPositions.map(([sector, sectorPositions]) => (
-                                    <React.Fragment key={sector}>
-                                        <div style={{ padding: '0.5rem 0', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--glass-border)' }}>
-                                            {sector} <span style={{ fontSize: '0.7rem', opacity: 0.5, fontWeight: 600, marginLeft: '4px' }}>({sectorPositions.length})</span>
-                                        </div>
-                                        {sectorPositions.map((position) => {
-                                            const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                            return (
-                                                <div
-                                                    key={position.id}
-                                                    className="glass-card"
-                                                    style={{
-                                                        padding: '1.25rem',
-                                                        background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)',
-                                                        transition: 'all 0.3s ease',
-                                                        border: '1px solid var(--glass-border-bright)'
-                                                    }}
-                                                    onClick={() => handleRowClick(position.symbol)}
-                                                >
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                            <div style={{
-                                                                width: '40px',
-                                                                height: '40px',
-                                                                borderRadius: '10px',
-                                                                background: 'rgba(255,255,255,0.05)',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                fontSize: '1rem',
-                                                                fontWeight: 800,
-                                                                color: 'var(--color-accent)'
-                                                            }}>
-                                                                {position.symbol.substring(0, 1)}
-                                                            </div>
-                                                            <div>
-                                                                <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>{position.symbol}</div>
-                                                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>{position.name}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div style={{ textAlign: 'right' }}>
-                                                            <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{fmt(position.currentPrice)}</div>
-                                                            <div style={{
-                                                                fontSize: '0.75rem',
-                                                                fontWeight: 700,
-                                                                color: position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)'
-                                                            }}>
-                                                                {position.profitLossPercent >= 0 ? '+' : ''}{formatPercent(position.profitLossPercent)}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Mobile AI Badge */}
-                                                    {aiRecs[position.symbol] && (
+                            {/* Mobile Card View (Flat Sequential List - iOS Optimized) */}
+                            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.5rem' }}>
+                                {positions.map((position) => {
+                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
+                                    return (
+                                        <div
+                                            key={position.id}
+                                            className="glass-card"
+                                            style={{
+                                                padding: '0.65rem 0.85rem',
+                                                background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.1)' : 'var(--glass-bg)',
+                                                transition: 'all 0.3s ease',
+                                                border: '1px solid var(--glass-border)',
+                                                borderRadius: '10px'
+                                            }}
+                                            onClick={() => handleRowClick(position.symbol)}
+                                        >
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                                                    <div style={{ fontWeight: 900, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{position.symbol}</div>
+                                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{position.name.split(' ')[0]}</div>
+                                                </div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'right' }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: 800, fontSize: '0.85rem' }}>{fmt(position.currentPrice)}</div>
                                                         <div style={{
-                                                            margin: '0 -1.25rem 1rem -1.25rem',
-                                                            padding: '6px 1.25rem',
-                                                            background: 'rgba(99, 102, 241, 0.03)',
-                                                            borderTop: '1px solid var(--glass-border)',
-                                                            borderBottom: '1px solid var(--glass-border)',
-                                                            display: 'flex',
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center'
+                                                            fontSize: '0.65rem',
+                                                            fontWeight: 800,
+                                                            color: position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                                                            marginTop: '-2px'
                                                         }}>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                <Zap size={12} color="var(--color-accent)" />
-                                                                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI SIGNAL</span>
-                                                            </div>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                <span style={{
-                                                                    fontSize: '0.75rem',
-                                                                    fontWeight: 900,
-                                                                    color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')
-                                                                }}>
-                                                                    {aiRecs[position.symbol].recommendation?.toUpperCase()}
-                                                                </span>
-                                                                {getRecIcon(aiRecs[position.symbol].recommendation)}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '0.75rem', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                            <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>Position</span>
-                                                            <span style={{ fontWeight: 600 }}>{position.units} @ {fmt(position.avgCost)}</span>
-                                                        </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
-                                                            <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>Market Value</span>
-                                                            <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--color-text-primary)' }}>{fmt(position.marketValue)}</span>
+                                                            {position.profitLossPercent >= 0 ? '▲' : '▼'} {Math.abs(position.profitLossPercent).toFixed(2)}%
                                                         </div>
                                                     </div>
-
-                                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                                        <button
-                                                            className="btn glass-button"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleEditClick(position, e);
-                                                            }}
-                                                            style={{
-                                                                flex: 1,
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                gap: '8px',
-                                                                padding: '10px',
-                                                                borderRadius: '10px',
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: 700,
-                                                                color: 'var(--color-accent)',
-                                                                border: '1px solid rgba(99, 102, 241, 0.2)'
-                                                            }}
-                                                        >
-                                                            <Pencil size={14} />
-                                                            Edit
-                                                        </button>
-                                                        <button
-                                                            className="btn glass-button"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleRemove(position.id, position.symbol, e);
-                                                            }}
-                                                            style={{
-                                                                flex: 1,
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                gap: '8px',
-                                                                padding: '10px',
-                                                                borderRadius: '10px',
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: 700,
-                                                                color: 'var(--color-error)',
-                                                                border: '1px solid rgba(239, 68, 68, 0.2)'
-                                                            }}
-                                                        >
-                                                            <Trash2 size={14} />
-                                                            Delete
-                                                        </button>
+                                                    <div style={{ minWidth: '70px' }}>
+                                                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'var(--color-accent)' }}>{fmt(position.marketValue)}</div>
+                                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{position.units} SHARES</div>
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
-                                    </React.Fragment>
-                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                {positions.length === 0 && (
+                                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
+                                        No positions found. Start by adding a stock.
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}
