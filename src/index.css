@@ -362,6 +362,11 @@ html[data-theme='light'] {
   }
 }
 
+.pulse-ticker-container {
+  margin: 0 -1.5rem 1.5rem;
+  width: auto;
+}
+
 @keyframes scroll-news {
   0% {
     transform: translateX(0);
@@ -703,9 +708,32 @@ h6 {
   }
 }
 
+.header-tab:nth-child(4) {
+  position: relative;
+  overflow: hidden;
+}
+
+.header-tab:nth-child(4)::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.header-tab:nth-child(4):hover::after {
+  opacity: 1;
+}
+
 .header-tab:nth-child(4).active {
   animation: aiPulse 2s ease-in-out infinite;
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
 /* tab-indicator removed */

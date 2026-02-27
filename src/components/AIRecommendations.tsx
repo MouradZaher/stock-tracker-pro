@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
 import { soundService } from '../services/soundService';
 import { LiveBadge } from './LiveBadge';
-import { TrendingUp, MessageSquare, BarChart2 } from 'lucide-react';
+import { TrendingUp, MessageSquare, BarChart2, Sparkles } from 'lucide-react';
 
 import { getAllRecommendations } from '../services/aiRecommendationService';
 import { getStockData } from '../services/stockDataService';
@@ -333,13 +333,79 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
             <AIPerformanceTracker />
 
+            {/* ═══ TOP CONVICTION PICKS ═══ */}
+            <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 0.5rem' }}>
+                    <Sparkles size={16} color="var(--color-warning)" /> Top High-Conviction Picks
+                </h3>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '1rem',
+                    padding: '0 0.25rem'
+                }}>
+                    {INSTANT_RECS.slice(0, 3).map((stock, i) => (
+                        <div
+                            key={stock.symbol}
+                            onClick={() => handleLocalSelect(stock.symbol)}
+                            className="glass-card-hover"
+                            style={{
+                                padding: '1.5rem',
+                                borderRadius: '20px',
+                                background: i === 0
+                                    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
+                                    : 'rgba(255, 255, 255, 0.03)',
+                                border: i === 0 ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid var(--glass-border)',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {i === 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '12px',
+                                    right: '12px',
+                                    background: 'var(--color-accent)',
+                                    color: 'white',
+                                    padding: '3px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: 900,
+                                    letterSpacing: '0.05em'
+                                }}>TOP ALPHA</div>
+                            )}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                <div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{stock.name}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '1.25rem', fontWeight: 900, color: getScoreColor(stock.score) }}>{stock.score}%</div>
+                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>SCORE</div>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    {stock.sector}
+                                </div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '4px 8px', borderRadius: '6px', fontWeight: 700 }}>
+                                    {stock.recommendation.toUpperCase()}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             {/* ═══ RECOMMENDATIONS TABLE ═══ */}
             <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                     <div>
                         <h2 style={{ fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <img src={selectedMarket.flagUrl} alt="" style={{ width: '20px', height: '14px', borderRadius: '2px', objectFit: 'cover' }} />
-                            {selectedMarket.indexName} Recommendations
+                            {selectedMarket.indexName} AI Recommendations
+                            <LiveBadge />
                         </h2>
                         <p style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '0.25rem' }}>
                             Following 5% per stock, 20% per sector allocation rules

@@ -25,24 +25,33 @@
     /* --- Viewport Scroll enabled --- */
     html,
     body {
-        height: 100%;
-        min-height: 100%;
-        width: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
+        height: auto !important;
+        min-height: 100dvh !important;
+        width: 100vw;
+        max-width: 100vw;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
         position: relative;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-y: auto;
     }
 
+    /* Force all major containers to be transparent to natural scrolling */
+    #root,
+    .app,
+    .main-content {
+        height: auto !important;
+        min-height: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
+    }
+
     #root {
-        height: 100%;
         overflow: visible;
     }
 
     .app {
-        height: 100%;
-        width: 100%;
         display: flex;
         flex-direction: column;
         overflow: visible;
@@ -150,18 +159,28 @@
         gap: 12px !important;
     }
 
+    .pulse-ticker-container {
+        margin: 0 -12px 1rem !important;
+        width: calc(100% + 24px) !important;
+    }
+
     /* ---------------------------------------------------------
-       TAB CONTENT — scrollable region
+       TAB CONTENT — natural scrolling
        --------------------------------------------------------- */
     .tab-content {
-        height: 100%;
-        width: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
-        padding-bottom: calc(var(--mobile-nav-height) + 16px + var(--safe-area-bottom));
+        height: auto !important;
+        min-height: 100% !important;
+        width: 100% !important;
+        overflow-y: visible !important;
+        overflow-x: hidden !important;
+        padding-bottom: calc(var(--mobile-nav-height) + 24px + var(--safe-area-bottom)) !important;
         scroll-behavior: smooth;
+        position: relative;
+    }
+
+    .landing-scrolling {
+        height: auto !important;
+        overflow-y: auto !important;
     }
 
     /* Home tab pan gesture support */
@@ -332,5 +351,62 @@
 
     .header-actions {
         gap: 3px;
+    }
+}
+
+/* =========================================================
+   iPhone 13 Pro / Pro Max / modern "Thin" phones (≤ 430px)
+   ========================================================= */
+@media (max-width: 430px) {
+    :root {
+        --spacing-xl: 12px;
+        --spacing-lg: 10px;
+        --spacing-md: 8px;
+        --header-height: 56px;
+        --mobile-header-height: 56px;
+    }
+
+    .main-content {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        padding-top: calc(var(--mobile-header-height) + var(--safe-area-top) + 12px);
+    }
+
+    .header {
+        padding: 0 8px 4px !important;
+    }
+
+    .tab-content {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Force all grid gaps to be tighter */
+    .portfolio-summary-grid,
+    .admin-stats-grid,
+    .pulse-grid,
+    .watchlist-grid {
+        gap: 8px !important;
+    }
+
+    /* Reduce font size slightly for headers to prevent wrap */
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+    }
+
+    h3 {
+        font-size: 1.1rem !important;
+    }
+
+    .summary-card {
+        padding: 1rem !important;
+    }
+
+    .summary-value {
+        font-size: 1.25rem !important;
     }
 }

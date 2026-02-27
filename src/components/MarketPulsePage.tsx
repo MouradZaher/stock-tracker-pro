@@ -51,8 +51,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             const ticker = effectiveMarket.indexSymbol.replace('%5E', '^');
             return await getStockNews(ticker, 5);
         },
-        refetchInterval: 60000,
-        staleTime: 30000,
+        refetchInterval: 30000,
+        staleTime: 15000,
     });
 
     // Fetch Sector and Volume data - Market Aware
@@ -115,7 +115,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 30000); // 30s refresh
+        const interval = setInterval(fetchData, 15000); // 15s refresh
         return () => clearInterval(interval);
     }, [effectiveMarket.id]);
 
@@ -205,17 +205,18 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         }}>
             {/* ── Breaking News Ticker (Smooth Marquee) ── */}
             {breakingNews && breakingNews.length > 0 && (
-                <div style={{
-                    margin: '0 -1.5rem 1.5rem',
-                    background: 'rgba(99, 102, 241, 0.05)',
-                    borderBottom: '1px solid var(--glass-border)',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    padding: '8px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '2rem'
-                }}>
+                <div
+                    className="pulse-ticker-container"
+                    style={{
+                        background: 'rgba(99, 102, 241, 0.05)',
+                        borderBottom: '1px solid var(--glass-border)',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        padding: '8px 0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2rem'
+                    }}>
                     <div style={{
                         background: 'var(--color-accent)',
                         padding: '2px 8px',

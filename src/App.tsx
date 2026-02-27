@@ -134,9 +134,7 @@ function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchli
             <div
               className="tab-content home-tab-content"
               style={{
-                position: 'relative',
-                overflowY: 'auto',
-                height: !selectedSymbol ? '100%' : 'auto'
+                position: 'relative'
               }}
             >
               {!selectedSymbol ? (
