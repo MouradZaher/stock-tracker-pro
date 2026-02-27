@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Simple in-memory rate limiting (per-instance)
 const RATE_LIMIT_WINDOW = 60 * 1000;
-const MAX_REQUESTS = 30;
+const MAX_REQUESTS = 300;
 const ipCache = new Map();
 
 function checkRateLimit(ip) {

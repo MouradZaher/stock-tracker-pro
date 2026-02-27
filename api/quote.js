@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Simple in-memory rate limiting (per-instance)
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 30;
+const MAX_REQUESTS = 300;
 const ipCache = new Map();
 
 /**
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
     for (const endpoint of endpoints) {
         try {
             const params = isSummary
-                ? { symbols, modules }
+                ? { symbol: symbols.split(',')[0], modules }
                 : { symbols };
 
             const response = await axios.get(endpoint, {
