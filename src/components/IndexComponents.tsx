@@ -46,7 +46,7 @@ const IndexComponents: React.FC<IndexComponentsProps> = ({ onQuickAdd }) => {
                     gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                     gap: '12px'
                 }}>
-                    {constituents.slice(0, 12).map((stock) => (
+                    {constituents.map((stock) => (
                         <div
                             key={stock.symbol}
                             style={{
@@ -92,19 +92,6 @@ const IndexComponents: React.FC<IndexComponentsProps> = ({ onQuickAdd }) => {
                         </div>
                     ))}
                 </div>
-
-                {constituents.length > 12 && (
-                    <div style={{
-                        marginTop: '1rem',
-                        padding: '8px',
-                        textAlign: 'center',
-                        fontSize: '0.75rem',
-                        color: 'var(--color-text-tertiary)',
-                        borderTop: '1px solid rgba(255,255,255,0.05)'
-                    }}>
-                        Showing top 12 of {constituents.length} index components
-                    </div>
-                )}
             </div>
 
             <style>{`
