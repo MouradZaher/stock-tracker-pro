@@ -239,6 +239,10 @@ const PinLoginPage: React.FC = () => {
                                                 onChange={(e) => setUsername(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                                 disabled={isLoading}
+                                                autoCapitalize="none"
+                                                autoCorrect="off"
+                                                spellCheck={false}
+                                                autoComplete="username"
                                                 autoFocus
                                             />
                                         </div>

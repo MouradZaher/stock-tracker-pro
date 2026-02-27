@@ -25,19 +25,26 @@ const PinAuthContext = createContext<PinAuthContextType | undefined>(undefined);
 
 // ─── SHA-256 PIN hashing via WebCrypto ──────────────────────────────────────
 async function hashPin(pin: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(pin);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(pin);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) {
+        console.warn('WebCrypto not available. Using plain-text fallback (avoid over non-HTTPS).');
+        return pin; // Fallback for non-HTTPS local mobile testing
+    }
 }
 
 // ─── Compare PIN against stored hash ─────────────────────────────────────────
-async function verifyPin(plain: string, stored: string): Promise<boolean> {
+async function verifyPin(plain: string, stored: string | null | undefined): Promise<boolean> {
+    if (!stored) return false;
+
     // Support legacy plain-text PINs (4-6 digit numbers)
     // A hex SHA-256 hash is always 64 chars; plain PINs are 4-10 chars
     if (stored.length < 32) {
-        // Legacy plain-text comparison — still works for existing users
+        // Legacy plain-text comparison — still works for existing users or fallbacks
         return stored === plain;
     }
     const hashed = await hashPin(plain);
