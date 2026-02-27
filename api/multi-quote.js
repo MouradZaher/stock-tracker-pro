@@ -24,45 +24,46 @@ function isValidSymbols(symbols) {
 const PROVIDERS = [
     {
         name: 'yahoo_query2',
-        url: 'https://query2.finance.yahoo.com/v7/finance/quote',
+        url: 'https://query2.finance.yahoo.com/v10/finance/quoteSummary',
         parse: (data, symbol) => {
-            const quote = data?.quoteResponse?.result?.[0];
-            if (!quote || !quote.regularMarketPrice) return null;
+            const result = data?.quoteSummary?.result?.[0];
+            const quote = result?.price;
+            if (!quote || !quote.regularMarketPrice?.raw) return null;
             return {
                 symbol: quote.symbol,
                 name: quote.longName || quote.shortName || symbol,
-                price: quote.postMarketPrice || quote.regularMarketPrice,
-                change: quote.postMarketChange ?? quote.regularMarketChange ?? 0,
-                changePercent: quote.postMarketChangePercent ?? quote.regularMarketChangePercent ?? 0,
-                previousClose: quote.regularMarketPreviousClose || 0,
-                open: quote.regularMarketOpen || 0,
-                high: quote.regularMarketDayHigh || 0,
-                low: quote.regularMarketDayLow || 0,
-                volume: quote.regularMarketVolume || 0,
-                avgVolume: quote.averageDailyVolume3Month || 0,
-                marketCap: quote.marketCap || 0,
-                peRatio: quote.trailingPE || 0,
-                eps: quote.epsTrailingTwelveMonths || 0,
-                dividendYield: quote.dividendYield ? quote.dividendYield * 100 : 0,
-                fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
-                fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
+                price: quote.postMarketPrice?.raw || quote.regularMarketPrice.raw,
+                change: quote.postMarketChange?.raw ?? quote.regularMarketChange?.raw ?? 0,
+                changePercent: quote.postMarketChangePercent?.raw ?? (quote.regularMarketChangePercent?.raw * 100) ?? 0,
+                previousClose: quote.regularMarketPreviousClose?.raw || 0,
+                open: quote.regularMarketOpen?.raw || 0,
+                high: quote.regularMarketDayHigh?.raw || 0,
+                low: quote.regularMarketDayLow?.raw || 0,
+                volume: quote.regularMarketVolume?.raw || 0,
+                avgVolume: quote.averageDailyVolume3Month?.raw || 0,
+                marketCap: quote.marketCap?.raw || 0,
+                peRatio: 0,
+                eps: 0,
+                dividendYield: 0,
+                fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh?.raw || 0,
+                fiftyTwoWeekLow: quote.fiftyTwoWeekLow?.raw || 0,
                 provider: 'yahoo'
             };
         },
         headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
             'Accept': 'application/json',
             'Origin': 'https://finance.yahoo.com',
             'Referer': 'https://finance.yahoo.com/',
         },
-        buildParams: (symbols) => ({ symbols }),
+        buildParams: (symbols) => ({ symbol: symbols.split(',')[0], modules: 'price' }),
     },
     {
         name: 'yahoo_query1',
-        url: 'https://query1.finance.yahoo.com/v7/finance/quote',
+        url: 'https://query1.finance.yahoo.com/v10/finance/quoteSummary',
         parse: null, // Same as yahoo_query2
         headers: null, // Same as above
-        buildParams: (symbols) => ({ symbols }),
+        buildParams: (symbols) => ({ symbol: symbols.split(',')[0], modules: 'price' }),
     },
     {
         name: 'finnhub',

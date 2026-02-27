@@ -21,7 +21,7 @@ function isValidSymbol(symbol) {
 }
 
 export default async function handler(req, res) {
-    const { symbol } = req.query;
+    const { symbol, limit } = req.query;
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     if (!checkRateLimit(clientIp)) {
@@ -52,13 +52,13 @@ export default async function handler(req, res) {
 
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const endpoint = 'https://query2.finance.yahoo.com/v2/finance/news';
+    const endpoint = 'https://query1.finance.yahoo.com/v1/finance/search';
 
     try {
         const response = await axios.get(endpoint, {
-            params: { symbols: symbol },
+            params: { q: symbol, quotesCount: 0, newsCount: Math.min(limit ? parseInt(limit) : 10, 20) },
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                 'Accept': 'application/json',
             },
             timeout: 5000
@@ -66,6 +66,6 @@ export default async function handler(req, res) {
 
         return res.status(200).json(response.data);
     } catch (error) {
-        return res.status(500).json({ error: 'Failed to fetch news' });
+        return res.status(500).json({ error: 'Failed to fetch news', details: error.message });
     }
 }
