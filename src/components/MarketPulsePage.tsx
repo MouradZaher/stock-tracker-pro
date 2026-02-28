@@ -87,7 +87,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                         label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'Gold (XAU/USD)' : 'WTI Crude'} Intelligence`,
                         status: isGoldUp ? 'Hedge Bias' : 'Risk On',
                         color: isGoldUp ? '#10B981' : '#F59E0B',
-                        desc: `Cross-asset analysis confirms ${effectiveMarket.name} liquidity flows are moving toward ${isGoldUp ? 'defensive structures' : 'risk-on positions'}. Institutional conviction is high for mid-term stability.`,
+                        desc: `Cross-asset analysis confirms liquidity flows in ${effectiveMarket.name} are moving toward ${isGoldUp ? 'defensive structures' : 'risk-on positions'}. Institutional conviction is high for mid-term stability.`,
                         action: isGoldUp ? 'Strategic Long' : 'Reduce Hedges'
                     },
                     {
@@ -304,7 +304,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                             label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'USD/EGP Parallel' : 'WTI Crude'} Intelligence`,
                             status: 'Hedge Bias',
                             color: '#10B981',
-                            desc: `Cross-asset analysis confirms ${effectiveMarket.name} liquidity flows are moving toward defensive structures. Institutional conviction is high for mid-term stability.`,
+                            desc: `Cross-asset analysis confirms liquidity flows in ${effectiveMarket.name} are moving toward defensive structures. Institutional conviction is high for mid-term stability.`,
                             action: 'Strategic Long'
                         },
                         {
@@ -404,7 +404,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                             ? `https://www.youtube-nocookie.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
                                             : stream.videoId
                                                 ? `https://www.youtube-nocookie.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
-                                                : `https://www.youtube-nocookie.com/embed/live_stream?channel_id=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
+                                                : `https://www.youtube-nocookie.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
                                         title={stream.name}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
