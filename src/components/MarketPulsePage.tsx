@@ -15,19 +15,19 @@ interface MarketPulsePageProps {
 
 const MARKET_STREAMS: Record<string, any[]> = {
     us: [
-        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', videoId: 'iEpJwprxDdk' },
-        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'YDvsBbKfLPA' },
+        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdToI7VJ' }, // Bloomberg Live
+        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'YDvsBbKfLPA' }, // Often direct video id is required for Sky
         { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', videoId: 'KQp-e_XQnDE' }
     ],
     egypt: [
-        { name: 'Thndr | Latest Update 1', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 0 },
-        { name: 'Thndr | Latest Update 2', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 1 },
-        { name: 'Thndr | Latest Update 3', origin: 'Egypt Markets', color: '#10B981', playlistId: 'UU2h4E4aZ-NBO41cCnLvW6Og', index: 2 }
+        { name: 'Asharq Business', origin: 'MENA Markets', color: '#B30000', channelId: 'UCxAJ3w8l8V8o6tGfL2-AItw' },
+        { name: 'CNBC Arabia Live', origin: 'Gulf & Egypt Pulse', color: '#004a99', channelId: 'UC6zO1qH20Nndh7kG3LdE69w' },
+        { name: 'Al Arabiya Business', origin: 'Regional Markets', color: '#7a00ff', channelId: 'UCy1Jc8_1oF03-F7wR6hX3Nw' }
     ],
     abudhabi: [
-        { name: 'Stalk Stock UAE Latest', origin: 'UAE Markets Expert', color: '#3b82f6', playlistId: 'UUWrdHtyJD9_VIDL0d-1rYqQ', index: 0 },
-        { name: 'ADX Official Latest', origin: 'Abu Dhabi Exchange', color: '#10b981', playlistId: 'UUTXDxQ1zAsRC1mX1zHzbEVw', index: 0 },
-        { name: 'CNBC Arabia Latest', origin: 'Gulf Business News', color: '#004a99', playlistId: 'UUm6M_r9MRf_MAsq_o7K_wWA', index: 0 }
+        { name: 'Sky News Arabia Economy', origin: 'UAE Markets Expert', color: '#e60000', channelId: 'UCr_s1DntJ-mXN8oE6DDIUag' },
+        { name: 'CNBC Arabia Live', origin: 'Abu Dhabi Exchange', color: '#004a99', channelId: 'UC6zO1qH20Nndh7kG3LdE69w' },
+        { name: 'Asharq Business', origin: 'Gulf Business News', color: '#B30000', channelId: 'UCxAJ3w8l8V8o6tGfL2-AItw' }
     ]
 };
 
