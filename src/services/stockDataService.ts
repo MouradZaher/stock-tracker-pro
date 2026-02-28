@@ -540,7 +540,7 @@ export const getSectorPerformance = async (marketId: string = 'us') => {
 
     return Object.entries(marketSectors).map(([name, symbol]) => {
         // Find exact or suffixed match since Yahoo Finance may append .CA or .AE
-        let quote = quotes.get(symbol) || quotes.get(`${symbol}.CA`) || quotes.get(`${symbol}.AE`);
+        const quote = quotes.get(symbol) || quotes.get(`${symbol}.CA`) || quotes.get(`${symbol}.AE`);
 
         let change = quote?.changePercent;
 

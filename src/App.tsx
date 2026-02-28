@@ -75,7 +75,27 @@ function AppContent() {
   );
 }
 
-function MainLayout({ role, logout, selectedSymbol, setSelectedSymbol, isWatchlistOpen, setIsWatchlistOpen, isAdminOpen, setIsAdminOpen }: any) {
+interface MainLayoutProps {
+  role: string;
+  logout: () => void;
+  selectedSymbol: string | null;
+  setSelectedSymbol: (symbol: string | null) => void;
+  isWatchlistOpen: boolean;
+  setIsWatchlistOpen: (open: boolean) => void;
+  isAdminOpen: boolean;
+  setIsAdminOpen: (open: boolean) => void;
+}
+
+function MainLayout({
+  role,
+  logout,
+  selectedSymbol,
+  setSelectedSymbol,
+  isWatchlistOpen,
+  setIsWatchlistOpen,
+  isAdminOpen,
+  setIsAdminOpen
+}: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
 

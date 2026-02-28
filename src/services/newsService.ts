@@ -29,15 +29,15 @@ export const getStockNews = async (symbol: string, limit: number = 5): Promise<N
             throw new Error('No news items found');
         }
 
-        const news: NewsArticle[] = items.slice(0, limit).map((item: Record<string, any>, index: number) => ({
+        const news: NewsArticle[] = items.slice(0, limit).map((item: any, index: number) => ({
             id: (item.uuid as string) || `news-${symbol}-${index}`,
-            headline: item.title,
-            summary: item.summary || item.description || 'No summary available.',
-            source: item.publisher || item.author_name || 'Yahoo Finance',
-            url: item.link || item.url,
-            datetime: item.published_at || Math.floor(Date.now() / 1000),
-            image: item.main_image?.original_url || null,
-            sentiment: 'neutral', // Auto-calculating sentiment is hard without NLP, default to neutral
+            headline: (item.title as string) || 'News Title',
+            summary: (item.summary as string) || (item.description as string) || 'No summary available.',
+            source: (item.publisher as string) || (item.author_name as string) || 'Yahoo Finance',
+            url: (item.link as string) || (item.url as string) || '#',
+            datetime: (item.published_at as number) || Math.floor(Date.now() / 1000),
+            image: (item.main_image?.original_url as string) || null,
+            sentiment: 'neutral',
         }));
 
         setCachedData(cacheKey, news);

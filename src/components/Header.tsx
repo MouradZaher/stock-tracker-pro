@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const iconSize = isMobile ? 11 : 14;
     const btnH = isMobile ? '20px' : '26px';
 
-    const tabs: { id: TabType; label: string; icon: any; isCustomIcon?: boolean }[] = [
+    const tabs: { id: TabType; label: string; icon: React.ElementType; isCustomIcon?: boolean }[] = [
         { id: 'search', label: 'Home', icon: Home },
         { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: Eye },
