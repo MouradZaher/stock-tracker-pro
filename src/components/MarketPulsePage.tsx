@@ -401,10 +401,10 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                         width="100%"
                                         height="100%"
                                         src={stream.playlistId
-                                            ? `https://www.youtube.com/embed?listType=playlist&list=${stream.playlistId}&index=${stream.index}&autoplay=0&mute=1&controls=1`
+                                            ? `https://www.youtube-nocookie.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
                                             : stream.videoId
-                                                ? `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1`
-                                                : `https://www.youtube.com/embed/live_stream?channel_id=${stream.channelId}&autoplay=0&mute=1&controls=1`}
+                                                ? `https://www.youtube-nocookie.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
+                                                : `https://www.youtube-nocookie.com/embed/live_stream?channel_id=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
                                         title={stream.name}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
