@@ -15,19 +15,43 @@ interface MarketPulsePageProps {
 
 const MARKET_STREAMS: Record<string, any[]> = {
     us: [
-        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UCIALMKvObZNtJ6AmdToI7VJ' }, // Bloomberg Live
-        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'YDvsBbKfLPA' }, // Often direct video id is required for Sky
+        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', videoId: 'live' }, // Standard direct live link placeholder
+        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'YDvsBbKfLPA' },
         { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', videoId: 'KQp-e_XQnDE' }
     ],
     egypt: [
-        { name: 'Asharq Business', origin: 'MENA Markets', color: '#B30000', channelId: 'UCxAJ3w8l8V8o6tGfL2-AItw' },
-        { name: 'CNBC Arabia Live', origin: 'Gulf & Egypt Pulse', color: '#004a99', channelId: 'UC6zO1qH20Nndh7kG3LdE69w' },
-        { name: 'Al Arabiya Business', origin: 'Regional Markets', color: '#7a00ff', channelId: 'UCy1Jc8_1oF03-F7wR6hX3Nw' }
+        { name: 'Asharq Business', origin: 'MENA Markets', color: '#B30000', videoId: 'live' },
+        { name: 'CNBC Arabia Live', origin: 'Gulf & Egypt Pulse', color: '#004a99', videoId: 'live' },
+        { name: 'Al Arabiya Business', origin: 'Regional Markets', color: '#7a00ff', videoId: 'live' }
     ],
     abudhabi: [
-        { name: 'Sky News Arabia Economy', origin: 'UAE Markets Expert', color: '#e60000', channelId: 'UCr_s1DntJ-mXN8oE6DDIUag' },
-        { name: 'CNBC Arabia Live', origin: 'Abu Dhabi Exchange', color: '#004a99', channelId: 'UC6zO1qH20Nndh7kG3LdE69w' },
-        { name: 'Asharq Business', origin: 'Gulf Business News', color: '#B30000', channelId: 'UCxAJ3w8l8V8o6tGfL2-AItw' }
+        { name: 'Sky News Arabia Economy', origin: 'UAE Markets Expert', color: '#e60000', videoId: 'live' },
+        { name: 'CNBC Arabia Live', origin: 'Abu Dhabi Exchange', color: '#004a99', videoId: 'live' },
+        { name: 'Asharq Business', origin: 'Gulf Business News', color: '#B30000', videoId: 'live' }
+    ]
+};
+
+const MARKET_ALPHA: Record<string, any[]> = {
+    us: [
+        { symbol: 'NVDA', score: 94, rec: 'Strong Buy', color: '#10B981' },
+        { symbol: 'MSFT', score: 88, rec: 'Buy', color: '#10B981' },
+        { symbol: 'AAPL', score: 85, rec: 'Buy', color: '#10B981' },
+        { symbol: 'TSLA', score: 72, rec: 'Hold', color: '#F59E0B' },
+        { symbol: 'META', score: 89, rec: 'Buy', color: '#10B981' }
+    ],
+    egypt: [
+        { symbol: 'COMI', score: 92, rec: 'Strong Buy', color: '#10B981' },
+        { symbol: 'TMGH', score: 87, rec: 'Buy', color: '#10B981' },
+        { symbol: 'FWRY', score: 84, rec: 'Buy', color: '#10B981' },
+        { symbol: 'SWDY', score: 79, rec: 'Buy', color: '#10B981' },
+        { symbol: 'ABUK', score: 75, rec: 'Hold', color: '#F59E0B' }
+    ],
+    abudhabi: [
+        { symbol: 'IHC', score: 95, rec: 'Strong Buy', color: '#10B981' },
+        { symbol: 'FAB', score: 89, rec: 'Buy', color: '#10B981' },
+        { symbol: 'ETISALAT', score: 86, rec: 'Buy', color: '#10B981' },
+        { symbol: 'ALDAR', score: 82, rec: 'Buy', color: '#10B981' },
+        { symbol: 'ADNOCDIST', score: 78, rec: 'Hold', color: '#F59E0B' }
     ]
 };
 
@@ -353,14 +377,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {/* Pulling these from a memoized/state-synced source would be ideal, for now using curated dynamic data */}
-                    {[
-                        { symbol: 'NVDA', score: 94, rec: 'Strong Buy', color: '#10B981' },
-                        { symbol: 'MSFT', score: 88, rec: 'Buy', color: '#10B981' },
-                        { symbol: 'AAPL', score: 85, rec: 'Buy', color: '#10B981' },
-                        { symbol: 'TSLA', score: 72, rec: 'Hold', color: '#F59E0B' },
-                        { symbol: 'META', score: 89, rec: 'Buy', color: '#10B981' }
-                    ].map((stock, idx) => (
+                    {(MARKET_ALPHA[effectiveMarket.id] || MARKET_ALPHA.us).map((stock, idx) => (
                         <div key={idx} className="glass-card-hover" style={{
                             minWidth: '140px',
                             padding: '1rem',
@@ -403,7 +420,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                         src={stream.playlistId
                                             ? `https://www.youtube-nocookie.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
                                             : stream.videoId
-                                                ? `https://www.youtube-nocookie.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
+                                                ? stream.videoId === 'live'
+                                                    ? `https://www.youtube-nocookie.com/embed/live_stream?channel=${stream.channelId || stream.videoId}&autoplay=0&mute=1&controls=1&rel=0`
+                                                    : `https://www.youtube-nocookie.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
                                                 : `https://www.youtube-nocookie.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
                                         title={stream.name}
                                         frameBorder="0"

@@ -556,7 +556,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             borderRadius: '6px',
                             fontSize: '0.7rem',
                             background: !hasAllocationWarnings ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                            border: `1px solid ${!hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)'}44`
+                            border: `1px solid ${!hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)'}44`,
+                            color: !hasAllocationWarnings ? 'inherit' : 'var(--theme-warning-text, inherit)'
                         }}>
                             {riskScore}/100
                         </div>

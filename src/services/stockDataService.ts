@@ -576,7 +576,15 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
     const quoteList = Array.from(quotes.values());
 
     tickers.forEach(symbol => {
-        const stock = quoteList.find(q => q.symbol === symbol || q.symbol === `${symbol}.CA` || q.symbol === `${symbol}.AE`);
+        // Strict match: must match the ticker and be in the correct market
+        const stock = quoteList.find(q => {
+            const isMatch = q.symbol === symbol || q.symbol === `${symbol}.CA` || q.symbol === `${symbol}.AE`;
+            if (!isMatch) return false;
+
+            // Validate the market for the symbol to prevent cross-over
+            const symMarket = getMarketForSymbol(symbol);
+            return symMarket === marketId;
+        });
 
         if (stock) {
             // Apply a minor realistic fluctuation for perfectly flat fake feeds
