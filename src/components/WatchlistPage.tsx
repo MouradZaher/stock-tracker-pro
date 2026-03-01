@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockData, getMultipleQuotes } from '../services/stockDataService';
+import { REFRESH_INTERVALS } from '../services/api';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
 import { TrendingUp, TrendingDown, Trash2, Star, Bell, Search, Zap, Minus, Activity } from 'lucide-react';
@@ -146,7 +147,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
         };
 
         fetchWatchlistData();
-        const interval = setInterval(fetchWatchlistData, 15000);
+        const interval = setInterval(fetchWatchlistData, REFRESH_INTERVALS.WATCHLIST);
         return () => clearInterval(interval);
     }, [watchlist, selectedMarket.id]);
 

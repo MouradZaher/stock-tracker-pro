@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import AIRecommendations from './AIRecommendations';
 import PriceAlertsModal from './PriceAlertsModal';
 import TradeAnalysisPanel from './TradeAnalysisPanel';
+import RealTimePrice from './RealTimePrice';
 import { useMarket } from '../contexts/MarketContext';
 
 interface StockDetailProps {
@@ -151,7 +152,9 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                 </div>
 
                 <div className="stock-price-section">
-                    <div className="stock-price" style={{ fontSize: 'var(--font-size-3xl)' }}>{formatCurrency(stock.price)}</div>
+                    <div className="stock-price" style={{ fontSize: 'var(--font-size-3xl)' }}>
+                        <RealTimePrice price={stock.price} />
+                    </div>
                     <div className={`stock-change ${getChangeClass(stock.change)}`} style={{ padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-sm)' }}>
                         {stock.change >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                         <span style={{ fontSize: 'var(--font-size-base)', fontWeight: 700 }}>

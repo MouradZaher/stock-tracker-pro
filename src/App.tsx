@@ -37,10 +37,10 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 15000, // 15 seconds for real-time feel
+      refetchInterval: 5000, // 5 seconds for ultra-live feel
       refetchIntervalInBackground: true,
-      staleTime: 10000, // Considered stale after 10s to encourage fresh fetches
-      retry: 2,
+      staleTime: 3000, // Considered stale after 3s to encourage fresh fetches
+      retry: 1,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     },
   },

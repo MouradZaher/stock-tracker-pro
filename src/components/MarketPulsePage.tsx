@@ -139,7 +139,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 15000); // 15s refresh
+        const interval = setInterval(fetchData, 8000); // 8s refresh for live pulse
         return () => clearInterval(interval);
     }, [effectiveMarket.id]);
 

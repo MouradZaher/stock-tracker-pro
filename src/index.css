@@ -109,7 +109,8 @@
   --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
 
   --header-height: 64px;
-  --mobile-nav-height: 80px;
+  --mobile-header-height: 56px;
+  --mobile-nav-height: 72px;
 
   /* Real-time Visual Feedback */
   --color-success-glow: rgba(16, 185, 129, 0.4);
@@ -231,26 +232,24 @@ html[data-theme='light'] {
 
 /* Heatmap Responsive Wrapper — Fixed overlay for mobile, contained for desktop */
 .heatmap-wrapper {
-  position: fixed !important;
-  top: calc(var(--header-height) + var(--safe-area-top, 0px)) !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom, 0px)) !important;
+  position: fixed;
+  top: calc(var(--header-height) + var(--safe-area-top, 0px));
+  left: 0;
+  right: 0;
+  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom, 0px));
   border-radius: 0;
   overflow: hidden;
   z-index: 50;
-  /* Above tokens, below main nav UI */
   background: var(--color-bg-primary);
   border: none;
   touch-action: none;
-  /* Let TradingView handle all touch internally */
 }
 
 @media (min-width: 768px) {
   .heatmap-wrapper {
-    left: 1.5rem !important;
-    right: 1.5rem !important;
-    bottom: 1rem !important;
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 1rem;
     border-radius: var(--radius-lg);
   }
 }

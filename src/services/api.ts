@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 export const REFRESH_INTERVALS = {
-    MARKET_STATUS: 60000,
+    MARKET_STATUS: 30000, // 30 seconds
     STOCK_PRICE: 1000, // 1 second for live feel
-    PORTFOLIO: 10000,
-    WATCHLIST: 15000,
+    PORTFOLIO: 5000,   // 5 seconds
+    WATCHLIST: 5000,   // 5 seconds
 };
 
 export const YAHOO_ENDPOINT = 'quote';
@@ -12,7 +12,7 @@ export const MULTI_QUOTE_ENDPOINT = 'multi-quote';
 
 // Simple in-memory cache
 const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 2000; // 2 seconds - near instant updates
+const CACHE_DURATION = 1000; // 1 second - ultra fast updates
 
 export const getCachedData = (key: string) => {
     const cached = cache.get(key);

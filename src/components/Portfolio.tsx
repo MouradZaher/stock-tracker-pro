@@ -4,6 +4,7 @@ import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, Trendin
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { getStockQuote, getMultipleQuotes } from '../services/stockDataService';
+import { REFRESH_INTERVALS } from '../services/api';
 import { formatCurrency, formatCurrencyForMarket, formatPercent, formatDate, getChangeClass } from '../utils/formatters';
 import { useMarket } from '../contexts/MarketContext';
 import { checkAllocationLimits, calculateAllocation } from '../utils/calculations';
@@ -120,7 +121,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             updatePrices();
         }
 
-        const interval = setInterval(updatePrices, 15000); // Live update every 15 seconds (prevents API rate limiting)
+        const interval = setInterval(updatePrices, REFRESH_INTERVALS.PORTFOLIO); // Live update every 5 seconds
 
         return () => clearInterval(interval);
     }, [user?.id, updatePrice, checkPrice]);

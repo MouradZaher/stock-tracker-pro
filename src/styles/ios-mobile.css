@@ -13,8 +13,8 @@
     --safe-area-right: env(safe-area-inset-right, 0px);
 
     /* Mobile header reduced to 38px for iPhone 13 Pro compactness */
-    --mobile-header-height: 38px;
-    --mobile-nav-height: 68px;
+    --mobile-header-height: 56px;
+    --mobile-nav-height: 72px;
 }
 
 /* =========================================================
@@ -286,13 +286,17 @@
    ========================================================= */
 @media (max-width: 768px) {
     .heatmap-wrapper {
-        position: relative;
-        height: calc(100dvh - var(--mobile-header-height) - var(--mobile-nav-height) - var(--safe-area-top) - var(--safe-area-bottom) - 10px);
+        position: fixed;
+        top: calc(var(--mobile-header-height) + var(--safe-area-top));
+        left: 0;
+        right: 0;
+        bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
         width: 100%;
         overflow: hidden;
         background: var(--color-bg-primary);
         display: block;
-        border-radius: 8px;
+        border-radius: 0;
+        z-index: 900;
     }
 
     .heatmap-container,
