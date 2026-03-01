@@ -7,7 +7,6 @@ import { REFRESH_INTERVALS } from '../services/api';
 import { formatCurrency, formatPercent, formatNumber, formatNumberPlain, formatTimeAgo, getChangeClass } from '../utils/formatters';
 import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
-import LiveBadge from './LiveBadge';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
@@ -115,7 +114,6 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                             </button>
                         )}
                         <div className="stock-symbol">{stock.symbol}</div>
-                        <LiveBadge lastUpdate={dataUpdatedAt} />
                         <button
                             className={`btn-icon ${inWatchlist ? 'text-warning' : ''}`}
                             onClick={toggleWatchlist}
