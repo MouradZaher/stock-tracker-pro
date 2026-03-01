@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Simple in-memory rate limiting (per-instance)
 const RATE_LIMIT_WINDOW = 60 * 1000;
-const MAX_REQUESTS = 40; // Slightly higher for multi-quote as it's used for dashboard
+const MAX_REQUESTS = 100; // Increased to accommodate ultra-live dashboard
 const ipCache = new Map();
 
 function checkRateLimit(ip) {
