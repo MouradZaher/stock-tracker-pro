@@ -539,8 +539,8 @@ export const getSectorPerformance = async (marketId: string = 'us') => {
     const quotes = await getMultipleQuotes(symbols);
 
     return Object.entries(marketSectors).map(([name, symbol]) => {
-        // Find exact or suffixed match since Yahoo Finance may append .CA or .AE
-        const quote = quotes.get(symbol) || quotes.get(`${symbol}.CA`) || quotes.get(`${symbol}.AE`);
+        // Find exact or suffixed match since Yahoo Finance may append .CA or .AD
+        const quote = quotes.get(symbol) || quotes.get(`${symbol}.CA`) || quotes.get(`${symbol}.AD`);
 
         let change = quote?.changePercent;
 
@@ -578,7 +578,7 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
     tickers.forEach(symbol => {
         // Strict match: must match the ticker and be in the correct market
         const stock = quoteList.find(q => {
-            const isMatch = q.symbol === symbol || q.symbol === `${symbol}.CA` || q.symbol === `${symbol}.AE`;
+            const isMatch = q.symbol === symbol || q.symbol === `${symbol}.CA` || q.symbol === `${symbol}.AD`;
             if (!isMatch) return false;
 
             // Validate the market for the symbol to prevent cross-over
@@ -596,7 +596,7 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
                 const cleanRatio = ratio > 10 ? (Math.random() * 3 + 1.2) : ratio;
 
                 anomalies.push({
-                    symbol: stock.symbol.replace('.CA', '').replace('.AE', ''),
+                    symbol: stock.symbol.replace('.CA', '').replace('.AD', ''),
                     vol: `${cleanRatio.toFixed(1)}x`,
                     reason: cleanChange > 0 ? 'Bullish Momentum' : 'Bearish Pressure',
                     change: cleanChange

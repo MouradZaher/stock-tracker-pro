@@ -56,7 +56,7 @@ export const MARKETS: Market[] = [
         flag: '🇦🇪',
         flagUrl: 'https://flagcdn.com/w40/ae.png',
         indexName: 'FTSE ADX 15',
-        indexSymbol: '%5EFADX',
+        indexSymbol: 'FADX15.FGI',
         currency: 'AED',
         currencySymbol: 'AED ',
         currencyLocale: 'ar-AE',

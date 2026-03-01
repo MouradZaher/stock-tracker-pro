@@ -23,13 +23,40 @@ function isValidSymbols(symbols) {
 
 const PROVIDERS = [
     {
-        name: 'yahoo_query2',
+        name: 'yahoo_v7',
+        url: 'https://query1.finance.yahoo.com/v7/finance/quote',
+        parse: (data) => {
+            const results = data?.quoteResponse?.result || [];
+            return results.map(quote => ({
+                symbol: quote.symbol,
+                name: quote.longName || quote.shortName || quote.symbol,
+                price: quote.regularMarketPrice || 0,
+                change: quote.regularMarketChange || 0,
+                changePercent: quote.regularMarketChangePercent || 0,
+                previousClose: quote.regularMarketPreviousClose || 0,
+                open: quote.regularMarketOpen || 0,
+                high: quote.regularMarketDayHigh || 0,
+                low: quote.regularMarketDayLow || 0,
+                volume: quote.regularMarketVolume || 0,
+                avgVolume: quote.averageDailyVolume3Month || 0,
+                marketCap: quote.marketCap || 0,
+                provider: 'yahoo_v7'
+            }));
+        },
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+        },
+        buildParams: (symbols) => ({ symbols }),
+    },
+    {
+        name: 'yahoo_query2_summary',
         url: 'https://query2.finance.yahoo.com/v10/finance/quoteSummary',
         parse: (data, symbol) => {
             const result = data?.quoteSummary?.result?.[0];
             const quote = result?.price;
             if (!quote || !quote.regularMarketPrice?.raw) return null;
-            return {
+            return [{
                 symbol: quote.symbol,
                 name: quote.longName || quote.shortName || symbol,
                 price: quote.postMarketPrice?.raw || quote.regularMarketPrice.raw,
@@ -42,27 +69,10 @@ const PROVIDERS = [
                 volume: quote.regularMarketVolume?.raw || 0,
                 avgVolume: quote.averageDailyVolume3Month?.raw || 0,
                 marketCap: quote.marketCap?.raw || 0,
-                peRatio: 0,
-                eps: 0,
-                dividendYield: 0,
-                fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh?.raw || 0,
-                fiftyTwoWeekLow: quote.fiftyTwoWeekLow?.raw || 0,
-                provider: 'yahoo'
-            };
+                provider: 'yahoo_v10'
+            }];
         },
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-            'Origin': 'https://finance.yahoo.com',
-            'Referer': 'https://finance.yahoo.com/',
-        },
-        buildParams: (symbols) => ({ symbol: symbols.split(',')[0], modules: 'price' }),
-    },
-    {
-        name: 'yahoo_query1',
-        url: 'https://query1.finance.yahoo.com/v10/finance/quoteSummary',
-        parse: null, // Same as yahoo_query2
-        headers: null, // Same as above
+        headers: PROVIDERS[0].headers,
         buildParams: (symbols) => ({ symbol: symbols.split(',')[0], modules: 'price' }),
     },
     {
@@ -281,16 +291,16 @@ export default async function handler(req, res) {
             const response = await axios.get(url, {
                 params,
                 headers,
-                timeout: 6000
+                timeout: 8000
             });
 
             const parser = provider.parse || PROVIDERS[0].parse;
-            const parsed = parser(response.data, symbols.split(',')[0]);
+            const parsedArray = parser(response.data, symbols.split(',')[0]);
 
-            if (parsed && parsed.price > 0) {
+            if (parsedArray && parsedArray.length > 0 && parsedArray[0].price > 0) {
                 return res.status(200).json({
                     quoteResponse: {
-                        result: [parsed],
+                        result: parsedArray,
                         error: null
                     },
                     _provider: provider.name
