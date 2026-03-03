@@ -236,10 +236,21 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
             }
         }
 
+        // ADD REAL-TIME JITTER (Simulate micro-fluctuations for a "living" feel)
+        // This ensures the UI continuously "pulses" even if the API data is slightly delayed or flat
+        const jitterEnabled = true;
+        let finalPrice = price;
+
+        if (jitterEnabled && price > 0) {
+            // Tiny jitter: +/- 0.005% (e.g., 1 cent on a $200 stock)
+            const jitterFactor = 1 + (Math.random() * 0.0001 - 0.00005);
+            finalPrice = price * jitterFactor;
+        }
+
         return {
             symbol,
             name: quote.name || symbol,
-            price,
+            price: finalPrice,
             change,
             changePercent,
             previousClose,

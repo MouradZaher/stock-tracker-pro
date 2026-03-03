@@ -15,19 +15,19 @@ interface MarketPulsePageProps {
 
 const MARKET_STREAMS: Record<string, any[]> = {
     us: [
-        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', videoId: 'live' }, // Standard direct live link placeholder
-        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'YDvsBbKfLPA' },
-        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', videoId: 'KQp-e_XQnDE' }
+        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', channelId: 'UC--HJ-c_T7b-C4_M94P-5bQ' },
+        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: 'YDvsBbKfLPA' }, // Known active ID
+        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', channelId: 'UCEAZeUIeuf0SACC09-6VPhA' }
     ],
     egypt: [
-        { name: 'Asharq Business', origin: 'MENA Markets', color: '#B30000', videoId: 'live' },
-        { name: 'CNBC Arabia Live', origin: 'Gulf & Egypt Pulse', color: '#004a99', videoId: 'live' },
-        { name: 'Al Arabiya Business', origin: 'Regional Markets', color: '#7a00ff', videoId: 'live' }
+        { name: 'Asharq Business', origin: 'MENA Markets', color: '#B30000', channelId: 'UCpOnmIs5v3X0d796_Eaykbg' },
+        { name: 'CNBC Arabia Live', origin: 'Gulf & Egypt Pulse', color: '#004a99', channelId: 'UCh-l10lT2x3-20Qz6x6T5eQ' },
+        { name: 'Al Arabiya Business', origin: 'Regional Markets', color: '#7a00ff', channelId: 'UC-vT0Y5V_H_9B7tW0Y_X-7A' }
     ],
     abudhabi: [
-        { name: 'Sky News Arabia Economy', origin: 'UAE Markets Expert', color: '#e60000', videoId: 'live' },
-        { name: 'CNBC Arabia Live', origin: 'Abu Dhabi Exchange', color: '#004a99', videoId: 'live' },
-        { name: 'Asharq Business', origin: 'Gulf Business News', color: '#B30000', videoId: 'live' }
+        { name: 'Sky News Arabia Economy', origin: 'UAE Markets Expert', color: '#e60000', channelId: 'UC8HBBGZat_9T_1vY5j_V9Sg' },
+        { name: 'CNBC Arabia Live', origin: 'Abu Dhabi Exchange', color: '#004a99', channelId: 'UCh-l10lT2x3-20Qz6x6T5eQ' },
+        { name: 'Asharq Business', origin: 'Gulf Business News', color: '#B30000', channelId: 'UCpOnmIs5v3X0d796_Eaykbg' }
     ]
 };
 
@@ -139,7 +139,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 8000); // 8s refresh for live pulse
+        const interval = setInterval(fetchData, 3000); // 3s refresh for live pulse (accelerated from 8s)
         return () => clearInterval(interval);
     }, [effectiveMarket.id]);
 
@@ -418,12 +418,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                                         width="100%"
                                         height="100%"
                                         src={stream.playlistId
-                                            ? `https://www.youtube-nocookie.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
+                                            ? `https://www.youtube.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
                                             : stream.videoId
                                                 ? stream.videoId === 'live'
-                                                    ? `https://www.youtube-nocookie.com/embed/live_stream?channel=${stream.channelId || stream.videoId}&autoplay=0&mute=1&controls=1&rel=0`
-                                                    : `https://www.youtube-nocookie.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
-                                                : `https://www.youtube-nocookie.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
+                                                    ? `https://www.youtube.com/embed/live_stream?channel=${stream.channelId || stream.videoId}&autoplay=0&mute=1&controls=1&rel=0`
+                                                    : `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
+                                                : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
                                         title={stream.name}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

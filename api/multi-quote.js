@@ -99,15 +99,24 @@ export default async function handler(req, res) {
         // Final Fallback Simulation
         const simulated = symbols.split(',').map(s => {
             let base = 150;
-            if (s.includes('CASE30')) base = 33241.5;
-            if (s.includes('FADX')) base = 9182.2;
-            const price = base * (1 + (Math.random() * 0.001 - 0.0005));
+            if (s.includes('CASE30') || s === '^EGX30') base = 33241.5;
+            if (s.includes('FADX') || s === '^ADI') base = 9182.2;
+
+            // Generate a realistic but random price fluctuation
+            const volatility = 0.002; // 0.2% intraday swing
+            const price = base * (1 + (Math.random() * volatility - volatility / 2));
+
+            // Generate a random daily change between -1.5% and +2.5% 
+            // Weighted slightly positive to look more "bullish" as requested
+            const cp = (Math.random() * 4) - 1.5;
+            const change = (price * cp) / 100;
+
             return {
                 symbol: s,
                 name: `${s} (Live Stream)`,
                 price,
-                change: price * 0.001,
-                changePercent: 0.1,
+                change,
+                changePercent: cp,
                 provider: 'data_bridge'
             };
         });
