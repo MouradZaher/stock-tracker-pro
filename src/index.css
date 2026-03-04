@@ -230,13 +230,13 @@ html[data-theme='light'] {
   box-shadow: var(--glass-shadow);
 }
 
-/* Heatmap Responsive Wrapper — Fixed overlay for mobile, contained for desktop */
+/* Heatmap Responsive Wrapper — Contained for both mobile and desktop */
 .heatmap-wrapper {
-  position: fixed;
-  top: calc(var(--header-height) + var(--safe-area-top, 0px));
+  position: absolute;
+  top: 0;
   left: 0;
   right: 0;
-  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom, 0px));
+  bottom: 0;
   border-radius: 0;
   overflow: hidden;
   z-index: 50;
@@ -249,8 +249,10 @@ html[data-theme='light'] {
   .heatmap-wrapper {
     left: 1.5rem;
     right: 1.5rem;
+    top: 1rem;
     bottom: 1rem;
     border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
   }
 }
 
