@@ -271,9 +271,11 @@ html[data-theme='light'] {
 
   .home-tab-content {
     overflow: hidden !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
+    height: calc(100vh - var(--header-height)) !important;
+    max-height: calc(100vh - var(--header-height)) !important;
     padding: 0 !important;
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -576,9 +578,11 @@ h6 {
   position: relative;
 }
 
-/* Home Tab Content */
+/* Home Tab Content - Base */
 .home-tab-content {
-  overflow: visible !important;
+  overflow: hidden;
+  height: auto;
+  min-height: 0;
 }
 
 /* Header Styles */
