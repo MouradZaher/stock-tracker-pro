@@ -47,7 +47,7 @@ export const getRecommendationsForStocks = async (
             const ma200 = calculateSMA(history, 200);
             const socialSentiment = socialFeedService.getSentimentScore(stock.symbol);
 
-            const score = calculateRecommendationScore({
+            const { score, valueScore, growthScore } = calculateRecommendationScore({
                 price: stockData.price,
                 change: stockData.change,
                 changePercent: stockData.changePercent,
@@ -84,7 +84,9 @@ export const getRecommendationsForStocks = async (
                 fundamentals: {
                     peRatio: stockData.peRatio,
                     epsGrowth: growth?.earningsGrowth || null,
-                    pegRatio: growth?.pegRatio || null
+                    pegRatio: growth?.pegRatio || null,
+                    valueScore,
+                    growthScore
                 },
             });
         } catch (error) {
@@ -117,7 +119,7 @@ export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation
         const ma200 = calculateSMA(history, 200);
         const socialSentiment = socialFeedService.getSentimentScore(symbol);
 
-        const score = calculateRecommendationScore({
+        const { score, valueScore, growthScore } = calculateRecommendationScore({
             price: stockData.price,
             change: stockData.change,
             changePercent: stockData.changePercent,
@@ -155,7 +157,9 @@ export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation
             fundamentals: {
                 peRatio: stockData.peRatio,
                 epsGrowth: growth?.earningsGrowth || null,
-                pegRatio: growth?.pegRatio || null
+                pegRatio: growth?.pegRatio || null,
+                valueScore,
+                growthScore
             },
         };
     } catch (error) {
@@ -293,18 +297,22 @@ const calculateRecommendationScore = (params: {
     revenueGrowth: number | null;
     news: NewsArticle[];
     socialSentiment: number;
-}): number => {
+}): { score: number, valueScore: number, growthScore: number } => {
     let score = 50; // Base score
+    let valuePoints = 0;
+    let growthPoints = 0;
 
     // Technical analysis (35 points max)
     if (params.rsi !== null) {
         // RSI < 30 is oversold (Strong Buy Signal), RSI < 45 is undervalued entry
         if (params.rsi < 30) {
-            score += 20;
+            score += 25;
+            valuePoints += 15;
         } else if (params.rsi < 45) {
-            score += 10;
+            score += 15;
+            valuePoints += 10;
         } else if (params.rsi > 70) {
-            score -= 15; // Overbought
+            score -= 20; // Overbought
         }
     }
 
@@ -316,21 +324,37 @@ const calculateRecommendationScore = (params: {
     // Fundamentals & Growth (40 points max)
     // 1. P/E Ratio (Undervaluation)
     if (params.peRatio !== null && params.peRatio > 0) {
-        if (params.peRatio < 15) score += 15;
-        else if (params.peRatio < 25) score += 5;
-        else if (params.peRatio > 45) score -= 10;
+        if (params.peRatio < 12) {
+            score += 20;
+            valuePoints += 20;
+        } else if (params.peRatio < 20) {
+            score += 10;
+            valuePoints += 10;
+        } else if (params.peRatio > 45) {
+            score -= 15;
+        }
     }
 
     // 2. PEG Ratio (Growth at reasonable price)
     if (params.pegRatio !== null) {
-        if (params.pegRatio < 1.0) score += 15; // High growth relative to price
-        else if (params.pegRatio > 2.0) score -= 5;
+        if (params.pegRatio < 1.0) {
+            score += 20; // High growth relative to price
+            growthPoints += 20;
+            valuePoints += 10;
+        } else if (params.pegRatio > 2.0) {
+            score -= 10;
+        }
     }
 
     // 3. Earnings Growth
     if (params.earningsGrowth !== null) {
-        if (params.earningsGrowth > 0.20) score += 10; // > 20% Growth
-        else if (params.earningsGrowth > 0.10) score += 5;
+        if (params.earningsGrowth > 0.25) {
+            score += 15;
+            growthPoints += 20;
+        } else if (params.earningsGrowth > 0.15) {
+            score += 10;
+            growthPoints += 10;
+        }
     }
 
     // News & Social (25 points max)
@@ -340,7 +364,11 @@ const calculateRecommendationScore = (params: {
     score -= negativeNews * 10;
     score += (params.socialSentiment / 100) * 10;
 
-    return Math.max(0, Math.min(100, score));
+    return {
+        score: Math.max(0, Math.min(100, score)),
+        valueScore: Math.min(100, (valuePoints / 45) * 100),
+        growthScore: Math.min(100, (growthPoints / 40) * 100)
+    };
 };
 
 // Determine recommendation type

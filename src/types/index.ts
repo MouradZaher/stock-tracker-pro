@@ -99,6 +99,8 @@ export interface StockRecommendation {
     peRatio: number | null;
     epsGrowth: number | null;
     pegRatio: number | null;
+    valueScore?: number;
+    growthScore?: number;
   };
 }
 

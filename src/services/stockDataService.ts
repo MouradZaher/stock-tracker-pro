@@ -2,6 +2,7 @@ import axios from 'axios';
 import { PROVIDERS, parsers, markProviderFailed, markProviderSuccess, getAvailableProviders, API_KEYS, type StockQuote } from './dataProviders';
 import type { Stock, CompanyProfile, Dividend } from '../types';
 import { getAllSymbols, getMarketForSymbol } from '../data/sectors';
+import { calculateRSI } from '../utils/calculations';
 
 // ============================================
 // MULTI-SOURCE STOCK DATA SERVICE
@@ -299,18 +300,27 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
     };
 };
 
-// Get company profile
-export const getStockData = async (symbol: string): Promise<{ stock: Stock; profile: CompanyProfile | null }> => {
-    const [stock, profile] = await Promise.all([
+// Get comprehensive stock data including profile and growth metrics
+export const getStockData = async (symbol: string): Promise<{
+    stock: Stock;
+    profile: CompanyProfile | null;
+    growth: any | null;
+    rsi: number | null;
+}> => {
+    const [stock, profile, growth, history] = await Promise.all([
         getStockQuote(symbol),
-        getProfileFromYahoo(symbol)
+        getProfileFromYahoo(symbol),
+        getGrowthMetrics(symbol),
+        getHistoricalPrices(symbol, 30)
     ]);
 
     if (profile?.name && stock.name === symbol) {
         stock.name = profile.name;
     }
 
-    return { stock, profile };
+    const rsi = history.length >= 14 ? calculateRSI(history, 14) : null;
+
+    return { stock, profile, growth, rsi };
 };
 
 // Get company profile from Yahoo

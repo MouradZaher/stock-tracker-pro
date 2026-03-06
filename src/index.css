@@ -247,10 +247,10 @@ html[data-theme='light'] {
 
 @media (min-width: 768px) {
   .heatmap-wrapper {
-    left: 1.5rem;
-    right: 1.5rem;
-    top: 1rem;
-    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--glass-border);
   }
@@ -268,16 +268,22 @@ html[data-theme='light'] {
 
   .main-content:has(.home-tab-content) {
     padding: 0 !important;
-    overflow: hidden !important;
+    /* allow scrolling if content overflows */
   }
 
   .home-tab-content {
-    overflow: hidden !important;
-    height: calc(100vh - var(--header-height)) !important;
-    max-height: calc(100vh - var(--header-height)) !important;
+    min-height: calc(100vh - var(--header-height)) !important;
     padding: 0 !important;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+  }
+
+  .heatmap-wrapper {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    min-height: 0;
   }
 }
 

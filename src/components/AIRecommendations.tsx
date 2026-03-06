@@ -414,33 +414,41 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                             onClick={() => handleLocalSelect(stock)}
                             className="glass-card-hover"
                             style={{
-                                padding: '1rem',
+                                padding: '1.25rem',
                                 borderRadius: '16px',
                                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
                                 border: '1px solid rgba(16, 185, 129, 0.2)',
                                 position: 'relative',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.5rem'
                             }}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
-                                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-success)', fontWeight: 700 }}>UNDERVALUED</div>
+                                    <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>{stock.score}% ALPHA</div>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--color-success)' }}>{stock.score}%</div>
+                                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Value</div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'var(--color-success)' }}>{Math.round(stock.fundamentals?.valueScore || 0)}</div>
                                 </div>
                             </div>
 
-                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', height: '2.4em', overflow: 'hidden' }}>
-                                {stock.reasoning?.[0] || 'High growth potential with low RSI signatures.'}
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem' }}>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, marginBottom: '0.75rem', height: '2.8em', overflow: 'hidden' }}>
+                                    {stock.reasoning?.[0] || 'High growth potential with low RSI signatures.'}
+                                </div>
                             </div>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-tertiary)' }}>
-                                    {stock.sector}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                    <div style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-tertiary)' }}>
+                                        {stock.sector}
+                                    </div>
                                 </div>
-                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-success)' }}>
+                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
                                     {stock.price ? formatCurrency(stock.price) : '--'}
                                 </div>
                             </div>
@@ -590,14 +598,14 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                             <td style={{ padding: '1rem' }}>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '350px' }}>
                                                     <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: 0 }}>
-                                                        {rec.reasoning || generateDynamicReasoning(rec.symbol, rec.name, rec.sector || 'Unknown', rec.score).text}
+                                                        {Array.isArray(rec.reasoning) ? rec.reasoning[0] : (rec.reasoning || generateDynamicReasoning(rec.symbol, rec.name, rec.sector || 'Unknown', rec.score).text)}
                                                     </p>
                                                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 700 }}>
-                                                            <BarChart2 size={12} /> VOL: {generateDynamicReasoning(rec.symbol, rec.name, rec.sector || 'Unknown', rec.score).vol}x
+                                                            <BarChart2 size={12} /> VAL SCORE: {Math.round(rec.fundamentals?.valueScore || 0)}
                                                         </div>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem', color: rec.score >= 85 ? 'var(--color-success)' : (rec.score >= 70 ? 'var(--color-warning)' : 'var(--color-text-secondary)'), fontWeight: 700 }}>
-                                                            <MessageSquare size={12} /> SENT: {generateDynamicReasoning(rec.symbol, rec.name, rec.sector || 'Unknown', rec.score).sent}
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem', color: 'var(--color-warning)', fontWeight: 700 }}>
+                                                            <Sparkles size={12} /> GROWTH: {Math.round(rec.fundamentals?.growthScore || 0)}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -287,9 +287,31 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         <div className="stat-label">EPS</div>
                         <div className="stat-value">{stock.eps ? formatCurrency(stock.eps) : 'N/A'}</div>
                     </div>
-                    <div className="stat-card glass-card">
-                        <div className="stat-label">Dividend Yield</div>
-                        <div className="stat-value">{stock.dividendYield ? `${stock.dividendYield.toFixed(2)}%` : 'N/A'}</div>
+                    <div className="stat-card glass-card" style={{
+                        border: data.growth?.pegRatio < 1 ? '1.5px solid var(--color-success)' : '1px solid var(--glass-border)',
+                        background: data.growth?.pegRatio < 1 ? 'rgba(0, 255, 136, 0.05)' : 'var(--glass-bg)'
+                    }}>
+                        <div className="stat-label">PEG Ratio</div>
+                        <div className="stat-value" style={{ color: data.growth?.pegRatio < 1 ? 'var(--color-success)' : 'inherit' }}>
+                            {data.growth?.pegRatio ? data.growth.pegRatio.toFixed(2) : 'N/A'}
+                        </div>
+                        {data.growth?.pegRatio < 1 && (
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-success)', fontWeight: 700, marginTop: '2px' }}>UNDERVALUED GROWTH</div>
+                        )}
+                    </div>
+                    <div className="stat-card glass-card" style={{
+                        border: data.rsi < 45 ? '1.5px solid var(--color-warning)' : '1px solid var(--glass-border)',
+                        background: data.rsi < 45 ? 'rgba(255, 170, 0, 0.05)' : 'var(--glass-bg)'
+                    }}>
+                        <div className="stat-label">RSI (14D)</div>
+                        <div className="stat-value" style={{ color: data.rsi < 30 ? 'var(--color-success)' : (data.rsi < 45 ? 'var(--color-warning)' : 'inherit') }}>
+                            {data.rsi ? data.rsi.toFixed(1) : 'N/A'}
+                        </div>
+                        {data.rsi < 45 && (
+                            <div style={{ fontSize: '0.6rem', color: data.rsi < 30 ? 'var(--color-success)' : 'var(--color-warning)', fontWeight: 700, marginTop: '2px' }}>
+                                {data.rsi < 30 ? 'OVERSOLD / VALUE' : 'ACCUMULATION ZONE'}
+                            </div>
+                        )}
                     </div>
                     <div className="stat-card glass-card">
                         <div className="stat-label">52W Range</div>
