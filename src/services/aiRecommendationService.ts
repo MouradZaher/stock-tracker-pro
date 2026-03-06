@@ -1,9 +1,10 @@
-import { getStockData } from './stockDataService';
+import { getStockData, getHistoricalPrices, getGrowthMetrics } from './stockDataService';
 import { getStockNews } from './newsService';
 import type { StockRecommendation, NewsArticle } from '../types';
 import { STOCKS_BY_SECTOR, SECTORS, getAllSymbols, STOCKS_BY_INDEX } from '../data/sectors';
 import { calculateRSI, calculateSMA } from '../utils/calculations';
 import { socialFeedService } from './SocialFeedService';
+import { formatCurrency } from '../utils/formatters';
 
 // Generate recommendations for a sector
 export const getRecommendationsForSector = async (
@@ -20,23 +21,30 @@ export const getRecommendationsForSector = async (
     return allRecs.sort((a, b) => b.score - a.score).slice(0, topN);
 };
 
-// Get recommendations for a specific list of stocks (LOCKED: approved 2026-02-25)
+// Get recommendations for a specific list of stocks
 export const getRecommendationsForStocks = async (
     stocks: { symbol: string, name: string }[]
 ): Promise<StockRecommendation[]> => {
     const recommendations: StockRecommendation[] = [];
 
-    // Process in batches of 5 to avoid overwhelming
+    // Process in batches
     for (const stock of stocks) {
         try {
-            let { stock: stockData } = await getStockData(stock.symbol);
-            const news = await getStockNews(stock.symbol, 2); // 2 news items for speed
+            // Parallel fetch for speed
+            const [data, history, growth, news] = await Promise.all([
+                getStockData(stock.symbol),
+                getHistoricalPrices(stock.symbol, 30),
+                getGrowthMetrics(stock.symbol),
+                getStockNews(stock.symbol, 2)
+            ]);
 
+            const stockData = data.stock;
             if (!stockData.price || stockData.price === 0) continue;
 
-            const rsi = null;
-            const ma50 = stockData.previousClose;
-            const ma200 = stockData.fiftyTwoWeekHigh ? (stockData.fiftyTwoWeekHigh + stockData.fiftyTwoWeekLow) / 2 : null;
+            // Technical Indicators
+            const rsi = calculateRSI(history, 14);
+            const ma50 = calculateSMA(history, 50);
+            const ma200 = calculateSMA(history, 200);
             const socialSentiment = socialFeedService.getSentimentScore(stock.symbol);
 
             const score = calculateRecommendationScore({
@@ -45,15 +53,19 @@ export const getRecommendationsForStocks = async (
                 changePercent: stockData.changePercent,
                 rsi, ma50, ma200,
                 peRatio: stockData.peRatio,
-                eps: stockData.eps,
+                pegRatio: growth?.pegRatio || null,
+                earningsGrowth: growth?.earningsGrowth || null,
+                revenueGrowth: growth?.revenueGrowth || null,
                 news,
                 socialSentiment,
             });
 
+            const symbolInfo = getAllSymbols().find(s => s.symbol === stock.symbol);
+
             recommendations.push({
                 symbol: stock.symbol,
                 name: stock.name,
-                sector: 'Index Constituent',
+                sector: symbolInfo?.sector || 'Other',
                 price: stockData.price,
                 score,
                 recommendation: getRecommendationType(score),
@@ -62,12 +74,18 @@ export const getRecommendationsForStocks = async (
                     score, rsi, ma50, ma200,
                     price: stockData.price,
                     peRatio: stockData.peRatio,
+                    pegRatio: growth?.pegRatio || null,
+                    earningsGrowth: growth?.earningsGrowth || null,
                     changePercent: stockData.changePercent,
                     news, socialSentiment,
                 }),
                 news,
                 technicalIndicators: { rsi, ma50, ma200 },
-                fundamentals: { peRatio: stockData.peRatio, epsGrowth: null },
+                fundamentals: {
+                    peRatio: stockData.peRatio,
+                    epsGrowth: growth?.earningsGrowth || null,
+                    pegRatio: growth?.pegRatio || null
+                },
             });
         } catch (error) {
             console.error(`Error analyzing ${stock.symbol}:`, error);
@@ -84,40 +102,43 @@ export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation
         const stockInfo = symbols.find(s => s.symbol === symbol);
         if (!stockInfo) return null;
 
-        let { stock: stockData } = await getStockData(symbol);
-        const news = await getStockNews(symbol, 3);
+        const [data, history, growth, news] = await Promise.all([
+            getStockData(symbol),
+            getHistoricalPrices(symbol, 30),
+            getGrowthMetrics(symbol),
+            getStockNews(symbol, 3)
+        ]);
 
+        const stockData = data.stock;
         if (!stockData.price || stockData.price === 0) return null;
 
-        const rsi = null;
-        const ma50 = stockData.previousClose;
-        const ma200 = stockData.fiftyTwoWeekHigh ? (stockData.fiftyTwoWeekHigh + stockData.fiftyTwoWeekLow) / 2 : null;
+        const rsi = calculateRSI(history, 14);
+        const ma50 = calculateSMA(history, 50);
+        const ma200 = calculateSMA(history, 200);
         const socialSentiment = socialFeedService.getSentimentScore(symbol);
 
         const score = calculateRecommendationScore({
             price: stockData.price,
             change: stockData.change,
             changePercent: stockData.changePercent,
-            rsi,
-            ma50,
-            ma200,
+            rsi, ma50, ma200,
             peRatio: stockData.peRatio,
-            eps: stockData.eps,
+            pegRatio: growth?.pegRatio || null,
+            earningsGrowth: growth?.earningsGrowth || null,
+            revenueGrowth: growth?.revenueGrowth || null,
             news,
             socialSentiment,
         });
 
         const recommendation = getRecommendationType(score);
         const reasoning = generateReasoning({
-            score,
-            rsi,
-            ma50,
-            ma200,
+            score, rsi, ma50, ma200,
             price: stockData.price,
             peRatio: stockData.peRatio,
+            pegRatio: growth?.pegRatio || null,
+            earningsGrowth: growth?.earningsGrowth || null,
             changePercent: stockData.changePercent,
-            news,
-            socialSentiment,
+            news, socialSentiment,
         });
 
         return {
@@ -131,7 +152,11 @@ export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation
             reasoning,
             news,
             technicalIndicators: { rsi, ma50, ma200 },
-            fundamentals: { peRatio: stockData.peRatio, epsGrowth: null },
+            fundamentals: {
+                peRatio: stockData.peRatio,
+                epsGrowth: growth?.earningsGrowth || null,
+                pegRatio: growth?.pegRatio || null
+            },
         };
     } catch (error) {
         console.error(`Failed to analyze ${symbol}:`, error);
@@ -214,27 +239,39 @@ export const getTacticalRebalancing = async (positions: any[]): Promise<Rebalanc
     return actions;
 };
 
-// Get all recommendations with global optimization (Restricted to Indices)
 export const getAllRecommendations = async (indexName: string = 'S&P 500'): Promise<StockRecommendation[]> => {
     const stocks = STOCKS_BY_INDEX[indexName] || STOCKS_BY_INDEX['S&P 500'];
 
-    // Scan more stocks in the index for a broader search
-    const candidates = stocks.slice(0, 50);
+    // Scan a smaller subset for performance in this iteration
+    const candidates = stocks.slice(0, 30);
     const allRecommendations = await getRecommendationsForStocks(candidates);
 
     // Final global sort
     allRecommendations.sort((a, b) => b.score - a.score);
 
-    // Final Global Allocation Normalization (Cap at 100%)
-    const currentTotal = allRecommendations.reduce((sum, r) => sum + r.suggestedAllocation, 0);
-    if (currentTotal > 100) {
-        const multiplier = 100 / currentTotal;
-        allRecommendations.forEach(r => {
-            r.suggestedAllocation = parseFloat((r.suggestedAllocation * multiplier).toFixed(1));
-        });
-    }
+    return allRecommendations;
+};
 
-    return allRecommendations.slice(0, 30);
+/**
+ * Enhanced Grouping Logic: Picks the BEST stocks (Undervalued + Growth) 
+ * and groups them by sector as requested.
+ */
+export const getGroupedRecommendations = async (indexName: string = 'S&P 500') => {
+    const allRecs = await getAllRecommendations(indexName);
+
+    // Group by sector
+    const grouped: Record<string, StockRecommendation[]> = {};
+
+    allRecs.forEach(rec => {
+        if (!grouped[rec.sector]) grouped[rec.sector] = [];
+        grouped[rec.sector].push(rec);
+    });
+
+    // Return as array of sector objects
+    return Object.entries(grouped).map(([name, recommendations]) => ({
+        name,
+        recommendations: recommendations.sort((a, b) => b.score - a.score).slice(0, 5)
+    })).sort((a, b) => b.recommendations[0].score - a.recommendations[0].score);
 };
 
 // Generate mock price history (DEPRECATED - Returning empty to ensure no fake data)
@@ -251,67 +288,58 @@ const calculateRecommendationScore = (params: {
     ma50: number | null;
     ma200: number | null;
     peRatio: number | null;
-    eps: number | null;
+    pegRatio: number | null;
+    earningsGrowth: number | null;
+    revenueGrowth: number | null;
     news: NewsArticle[];
     socialSentiment: number;
 }): number => {
     let score = 50; // Base score
 
-    // Technical analysis (40 points max)
+    // Technical analysis (35 points max)
     if (params.rsi !== null) {
-        // RSI between 30-70 is ideal
-        if (params.rsi >= 30 && params.rsi <= 70) {
+        // RSI < 30 is oversold (Strong Buy Signal), RSI < 45 is undervalued entry
+        if (params.rsi < 30) {
+            score += 20;
+        } else if (params.rsi < 45) {
             score += 10;
-        } else if (params.rsi < 30) {
-            score += 15; // Oversold, potential buy
         } else if (params.rsi > 70) {
-            score -= 10; // Overbought
+            score -= 15; // Overbought
         }
     }
 
     if (params.ma50 !== null && params.ma200 !== null) {
-        // Golden cross (MA50 > MA200) is bullish
-        if (params.ma50 > params.ma200 && params.price > params.ma50) {
-            score += 15;
-        } else if (params.price > params.ma50) {
-            score += 10;
-        } else if (params.price < params.ma200) {
-            score -= 10;
-        }
+        if (params.ma50 > params.ma200) score += 10; // Bullish cross
+        if (params.price > params.ma50) score += 5;
     }
 
-    // Momentum (15 points)
-    if (params.changePercent > 2) {
-        score += 10;
-    } else if (params.changePercent > 0) {
-        score += 5;
-    } else if (params.changePercent < -2) {
-        score -= 10;
-    }
-
-    // Fundamentals (20 points max)
+    // Fundamentals & Growth (40 points max)
+    // 1. P/E Ratio (Undervaluation)
     if (params.peRatio !== null && params.peRatio > 0) {
-        // PE ratio between 15-25 is generally healthy
-        if (params.peRatio >= 10 && params.peRatio <= 25) {
-            score += 15;
-        } else if (params.peRatio < 10) {
-            score += 10; // Undervalued
-        } else if (params.peRatio > 40) {
-            score -= 10; // Overvalued
-        }
+        if (params.peRatio < 15) score += 15;
+        else if (params.peRatio < 25) score += 5;
+        else if (params.peRatio > 45) score -= 10;
     }
 
-    // News sentiment (25 points max)
+    // 2. PEG Ratio (Growth at reasonable price)
+    if (params.pegRatio !== null) {
+        if (params.pegRatio < 1.0) score += 15; // High growth relative to price
+        else if (params.pegRatio > 2.0) score -= 5;
+    }
+
+    // 3. Earnings Growth
+    if (params.earningsGrowth !== null) {
+        if (params.earningsGrowth > 0.20) score += 10; // > 20% Growth
+        else if (params.earningsGrowth > 0.10) score += 5;
+    }
+
+    // News & Social (25 points max)
     const positiveNews = params.news.filter((n) => n.sentiment === 'positive').length;
     const negativeNews = params.news.filter((n) => n.sentiment === 'negative').length;
-    score += positiveNews * 8;
-    score -= negativeNews * 8;
+    score += positiveNews * 5;
+    score -= negativeNews * 10;
+    score += (params.socialSentiment / 100) * 10;
 
-    // Social Pulse (15 points max)
-    // socialSentiment is -100 to 100
-    score += (params.socialSentiment / 100) * 15;
-
-    // Clamp between 0-100
     return Math.max(0, Math.min(100, score));
 };
 
@@ -332,70 +360,40 @@ const generateReasoning = (params: {
     ma200: number | null;
     price: number;
     peRatio: number | null;
+    pegRatio: number | null;
+    earningsGrowth: number | null;
     changePercent: number;
     news: NewsArticle[];
     socialSentiment: number;
 }): string[] => {
     const reasons: string[] = [];
 
+    // Valuation & Growth (User requested focus)
+    if (params.pegRatio !== null && params.pegRatio < 1.0) {
+        reasons.push(`High Value: PEG ratio of ${params.pegRatio.toFixed(2)} indicates growth is undervalued at current price`);
+    }
+
+    if (params.earningsGrowth !== null && params.earningsGrowth > 0.15) {
+        reasons.push(`Strong Growth: Projected earnings expansion of ${(params.earningsGrowth * 100).toFixed(1)}% YoY`);
+    }
+
+    if (params.peRatio !== null && params.peRatio < 15) {
+        reasons.push(`Undervalued: P/E ratio (${params.peRatio.toFixed(1)}) is well below sector average`);
+    }
+
     // Technical reasons
     if (params.rsi !== null) {
         if (params.rsi < 30) {
-            reasons.push(`RSI at ${params.rsi.toFixed(1)} indicates oversold conditions, potential buying opportunity`);
-        } else if (params.rsi > 70) {
-            reasons.push(`RSI at ${params.rsi.toFixed(1)} suggests overbought conditions, exercise caution`);
-        } else {
-            reasons.push(`RSI at ${params.rsi.toFixed(1)} shows neutral momentum`);
+            reasons.push(`Oversold: RSI at ${params.rsi.toFixed(1)} confirms deep-value entry point`);
+        } else if (params.rsi < 45) {
+            reasons.push(`Accumulation: RSI at ${params.rsi.toFixed(1)} suggests steady accumulation window`);
         }
     }
 
-    if (params.ma50 !== null && params.ma200 !== null) {
-        if (params.ma50 > params.ma200) {
-            reasons.push(`Bullish trend: 50-day MA above 200-day MA (golden cross)`);
-        } else {
-            reasons.push(`Bearish trend: 50-day MA below 200-day MA`);
-        }
-    }
-
-    // Momentum
-    if (params.changePercent > 2) {
-        reasons.push(`Strong positive momentum with ${params.changePercent.toFixed(2)}% recent gain`);
-    } else if (params.changePercent < -2) {
-        reasons.push(`Negative momentum with ${params.changePercent.toFixed(2)}% recent decline`);
-    }
-
-    // Fundamentals
-    if (params.peRatio !== null && params.peRatio > 0) {
-        if (params.peRatio < 15) {
-            reasons.push(`P/E ratio of ${params.peRatio.toFixed(2)} suggests potential undervaluation`);
-        } else if (params.peRatio > 30) {
-            reasons.push(`High P/E ratio of ${params.peRatio.toFixed(2)} indicates premium valuation`);
-        }
-    }
-
-    // News sentiment
-    const positiveNews = params.news.filter((n) => n.sentiment === 'positive').length;
-    const negativeNews = params.news.filter((n) => n.sentiment === 'negative').length;
-
-    if (positiveNews > negativeNews) {
-        reasons.push(`Positive news sentiment with ${positiveNews} favorable headlines`);
-    } else if (negativeNews > positiveNews) {
-        reasons.push(`Negative news sentiment with ${negativeNews} concerning headlines`);
-    }
-
-    // Social insight
+    // News & Social
     if (params.socialSentiment > 30) {
-        reasons.push(`High institutional social volume (X Pulse) indicates strong bullish accumulation`);
-    } else if (params.socialSentiment < -30) {
-        reasons.push(`Negative social divergence detected; high volume of bearish sentiment on X`);
+        reasons.push(`X Pulse: High institutional volume and bullish sentiment detected`);
     }
 
-    // Overall score reasoning
-    if (params.score >= 75) {
-        reasons.push(`Strong overall score of ${params.score}/100 across technical and fundamental metrics`);
-    } else if (params.score < 50) {
-        reasons.push(`Weak overall score of ${params.score}/100 suggests heightened risk`);
-    }
-
-    return reasons;
+    return reasons.slice(0, 4); // Keep it concise
 };

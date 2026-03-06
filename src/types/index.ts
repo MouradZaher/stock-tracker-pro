@@ -98,6 +98,7 @@ export interface StockRecommendation {
   fundamentals: {
     peRatio: number | null;
     epsGrowth: number | null;
+    pegRatio: number | null;
   };
 }
 

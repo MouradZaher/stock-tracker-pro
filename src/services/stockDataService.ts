@@ -400,6 +400,68 @@ export const searchSymbols = async (query: string, marketId?: string): Promise<R
     return Array.from(uniqueMap.values()).slice(0, 20);
 };
 
+/**
+ * Fetch historical price data for technical analysis (RSI, MA)
+ * Returns array of closing prices
+ */
+export const getHistoricalPrices = async (symbol: string, days: number = 30): Promise<number[]> => {
+    try {
+        const cacheKey = `history_${symbol}_${days}`;
+        const cached = getCachedData(cacheKey, 3600000); // 1 hour
+        if (cached) return cached;
+
+        const response = await api.get('/quote', {
+            params: {
+                symbols: symbol,
+                chart: 'true',
+                range: days > 30 ? '3mo' : '1mo',
+                interval: '1d'
+            }
+        });
+
+        const chartData = response.data?.chart?.result?.[0];
+        const closes = chartData?.indicators?.quote?.[0]?.close || [];
+
+        // Filter out nulls and return
+        const validCloses = closes.filter((c: any) => c !== null && c !== undefined);
+        setCachedData(cacheKey, validCloses);
+        return validCloses;
+    } catch (error) {
+        console.warn(`History fetch failed for ${symbol}:`, error);
+        return [];
+    }
+};
+
+/**
+ * Extract valuation and growth metrics for AI analysis
+ */
+export const getGrowthMetrics = async (symbol: string) => {
+    try {
+        const response = await api.get('/quote', {
+            params: {
+                symbols: symbol,
+                modules: 'defaultKeyStatistics,financialData,earningsGrowth'
+            }
+        });
+
+        const result = response.data?.quoteSummary?.result?.[0] || {};
+        const stats = result.defaultKeyStatistics || {};
+        const financialData = result.financialData || {};
+
+        return {
+            pegRatio: stats.pegRatio?.raw || null,
+            forwardEps: stats.forwardEps?.raw || null,
+            targetPrice: financialData.targetMeanPrice?.raw || null,
+            revenueGrowth: financialData.revenueGrowth?.raw || null,
+            earningsGrowth: financialData.earningsGrowth?.raw || null,
+            currentRatio: financialData.currentRatio?.raw || null,
+        };
+    } catch (error) {
+        console.warn(`Growth metrics fetch failed for ${symbol}:`, error);
+        return null;
+    }
+};
+
 // Get multiple quotes efficiently with multi-source
 export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, Stock>> => {
     const stockMap = new Map<string, Stock>();

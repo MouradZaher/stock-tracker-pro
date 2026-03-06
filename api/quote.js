@@ -95,7 +95,14 @@ export default async function handler(req, res) {
     }
 
     const isSummary = !!modules;
-    const path = isSummary ? 'v10/finance/quoteSummary' : 'v7/finance/quote';
+    const isChart = req.query.chart === 'true';
+    let path;
+
+    if (isChart) {
+        path = `v8/finance/chart/${symbols.split(',')[0]}`;
+    } else {
+        path = isSummary ? 'v10/finance/quoteSummary' : 'v7/finance/quote';
+    }
 
     const endpoints = [
         `https://query2.finance.yahoo.com/${path}`,
