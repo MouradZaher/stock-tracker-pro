@@ -158,52 +158,9 @@ function MainLayout({
               }}
             >
               {!selectedSymbol ? (
-                <>
-                  {/* Market Health Summary Bar */}
-                  <div style={{
-                    padding: '0.75rem 1.5rem 0',
-                    zIndex: 200,
-                    position: 'relative',
-                    pointerEvents: 'none'
-                  }}>
-                    <div className="glass-effect" style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.6rem 1.25rem',
-                      borderRadius: 'var(--radius-lg)',
-                      background: 'rgba(15, 15, 25, 0.6)',
-                      pointerEvents: 'auto'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Market Sentiment</span>
-                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-success)' }}>BULLISH (74%)</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Top Sector</span>
-                          <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Technology (+1.8%)</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Discovery Alert</span>
-                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-warning)' }}>3 Undervalued Gems Found</span>
-                        </div>
-                      </div>
-                      <button
-                        className="glass-button"
-                        style={{ padding: '4px 12px', fontSize: '0.65rem', borderRadius: 'var(--radius-sm)' }}
-                        onClick={() => navigate('/recommendations')}
-                      >
-                        View Gems →
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Heatmap fills the rest */}
-                  <div className="heatmap-wrapper" style={{ top: '65px' }}>
-                    <StockHeatmap />
-                  </div>
-                </>
+                <div className="heatmap-wrapper" style={{ top: 0 }}>
+                  <StockHeatmap />
+                </div>
               ) : (
                 <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
                   <StockDetail

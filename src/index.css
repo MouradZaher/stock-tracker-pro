@@ -122,14 +122,16 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
 
-  /* Premium Glares */
-  --glare-opacity: 0.15;
-  --noise-opacity: 0.04;
+  /* Premium Glares & Effects */
+  --glare-opacity: 0.12;
+  --noise-opacity: 0.03;
+  --mesh-opacity: 0.08;
 
-  /* Mesh Gradient Colors */
-  --mesh-1: rgba(99, 102, 241, 0.15);
-  --mesh-2: rgba(139, 92, 246, 0.15);
-  --mesh-3: rgba(168, 85, 247, 0.15);
+  /* Mesh Gradient Colors - Ultra Refined */
+  --mesh-1: rgba(99, 102, 241, var(--mesh-opacity));
+  --mesh-2: rgba(139, 92, 246, var(--mesh-opacity));
+  --mesh-3: rgba(16, 185, 129, var(--mesh-opacity));
+  --mesh-4: rgba(239, 68, 68, var(--mesh-opacity));
 }
 
 /* Custom Premium Scrollbar */
@@ -438,6 +440,7 @@ body {
     radial-gradient(at 0% 0%, var(--mesh-1) 0, transparent 50%),
     radial-gradient(at 50% 0%, var(--mesh-2) 0, transparent 50%),
     radial-gradient(at 100% 0%, var(--mesh-3) 0, transparent 50%),
+    radial-gradient(at 50% 50%, var(--mesh-4) 0, transparent 50%),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   background-attachment: fixed;
   color: var(--color-text-primary);
@@ -680,8 +683,21 @@ h6 {
   color: white;
   background: var(--gradient-primary);
   border-color: var(--color-accent);
-  font-weight: 600;
-  box-shadow: 0 0 20px var(--color-accent-light), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+  box-shadow:
+    0 0 20px var(--color-accent-light),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 4px 12px rgba(99, 102, 241, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Touch-friendly sizing for tablets and small desktops */
+@media (max-width: 1024px) {
+  .header-tab {
+    padding: 4px 14px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
 }
 
 /* AI Tab Special Styling */
