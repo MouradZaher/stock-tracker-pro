@@ -158,7 +158,13 @@ function MainLayout({
               }}
             >
               {!selectedSymbol ? (
-                <div className="heatmap-wrapper" style={{ top: 0 }}>
+                <div className="heatmap-wrapper" style={{
+                  flex: 1,
+                  position: 'relative',
+                  minHeight: '300px', // Ensure it doesn't collapse to 0
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
                   <StockHeatmap />
                 </div>
               ) : (
