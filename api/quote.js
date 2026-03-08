@@ -1,201 +1,219 @@
 import axios from 'axios';
 
-// Simple in-memory rate limiting (per-instance)
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 300;
-const ipCache = new Map();
+// ============================================================
+// AUTO-FETCH SINGLE QUOTE HANDLER
+// Fetches real-time price for a single symbol from multiple sources.
+// No hardcoded prices. Pure auto-fetch with smart market detection.
+// ============================================================
 
-/**
- * Basic rate limiter
- * @param {string} ip 
- * @returns {boolean} true if allowed, false if limited
- */
+const EGYPT_SYMBOLS = new Set([
+    'COMI', 'TMGH', 'HRHO', 'EAST', 'EFID', 'EMFD', 'ADIB',
+    'ETEL', 'ABUK', 'FWRY', 'SWDY', 'ORAS', 'RAYA', 'PHDC', 'CLHO',
+]);
+const ADX_SYMBOLS = new Set([
+    'IHC', 'FAB', 'ETISALAT', 'ADNOCDIST', 'ALDAR', 'ADCB',
+    'MULTIPLY', 'ADNOCDRILL', 'PRESIGHT', 'FERTIGLBE', 'DANA',
+    'AGTHIA', 'YAHSAT', 'ALPHADHABI', 'RAKPROP',
+]);
+const CRYPTO_SYMBOLS = new Set([
+    'BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE',
+    'BTC-USD', 'ETH-USD', 'BNB-USD', 'SOL-USD',
+]);
+const COINGECKO_IDS = {
+    'BTC': 'bitcoin', 'BTC-USD': 'bitcoin',
+    'ETH': 'ethereum', 'ETH-USD': 'ethereum',
+    'BNB': 'binancecoin', 'BNB-USD': 'binancecoin',
+    'SOL': 'solana', 'SOL-USD': 'solana',
+};
+
+function getMarket(symbol) {
+    const s = symbol.toUpperCase().split('.')[0].trim();
+    if (symbol.includes('.CA')) return 'egypt';
+    if (symbol.includes('.AD') || symbol.includes('.AE')) return 'abudhabi';
+    if (EGYPT_SYMBOLS.has(s)) return 'egypt';
+    if (ADX_SYMBOLS.has(s)) return 'abudhabi';
+    if (CRYPTO_SYMBOLS.has(s)) return 'crypto';
+    return 'us';
+}
+
+function toYahooSymbol(symbol) {
+    const s = symbol.toUpperCase().trim();
+    if (s.includes('.')) return s;
+    const market = getMarket(s);
+    if (market === 'egypt') return `${s}.CA`;
+    if (market === 'abudhabi') return `${s}.AD`;
+    return s;
+}
+
+const YAHOO_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Origin': 'https://finance.yahoo.com',
+    'Referer': 'https://finance.yahoo.com/',
+};
+
+// Rate limiting
+const ipCache = new Map();
 function checkRateLimit(ip) {
     const now = Date.now();
-    const records = ipCache.get(ip) || [];
-    const recentRecords = records.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
-
-    if (recentRecords.length >= MAX_REQUESTS) {
-        return false;
-    }
-
-    recentRecords.push(now);
-    ipCache.set(ip, recentRecords);
-
-    // Cleanup cache occasionally
-    if (ipCache.size > 1000) {
-        const cleanupThreshold = now - RATE_LIMIT_WINDOW;
-        for (const [key, value] of ipCache.entries()) {
-            const filtered = value.filter(t => t > cleanupThreshold);
-            if (filtered.length === 0) ipCache.delete(key);
-            else ipCache.set(key, filtered);
-        }
-    }
-
+    const records = (ipCache.get(ip) || []).filter(t => now - t < 60000);
+    if (records.length >= 300) return false;
+    records.push(now);
+    ipCache.set(ip, records);
     return true;
 }
 
-/**
- * Validate stock symbols to prevent injection
- * @param {string} symbols 
- * @returns {boolean}
- */
-function isValidSymbol(symbols) {
-    if (!symbols || typeof symbols !== 'string') return false;
-    // Allow letters, numbers, dots, hyphens, and commas for multiple symbols
-    // Max length 200 for bulk requests
-    return /^[A-Z0-9.,^:-]{1,200}$/i.test(symbols);
+function isValidSymbol(s) {
+    return s && typeof s === 'string' && /^[A-Z0-9.,^:\-]{1,200}$/i.test(s);
 }
 
 export default async function handler(req, res) {
     const { symbols, modules } = req.query;
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // 1. Rate Limiting
     if (!checkRateLimit(clientIp)) {
         return res.status(429).json({ error: 'Too many requests. Please slow down.' });
     }
+    if (!symbols) return res.status(400).json({ error: 'Missing symbols parameter' });
+    if (!isValidSymbol(symbols)) return res.status(400).json({ error: 'Invalid symbol format' });
 
-    // 2. Input Validation
-    if (!symbols) {
-        return res.status(400).json({ error: 'Missing symbols parameter' });
-    }
-
-    if (!isValidSymbol(symbols)) {
-        return res.status(400).json({ error: 'Invalid symbol format' });
-    }
-
-    if (modules && !/^[a-z,]{1,100}$/i.test(modules)) {
-        return res.status(400).json({ error: 'Invalid modules format' });
-    }
-
-    // 3. CORS Lockdown
     const origin = req.headers.origin;
-    const internalHost = req.headers.host;
+    const isAllowedOrigin = !origin || origin.includes('vercel.app') || origin.includes('localhost');
+    if (!isAllowedOrigin) return res.status(403).json({ error: 'Origin not allowed' });
 
-    // Only allow requests from our own host or localhost (for dev)
-    const isAllowedOrigin = !origin ||
-        origin.includes('vercel.app') ||
-        origin.includes('localhost') ||
-        origin.includes(internalHost);
-
-    if (!isAllowedOrigin) {
-        return res.status(403).json({ error: 'Origin not allowed' });
-    }
-
-    // Set Security Headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Cache-Control', 's-maxage=2, stale-while-revalidate');
+    res.setHeader('Cache-Control', 's-maxage=3, stale-while-revalidate');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
     const isSummary = !!modules;
     const isChart = req.query.chart === 'true';
-    let path;
+    const rawSymbol = symbols.split(',')[0].trim();
+    const market = getMarket(rawSymbol);
 
+    // ── CRYPTO: use CoinGecko ─────────────────────────────────
+    if (market === 'crypto' && !isSummary && !isChart) {
+        const sym = rawSymbol.toUpperCase().split('.')[0].trim();
+        const cgId = COINGECKO_IDS[sym];
+        if (cgId) {
+            try {
+                const r = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+                    params: { ids: cgId, vs_currencies: 'usd', include_24hr_change: true },
+                    timeout: 5000,
+                });
+                const data = r.data[cgId];
+                if (data?.usd) {
+                    const price = data.usd;
+                    const cp = data.usd_24h_change || 0;
+                    const change = (price * cp) / 100;
+                    return res.status(200).json({
+                        quoteResponse: {
+                            result: [{
+                                symbol: rawSymbol,
+                                regularMarketPrice: price,
+                                regularMarketChange: change,
+                                regularMarketChangePercent: cp,
+                                regularMarketPreviousClose: price - change,
+                                longName: sym
+                            }]
+                        },
+                        _provider: 'coingecko'
+                    });
+                }
+            } catch (e) {
+                console.warn('CoinGecko failed:', e.message);
+            }
+        }
+    }
+
+    // ── Non-crypto: use Yahoo Finance ─────────────────────────
+    const yahooSym = toYahooSymbol(rawSymbol);
+    const isSummaryModules = modules || 'price';
+
+    let path;
     if (isChart) {
-        path = `v8/finance/chart/${symbols.split(',')[0]}`;
+        path = `v8/finance/chart/${yahooSym}`;
     } else {
         path = isSummary ? 'v10/finance/quoteSummary' : 'v7/finance/quote';
     }
 
     const endpoints = [
+        `https://query1.finance.yahoo.com/${path}`,
         `https://query2.finance.yahoo.com/${path}`,
-        `https://query1.finance.yahoo.com/${path}`
     ];
 
     for (const endpoint of endpoints) {
         try {
             const params = isSummary
-                ? { symbol: symbols.split(',')[0], modules }
-                : { symbols };
+                ? { symbol: yahooSym, modules }
+                : isChart
+                    ? { range: req.query.range || '1mo', interval: req.query.interval || '1d' }
+                    : { symbols: yahooSym };
 
             const response = await axios.get(endpoint, {
                 params,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-                    'Accept': 'application/json, text/plain, */*',
-                    'Origin': 'https://finance.yahoo.com',
-                    'Referer': 'https://finance.yahoo.com/',
-                },
-                timeout: 8000
+                headers: YAHOO_HEADERS,
+                timeout: 8000,
             });
 
-            return res.status(200).json(response.data);
+            // For quote responses, remap back to original symbol
+            if (!isSummary && !isChart) {
+                const result = response.data?.quoteResponse?.result?.[0];
+                if (result?.regularMarketPrice > 0) {
+                    result.symbol = rawSymbol; // restore original symbol
+                    return res.status(200).json(response.data);
+                }
+            } else {
+                return res.status(200).json(response.data);
+            }
         } catch (error) {
-            // Keep error logging for debugging but remove request data logs
-            if (endpoint === endpoints[endpoints.length - 1]) {
-                // If all endpoints fail, return a realistic fallback for the UI
-                const sym = symbols.split(',')[0].toUpperCase().split('.')[0];
-                let base = 150;
+            console.warn(`Yahoo ${endpoint} failed for ${yahooSym}:`, error.message);
+        }
+    }
 
-                // Realism Overrides
-                if (sym === 'AAPL') base = 188.42;
-                else if (sym === 'MSFT') base = 412.30;
-                else if (sym === 'NVDA') base = 902.50;
-                else if (sym === 'GOOGL' || sym === 'GOOG') base = 158.30;
-                else if (sym === 'TSLA') base = 175.20;
-                else if (sym === 'AMZN') base = 178.50;
-                else if (sym === 'META') base = 495.20;
-                else if (sym === 'DIS') base = 112.10;
-                else if (sym === 'AMD') base = 162.40;
-                else if (sym === 'NFLX') base = 605.20;
-                else if (sym === 'BABA') base = 72.30;
-                else if (sym === 'MCD') base = 282.15;
-                else if (sym === 'VOO') base = 472.50;
-                else if (sym === 'COMI') base = 75.10;
-                else if (sym === 'TMGH') base = 104.40;
-                else if (sym === 'FWRY') base = 6.80;
-                else if (sym === 'FAB') base = 12.45;
-                else if (sym === 'GLD') base = 215.30;
-                else if (sym === 'SLV') base = 24.80;
-                else if (sym === 'CAT') base = 365.10;
-                else if (sym === 'XOM') base = 118.20;
-                else if (sym === 'CVX') base = 158.40;
-
-                const volatility = 0.002;
-                const price = base * (1 + (Math.random() * volatility - volatility / 2));
-                const cp = (Math.random() * 4) - 1.5;
-                const change = (price * cp) / 100;
-
-                // Mock Yahoo structure based on the request type
-                if (isSummary) {
-                    return res.status(200).json({
-                        quoteSummary: {
-                            result: [{
-                                price: {
-                                    regularMarketPrice: { raw: price, fmt: price.toFixed(2) },
-                                    regularMarketChange: { raw: change, fmt: change.toFixed(2) },
-                                    regularMarketChangePercent: { raw: cp / 100, fmt: (cp / 100).toFixed(4) },
-                                    symbol: sym,
-                                    longName: `${sym} (Live)`
-                                },
-                                summaryProfile: { sector: 'Unknown', industry: 'Unknown', longBusinessSummary: 'Market data fallback active.' }
-                            }]
-                        },
-                        _provider: 'data_bridge_v2'
-                    });
-                } else {
+    // ── Stooq fallback (US stocks only) ──────────────────────
+    if (market === 'us' && !isSummary && !isChart) {
+        try {
+            const r = await axios.get(
+                `https://stooq.com/q/l/?s=${rawSymbol.toLowerCase()}&f=sd2t2ohlcvn&h&e=csv`,
+                { timeout: 4000, responseType: 'text' }
+            );
+            const lines = r.data.split('\n');
+            if (lines.length >= 2) {
+                const headers = lines[0].split(',');
+                const values = lines[1].split(',');
+                const row = {};
+                headers.forEach((h, i) => (row[h.trim().toLowerCase()] = values[i]?.trim()));
+                const close = parseFloat(row['close']) || 0;
+                const open = parseFloat(row['open']) || 0;
+                if (close > 0) {
                     return res.status(200).json({
                         quoteResponse: {
                             result: [{
-                                symbol: sym,
-                                regularMarketPrice: price,
-                                regularMarketChange: change,
-                                regularMarketChangePercent: cp,
-                                regularMarketPreviousClose: price - change,
-                                longName: `${sym} (Live)`
+                                symbol: rawSymbol,
+                                regularMarketPrice: close,
+                                regularMarketChange: close - open,
+                                regularMarketChangePercent: open ? ((close - open) / open) * 100 : 0,
+                                regularMarketPreviousClose: open,
+                                longName: row['name'] || rawSymbol,
                             }]
                         },
-                        _provider: 'data_bridge_v2'
+                        _provider: 'stooq'
                     });
                 }
             }
+        } catch (e) {
+            console.warn('Stooq fallback failed:', e.message);
         }
     }
+
+    // ── All sources failed: return empty ──────────────────────
+    console.error(`❌ All sources failed for ${rawSymbol}`);
+    return res.status(200).json({
+        quoteResponse: { result: [], error: `No data available for ${rawSymbol}` },
+        _provider: 'none'
+    });
 }
