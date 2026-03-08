@@ -58,15 +58,17 @@ const HeatmapMobileFallback: React.FC = () => {
             }}>
                 {data.map((stock) => (
                     <div key={stock.symbol} style={{
-                        padding: '14px',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid rgba(255, 255, 255, 0.12)',
-                        borderRadius: '16px',
+                        padding: '16px',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '20px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '6px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                        backdropFilter: 'blur(10px)'
+                        gap: '8px',
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+                        backdropFilter: 'blur(12px)',
+                        minHeight: '100px',
+                        justifyContent: 'center'
                     }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#fff' }}>{stock.symbol}</span>
