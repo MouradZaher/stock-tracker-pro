@@ -8,6 +8,7 @@ import Header from './components/Header';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
+import TopBar from './components/TopBar';
 import { PageSkeleton } from './components/LoadingSkeleton';
 import { MarketProvider } from './contexts/MarketContext';
 
@@ -125,7 +126,7 @@ function MainLayout({
 
   return (
     <div className="app">
-
+      <TopBar />
       <Header
         activeTab={activeTab}
 
