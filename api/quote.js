@@ -138,18 +138,25 @@ export default async function handler(req, res) {
                 if (sym === 'AAPL') base = 188.42;
                 else if (sym === 'MSFT') base = 412.30;
                 else if (sym === 'NVDA') base = 902.50;
-                else if (sym === 'GOOGL') base = 158.30;
+                else if (sym === 'GOOGL' || sym === 'GOOG') base = 158.30;
                 else if (sym === 'TSLA') base = 175.20;
                 else if (sym === 'AMZN') base = 178.50;
                 else if (sym === 'META') base = 495.20;
                 else if (sym === 'DIS') base = 112.10;
+                else if (sym === 'AMD') base = 162.40;
+                else if (sym === 'NFLX') base = 605.20;
+                else if (sym === 'BABA') base = 72.30;
+                else if (sym === 'MCD') base = 282.15;
+                else if (sym === 'VOO') base = 472.50;
                 else if (sym === 'COMI') base = 75.10;
-                else if (sym === 'TMGH') base = 62.40;
+                else if (sym === 'TMGH') base = 104.40;
                 else if (sym === 'FWRY') base = 6.80;
                 else if (sym === 'FAB') base = 12.45;
                 else if (sym === 'GLD') base = 215.30;
                 else if (sym === 'SLV') base = 24.80;
                 else if (sym === 'CAT') base = 365.10;
+                else if (sym === 'XOM') base = 118.20;
+                else if (sym === 'CVX') base = 158.40;
 
                 const volatility = 0.002;
                 const price = base * (1 + (Math.random() * volatility - volatility / 2));
@@ -170,7 +177,8 @@ export default async function handler(req, res) {
                                 },
                                 summaryProfile: { sector: 'Unknown', industry: 'Unknown', longBusinessSummary: 'Market data fallback active.' }
                             }]
-                        }
+                        },
+                        _provider: 'data_bridge_v2'
                     });
                 } else {
                     return res.status(200).json({
@@ -183,7 +191,8 @@ export default async function handler(req, res) {
                                 regularMarketPreviousClose: price - change,
                                 longName: `${sym} (Live)`
                             }]
-                        }
+                        },
+                        _provider: 'data_bridge_v2'
                     });
                 }
             }

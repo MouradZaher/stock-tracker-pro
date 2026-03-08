@@ -151,12 +151,11 @@ const fetchFromFMP = async (symbol: string): Promise<StockQuote | null> => {
 const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> => {
     const cacheKey = `quote_${symbol}`;
 
-    // Check cache first
+    // 1. Check cache first
     const cached = getCachedData(cacheKey);
     if (cached) return cached;
 
-    // 1. Try serverless proxy first (handles multiple providers)
-    // Automatically apply suffixes for non-US markets if missing
+    // 2. Prepare symbol (add market suffix if missing)
     let searchSymbol = symbol;
     if (!symbol.includes('.')) {
         const market = getMarketForSymbol(symbol);
@@ -164,6 +163,8 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
         else if (market === 'abudhabi') searchSymbol = `${symbol}.AD`;
     }
 
+    // 3. Try serverless proxy first (Tier 1 - Multi-Quote)
+    console.log(`🔍 Fetching Tier 1 (Proxy) for ${searchSymbol}...`);
     let result = await fetchFromProxy(searchSymbol);
     if (result && result.price > 0) {
         setCachedData(cacheKey, result);
@@ -171,31 +172,45 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
         return result;
     }
 
-    // 2. Try direct API calls if proxy fails
+    // 4. Fallback to Direct API Providers (Tier 2-10)
+    const availableProviderIds = getAvailableProviders();
+    console.log(`🔄 Proxy failed. Rotating through ${availableProviderIds.length} alternative sources for ${symbol}...`);
 
+    for (const providerId of availableProviderIds) {
+        // Skip providers that are part of the proxy already (handled in Tier 1)
+        if (providerId === 'yahoo') continue;
 
-    const directFetchers = [
-        fetchFromFinnhub,
-        fetchFromAlphaVantage,
-        fetchFromTwelveData,
-        fetchFromFMP,
-    ];
+        try {
+            console.log(`📡 Trying Source: ${providerId} for ${symbol}...`);
+            let quote: StockQuote | null = null;
 
-    for (const fetcher of directFetchers) {
-        result = await fetcher(symbol);
-        if (result && result.price > 0) {
-            setCachedData(cacheKey, result);
-            setCachedData(`last_good_${symbol}`, result);
-            return result;
+            // Map provider ID to its specific fetcher function
+            switch (providerId) {
+                case 'finnhub': quote = await fetchFromFinnhub(symbol); break;
+                case 'alphaVantage': quote = await fetchFromAlphaVantage(symbol); break;
+                case 'twelveData': quote = await fetchFromTwelveData(symbol); break;
+                case 'fmp': quote = await fetchFromFMP(symbol); break;
+                // Add more cases as fetchers are implemented for other providers in dataProviders.ts
+            }
+
+            if (quote && quote.price > 0) {
+                console.log(`✅ Success from ${providerId} for ${symbol}`);
+                setCachedData(cacheKey, quote);
+                setCachedData(`last_good_${symbol}`, quote);
+                return quote;
+            }
+        } catch (err) {
+            console.warn(`❌ Source ${providerId} failed for ${symbol}`);
         }
     }
 
-    // 3. Use last known good price (no jitter)
+    // 5. Use last known good price (Safety Net)
     const lastGood = getCachedData(`last_good_${symbol}`, GOOD_PRICE_CACHE_DURATION);
     if (lastGood) {
+        console.log(`💾 Using cached fallback for ${symbol}`);
         return {
             ...lastGood,
-            name: lastGood.name + ' (Cached)',
+            name: `${lastGood.name} (Estimated)`,
         };
     }
 
