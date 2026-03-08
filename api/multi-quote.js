@@ -155,6 +155,8 @@ export default async function handler(req, res) {
             };
         });
 
+        console.log(`[DEBUG] Final simulated results:`, JSON.stringify(simulated, null, 2));
+
         return res.status(200).json({
             quoteResponse: { result: simulated, error: null },
             _provider: 'data_bridge_v2'
