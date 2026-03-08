@@ -156,7 +156,15 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
     if (cached) return cached;
 
     // 1. Try serverless proxy first (handles multiple providers)
-    let result = await fetchFromProxy(symbol);
+    // Automatically apply suffixes for non-US markets if missing
+    let searchSymbol = symbol;
+    if (!symbol.includes('.')) {
+        const market = getMarketForSymbol(symbol);
+        if (market === 'egypt') searchSymbol = `${symbol}.CA`;
+        else if (market === 'abudhabi') searchSymbol = `${symbol}.AD`;
+    }
+
+    let result = await fetchFromProxy(searchSymbol);
     if (result && result.price > 0) {
         setCachedData(cacheKey, result);
         setCachedData(`last_good_${symbol}`, result);
@@ -479,7 +487,16 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 
     // Try batch request first via proxy
     try {
-        const symbolsString = symbols.join(',');
+        // Map symbols to their suffix-aware versions for the proxy call
+        const mappedSymbols = symbols.map(s => {
+            if (s.includes('.')) return s;
+            const market = getMarketForSymbol(s);
+            if (market === 'egypt') return `${s}.CA`;
+            if (market === 'abudhabi') return `${s}.AD`;
+            return s;
+        });
+
+        const symbolsString = mappedSymbols.join(',');
         const response = await api.get('/multi-quote', {
             params: { symbols: symbolsString },
             timeout: 15000
@@ -487,11 +504,14 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 
         const quotes = response.data?.quoteResponse?.result || [];
         for (const quote of quotes) {
-            const sym = quote.symbol;
+            // Match back to the original symbol (strip suffix)
+            const sym = quote.symbol.split('.')[0];
+            const originalSymbol = symbols.find(s => s === sym || s === quote.symbol) || sym;
+
             if (quote.price > 0) {
                 const stock: Stock = {
-                    symbol: sym,
-                    name: quote.name || sym,
+                    symbol: originalSymbol,
+                    name: quote.name || originalSymbol,
                     price: quote.price,
                     change: quote.change || 0,
                     changePercent: quote.changePercent || 0,
@@ -512,8 +532,9 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
                     totalSell: null,
                     lastUpdated: new Date(),
                 };
-                stockMap.set(sym, stock);
-                setCachedData(`last_good_${sym}`, quote);
+                stockMap.set(originalSymbol, stock);
+                setCachedData(`last_good_${originalSymbol}`, quote);
+                setCachedData(`quote_${originalSymbol}`, quote);
             }
         }
 

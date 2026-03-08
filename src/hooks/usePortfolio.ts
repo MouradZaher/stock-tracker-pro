@@ -5,6 +5,19 @@ import { calculateProfitLoss } from '../utils/calculations';
 import { getSectorForSymbol } from '../data/sectors';
 import * as portfolioService from '../services/portfolioService';
 import { supabase } from '../services/supabase';
+import { getMarketForSymbol } from '../data/sectors';
+
+export interface AdvancedMetrics {
+    diversificationScore: number; // 0-100 (Higher is better)
+    concentrationRisk: 'Low' | 'Medium' | 'High';
+    weightedRsi: number | null;
+    regionalBreakdown: {
+        us: number;
+        egypt: number;
+        uae: number;
+    };
+    sectorMomentum: Record<string, number>;
+}
 
 interface PortfolioStore {
     positions: PortfolioPosition[];
@@ -17,6 +30,7 @@ interface PortfolioStore {
     updatePosition: (id: string, updates: Partial<PortfolioPosition>, userId?: string) => Promise<void>;
     removePosition: (id: string, symbol: string, userId?: string) => Promise<void>;
     updatePrice: (symbol: string, price: number, userId?: string) => Promise<void>;
+    syncPrices: () => Promise<void>;
 
     // Supabase sync actions
     syncWithSupabase: (userId: string) => Promise<void>;
@@ -25,6 +39,7 @@ interface PortfolioStore {
 
     // Utility actions
     getSummary: () => PortfolioSummary;
+    getAdvancedMetrics: () => AdvancedMetrics;
     clearPositions: () => void;
     clearError: () => void;
 }
@@ -188,6 +203,37 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     }
                 },
 
+                syncPrices: async () => {
+                    const positions = get().positions;
+                    if (positions.length === 0) return;
+
+                    try {
+                        const { getMultipleQuotes } = await import('../services/stockDataService');
+                        const symbols = positions.map(p => p.symbol);
+                        const quotes = await getMultipleQuotes(symbols);
+
+                        set((state) => ({
+                            positions: state.positions.map(pos => {
+                                const quote = quotes.get(pos.symbol);
+                                if (!quote || quote.price <= 0) return pos;
+
+                                const marketValue = pos.units * quote.price;
+                                const { amount, percent } = calculateProfitLoss(quote.price, pos.avgCost, pos.units);
+
+                                return {
+                                    ...pos,
+                                    currentPrice: quote.price,
+                                    marketValue,
+                                    profitLoss: amount,
+                                    profitLossPercent: percent,
+                                };
+                            })
+                        }));
+                    } catch (error) {
+                        console.error('Error syncing portfolio prices:', error);
+                    }
+                },
+
                 loadFromSupabase: async (userId: string) => {
                     if (!userId || userId.startsWith('bypass-')) return;
                     set({ isLoading: true, error: null });
@@ -282,6 +328,69 @@ export const usePortfolioStore = create<PortfolioStore>()(
                         totalProfitLoss,
                         totalProfitLossPercent,
                         positions,
+                    };
+                },
+
+                getAdvancedMetrics: () => {
+                    const positions = get().positions;
+                    const totalValue = positions.reduce((sum, p) => sum + p.marketValue, 0);
+
+                    if (totalValue === 0) {
+                        return {
+                            diversificationScore: 0,
+                            concentrationRisk: 'Low',
+                            weightedRsi: null,
+                            regionalBreakdown: { us: 0, egypt: 0, uae: 0 },
+                            sectorMomentum: {}
+                        };
+                    }
+
+                    // 1. Diversification (HHI)
+                    // HHI = sum of (weight^2) * 100
+                    const hhi = positions.reduce((sum, p) => {
+                        const weight = (p.marketValue / totalValue) * 100;
+                        return sum + (weight * weight);
+                    }, 0);
+
+                    // Normalize HHI (10000 = max concentration, 0 = min concentration)
+                    // We want 100 to be "Highly Diversified"
+                    const divScore = Math.max(0, 100 - (hhi / 100)); // Simple normalization
+                    const concentrationRisk = divScore > 80 ? 'Low' : divScore > 50 ? 'Medium' : 'High';
+
+                    // 2. Regional Breakdown
+                    const regional = { us: 0, egypt: 0, uae: 0 };
+                    positions.forEach(p => {
+                        const market = getMarketForSymbol(p.symbol);
+                        if (market === 'us') regional.us += p.marketValue;
+                        else if (market === 'egypt') regional.egypt += p.marketValue;
+                        else if (market === 'abudhabi') regional.uae += p.marketValue;
+                    });
+
+                    // Convert to percentages
+                    regional.us = (regional.us / totalValue) * 100;
+                    regional.egypt = (regional.egypt / totalValue) * 100;
+                    regional.uae = (regional.uae / totalValue) * 100;
+
+                    // 3. Sector Momentum (Simplified as avg. P/L % per sector)
+                    const sectorPL: Record<string, { total: number, count: number }> = {};
+                    positions.forEach(p => {
+                        const sector = p.sector || 'Other';
+                        if (!sectorPL[sector]) sectorPL[sector] = { total: 0, count: 0 };
+                        sectorPL[sector].total += p.profitLossPercent || 0;
+                        sectorPL[sector].count += 1;
+                    });
+
+                    const sectorMomentum: Record<string, number> = {};
+                    Object.entries(sectorPL).forEach(([sector, data]) => {
+                        sectorMomentum[sector] = data.total / data.count;
+                    });
+
+                    return {
+                        diversificationScore: divScore,
+                        concentrationRisk,
+                        weightedRsi: null, // RSI requires separate fetching logic
+                        regionalBreakdown: regional,
+                        sectorMomentum
                     };
                 },
 

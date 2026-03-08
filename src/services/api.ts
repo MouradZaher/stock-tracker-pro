@@ -30,9 +30,8 @@ export const setCachedData = (key: string, data: any) => {
     cache.set(key, { data, timestamp: Date.now() });
 };
 
-// API base URL - uses Vercel proxy in production, direct in dev
-const API_BASE_URL = import.meta.env.VITE_API_URL ||
-    (window.location.hostname === 'localhost' ? 'https://stock-tracker-pro.vercel.app/api' : '/api');
+// API base URL - prioritize local /api for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Create Axios instance for Yahoo Finance API calls
 export const yahooFinanceApi = axios.create({

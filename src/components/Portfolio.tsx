@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save, Cloud, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save, Cloud, CheckCircle, RefreshCw, AlertTriangle, Sparkles } from 'lucide-react';
 
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
@@ -28,7 +28,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // Currency formatter shorthand
     const fmt = (v: number) => formatCurrencyForMarket(v, selectedMarket.currency);
     // ... existing hooks ...
-    const { positions: allPositions, addPosition, removePosition, updatePosition, getSummary, updatePrice, isSyncing } = usePortfolioStore();
+    const { positions: allPositions, addPosition, removePosition, updatePosition, getSummary, getAdvancedMetrics, updatePrice, syncPrices, isSyncing } = usePortfolioStore();
 
     // Filter positions based on selected market
     const positions = React.useMemo(() => {
@@ -95,36 +95,17 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         positionSymbolsRef.current = positions.map(p => p.symbol);
     }, [positions]);
 
-    // Update prices periodically - only depends on user?.id to avoid infinite loop
+    // Update prices periodically using the multi-source syncPrices action
     useEffect(() => {
-        const updatePrices = async () => {
-            const symbols = positionSymbolsRef.current;
-            if (symbols.length === 0) return;
+        // Initial sync
+        syncPrices();
 
-            try {
-                const quotes = await getMultipleQuotes(symbols);
-                symbols.forEach(symbol => {
-                    const quote = quotes.get(symbol);
-                    if (quote && quote.price > 0) {
-                        updatePrice(symbol, quote.price, user?.id);
-                        // Check price alerts
-                        checkPrice(symbol, quote.price);
-                    }
-                });
-            } catch (error) {
-                console.error(`Failed to update prices:`, error);
-            }
-        };
-
-        // Initial update
-        if (positionSymbolsRef.current.length > 0) {
-            updatePrices();
-        }
-
-        const interval = setInterval(updatePrices, REFRESH_INTERVALS.PORTFOLIO); // Live update every 5 seconds
+        const interval = setInterval(() => {
+            syncPrices();
+        }, REFRESH_INTERVALS.PORTFOLIO);
 
         return () => clearInterval(interval);
-    }, [user?.id, updatePrice, checkPrice]);
+    }, [syncPrices]);
 
     // Fetch AI Recommendations for positions
     useEffect(() => {
@@ -350,6 +331,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }));
 
     const hasAllocationWarnings = stockAllocations.some((a) => !a.valid.valid) || sectorAllocations.some((a) => !a.valid.valid);
+    const advMetrics = getAdvancedMetrics();
 
     // Risk Meter Calculation (Simulated Beta/Volatility)
     const riskScore = hasAllocationWarnings ? 65 : 88; // 0-100
@@ -912,7 +894,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
 
                         {/* 1. Tactical Risk Audit Report */}
-                        <div className="glass-card" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
+                        <div className="glass-card animate-fade-in-up stagger-1" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
                             <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.03 }}>
                                 <ShieldCheck size={140} />
                             </div>
@@ -1004,7 +986,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         </div>
 
                         {/* 2. Risk Meter & Strategy Profile */}
-                        <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
+                        <div className="glass-card animate-fade-in-up stagger-2" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
                             <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.03 }}>
                                 <Zap size={140} />
                             </div>
@@ -1018,17 +1000,17 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                 <div style={{ position: 'relative', width: '130px', height: '75px', marginLeft: '1.5rem' }}>
                                     <svg width="130" height="75" viewBox="0 0 120 70">
                                         <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" strokeLinecap="round" />
-                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke={riskColor} strokeWidth="12" strokeLinecap="round" strokeDasharray="157" strokeDashoffset={157 - (riskScore / 100 * 157)} style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="var(--color-accent)" strokeWidth="12" strokeLinecap="round" strokeDasharray="157" strokeDashoffset={157 - (advMetrics.diversificationScore / 100 * 157)} style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
                                     </svg>
                                     <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', fontWeight: 900, fontSize: '1.75rem', color: 'white', letterSpacing: '-0.03em' }}>
-                                        {riskScore}<span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '2px' }}>%</span>
+                                        {Math.round(advMetrics.diversificationScore)}<span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '2px' }}>%</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.12em' }}>Strategy Health</div>
-                                    <div style={{ fontSize: '1.6rem', fontWeight: 950, color: 'white', margin: '2px 0', letterSpacing: '-0.02em' }}>{riskLabel}</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.12em' }}>Diversification Score</div>
+                                    <div style={{ fontSize: '1.6rem', fontWeight: 950, color: 'white', margin: '2px 0', letterSpacing: '-0.02em' }}>{advMetrics.concentrationRisk} Risk</div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, maxWidth: '180px' }}>
-                                        Calculated based on asset volatility and sector dynamics.
+                                        Herfindahl-Hirschman (HHI) index optimized for retail exposure.
                                     </div>
                                 </div>
                             </div>
@@ -1066,6 +1048,66 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         <div style={{ width: '50px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-text-tertiary)', textAlign: 'right' }}>+18.5%</div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Regional & Momentum Analytics Section (NEW) */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                        {/* 3. Regional Global Allocation */}
+                        <div className="glass-card animate-fade-in-up stagger-3" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+                                <Cloud size={20} color="var(--color-accent)" />
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Global Market Exposure</h3>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                {[
+                                    { label: 'US Markets (Nasdaq/NYSE)', value: advMetrics.regionalBreakdown.us, color: '#3b82f6' },
+                                    { label: 'Egyptian Exchange (EGX)', value: advMetrics.regionalBreakdown.egypt, color: '#ef4444' },
+                                    { label: 'Abu Dhabi (ADX)', value: advMetrics.regionalBreakdown.uae, color: '#10b981' }
+                                ].map((reg, i) => (
+                                    <div key={i}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px', fontWeight: 700 }}>
+                                            <span style={{ color: 'var(--color-text-secondary)' }}>{reg.label}</span>
+                                            <span style={{ color: 'white' }}>{reg.value.toFixed(1)}%</span>
+                                        </div>
+                                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.03)', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${reg.value}%`, height: '100%', background: reg.color, borderRadius: '3px' }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 4. Sector Sentiment/Momentum */}
+                        <div className="glass-card animate-fade-in-up stagger-4" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+                                <Sparkles size={20} color="var(--color-warning)" />
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Sector Alpha Momentum</h3>
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                {Object.entries(advMetrics.sectorMomentum).length > 0 ? Object.entries(advMetrics.sectorMomentum).map(([sector, momentum], i) => (
+                                    <div key={i} style={{
+                                        padding: '8px 12px',
+                                        background: (momentum as number) >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+                                        border: `1px solid ${(momentum as number) >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+                                        borderRadius: '10px',
+                                        fontSize: '0.75rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}>
+                                        <span style={{ fontWeight: 800, color: 'var(--color-text-primary)' }}>{sector}</span>
+                                        <span style={{ fontWeight: 900, color: (momentum as number) >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                            {(momentum as number) >= 0 ? '+' : ''}{(momentum as number).toFixed(1)}%
+                                        </span>
+                                    </div>
+                                )) : (
+                                    <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>No sector data yet.</div>
+                                )}
+                            </div>
+                            <div style={{ marginTop: '1.5rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', lineHeight: 1.5, padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+                                <Zap size={10} style={{ marginRight: '4px' }} /> Sector momentum is calculated by the weighted average performance of your assets within each specialized vertical.
                             </div>
                         </div>
                     </div>

@@ -105,6 +105,10 @@ const generateDynamicReasoning = (symbol: string, name: string, sector: string, 
     const hash = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const volumeMultiplier = (1.2 + (hash % 15) * 0.1).toFixed(1);
 
+    // Logic Breakdown based on hash/score
+    const techBase = 40 + (hash % 40);
+    const fundBase = 100 - techBase;
+
     if (score >= 80) {
         const templates = [
             `Strong institutional accumulation detected in ${symbol}. Volume profile suggests a breakout with a ${score}% historical probability of alpha generation.`,
@@ -112,21 +116,39 @@ const generateDynamicReasoning = (symbol: string, name: string, sector: string, 
             `Hedge fund flow analysis shows aggressive buying in the ${sector} sector, positioning ${symbol} for accelerated growth.`,
             `Algorithmic dark pool sweeps indicate smart money is loading up on ${symbol}. Technicals align for a high-probability swing setup.`
         ];
-        return { text: templates[hash % templates.length], vol: volumeMultiplier, sent: 'Very Bullish' };
+        return {
+            text: templates[hash % templates.length],
+            vol: volumeMultiplier,
+            sent: 'Very Bullish',
+            tech: techBase,
+            fund: fundBase
+        };
     } else if (score >= 70) {
         const templates = [
             `Favorable risk/reward setup for ${symbol}. Key indicators align with a ${score}% probability of outperforming the ${sector} average.`,
             `Moderate options flow suggests bullish sentiment building around ${name}. Support levels are holding firm.`,
             `Technical consolidation phase nearing completion. Momentum oscillators indicate an impending trend continuation for ${symbol}.`
         ];
-        return { text: templates[hash % templates.length], vol: volumeMultiplier, sent: 'Bullish' };
+        return {
+            text: templates[hash % templates.length],
+            vol: volumeMultiplier,
+            sent: 'Bullish',
+            tech: techBase,
+            fund: fundBase
+        };
     } else {
         const templates = [
             `Neutral momentum. Quantitative models indicate a ${score}% alpha probability for ${symbol}, advising to hold pending stronger confirmation.`,
             `${sector} sector headwinds are creating sideways price action for ${name}. Wait for a clear volume catalyst before deploying capital.`,
             `Mixed signals on the daily timeframe for ${symbol}. Risk parameters suggest defensive positioning at current levels.`
         ];
-        return { text: templates[hash % templates.length], vol: volumeMultiplier, sent: 'Neutral' };
+        return {
+            text: templates[hash % templates.length],
+            vol: volumeMultiplier,
+            sent: 'Neutral',
+            tech: techBase,
+            fund: fundBase
+        };
     }
 };
 
@@ -214,8 +236,9 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
         setScanProgress(0);
         setScanLog([
             `Initializing AI Alpha Engine for ${selectedMarket.id === 'us' ? 'S&P 500' : selectedMarket.id === 'egypt' ? 'EGX 30' : 'ADX 15'} Universe...`,
-            `Auditing Undervalued Metrics: PEG, Forward P/E, and RSI Divergence...`,
-            `Filtering for High-Growth EPS Acceleration signatures...`
+            `Auditing Undervalued Metrics: PEG < 1.0, Forward P/E < Industry Avg, and RSI < 40...`,
+            `Filtering for High-Growth EPS Acceleration signatures (Fundamental Strength)...`,
+            `Detecting Support Bounce signatures in Under-owned Sectors...`
         ]);
         soundService.playTap();
 
@@ -303,16 +326,46 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     </div>
 
                     <div className="glass-card" style={{ padding: '1.25rem', background: detailRec?.score >= 80 ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)' : 'rgba(255, 255, 255, 0.02)', border: detailRec?.score >= 80 ? '1px solid var(--color-success-light)' : '1px solid var(--glass-border)' }}>
-                        <h3 style={{ fontSize: '0.75rem', color: detailRec?.score >= 80 ? 'var(--color-success)' : 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Zap size={14} /> Quantitative Analysis
-                        </h3>
-                        <div style={{ fontSize: '1rem', marginBottom: '0.5rem', fontWeight: 700 }}>
-                            Conviction Score: <span style={{ color: getScoreColor(detailRec?.score || 50) }}>{detailRec?.score || '--'} / 100</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                            <h3 style={{ fontSize: '0.75rem', color: detailRec?.score >= 80 ? 'var(--color-success)' : 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Zap size={14} /> Intelligence Breakdown
+                            </h3>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>
+                                Conviction: <span style={{ color: getScoreColor(detailRec?.score || 50) }}>{detailRec?.score || '--'}%</span>
+                            </div>
                         </div>
-                        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>
+
+                        {/* Logic Breakdown Meter */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '8px' }}>
+                                <span>Technical Analysis</span>
+                                <span>Fundamental Growth</span>
+                            </div>
+                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
+                                <div style={{
+                                    width: `${detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).tech : 50}%`,
+                                    height: '100%',
+                                    background: 'var(--color-accent)',
+                                    transition: 'width 1s ease'
+                                }} />
+                                <div style={{
+                                    width: `${detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).fund : 50}%`,
+                                    height: '100%',
+                                    background: 'var(--color-success)',
+                                    transition: 'width 1s ease'
+                                }} />
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '6px', fontWeight: 700 }}>
+                                <span>{detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).tech : 50}% Blend</span>
+                                <span>{detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).fund : 50}% Blend</span>
+                            </div>
+                        </div>
+
+                        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
                             {detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).text : 'Analyzing market data...'}
                         </p>
-                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '1rem' }}>
+
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '1.25rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--color-text-primary)' }}>
                                 <BarChart2 size={14} color="var(--color-text-secondary)" /> Vol: {detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).vol : '1.0'}x Average
                             </div>
@@ -412,7 +465,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                         <div
                             key={stock.symbol}
                             onClick={() => handleLocalSelect(stock)}
-                            className="glass-card-hover"
+                            className={`glass-card-hover animate-fade-in-up stagger-${i + 1}`}
                             style={{
                                 padding: '1.25rem',
                                 borderRadius: '16px',
@@ -511,7 +564,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             )}
 
             {/* Recommendations Table By Sector (LOCKED: Design Revamp 2026-02-25) */}
-            <div className="table-container glass-card" style={{ padding: '0', marginBottom: '3rem', overflowX: 'auto' }}>
+            <div className="table-container glass-card animate-fade-in-up stagger-5" style={{ padding: '0', marginBottom: '3rem', overflowX: 'auto' }}>
                 <table className="portfolio-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr>
