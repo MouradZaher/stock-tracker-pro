@@ -58,43 +58,49 @@ const HeatmapMobileFallback: React.FC = () => {
             }}>
                 {data.map((stock) => (
                     <div key={stock.symbol} style={{
-                        padding: '12px',
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid var(--glass-border)',
-                        borderRadius: '12px',
+                        padding: '14px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        borderRadius: '16px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '4px'
+                        gap: '6px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                        backdropFilter: 'blur(10px)'
                     }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.9rem', fontWeight: 900 }}>{stock.symbol}</span>
+                            <span style={{ fontSize: '0.95rem', fontWeight: 900, color: '#fff' }}>{stock.symbol}</span>
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '2px',
-                                fontSize: '0.7rem',
+                                gap: '3px',
+                                fontSize: '0.75rem',
                                 fontWeight: 800,
-                                color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)'
+                                color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                                background: stock.change >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                padding: '2px 6px',
+                                borderRadius: '6px'
                             }}>
                                 {stock.change >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                                {Math.abs(stock.change)}%
+                                {Math.abs(stock.change).toFixed(2)}%
                             </div>
                         </div>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
                             {formatCurrency(stock.price)}
                         </span>
                         <div style={{
                             width: '100%',
-                            height: '4px',
-                            background: 'rgba(255,255,255,0.05)',
-                            borderRadius: '2px',
+                            height: '5px',
+                            background: 'rgba(255,255,255,0.08)',
+                            borderRadius: '3px',
                             marginTop: '4px',
                             overflow: 'hidden'
                         }}>
                             <div style={{
-                                width: `${Math.min(Math.abs(stock.change) * 20, 100)}%`,
+                                width: `${Math.min(Math.abs(stock.change) * 15, 100)}%`,
                                 height: '100%',
-                                background: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)'
+                                background: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                                boxShadow: stock.change >= 0 ? '0 0 10px var(--color-success)' : '0 0 10px var(--color-error)'
                             }} />
                         </div>
                     </div>
