@@ -127,6 +127,9 @@ export default async function handler(req, res) {
             else if (sym === 'CAT') base = 365.10;
             else if (sym === 'XOM') base = 118.20;
             else if (sym === 'CVX') base = 158.40;
+            else if (sym === 'AMZN') base = 178.50;
+            else if (sym === 'META') base = 495.20;
+            else if (sym === 'DIS') base = 112.10;
             else if (sym === 'ASML') base = 985.60;
 
             // Generate a realistic but random price fluctuation

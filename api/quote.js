@@ -140,6 +140,9 @@ export default async function handler(req, res) {
                 else if (sym === 'NVDA') base = 902.50;
                 else if (sym === 'GOOGL') base = 158.30;
                 else if (sym === 'TSLA') base = 175.20;
+                else if (sym === 'AMZN') base = 178.50;
+                else if (sym === 'META') base = 495.20;
+                else if (sym === 'DIS') base = 112.10;
                 else if (sym === 'COMI') base = 75.10;
                 else if (sym === 'TMGH') base = 62.40;
                 else if (sym === 'FWRY') base = 6.80;
