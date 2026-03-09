@@ -24,12 +24,26 @@ const AdminPortfolioView: React.FC<AdminPortfolioViewProps> = ({ userId, userEma
         const loadPortfolio = async () => {
             setLoading(true);
             try {
-                const data = await fetchUserPortfolios(userId);
-                setPositions(data);
+                const positionsData = await fetchUserPortfolios(userId);
 
-                // Calculate summary
-                const totalValue = data.reduce((sum, p) => sum + (p.units * p.currentPrice), 0);
-                const totalCost = data.reduce((sum, p) => sum + (p.units * p.avgCost), 0);
+                // Fetch real-time quotes to ensure admin sees live data, not placeholders
+                const { getMultipleQuotes } = await import('../services/stockDataService');
+                const symbols = positionsData.map(p => p.symbol);
+                const quotes = await getMultipleQuotes(symbols);
+
+                const updatedPositions = positionsData.map(pos => {
+                    const quote = quotes.get(pos.symbol);
+                    if (quote && quote.price > 0) {
+                        return { ...pos, currentPrice: quote.price };
+                    }
+                    return pos;
+                });
+
+                setPositions(updatedPositions);
+
+                // Calculate summary with live prices
+                const totalValue = updatedPositions.reduce((sum, p) => sum + (p.units * p.currentPrice), 0);
+                const totalCost = updatedPositions.reduce((sum, p) => sum + (p.units * p.avgCost), 0);
                 const totalPL = totalValue - totalCost;
                 const totalPLPercent = totalCost > 0 ? (totalPL / totalCost) * 100 : 0;
 

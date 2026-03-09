@@ -6,15 +6,15 @@ const SYMBOLS = ['TSLA', 'AMZN', 'GOOGL', 'META', '^GSPC', 'AAPL', 'NVDA', 'MSFT
 
 // Fallback data when API is unavailable - shows last known approximate prices
 const FALLBACK_DATA = [
-    { symbol: 'TSLA', price: 185.10, change: -0.85, isUp: false },
-    { symbol: 'AMZN', price: 178.35, change: 0.32, isUp: true },
-    { symbol: 'GOOGL', price: 146.40, change: -0.15, isUp: false },
-    { symbol: 'META', price: 478.15, change: 0.75, isUp: true },
-    { symbol: 'S&P 500', price: 5085.60, change: 0.12, isUp: true },
-    { symbol: 'AAPL', price: 188.45, change: 0.25, isUp: true },
-    { symbol: 'NVDA', price: 785.30, change: 1.15, isUp: true },
-    { symbol: 'MSFT', price: 412.50, change: 0.45, isUp: true },
-    { symbol: 'NFLX', price: 635.00, change: 1.50, isUp: true }
+    { symbol: 'TSLA', price: 242.15, change: 1.24, isUp: true },
+    { symbol: 'AMZN', price: 189.35, change: 0.32, isUp: true },
+    { symbol: 'GOOGL', price: 165.40, change: -0.15, isUp: false },
+    { symbol: 'META', price: 524.15, change: 0.75, isUp: true },
+    { symbol: 'S&P 500', price: 5625.60, change: 0.12, isUp: true },
+    { symbol: 'AAPL', price: 228.45, change: 0.25, isUp: true },
+    { symbol: 'NVDA', price: 118.30, change: 1.15, isUp: true },
+    { symbol: 'MSFT', price: 442.50, change: 0.45, isUp: true },
+    { symbol: 'NFLX', price: 685.00, change: 1.50, isUp: true }
 ];
 
 const TopBar: React.FC = () => {
@@ -89,8 +89,11 @@ const TopBar: React.FC = () => {
             alignItems: 'center',
             padding: '0 1rem',
             fontSize: '0.75rem',
-            background: 'rgba(0,0,0,0.3)',
-            zIndex: 50,
+            background: 'rgba(0,0,0,0.8)',
+            zIndex: 1100, // Above header
+            position: 'fixed',
+            top: 0,
+            left: 0,
             overflow: 'hidden',
             whiteSpace: 'nowrap'
         }}>

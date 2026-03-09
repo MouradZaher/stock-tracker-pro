@@ -102,8 +102,8 @@ const StockHeatmap: React.FC = () => {
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                borderRadius: '12px',
-                border: '1px solid var(--glass-border)',
+                borderRadius: 0,
+                border: 'none',
             }}
         >
             {error ? (

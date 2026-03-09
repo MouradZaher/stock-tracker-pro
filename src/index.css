@@ -249,12 +249,12 @@ html[data-theme='light'] {
 
 @media (min-width: 768px) {
   .heatmap-wrapper {
-    left: 1rem;
-    right: 1rem;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--glass-border);
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 0;
+    border: none;
   }
 }
 
@@ -601,15 +601,14 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--spacing-xl) 6px !important;
+  padding: 0 var(--spacing-xl) 0 !important;
   height: var(--header-height) !important;
   background: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border);
   z-index: 1000;
   position: fixed;
-  display: flex;
-  align-items: center;
-  top: 0;
+  top: 32px;
+  /* Accounting for TopBar */
   left: 0;
   right: 0;
 }
@@ -869,9 +868,10 @@ h6 {
   width: 100%;
   margin: 0;
   position: relative;
-  padding: calc(var(--header-height) + var(--spacing-lg)) var(--spacing-xl) var(--spacing-xl);
+  /* Top spacing = TopBar (32px) + Header (var(--header-height)) */
+  padding: calc(var(--header-height) + 32px) 0 0;
   /* Support for iOS safe area and prevent mobile nav overlap */
-  padding-bottom: calc(var(--mobile-nav-height) + var(--spacing-lg) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
 }
 
 .tab-content {
@@ -881,8 +881,9 @@ h6 {
   overflow: visible;
   animation: fadeIn var(--transition-base);
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: 100%;
+  /* Fully enlarge horizontally */
+  margin: 0;
 }
 
 @keyframes fadeIn {
@@ -3415,12 +3416,14 @@ body,
     box-shadow: 0 0 5px #3b82f6;
   }
 }
+
 /* Staggered Entrance Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -3432,12 +3435,34 @@ body,
   animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-.stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.10s; }
-.stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.20s; }
-.stagger-5 { animation-delay: 0.25s; }
-.stagger-6 { animation-delay: 0.30s; }
-.stagger-7 { animation-delay: 0.35s; }
-.stagger-8 { animation-delay: 0.40s; }
+.stagger-1 {
+  animation-delay: 0.05s;
+}
 
+.stagger-2 {
+  animation-delay: 0.10s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.20s;
+}
+
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+
+.stagger-6 {
+  animation-delay: 0.30s;
+}
+
+.stagger-7 {
+  animation-delay: 0.35s;
+}
+
+.stagger-8 {
+  animation-delay: 0.40s;
+}

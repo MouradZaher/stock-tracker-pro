@@ -49,9 +49,21 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const { isAuthenticated, logout, user } = usePinAuth();
+  const syncPrices = usePortfolioStore(state => state.syncPrices);
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  // Auto-sync portfolio prices on login/refresh to replace $150 placeholders
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('🔄 Initializing portfolio price sync...');
+      syncPrices();
+      // Also sync every 30 seconds
+      const interval = setInterval(syncPrices, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, syncPrices]);
 
   // If not authenticated, show PIN login
   if (!isAuthenticated) {
