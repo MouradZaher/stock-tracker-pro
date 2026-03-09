@@ -164,7 +164,6 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
     }
 
     // 3. Try serverless proxy first (Tier 1 - Multi-Quote)
-    console.log(`🔍 Fetching Tier 1 (Proxy) for ${searchSymbol}...`);
     let result = await fetchFromProxy(searchSymbol);
     if (result && result.price > 0) {
         setCachedData(cacheKey, result);
@@ -174,14 +173,12 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
 
     // 4. Fallback to Direct API Providers (Tier 2-10)
     const availableProviderIds = getAvailableProviders();
-    console.log(`🔄 Proxy failed. Rotating through ${availableProviderIds.length} alternative sources for ${symbol}...`);
 
     for (const providerId of availableProviderIds) {
         // Skip providers that are part of the proxy already (handled in Tier 1)
         if (providerId === 'yahoo') continue;
 
         try {
-            console.log(`📡 Trying Source: ${providerId} for ${symbol}...`);
             let quote: StockQuote | null = null;
 
             // Map provider ID to its specific fetcher function
@@ -194,7 +191,6 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
             }
 
             if (quote && quote.price > 0) {
-                console.log(`✅ Success from ${providerId} for ${symbol}`);
                 setCachedData(cacheKey, quote);
                 setCachedData(`last_good_${symbol}`, quote);
                 return quote;
@@ -207,7 +203,6 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
     // 5. Use last known good price (Safety Net)
     const lastGood = getCachedData(`last_good_${symbol}`, GOOD_PRICE_CACHE_DURATION);
     if (lastGood) {
-        console.log(`💾 Using cached fallback for ${symbol}`);
         return {
             ...lastGood,
             name: `${lastGood.name} (Estimated)`,

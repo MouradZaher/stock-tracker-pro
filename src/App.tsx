@@ -57,7 +57,6 @@ function AppContent() {
   // Auto-sync portfolio prices on login/refresh to replace $150 placeholders
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('🔄 Initializing portfolio price sync...');
       syncPrices();
       // Also sync every 30 seconds
       const interval = setInterval(syncPrices, 30000);
