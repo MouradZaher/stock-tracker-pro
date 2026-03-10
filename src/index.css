@@ -269,13 +269,14 @@ html[data-theme='light'] {
   }
 
   .main-content:has(.home-tab-content) {
-    padding: 0 !important;
-    /* allow scrolling if content overflows */
+    padding: calc(var(--header-height) + 32px) 0 0 !important;
+    /* ensure top offset for TopBar(32) + Header(64) */
   }
 
   .home-tab-content {
-    min-height: calc(100vh - var(--header-height)) !important;
-    padding: 0 !important;
+    min-height: calc(100vh - (var(--header-height) + 32px)) !important;
+    padding: 1rem !important;
+    /* Contain it for better aesthetics */
     display: flex;
     flex-direction: column;
     overflow: hidden;

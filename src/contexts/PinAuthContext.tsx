@@ -65,7 +65,9 @@ export const PinAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
             unsubRef.current();
             unsubRef.current = null;
         }
-        loadFromSupabase(userId);
+        // Use syncWithSupabase instead of loadFromSupabase to preserve local positions
+        // and upload them to the cloud on login/refresh.
+        syncWithSupabase(userId);
         unsubRef.current = initRealtimeSubscription(userId);
     };
 
