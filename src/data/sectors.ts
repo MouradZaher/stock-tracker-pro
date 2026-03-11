@@ -69,12 +69,13 @@ export const STOCKS_BY_INDEX: Record<string, { symbol: string; name: string }[]>
         { symbol: 'ADIB', name: 'ADIB Egypt' },
         { symbol: 'ETEL', name: 'Telecom Egypt' },
         { symbol: 'ABUK', name: 'Abu Qir Fertilizers' },
-        { symbol: 'FWRY', name: 'Fawry' },
-        { symbol: 'SWDY', name: 'Elsewedy Electric' },
-        { symbol: 'ORAS', name: 'Orascom Construction' },
-        { symbol: 'RAYA', name: 'Raya Holding' },
-        { symbol: 'PHDC', name: 'Palm Hills' },
         { symbol: 'CLHO', name: 'Cleopatra Hospitals' },
+        { symbol: 'FWRY', name: 'Fawry' },
+        { symbol: 'OLFI', name: 'Obour Land' },
+        { symbol: 'SKPC', name: 'Sidi Kerir Petrocl' },
+        { symbol: 'AZG', name: 'Azimut Egypt Equity' },
+        { symbol: 'AZO', name: 'Azimut Egypt Opp' },
+        { symbol: 'CI30', name: 'CI Capital EGX30 Fund' },
     ],
     'FTSE ADX 15': [
         { symbol: 'IHC', name: 'International Holding Co.' },
@@ -268,6 +269,10 @@ export const POPULAR_ETFS = [
     { symbol: 'GLD', name: 'SPDR Gold Shares', sector: 'Commodities' },
     { symbol: 'USO', name: 'United States Oil Fund', sector: 'Commodities' },
     { symbol: 'TLT', name: 'iShares 20+ Year Treasury Bond ETF', sector: 'Fixed Income' },
+    { symbol: 'AZG', name: 'Azimut Egypt Equity Fund', sector: 'Financial Services' },
+    { symbol: 'AZO', name: 'Azimut Egypt Opportunistic', sector: 'Financial Services' },
+    { symbol: 'CI30', name: 'CI Capital EGX 30 Index Fund', sector: 'Financial Services' },
+    { symbol: 'BMM', name: 'Banque Misr Money Market', sector: 'Financial Services' },
 ];
 
 // Get sector for a symbol
@@ -292,7 +297,7 @@ export const getMarketForSymbol = (symbol: string): 'us' | 'egypt' | 'abudhabi' 
     if (STOCKS_BY_INDEX['FTSE ADX 15']?.some(s => s.symbol === symbol)) return 'abudhabi';
 
     // Explicit list fallback just in case
-    const egyptSymbols = ['COMI', 'TMGH', 'FWRY', 'HRHO', 'EAST', 'ETEL', 'PHDC', 'ORAS', 'SWDY', 'ABUK', 'CLHO', 'EMFD', 'EFID', 'ADIB', 'RAYA'];
+    const egyptSymbols = ['COMI', 'TMGH', 'FWRY', 'HRHO', 'EAST', 'ETEL', 'PHDC', 'ORAS', 'SWDY', 'ABUK', 'CLHO', 'EMFD', 'EFID', 'ADIB', 'RAYA', 'OLFI', 'SKPC', 'AZG', 'AZO', 'BAL', 'BCO', 'BFF', 'BIN', 'BMM', 'CI30'];
     if (egyptSymbols.includes(symbol)) return 'egypt';
 
     const adxSymbols = ['IHC', 'FAB', 'ETISALAT', 'ADNOCDIST', 'ALDAR', 'ADCB', 'MULTIPLY', 'ADNOCDRILL', 'PRESIGHT', 'FERTIGLBE', 'DANA', 'AGTHIA', 'YAHSAT', 'ALPHADHABI', 'RAKPROP'];

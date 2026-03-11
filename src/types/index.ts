@@ -70,6 +70,7 @@ export interface PortfolioPosition {
   dividends: Dividend[];
   currency?: string;  // e.g. 'USD', 'EGP', 'AED'
   marketValueUSD?: number; // Normalized value
+  purchaseValueUSD?: number; // Normalized cost
 }
 
 export interface PortfolioSummary {

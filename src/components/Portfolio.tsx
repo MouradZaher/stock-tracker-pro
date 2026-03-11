@@ -61,18 +61,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     // Safety: Ensure getSummary never crashes
     const summary = React.useMemo(() => {
         try {
-            // Unused, but keeps getSummary from throwing if it had errors internally
-            getSummary();
-
+            // Calculate GLOBAL totals across all markets for the summary cards
+            const globalTotalValueUSD = allPositions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
+            
+            // Local market totals (for the list context)
             const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
-            const normalizedTotalValueUSD = positions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
             const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
             const totalProfitLoss = totalValue - totalCost;
             const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
 
             return {
                 totalValue,
-                normalizedTotalValueUSD,
+                normalizedTotalValueUSD: globalTotalValueUSD,
                 totalCost,
                 totalProfitLoss,
                 totalProfitLossPercent,
@@ -89,7 +89,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 positions: []
             };
         }
-    }, [getSummary, positions]); // Recompute when positions change
+    }, [allPositions, positions]); // Recompute when any positions change
 
     // Use ref to track symbols for price updates without causing re-renders
     const positionSymbolsRef = useRef<string[]>([]);
@@ -421,27 +421,65 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         Manage your positions and track real-time performance
                     </p>
                 </div>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => setShowModal(true)}
-                    style={{
-                        background: 'var(--gradient-primary)',
-                        border: 'none',
-                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
-                        padding: '0.75rem 1.5rem',
-                        borderRadius: '12px',
-                        fontWeight: 700,
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        transformOrigin: 'center'
-                    }}
-                >
-                    <Plus size={18} strokeWidth={3} />
-                    <span>Add position</span>
-                </button>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <button
+                        className="glass-button"
+                        onClick={async () => {
+                            const egyptPositions = [
+                                { symbol: 'AZG', name: 'Azimut Egypt Equity Fund', units: 10771, avgCost: 21.03, currentPrice: 28.51, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'AZO', name: 'Azimut Egypt Opportunistic', units: 2708, avgCost: 31.79, currentPrice: 43.13, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'BAL', name: 'Balanced Fund', units: 5109, avgCost: 1.00, currentPrice: 1.19, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'BCO', name: 'Banque du Caire Fund', units: 3632, avgCost: 1.38, currentPrice: 1.36, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'BFF', name: 'Banque Misr Fixed Income', units: 119, avgCost: 42.01, currentPrice: 42.00, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'BIN', name: 'Banque Misr Islamic Fund', units: 3291, avgCost: 1.52, currentPrice: 1.57, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'BMM', name: 'Banque Misr Money Market', units: 62526, avgCost: 1.33, currentPrice: 1.68, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'CI30', name: 'CI Capital EGX 30 Fund', units: 1441, avgCost: 20.81, currentPrice: 32.08, sector: 'Financial Services', currency: 'EGP' },
+                                { symbol: 'OLFI', name: 'Obour Land', units: 66, avgCost: 6.90, currentPrice: 10.53, sector: 'Consumer Defensive', currency: 'EGP' },
+                                { symbol: 'SKPC', name: 'Sidi Kerir Petrocl', units: 2, avgCost: 0.01, currentPrice: 18.35, sector: 'Basic Materials', currency: 'EGP' }
+                            ];
+                            const { addMultiplePositions } = usePortfolioStore.getState();
+                            await addMultiplePositions(egyptPositions, user?.id || 'bypass-user');
+                            toast.success('Egyptian assets integrated successfully!');
+                        }}
+                        style={{
+                            background: 'rgba(217, 119, 6, 0.1)',
+                            border: '1px solid rgba(217, 119, 6, 0.3)',
+                            padding: '0.75rem 1.5rem',
+                            borderRadius: '12px',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: '#fbbf24',
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
+                        <RefreshCw size={16} />
+                        <span>Sync Egypt Assets</span>
+                    </button>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => setShowModal(true)}
+                        style={{
+                            background: 'var(--gradient-primary)',
+                            border: 'none',
+                            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                            padding: '0.75rem 1.5rem',
+                            borderRadius: '12px',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transformOrigin: 'center'
+                        }}
+                    >
+                        <Plus size={18} strokeWidth={3} />
+                        <span>Add position</span>
+                    </button>
+                </div>
             </div>
 
             {/* Summary Cards */}

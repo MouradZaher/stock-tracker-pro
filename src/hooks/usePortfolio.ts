@@ -29,6 +29,7 @@ interface PortfolioStore {
     addPosition: (position: Omit<PortfolioPosition, 'id' | 'profitLoss' | 'profitLossPercent' | 'marketValue' | 'purchaseValue'>, userId?: string) => Promise<void>;
     updatePosition: (id: string, updates: Partial<PortfolioPosition>, userId?: string) => Promise<void>;
     removePosition: (id: string, symbol: string, userId?: string) => Promise<void>;
+    addMultiplePositions: (positions: Omit<PortfolioPosition, 'id' | 'profitLoss' | 'profitLossPercent' | 'marketValue' | 'purchaseValue'>[], userId?: string) => Promise<void>;
     updatePrice: (symbol: string, price: number, userId?: string) => Promise<void>;
     syncPrices: () => Promise<void>;
 
@@ -139,6 +140,45 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     }
                 },
 
+                addMultiplePositions: async (newPositions, userId) => {
+                    const positionsToSave = newPositions.map(p => {
+                        const id = `${p.symbol}-${Math.random().toString(36).substr(2, 9)}`;
+                        const purchaseValue = p.units * p.avgCost;
+                        const marketValue = p.units * p.currentPrice;
+                        const { amount, percent } = calculateProfitLoss(p.currentPrice, p.avgCost, p.units);
+                        
+                        return {
+                            ...p,
+                            id,
+                            purchaseValue,
+                            marketValue,
+                            profitLoss: amount,
+                            profitLossPercent: percent,
+                            sector: p.sector || getSectorForSymbol(p.symbol),
+                        } as PortfolioPosition;
+                    });
+
+                    // Optimistic update
+                    set((state) => ({
+                        positions: [...state.positions, ...positionsToSave],
+                    }));
+
+                    // Sync to Supabase
+                    if (userId && !userId.startsWith('bypass-')) {
+                        set({ isSyncing: true });
+                        try {
+                            await portfolioService.syncLocalToSupabase(userId, positionsToSave);
+                            set({ isSyncing: false });
+                        } catch (error) {
+                            console.error('Error batch saving positions:', error);
+                            set({
+                                error: 'Failed to sync some positions to cloud. Saved locally.',
+                                isSyncing: false
+                            });
+                        }
+                    }
+                },
+
                 removePosition: async (id, symbol, userId) => {
                     // Store old positions for potential rollback
                     const oldPositions = get().positions;
@@ -228,12 +268,14 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                 // Normalized value calculation
                                 const currency = pos.currency || (pos.symbol.includes('.CA') ? 'EGP' : pos.symbol.includes('.AD') ? 'AED' : 'USD');
                                 const marketValueUSD = convertToUSD(marketValue, currency, rates);
+                                const purchaseValueUSD = convertToUSD(pos.purchaseValue, currency, rates);
 
                                 return {
                                     ...pos,
                                     currentPrice: quote.price,
                                     marketValue,
                                     marketValueUSD,
+                                    purchaseValueUSD, // Added new field to state
                                     currency,
                                     profitLoss: amount,
                                     profitLossPercent: percent,
@@ -338,19 +380,19 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     
                     // Normalized sum in USD
                     const normalizedTotalValueUSD = positions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
+                    const normalizedTotalCostUSD = positions.reduce((sum, pos) => sum + (pos.purchaseValueUSD || 0), 0);
                     
-                    // Simplified: assume profit/loss percent is best viewed on the base currency (USD)
-                    // but we keep the legacy calculated total P/L for now
-                    const totalProfitLoss = totalValue - totalCost;
-                    const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
+                    // Global P/L based on normalized USD values
+                    const totalProfitLossUSD = normalizedTotalValueUSD - normalizedTotalCostUSD;
+                    const totalProfitLossPercentUSD = normalizedTotalCostUSD > 0 ? (totalProfitLossUSD / normalizedTotalCostUSD) * 100 : 0;
 
                     return {
                         totalValue,
                         normalizedTotalValueUSD,
                         totalCost,
-                        normalizedTotalCostUSD: 0, // Not strictly needed yet, value is priority
-                        totalProfitLoss,
-                        totalProfitLossPercent,
+                        normalizedTotalCostUSD,
+                        totalProfitLoss: totalProfitLossUSD, // We give preference to the normalized USD profit/loss
+                        totalProfitLossPercent: totalProfitLossPercentUSD,
                         positions,
                     };
                 },

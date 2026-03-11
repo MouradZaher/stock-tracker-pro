@@ -212,7 +212,23 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
 
     // 2. Prepare symbol (add market suffix if missing)
     let searchSymbol = symbol;
-    if (!symbol.includes('.')) {
+    
+    // Specialized Egypt Mapping
+    const egyptMapping: Record<string, string> = {
+        'GOUR': 'OLFI.CA', // Obour Land
+        'COMI': 'COMI.CA',
+        'TMGH': 'TMGH.CA',
+        'FWRY': 'FWRY.CA',
+        'SKPC': 'SKPC.CA',
+        // Mutual funds often use specialized tickers on Bloomberg/Reuters but might be on Yahoo
+        'AZG': 'AZG.CA', 
+        'AZO': 'AZO.CA',
+        'CI30': 'CI30.CA',
+    };
+
+    if (egyptMapping[symbol]) {
+        searchSymbol = egyptMapping[symbol];
+    } else if (!symbol.includes('.')) {
         const market = getMarketForSymbol(symbol);
         if (market === 'egypt') searchSymbol = `${symbol}.CA`;
         else if (market === 'abudhabi') searchSymbol = `${symbol}.AD`;
