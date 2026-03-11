@@ -39,6 +39,21 @@ const COINGECKO_IDS = {
     'DOGE': 'dogecoin', 'DOGE-USD': 'dogecoin',
 };
 
+// ─── Broker-verified minimum price floors ─────────────────────
+// If Yahoo returns below these floors, data is stale/wrong → reject it
+// and fall through to PRICE_MAP. Update whenever broker confirms new prices.
+const PRICE_FLOORS = {
+    // Commodities ETFs (gold/silver have rallied significantly)
+    'GLD': 400.00,  // floor: $400 — broker confirmed $475.70
+    'SLV': 55.00,   // floor: $55  — broker confirmed $77.52
+    // S&P500 ETFs
+    'VOO': 580.00,  // floor: $580 — broker confirmed $620.75
+    'SPY': 560.00,
+    'QQQ': 420.00,
+    // Index ETFs
+    'VTI': 230.00,
+};
+
 function getMarket(symbol) {
     const s = symbol.toUpperCase().split('.')[0].trim();
     if (symbol.includes('.CA')) return 'egypt';
@@ -181,11 +196,16 @@ async function fetchYahooBatch(yahooSymbols, endpoint = 'query1') {
     for (const q of results) {
         if (!q.regularMarketPrice) continue;
         const price = Number(q.regularMarketPrice) || 0;
-        // Sanity check: reject prices < $1 (catches MCD=$0.83 type garbage from Yahoo)
-        // Allow sub-$1 for known lower-value ADX/Egypt stocks explicitly handled by suffix
         const sym = q.symbol?.toUpperCase() || '';
         const isIndex = sym.startsWith('^');
-        if (!isIndex && price < 1.0) continue; // reject garbage
+        // Reject garbage prices < $1
+        if (!isIndex && price < 1.0) continue;
+        // Reject stale/wrong prices below broker-verified floors
+        const floor = PRICE_FLOORS[sym];
+        if (floor && price < floor) {
+            console.warn(`⚠️ Rejected ${sym} price $${price} (below floor $${floor}) — using PRICE_MAP fallback`);
+            continue;
+        }
         map.set(sym, {
             symbol: q.symbol,
             name: q.longName || q.shortName || q.symbol,

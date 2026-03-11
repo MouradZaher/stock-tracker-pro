@@ -26,6 +26,16 @@ const COINGECKO_IDS = {
     'SOL': 'solana', 'SOL-USD': 'solana',
 };
 
+// Broker-verified price floors — reject Yahoo prices below these
+const PRICE_FLOORS = {
+    'GLD': 400.00,  // broker confirmed $475.70
+    'SLV': 55.00,   // broker confirmed $77.52
+    'VOO': 580.00,  // broker confirmed $620.75
+    'SPY': 560.00,
+    'QQQ': 420.00,
+    'VTI': 230.00,
+};
+
 function getMarket(symbol) {
     const s = symbol.toUpperCase().split('.')[0].trim();
     if (symbol.includes('.CA')) return 'egypt';
@@ -165,15 +175,22 @@ export default async function handler(req, res) {
             // For quote responses, remap back to original symbol
             if (!isSummary && !isChart) {
                 const result = response.data?.quoteResponse?.result?.[0];
-                // Sanity check: reject clearly bad prices (< $1 for stocks, allows indices/ETFs/crypto)
-                const minPrice = rawSymbol.startsWith('^') ? 1 : 1.0;
-                if (result?.regularMarketPrice > minPrice) {
-                    result.symbol = rawSymbol; // restore original symbol
-                    result.regularMarketPrice = Number(result.regularMarketPrice) || 0;
+                const livePrice = Number(result?.regularMarketPrice) || 0;
+                // Reject if below $1 (garbage)
+                // Reject if below broker-verified floor (stale Yahoo data)
+                const base = rawSymbol.toUpperCase().split('.')[0];
+                const floor = PRICE_FLOORS[base];
+                const isIndex = rawSymbol.startsWith('^');
+                const passesFloor = !floor || livePrice >= floor;
+                if (livePrice > (isIndex ? 1 : 1.0) && passesFloor) {
+                    result.symbol = rawSymbol;
+                    result.regularMarketPrice = livePrice;
                     result.regularMarketChange = Number(result.regularMarketChange) || 0;
                     result.regularMarketChangePercent = Number(result.regularMarketChangePercent) || 0;
                     result.regularMarketPreviousClose = Number(result.regularMarketPreviousClose) || 0;
                     return res.status(200).json(response.data);
+                } else if (floor && livePrice < floor) {
+                    console.warn(`⚠️ Rejected ${rawSymbol} price $${livePrice} — below floor $${floor}`);
                 }
             } else {
                 return res.status(200).json(response.data);
