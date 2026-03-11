@@ -183,14 +183,14 @@ async function fetchYahooBatch(yahooSymbols, endpoint = 'query1') {
         map.set(q.symbol?.toUpperCase(), {
             symbol: q.symbol,
             name: q.longName || q.shortName || q.symbol,
-            price: q.regularMarketPrice,
-            change: q.regularMarketChange || 0,
-            changePercent: q.regularMarketChangePercent || 0,
-            previousClose: q.regularMarketPreviousClose || 0,
-            open: q.regularMarketOpen || 0,
-            high: q.regularMarketDayHigh || 0,
-            low: q.regularMarketDayLow || 0,
-            volume: q.regularMarketVolume || 0,
+            price: Number(q.regularMarketPrice) || 0,
+            change: Number(q.regularMarketChange) || 0,
+            changePercent: Number(q.regularMarketChangePercent) || 0,
+            previousClose: Number(q.regularMarketPreviousClose) || 0,
+            open: Number(q.regularMarketOpen) || 0,
+            high: Number(q.regularMarketDayHigh) || 0,
+            low: Number(q.regularMarketDayLow) || 0,
+            volume: Number(q.regularMarketVolume) || 0,
             provider: `yahoo_${endpoint}`,
         });
     }

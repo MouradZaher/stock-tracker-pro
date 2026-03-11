@@ -281,7 +281,22 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     const [detailStockData, setDetailStockData] = useState<any>(null);
 
     useEffect(() => {
-        if (detailSymbol) getStockData(detailSymbol).then(data => setDetailStockData(data.stock));
+        if (detailSymbol) getStockData(detailSymbol).then(data => {
+            if (!data?.stock) return;
+            // Normalize all numeric fields so .toFixed() never throws
+            const s = data.stock;
+            setDetailStockData({
+                ...s,
+                price: Number(s.price) || 0,
+                change: Number(s.change) || 0,
+                changePercent: Number(s.changePercent) || 0,
+                previousClose: Number(s.previousClose) || 0,
+                open: Number(s.open) || 0,
+                high: Number(s.high) || 0,
+                low: Number(s.low) || 0,
+                volume: Number(s.volume) || 0,
+            });
+        });
     }, [detailSymbol]);
 
     if (detailSymbol) {
