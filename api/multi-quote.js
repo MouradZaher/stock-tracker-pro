@@ -197,6 +197,14 @@ async function fetchYahooBatch(yahooSymbols, endpoint = 'query1') {
         if (!q.regularMarketPrice) continue;
         const price = Number(q.regularMarketPrice) || 0;
         const sym = q.symbol?.toUpperCase() || '';
+        const name = (q.longName || q.shortName || '').toLowerCase();
+
+        // REJECT CONFUSED SYMBOLS (e.g. SLV returning Selvita biotech instead of Silver ETF)
+        if (sym.split('.')[0] === 'SLV' && name.includes('selvita')) {
+            console.warn(`❌ Rejected batch SLV price: Name match "Selvita" detected.`);
+            continue;
+        }
+
         const isIndex = sym.startsWith('^');
         // Reject garbage prices < $1
         if (!isIndex && price < 1.0) continue;

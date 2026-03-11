@@ -176,6 +176,15 @@ export default async function handler(req, res) {
             if (!isSummary && !isChart) {
                 const result = response.data?.quoteResponse?.result?.[0];
                 const livePrice = Number(result?.regularMarketPrice) || 0;
+                const name = (result?.longName || result?.shortName || '').toLowerCase();
+                const rawBase = rawSymbol.toUpperCase().split('.')[0];
+
+                // REJECT CONFUSED SYMBOLS (e.g. SLV returning Selvita biotech instead of Silver ETF)
+                if (rawBase === 'SLV' && name.includes('selvita')) {
+                    console.warn(`❌ Rejected SLV price: Name match "Selvita" detected. Likely wrong asset.`);
+                    return res.status(200).json({ quoteResponse: { result: [] } });
+                }
+
                 // Reject if below $1 (garbage)
                 // Reject if below broker-verified floor (stale Yahoo data)
                 const base = rawSymbol.toUpperCase().split('.')[0];

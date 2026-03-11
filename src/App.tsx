@@ -175,7 +175,7 @@ function MainLayout({
                 <div className="heatmap-wrapper" style={{
                   flex: 1,
                   position: 'relative',
-                  minHeight: '300px', // Ensure it doesn't collapse to 0
+                  height: '500px', // Robust height for visibility on all devices
                   display: 'flex',
                   flexDirection: 'column'
                 }}>

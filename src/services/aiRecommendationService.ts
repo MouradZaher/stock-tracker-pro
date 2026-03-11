@@ -160,12 +160,15 @@ const calculateRecommendationScore = (params: {
     volumeScore: number;
     newsSentiment: { score: number; intensity: number };
     socialSentiment: number;
-}): { score: number; valueScore: number; growthScore: number; momentumScore: number; riskScore: number } => {
+    targetPrice: number; // v3.0: Price projection
+    sectorChange: number | null; // v3.0: Sector context
+}): { score: number; valueScore: number; growthScore: number; momentumScore: number; riskScore: number; sectorScore: number } => {
     let score = 50; // Base
     let valuePoints = 0;
     let growthPoints = 0;
     let momentumPoints = 0;
     let riskPenalty = 0;
+    let sectorPoints = 0;
 
     // ── BLOCK 1: RSI (0–25 pts) ──────────────────────────────
     if (params.rsi !== null) {
@@ -261,11 +264,11 @@ const calculateRecommendationScore = (params: {
     score += (params.socialSentiment / 100) * 10;
     if (params.newsSentiment.intensity > 5) growthPoints += 3; // High news coverage = attention
 
-    // ── BLOCK 10: Volatility risk penalty ─────────────────────
-    if (params.atr !== null && params.price > 0) {
-        const atrPct = (params.atr / params.price) * 100;
-        if (atrPct > 5) riskPenalty += 10; // Very volatile
-        else if (atrPct > 3) riskPenalty += 5;
+    // ── BLOCK 11: Sector Relativity v3.0 ─────────────────────
+    if (params.sectorChange !== null) {
+        const sectorRelativity = params.changePercent - params.sectorChange;
+        if (sectorRelativity > 2) { score += 10; sectorPoints += 20; } // Sector outperf
+        else if (sectorRelativity < -2) { score -= 12; riskPenalty += 10; } // Sector underperf
     }
 
     score -= riskPenalty * 0.3; // Soften risk penalty (not a hard block)
@@ -279,6 +282,7 @@ const calculateRecommendationScore = (params: {
         growthScore: Math.min(100, (growthPoints / 55) * 100),
         momentumScore,
         riskScore,
+        sectorScore: Math.min(100, (sectorPoints / 20) * 100),
     };
 };
 
@@ -310,8 +314,16 @@ const generateReasoning = (params: {
     newsSentiment: { score: number; intensity: number };
     socialSentiment: number;
     targetPrice: number;
+    sectorChange: number | null;
 }): string[] => {
     const reasons: string[] = [];
+
+    // v3.0 Cross-sector logic
+    if (params.sectorChange !== null) {
+        const rel = params.changePercent - params.sectorChange;
+        if (rel > 1.5) reasons.push(`🌟 Alpha Signal: Outperforming ${params.sectorChange > 0 ? 'bullish' : 'struggling'} sector by ${rel.toFixed(1)}% — strong relative strength.`);
+        else if (rel < -2.0) reasons.push(`⚠️ Sector Drag: Underperforming industry benchmark by ${Math.abs(rel).toFixed(1)}% — structural weakness detected.`);
+    }
 
     // Technical
 
@@ -420,7 +432,8 @@ export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation
             pegRatio: growth?.pegRatio ?? null,
             earningsGrowth: growth?.earningsGrowth ?? null,
             revenueGrowth: growth?.revenueGrowth ?? null,
-            volumeScore, newsSentiment, socialSentiment,
+            volumeScore, newsSentiment, socialSentiment, targetPrice,
+            sectorChange: 0, // Simplified for single symbol, improved in batch if needed
         });
 
         const reasoning = generateReasoning({
@@ -431,6 +444,7 @@ export const analyzeSymbol = async (symbol: string): Promise<StockRecommendation
             revenueGrowth: growth?.revenueGrowth ?? null,
             changePercent: stockData.changePercent,
             newsSentiment, socialSentiment, targetPrice,
+            sectorChange: 0, 
         });
 
         return {
