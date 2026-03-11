@@ -349,11 +349,11 @@ export default async function handler(req, res) {
             // REAL ESTATE
             'AMT': 185.00, 'PLD': 105.00, 'SPG': 160.00,
             // ETFs
-            'VOO': 617.00, 'SPY': 573.00, 'QQQ': 498.00, 'VTI': 273.00, 'IWM': 200.00,
+            'VOO': 620.75, 'SPY': 619.00, 'QQQ': 498.00, 'VTI': 273.00, 'IWM': 200.00,
             'DIA': 425.00, 'VGT': 530.00, 'VHT': 235.00, 'VFH': 97.00,
             'XLK': 215.00, 'XLV': 145.00, 'XLF': 48.00, 'XLE': 87.00,
             // COMMODITIES
-            'GLD': 306.00, 'SLV': 27.50, 'USO': 72.00, 'TLT': 84.00,
+            'GLD': 475.70, 'SLV': 77.52, 'USO': 72.00, 'TLT': 84.00,
             // EGYPT
             'COMI': 123.00, 'TMGH': 77.50, 'FWRY': 17.50, 'HRHO': 16.80, 'EAST': 18.40,
             'EFID': 12.20, 'EMFD': 7.80, 'ADIB': 19.40, 'ETEL': 86.00, 'ABUK': 58.40,
