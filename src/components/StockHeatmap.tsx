@@ -22,7 +22,7 @@ const StockHeatmap: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const isMobileView = width < 600;
+    const isMobileView = width < 900;
 
     useEffect(() => {
         socialFeedService.getGlobalFeed().then(() => {

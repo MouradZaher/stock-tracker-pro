@@ -165,8 +165,14 @@ export default async function handler(req, res) {
             // For quote responses, remap back to original symbol
             if (!isSummary && !isChart) {
                 const result = response.data?.quoteResponse?.result?.[0];
-                if (result?.regularMarketPrice > 0) {
+                // Sanity check: reject clearly bad prices (< $1 for stocks, allows indices/ETFs/crypto)
+                const minPrice = rawSymbol.startsWith('^') ? 1 : 1.0;
+                if (result?.regularMarketPrice > minPrice) {
                     result.symbol = rawSymbol; // restore original symbol
+                    result.regularMarketPrice = Number(result.regularMarketPrice) || 0;
+                    result.regularMarketChange = Number(result.regularMarketChange) || 0;
+                    result.regularMarketChangePercent = Number(result.regularMarketChangePercent) || 0;
+                    result.regularMarketPreviousClose = Number(result.regularMarketPreviousClose) || 0;
                     return res.status(200).json(response.data);
                 }
             } else {
@@ -214,52 +220,67 @@ export default async function handler(req, res) {
     }
 
     // ── Tier 4: PRICE_MAP static fallback ────────────────────
-    // Prices updated March 2026. LRCX had 10:1 split Jun 2024. CMG had 50:1 split Jun 2024.
+    // Prices calibrated March 2026. LRCX 10:1 split Jun-2024. CMG 50:1 split Jun-2024.
     const PRICE_MAP = {
-        'AAPL': 222.50, 'MSFT': 415.00, 'NVDA': 112.00, 'GOOGL': 162.00, 'GOOG': 163.00,
-        'META': 510.00, 'AMZN': 188.00, 'TSLA': 238.00, 'AVGO': 196.00, 'ORCL': 178.00,
-        'ADBE': 390.00, 'CRM': 295.00, 'AMD': 108.00, 'NFLX': 660.00, 'TSM': 155.00,
-        'ASML': 750.00, 'LRCX': 73.50, // LRCX: 10:1 split Jun 2024
-        'INTC': 22.50, 'TXN': 188.00, 'QCOM': 152.00,
-        'AMAT': 180.00, 'MU': 90.00, 'WDC': 42.00, 'SNDK': 42.00, 'IBM': 235.00,
-        'NOW': 900.00, 'PANW': 185.00, 'INTU': 600.00, 'PLTR': 88.00, 'AI': 27.00, 'SMCI': 40.00,
-        'UNH': 490.00, 'JNJ': 155.00, 'LLY': 850.00, 'ABBV': 183.00, 'MRK': 97.00,
-        'PFE': 27.00, 'TMO': 510.00, 'ABT': 122.00, 'DHR': 218.00, 'ISRG': 495.00,
-        'SYK': 375.00, 'VRTX': 460.00, 'REGN': 620.00, 'CVS': 53.00, 'CI': 315.00,
-        'BRK.B': 490.00, 'JPM': 235.00, 'V': 340.00, 'MA': 530.00, 'BAC': 43.00,
-        'WFC': 75.00, 'GS': 575.00, 'MS': 120.00, 'SCHW': 80.00, 'AXP': 280.00,
-        'C': 68.00, 'SPGI': 488.00, 'BLK': 975.00, 'PGR': 260.00,
-        'BABA': 90.00, 'HD': 370.00, 'NKE': 70.00, 'MCD': 293.00, 'SBUX': 83.00,
-        'LOW': 222.00, 'BKNG': 4800.00, 'TJX': 115.00, 'GM': 52.00, 'F': 10.50,
-        'MAR': 255.00, 'CMG': 52.00, // CMG: 50:1 split Jun 2024
-        'DIS': 112.00, 'CMCSA': 38.00, 'T': 22.00, 'VZ': 41.00,
-        'CAT': 348.00, 'BA': 165.00, 'UPS': 108.00, 'HON': 215.00, 'GE': 190.00,
-        'LMT': 470.00, 'RTX': 128.00, 'DE': 408.00, 'ETN': 345.00, 'WM': 218.00,
-        'ITW': 245.00, 'CSX': 32.00, 'UNP': 235.00, 'FDX': 245.00, 'DAL': 50.00,
-        'UAL': 80.00, 'LUV': 29.00,
-        'WMT': 92.00, 'PG': 165.00, 'KO': 67.00, 'PEP': 145.00, 'COST': 920.00,
-        'XOM': 107.00, 'CVX': 146.00, 'COP': 100.00, 'SLB': 36.00, 'PSX': 116.00,
-        'VLO': 140.00, 'MPC': 140.00, 'OXY': 48.00, 'HAL': 28.00, 'BKR': 35.00,
-        'KMI': 25.00, 'WMB': 54.00,
-        'LIN': 415.00, 'APD': 278.00, 'FCX': 35.00, 'UUUU': 19.00,
-        'NEE': 71.00, 'DUK': 97.00, 'SO': 83.00,
-        'AMT': 190.00, 'PLD': 100.00, 'SPG': 160.00,
-        'VOO': 535.00, 'SPY': 578.00, 'QQQ': 498.00, 'VTI': 255.00, 'IWM': 198.00,
-        'DIA': 420.00, 'VGT': 565.00, 'VHT': 235.00, 'VFH': 97.00,
-        'XLK': 220.00, 'XLV': 140.00, 'XLF': 48.00, 'XLE': 87.00,
-        'GLD': 265.00, 'SLV': 30.50, 'USO': 72.00, 'TLT': 84.00,
+        // === MEGA-CAP TECH ===
+        'AAPL': 210.00, 'MSFT': 390.00, 'NVDA': 110.00, 'GOOGL': 168.00, 'GOOG': 169.00,
+        'META': 580.00, 'AMZN': 210.00, 'TSLA': 232.00, 'AVGO': 200.00, 'ORCL': 175.00,
+        'ADBE': 380.00, 'CRM': 300.00, 'AMD': 105.00, 'NFLX': 980.00, 'TSM': 185.00,
+        'ASML': 760.00, 'LRCX': 73.00,
+        'INTC': 20.00, 'TXN': 175.00, 'QCOM': 155.00,
+        'AMAT': 160.00, 'MU': 93.00, 'WDC': 43.00, 'SNDK': 43.00, 'IBM': 240.00,
+        'NOW': 950.00, 'PANW': 190.00, 'INTU': 620.00, 'PLTR': 90.00, 'AI': 26.00, 'SMCI': 38.00,
+        // === HEALTHCARE ===
+        'UNH': 510.00, 'JNJ': 155.00, 'LLY': 810.00, 'ABBV': 190.00, 'MRK': 92.00,
+        'PFE': 26.00, 'TMO': 495.00, 'ABT': 124.00, 'DHR': 195.00, 'ISRG': 540.00,
+        'SYK': 390.00, 'VRTX': 480.00, 'REGN': 600.00, 'CVS': 50.00, 'CI': 300.00,
+        // === FINANCIALS ===
+        'BRK.B': 490.00, 'JPM': 240.00, 'V': 350.00, 'MA': 555.00, 'BAC': 42.00,
+        'WFC': 73.00, 'GS': 560.00, 'MS': 118.00, 'SCHW': 78.00, 'AXP': 285.00,
+        'C': 70.00, 'SPGI': 465.00, 'BLK': 960.00, 'PGR': 250.00,
+        // === CONSUMER ===
+        'BABA': 88.00, 'HD': 355.00, 'NKE': 72.00, 'MCD': 304.00, 'SBUX': 82.00,
+        'LOW': 215.00, 'BKNG': 5100.00, 'TJX': 120.00, 'GM': 48.00, 'F': 9.50,
+        'MAR': 270.00, 'CMG': 52.00,
+        'DIS': 113.00, 'CMCSA': 36.00, 'T': 22.00, 'VZ': 42.00,
+        // === INDUSTRIALS ===
+        'CAT': 330.00, 'BA': 175.00, 'UPS': 100.00, 'HON': 210.00, 'GE': 185.00,
+        'LMT': 480.00, 'RTX': 127.00, 'DE': 395.00, 'ETN': 330.00, 'WM': 225.00,
+        'ITW': 240.00, 'CSX': 31.00, 'UNP': 230.00, 'FDX': 230.00, 'DAL': 47.00,
+        'UAL': 78.00, 'LUV': 28.00,
+        // === CONSUMER STAPLES ===
+        'WMT': 93.00, 'PG': 168.00, 'KO': 71.00, 'PEP': 142.00, 'COST': 960.00,
+        // === ENERGY ===
+        'XOM': 110.00, 'CVX': 164.00, 'COP': 99.00, 'SLB': 36.00, 'PSX': 118.00,
+        'VLO': 142.00, 'MPC': 142.00, 'OXY': 46.00, 'HAL': 27.00, 'BKR': 34.00,
+        'KMI': 26.00, 'WMB': 55.00,
+        // === MATERIALS ===
+        'LIN': 400.00, 'APD': 265.00, 'FCX': 36.00, 'UUUU': 17.00,
+        // === UTILITIES ===
+        'NEE': 69.00, 'DUK': 99.00, 'SO': 85.00,
+        // === REAL ESTATE ===
+        'AMT': 185.00, 'PLD': 105.00, 'SPG': 160.00,
+        // === ETFs/INDEX FUNDS ===
+        'VOO': 617.00, 'SPY': 573.00, 'QQQ': 498.00, 'VTI': 273.00, 'IWM': 200.00,
+        'DIA': 425.00, 'VGT': 530.00, 'VHT': 235.00, 'VFH': 97.00,
+        'XLK': 215.00, 'XLV': 145.00, 'XLF': 48.00, 'XLE': 87.00,
+        // === COMMODITIES ===
+        'GLD': 306.00, 'SLV': 27.50, 'USO': 72.00, 'TLT': 84.00,
+        // === EGYPT ===
         'COMI': 123.00, 'TMGH': 77.50, 'FWRY': 17.50, 'HRHO': 16.80, 'EAST': 18.40,
         'EFID': 12.20, 'EMFD': 7.80, 'ADIB': 19.40, 'ETEL': 86.00, 'ABUK': 58.40,
         'SWDY': 25.80, 'ORAS': 42.60, 'RAYA': 14.20, 'PHDC': 8.90, 'CLHO': 9.40,
+        // === UAE ===
         'IHC': 390.00, 'FAB': 17.50, 'ETISALAT': 19.20, 'ADNOCDIST': 3.64,
         'ALDAR': 9.27, 'ADCB': 11.40, 'MULTIPLY': 1.82, 'ADNOCDRILL': 4.68,
         'PRESIGHT': 1.96, 'FERTIGLBE': 1.54, 'DANA': 0.88, 'AGTHIA': 6.60,
         'YAHSAT': 2.14, 'ALPHADHABI': 19.40, 'RAKPROP': 0.64,
-        'BTC': 82000, 'BTC-USD': 82000, 'ETH': 2000, 'ETH-USD': 2000,
-        // Market Indices
-        '^GSPC': 5580.00, '^DJI': 41600.00, '^IXIC': 17400.00,
-        '^RUT': 2050.00, '^VIX': 20.00, '^TNX': 4.30,
-        '^FTSE': 8600.00, '^GDAXI': 22500.00, '^N225': 36500.00,
+        // === CRYPTO ===
+        'BTC': 83000, 'BTC-USD': 83000, 'ETH': 1950, 'ETH-USD': 1950,
+        // === MARKET INDICES ===
+        '^GSPC': 5600.00, '^DJI': 41800.00, '^IXIC': 17600.00,
+        '^RUT': 2060.00, '^VIX': 20.00, '^TNX': 4.30,
+        '^FTSE': 8620.00, '^GDAXI': 22800.00, '^N225': 36800.00,
     };
     const base = rawSymbol.toUpperCase().split('.')[0].trim();
     const staticPrice = PRICE_MAP[rawSymbol] || PRICE_MAP[base];
