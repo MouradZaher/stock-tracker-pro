@@ -29,6 +29,7 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { usePortfolioStore } from './hooks/usePortfolio';
 import { useWatchlist } from './hooks/useWatchlist';
 import PriceAlertManager from './components/PriceAlertManager';
+import AIChatWidget from './components/AIChatWidget';
 
 import './index.css';
 import './styles/ios-mobile.css';
@@ -38,7 +39,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 5000, // 5 seconds for ultra-live feel
+      refetchInterval: 3000, // 3 seconds for ultra-live feel
       refetchIntervalInBackground: true,
       staleTime: 3000, // Considered stale after 3s to encourage fresh fetches
       retry: 1,
@@ -223,6 +224,7 @@ function MainLayout({
       </main>
 
       </ErrorBoundary>
+      <AIChatWidget />
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
     </div>
   );

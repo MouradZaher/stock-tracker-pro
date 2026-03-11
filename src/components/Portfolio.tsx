@@ -17,6 +17,7 @@ import PriceAlertsModal from './PriceAlertsModal';
 import { analyzeSymbol, getTacticalRebalancing, type RebalancingAction } from '../services/aiRecommendationService';
 import type { StockRecommendation } from '../types';
 import RealTimePrice from './RealTimePrice';
+import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
@@ -890,6 +891,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {/* AI/Risk Intelligence Tab Content */}
             {activeSubTab === 'intelligence' && (
                 <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                    {/* === SUPER INTELLIGENCE PANEL === */}
+                    <div className="glass-card" style={{ padding: '1.75rem', marginBottom: '1.5rem', border: '1px solid var(--glass-border-bright)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
+                            <Sparkles size={20} color="var(--color-accent)" />
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>AI Deep Analytics</h3>
+                            <span style={{ fontSize: '0.65rem', padding: '3px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: 'rgba(99,102,241,0.9)', fontWeight: 800 }}>v2.0</span>
+                        </div>
+                        <PortfolioIntelligencePanel />
+                    </div>
+
                     {/* Tactical Risk Audit & Report Section */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
 
