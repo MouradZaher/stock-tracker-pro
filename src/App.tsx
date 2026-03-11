@@ -137,8 +137,9 @@ function MainLayout({
 
   return (
     <div className="app">
-      <TopBar />
-      <Header
+      <ErrorBoundary>
+        <TopBar />
+        <Header
         activeTab={activeTab}
 
         onTabChange={handleTabChange}
@@ -221,6 +222,7 @@ function MainLayout({
         </Routes>
       </main>
 
+      </ErrorBoundary>
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
     </div>
   );

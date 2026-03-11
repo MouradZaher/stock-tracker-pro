@@ -12,6 +12,22 @@ import { calculateRSI } from '../utils/calculations';
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+// ============================================
+// SYMBOL SANITIZATION
+// TradingView widgets can pollute symbols via postMessages.
+// Strip any query params / garbage before hitting any API.
+// ============================================
+export const sanitizeSymbol = (raw: string): string => {
+    if (!raw || typeof raw !== 'string') return '';
+    // Strip anything after '?' (e.g. ?tvwidgetsymbol=NYSE:IBM)
+    const clean = raw.split('?')[0].trim();
+    // Reject literal placeholder {SYMBOL}
+    if (clean.startsWith('{') || clean.length === 0) return '';
+    // Allow only valid stock symbol chars: letters, digits, ^, ., -, :
+    return /^[A-Z0-9^.\-:]{1,20}$/i.test(clean) ? clean.toUpperCase() : '';
+};
+
+
 const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000,
@@ -217,7 +233,12 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
 // ============================================
 
 // Get stock quote with multi-source fallback
-export const getStockQuote = async (symbol: string): Promise<Stock> => {
+export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
+    const symbol = sanitizeSymbol(rawSymbol);
+    if (!symbol) {
+        console.warn(`⚠️ Invalid/polluted symbol rejected: "${rawSymbol}"`);
+        return { symbol: rawSymbol, name: 'Invalid Symbol', price: 0, change: 0, changePercent: 0, previousClose: 0, open: 0, high: 0, low: 0, volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0, dividendYield: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0, totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date() };
+    }
     const quote = await fetchWithFallbacks(symbol);
 
     if (quote && quote.price > 0) {
@@ -319,12 +340,13 @@ export const getStockQuote = async (symbol: string): Promise<Stock> => {
 };
 
 // Get comprehensive stock data including profile and growth metrics
-export const getStockData = async (symbol: string): Promise<{
+export const getStockData = async (rawSymbol: string): Promise<{
     stock: Stock;
     profile: CompanyProfile | null;
     growth: any | null;
     rsi: number | null;
 }> => {
+    const symbol = sanitizeSymbol(rawSymbol) || rawSymbol;
     const [stock, profile, growth, history] = await Promise.all([
         getStockQuote(symbol),
         getProfileFromYahoo(symbol),

@@ -37,15 +37,32 @@
                 },
                 {
                     "key": "X-CSP-Version",
-                    "value": "v2026-03-03-01"
+                    "value": "v2026-03-11-01"
                 }
             ]
         }
     ],
+    "functions": {
+        "api/quote.js": { "maxDuration": 10 },
+        "api/multi-quote.js": { "maxDuration": 10 },
+        "api/news.js": { "maxDuration": 10 }
+    },
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/api/quote",
+            "destination": "/api/quote"
+        },
+        {
+            "source": "/api/multi-quote",
+            "destination": "/api/multi-quote"
+        },
+        {
+            "source": "/api/news",
+            "destination": "/api/news"
+        },
+        {
+            "source": "/((?!api/).*)",
             "destination": "/index.html"
         }
     ]
-}
+}

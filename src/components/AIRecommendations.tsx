@@ -307,7 +307,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                         </div>
                         <div style={{ textAlign: 'right' }}>
                             <div style={{ color: (detailStockData?.change || 0) >= 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 700, fontSize: '1rem' }}>
-                                {detailStockData ? (detailStockData.change >= 0 ? '+' : '') : ''}{detailStockData ? detailStockData.changePercent.toFixed(2) : '0.00'}%
+                                {detailStockData ? (detailStockData.change >= 0 ? '+' : '') : ''}{detailStockData ? (Number(detailStockData.changePercent) || 0).toFixed(2) : '0.00'}%
                             </div>
                             <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>REAL-TIME</div>
                         </div>

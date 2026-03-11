@@ -65,7 +65,10 @@ function checkRateLimit(ip) {
 }
 
 function isValidSymbol(s) {
-    return s && typeof s === 'string' && /^[A-Z0-9.,^:\-]{1,200}$/i.test(s);
+    if (!s || typeof s !== 'string') return false;
+    // Reject TradingView widget pollution (e.g. {SYMBOL}?tvwidgetsymbol=NYSE:IBM)
+    if (s.includes('?') || s.includes('{') || s.includes(' ')) return false;
+    return /^[A-Z0-9.,^:\-]{1,20}$/i.test(s);
 }
 
 export default async function handler(req, res) {

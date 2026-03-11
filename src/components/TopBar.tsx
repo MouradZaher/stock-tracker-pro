@@ -29,11 +29,13 @@ const TopBar: React.FC = () => {
         retry: 2,
     });
 
-    const formatPrice = (price: number) => {
+    const formatPrice = (price: any) => {
+        if (typeof price !== 'number' || isNaN(price)) return '0.00';
         return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
-    const formatChange = (change: number) => {
+    const formatChange = (change: any) => {
+        if (typeof change !== 'number' || isNaN(change)) return '0.00%';
         const sign = change > 0 ? '+' : '';
         return `${sign}${change.toFixed(2)}%`;
     };
@@ -78,7 +80,7 @@ const TopBar: React.FC = () => {
         }
 
         return null;
-    }).filter(Boolean) as { symbol: string; price: number; change: number; isUp: boolean }[];
+    }).filter(item => item && typeof item.price === 'number' && !isNaN(item.price)) as { symbol: string; price: number; change: number; isUp: boolean }[];
 
     return (
         <div className="top-bar glass-effect" style={{

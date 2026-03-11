@@ -216,7 +216,15 @@ export default async function handler(req, res) {
         if (req.method === 'OPTIONS') return res.status(200).end();
 
         // Parse and categorize requested symbols
-        const symbolList = symbols.split(',').map(s => s.trim()).filter(Boolean);
+        // Filter out polluted symbols (e.g. TradingView postMessage garbage like {SYMBOL}?tvwidgetsymbol=...)
+        const rawList = symbols.split(',').map(s => s.trim()).filter(Boolean);
+        const symbolList = rawList.filter(s => {
+            if (s.includes('?') || s.includes('{') || s.includes(' ')) return false;
+            return /^[A-Z0-9.,^:\-]{1,20}$/i.test(s);
+        });
+        if (symbolList.length === 0) {
+            return res.status(400).json({ error: 'No valid symbols provided' });
+        }
         const resultsMap = new Map(); // original_symbol -> quote
 
         // 1. Split into crypto vs non-crypto

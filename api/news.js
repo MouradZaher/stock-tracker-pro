@@ -17,12 +17,20 @@ function checkRateLimit(ip) {
 
 function isValidSymbol(symbol) {
     if (!symbol || typeof symbol !== 'string') return false;
-    return /^[A-Z0-9.^:-]{1,20}$/i.test(symbol);
+    // Reject polluted symbols from TradingView postMessages
+    if (symbol.includes('?') || symbol.includes('{') || symbol.includes(' ')) return false;
+    return /^[A-Z0-9.^:\-]{1,20}$/i.test(symbol);
 }
 
 export default async function handler(req, res) {
     const { symbol, limit } = req.query;
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
     if (!checkRateLimit(clientIp)) {
         return res.status(429).json({ error: 'Too many requests' });
@@ -45,13 +53,6 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Origin not allowed' });
     }
 
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
-
-    if (req.method === 'OPTIONS') return res.status(200).end();
-
     const endpoint = 'https://query1.finance.yahoo.com/v1/finance/search';
 
     try {
@@ -66,6 +67,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json(response.data);
     } catch (error) {
-        return res.status(500).json({ error: 'Failed to fetch news', details: error.message });
+        // Return 200 with empty news so client-side fallback to mocks works cleanly
+        return res.status(200).json({ news: [], elements: [], error: error.message });
     }
 }
