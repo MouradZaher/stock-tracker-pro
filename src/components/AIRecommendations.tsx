@@ -435,7 +435,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     // ─── MAIN OVERVIEW ───────────────────────────────────────────────────
     return (
-        <div className="portfolio-container" style={{ paddingTop: '0' }}>
+        <div className="portfolio-container tab-content-wrapper" style={{ paddingTop: '0' }}>
             {/* ═══ HOW AI STRATEGY WORKS ═══ */}
             <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.75rem', borderLeft: `4px solid ${selectedMarket.color}` }}>
                 <h3 style={{ fontSize: '0.85rem', color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -532,6 +532,23 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                         <h2 style={{ fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <img src={selectedMarket.flagUrl} alt="" style={{ width: '16px', height: '11px', borderRadius: '2px', objectFit: 'cover' }} />
                             {selectedMarket.indexName} Market Pulse
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '4px 10px',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                borderRadius: '20px',
+                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                fontSize: '0.6rem',
+                                color: 'var(--color-error)',
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
+                            }}>
+                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
+                                Live Engine
+                            </div>
                         </h2>
                         <p style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>
                             Rules: 5% stock, 20% sector limit

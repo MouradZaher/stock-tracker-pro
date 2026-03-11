@@ -132,6 +132,25 @@ const MarketStatus: React.FC = () => {
                 <SessionBadge name="SHA" status={shanghaiStatus} />
                 <SessionBadge name="LND" status={londonStatus} />
                 <SessionBadge name="NYC" status={nyStatus} />
+                
+                {/* Real-time Badge */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    fontSize: '0.65rem',
+                    color: 'var(--color-error)',
+                    fontWeight: 900,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
+                    Live Pulse
+                </div>
             </div>
 
             {/* Cairo Time Display */}
@@ -173,19 +192,6 @@ const MarketStatus: React.FC = () => {
                     CAIRO
                 </span>
             </div>
-
-            <style>{`
-                @keyframes pulse-glow {
-                    0%, 100% {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                    50% {
-                        opacity: 0.6;
-                        transform: scale(0.9);
-                    }
-                }
-            `}</style>
         </div>
     );
 };

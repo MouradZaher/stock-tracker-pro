@@ -209,8 +209,13 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                     try {
                         const { getMultipleQuotes } = await import('../services/stockDataService');
-                        const symbols = positions.map(p => p.symbol);
-                        const quotes = await getMultipleQuotes(symbols);
+                        const { fetchExchangeRates, convertToUSD } = await import('../services/currencyService');
+                        
+                        // Parallel fetch exchange rates and quotes
+                        const [quotes, rates] = await Promise.all([
+                            getMultipleQuotes(positions.map(p => p.symbol)),
+                            fetchExchangeRates()
+                        ]);
 
                         set((state) => ({
                             positions: state.positions.map(pos => {
@@ -219,11 +224,17 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                                 const marketValue = pos.units * quote.price;
                                 const { amount, percent } = calculateProfitLoss(quote.price, pos.avgCost, pos.units);
+                                
+                                // Normalized value calculation
+                                const currency = pos.currency || (pos.symbol.includes('.CA') ? 'EGP' : pos.symbol.includes('.AD') ? 'AED' : 'USD');
+                                const marketValueUSD = convertToUSD(marketValue, currency, rates);
 
                                 return {
                                     ...pos,
                                     currentPrice: quote.price,
                                     marketValue,
+                                    marketValueUSD,
+                                    currency,
                                     profitLoss: amount,
                                     profitLossPercent: percent,
                                 };
@@ -244,6 +255,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             isLoading: false,
                             error: null,
                         });
+                        // Trigger immediate sync to get fresh prices and normalization
+                        get().syncPrices();
                     } catch (error) {
                         console.error('Error loading portfolios from Supabase:', error);
                         set({
@@ -278,6 +291,8 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             // Cloud is the authority — use it directly
                             set({ positions: cloudPositions, isSyncing: false, error: null });
                         }
+                        // Refresh prices after sync
+                        get().syncPrices();
                     } catch (error) {
                         console.error('Error syncing portfolios:', error);
                         set({ isSyncing: false, error: 'Failed to sync portfolios' });
@@ -303,6 +318,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                 try {
                                     const positions = await portfolioService.fetchUserPortfolios(userId);
                                     set({ positions });
+                                    get().syncPrices();
                                 } catch (err) {
                                     console.error('Failed to reload positions on realtime event:', err);
                                 }
@@ -319,12 +335,20 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     const positions = get().positions;
                     const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
                     const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
+                    
+                    // Normalized sum in USD
+                    const normalizedTotalValueUSD = positions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
+                    
+                    // Simplified: assume profit/loss percent is best viewed on the base currency (USD)
+                    // but we keep the legacy calculated total P/L for now
                     const totalProfitLoss = totalValue - totalCost;
                     const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
 
                     return {
                         totalValue,
+                        normalizedTotalValueUSD,
                         totalCost,
+                        normalizedTotalCostUSD: 0, // Not strictly needed yet, value is priority
                         totalProfitLoss,
                         totalProfitLossPercent,
                         positions,

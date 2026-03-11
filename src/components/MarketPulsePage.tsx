@@ -8,6 +8,8 @@ import { socialFeedService } from '../services/SocialFeedService';
 
 import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
+import EarningsCalendar from './EarningsCalendar';
+import OptionsFlowSimulator from './OptionsFlowSimulator';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -219,7 +221,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div style={{
+        <div className="market-pulse-page tab-content-wrapper" style={{
             maxWidth: '100%',
             margin: '0 auto',
             boxSizing: 'border-box',
@@ -275,19 +277,39 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
             )}
 
-            {/* Header Area - More Compact */}
-            <div style={{ marginBottom: '1rem', padding: '0 0.5rem' }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '-0.02em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
-                    Market Pulse
-                </h1>
-                <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                    Real-time institutional grade market intelligence.
-                </p>
+            {/* Header Area */}
+            <div className="pulse-page-header" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 1rem' }}>
+                <div>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        Market Pulse
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '4px 12px',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            borderRadius: '20px',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            fontSize: '0.65rem',
+                            color: 'var(--color-error)',
+                            fontWeight: 900,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
+                        }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
+                            Pulse Active
+                        </div>
+                    </h1>
+                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', margin: 0 }}>
+                        Real-time institutional grade market intelligence.
+                    </p>
+                </div>
             </div>
 
-            {/* ═══ GLOBAL MACRO INTELLIGENCE (WORLD MONITOR SYNC) ═══ */}
+            {/* ═══ GLOBAL MACRO INTELLIGENCE ═══ */}
             <div style={{
                 marginBottom: '1.25rem',
+                margin: '0 1rem 1.25rem 1rem',
                 padding: '1.25rem',
                 background: 'rgba(59, 130, 246, 0.08)',
                 borderRadius: '16px',
@@ -296,7 +318,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 overflow: 'hidden',
                 boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
             }}>
-                {/* Background Animation */}
                 <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'rgba(59, 130, 246, 0.1)', filter: 'blur(80px)', borderRadius: '50%', pointerEvents: 'none' }}></div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', position: 'relative', zIndex: 1 }}>
@@ -313,45 +334,17 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                         }}>
                             <Globe size={18} color="#3b82f6" />
                         </div>
-                        <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <h2 style={{ fontSize: '0.8rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Global Macro Intelligence</h2>
-                                <span style={{ fontSize: '0.6rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' }}>LIVE MONITOR</span>
-                            </div>
-                        </div>
+                        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Global Macro Intelligence</h2>
                     </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', position: 'relative', zIndex: 1 }}>
-                    {(macroData.length > 0 ? macroData : [
-                        {
-                            label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'USD/EGP Parallel' : 'WTI Crude'} Intelligence`,
-                            status: 'Hedge Bias',
-                            color: '#10B981',
-                            desc: `Cross-asset analysis confirms liquidity flows in ${effectiveMarket.name} are moving toward defensive structures. Institutional conviction is high for mid-term stability.`,
-                            action: 'Strategic Long'
-                        },
-                        {
-                            label: `${effectiveMarket.indexName} Volatility`,
-                            status: 'Order Flow',
-                            color: '#F59E0B',
-                            desc: `Real-time monitoring of ${effectiveMarket.indexName} components suggests pending rotation. Liquidity clusters identified at key structural supports.`,
-                            action: 'Defensive Bias'
-                        },
-                        {
-                            label: 'Institutional Flow',
-                            status: 'Smart Money',
-                            color: '#3b82f6',
-                            desc: `Aggregated order book data reveals significant block trade activity in ${effectiveMarket.shortName} top constituents. Tracking sovereign wealth participation.`,
-                            action: 'Accumulate'
-                        }
-                    ]).map((item, i) => (
+                    {(macroData.length > 0 ? macroData : []).map((item, i) => (
                         <div key={i} className="glass-card-hover" style={{
                             padding: '1.25rem',
                             background: 'rgba(255,255,255,0.03)',
                             borderRadius: '16px',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            transition: 'all 0.3s ease'
+                            border: '1px solid rgba(255,255,255,0.05)'
                         }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
                                 <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>{item.label}</div>
@@ -369,14 +362,14 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
             </div>
 
-            {/* ═══ LIVE AI ALPHA INTELLIGENCE (SYNCED TO TRADING AI) ═══ */}
-            <div style={{ marginBottom: '1.5rem', padding: '0 0.5rem' }}>
+            {/* ═══ LIVE AI ALPHA INTELLIGENCE ═══ */}
+            <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                     <div className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }}></div>
                     <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Top Alpha Recommendations</h2>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
                     {(MARKET_ALPHA[effectiveMarket.id] || MARKET_ALPHA.us).map((stock, idx) => (
                         <div key={idx} className="glass-card-hover" style={{
                             minWidth: '140px',
@@ -399,8 +392,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             </div>
 
             {/* ═══ LIVE WORLD FINANCIAL NETWORKS ═══ */}
-            <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', padding: '0 0.5rem' }}>
+            <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem' }}>
                     <div className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', boxShadow: '0 0 8px var(--color-error)' }}></div>
                     <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Live Intelligence Streams</h2>
                 </div>
@@ -413,24 +406,22 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     {(MARKET_STREAMS[effectiveMarket.id] || MARKET_STREAMS.us).map((stream, i) => (
                         <div key={i} className="glass-card" style={{ padding: '0', overflow: 'hidden', borderRadius: '16px', border: '1px solid var(--glass-borderShadow)' }}>
                             <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000' }}>
-                                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <iframe
-                                        width="100%"
-                                        height="100%"
-                                        src={stream.playlistId
-                                            ? `https://www.youtube.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
-                                            : stream.videoId
-                                                ? stream.videoId === 'live'
-                                                    ? `https://www.youtube.com/embed/live_stream?channel=${stream.channelId || stream.videoId}&autoplay=0&mute=1&controls=1&rel=0`
-                                                    : `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
-                                                : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
-                                        title={stream.name}
-                                        frameBorder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                        style={{ position: 'absolute', top: 0, left: 0 }}
-                                    ></iframe>
-                                </div>
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src={stream.playlistId
+                                        ? `https://www.youtube.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
+                                        : stream.videoId
+                                            ? stream.videoId === 'live'
+                                                ? `https://www.youtube.com/embed/live_stream?channel=${stream.channelId || stream.videoId}&autoplay=0&mute=1&controls=1&rel=0`
+                                                : `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
+                                            : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
+                                    title={stream.name}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    style={{ position: 'absolute', top: 0, left: 0 }}
+                                ></iframe>
                             </div>
                             <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
@@ -451,177 +442,44 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
             </div>
 
-
-            {/* Breaking News Ticker - Financial Terminal Style */}
-            <div className="glass-card" style={{
-                padding: '0 var(--spacing-xs)',
-                marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0',
-                overflow: 'hidden',
-                background: 'rgba(0, 0, 0, 0.4)',
-                border: '1px solid var(--glass-border-bright)',
-                borderRadius: '12px',
-                height: '36px'
-            }}>
-                <div style={{
-                    background: 'var(--color-error)',
-                    color: '#fff',
-                    padding: '0 var(--spacing-sm)',
-                    height: '100%',
-                    fontSize: '0.65rem',
-                    fontWeight: 900,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    letterSpacing: '0.1em',
-                    boxShadow: '10px 0 20px rgba(0,0,0,0.5)',
-                    zIndex: 2,
-                    position: 'relative'
-                }}>
-                    <div className="pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }}></div>
-                    LIVE_FEED
-                </div>
-
-                <div style={{
-                    padding: '0 var(--spacing-md)',
-                    height: '100%',
-                    background: 'rgba(255,255,255,0.03)',
-                    fontSize: '0.6rem',
-                    fontWeight: 800,
-                    color: 'var(--color-text-tertiary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    letterSpacing: '0.05em',
-                    borderRight: '1px solid rgba(255,255,255,0.05)',
-                    whiteSpace: 'nowrap'
-                }}>
-                    GLOBAL_INTELLIGENCE_FLOW
-                </div>
-
-                <div style={{ whiteSpace: 'nowrap', fontSize: '0.8rem', color: 'var(--color-text-primary)', flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-                    <div style={{
-                        display: 'inline-block',
-                        animation: 'scroll-news 45s linear infinite',
-                        paddingLeft: '20px',
-                        fontWeight: 500,
-                        letterSpacing: '0.02em',
-                        color: 'var(--color-success)'
-                    }}>
-                        {newsTickerText}
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Grid */}
+            {/* Main Pulse Grid */}
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
                 gap: '1rem',
-                marginBottom: '1rem'
+                margin: '0 1rem 1.5rem 1rem'
             }}>
-
-                {/* Market Psychological Gauge (Fear & Greed) */}
-                <div className="glass-card" style={{ padding: '1.25rem', position: 'relative', overflow: 'hidden' }}>
+                {/* Fear & Greed Gauge */}
+                <div className="glass-card" style={{ padding: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                         <div>
-                            <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <Zap size={16} color="var(--color-warning)" /> Fear & Greed Index
                             </h3>
-                            <div style={{ fontSize: '2rem', fontWeight: 900, color: sentimentColor, marginTop: '0.25rem', letterSpacing: '-0.03em' }}>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, color: sentimentColor, marginTop: '0.25rem' }}>
                                 {sentimentScore.toFixed(0)}
                             </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>MARKET_MOOD</div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: sentimentColor }}>{overallSentiment.toUpperCase()}</div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>MOOD</div>
+                            <div style={{ fontSize: '1rem', fontWeight: 800, color: sentimentColor }}>{overallSentiment.toUpperCase()}</div>
                         </div>
                     </div>
-
-                    {/* Gauge Visual - Institutional Style */}
-                    <div style={{ position: 'relative', height: '100px', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '15px' }}>
-                        {/* Gauge Track */}
-                        <div style={{
-                            height: '14px',
-                            width: '100%',
-                            background: 'rgba(255,255,255,0.05)',
-                            borderRadius: '7px',
-                            position: 'relative',
-                            display: 'flex',
-                            overflow: 'hidden',
-                            border: '1px solid var(--glass-border)'
-                        }}>
-                            <div style={{ flex: 1, background: '#EF4444', opacity: 0.2 }} />
-                            <div style={{ flex: 1, background: '#F59E0B', opacity: 0.2 }} />
-                            <div style={{ flex: 1, background: '#10B981', opacity: 0.2 }} />
-
-                            {/* Active Indicator Fill */}
-                            <div style={{
-                                position: 'absolute',
-                                left: 0,
-                                top: 0,
-                                height: '100%',
-                                width: `${sentimentScore}%`,
-                                background: sentimentColor,
-                                opacity: 0.8,
-                                boxShadow: `0 0 15px ${sentimentColor}60`,
-                                transition: 'width 1s cubic-bezier(0.2, 0.8, 0.2, 1)'
-                            }} />
-                        </div>
-
-                        {/* Labels */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: 'var(--spacing-xs) var(--spacing-sm)' }}>
-                            {['EXTREME FEAR', 'NEUTRAL', 'EXTREME GREED'].map((label, idx) => (
-                                <div key={label} style={{
-                                    fontSize: '0.6rem',
-                                    fontWeight: 800,
-                                    color: idx === 0 && sentimentScore < 33 ? '#EF4444' : (idx === 1 && sentimentScore >= 33 && sentimentScore < 66 ? '#F59E0B' : (idx === 2 && sentimentScore >= 66 ? '#10B981' : 'var(--color-text-tertiary)')),
-                                    transition: 'color 0.3s ease'
-                                }}>
-                                    {label}
-                                </div>
-                            ))}
-                        </div>
+                    <div style={{ height: '10px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+                        <div style={{ width: `${sentimentScore}%`, height: '100%', background: sentimentColor, boxShadow: `0 0 10px ${sentimentColor}40`, transition: 'width 1s ease' }} />
                     </div>
                 </div>
 
-                {/* Next Event Timer */}
-                <div className="glass-card" style={{
-                    padding: '1.25rem',
-                    background: 'var(--glass-bg)',
-                    border: '1px solid var(--glass-borderShadow)'
-                }}>
-                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Timer size={14} /> Next Major Event
-                    </h3>
-                    <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '1rem' }}>{nextEventData.name}</div>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                            {['hours', 'minutes', 'seconds'].map(unit => (
-                                <div key={unit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <div style={{
-                                        fontSize: '1.8rem',
-                                        fontWeight: 800,
-                                        color: 'var(--color-accent)',
-                                        fontVariantNumeric: 'tabular-nums',
-                                        background: 'rgba(0,0,0,0.3)',
-                                        padding: '0.5rem',
-                                        borderRadius: '8px',
-                                        minWidth: '50px'
-                                    }}>
-                                        {String(timeLeft[unit as keyof typeof timeLeft]).padStart(2, '0')}
-                                    </div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '4px', textTransform: 'uppercase' }}>{unit}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Industry Rotation */}
                 <div className="glass-card" style={{ padding: '1.25rem' }}>
-                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <EarningsCalendar />
+                </div>
+                
+                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                    <OptionsFlowSimulator />
+                </div>
+
+                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Layers size={14} /> Industry Rotation
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -629,22 +487,14 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                             <div key={sector.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                 <div style={{ fontSize: '1.2rem' }}>{sector.icon}</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', gap: '8px' }}>
-                                        <span style={{ fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{sector.name}</span>
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', whiteSpace: 'nowrap' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sector.name}</span>
+                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                                             {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
                                         </span>
                                     </div>
-                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', position: 'relative' }}>
-                                        <div style={{
-                                            position: 'absolute',
-                                            left: '50%',
-                                            width: `${Math.abs(sector.change) * 15}%`,
-                                            height: '100%',
-                                            background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)',
-                                            transform: sector.change < 0 ? 'translateX(-100%)' : 'none',
-                                            borderRadius: '2px'
-                                        }} />
+                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
+                                        <div style={{ width: `${Math.min(100, Math.abs(sector.change) * 20)}%`, height: '100%', background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', borderRadius: '2px' }} />
                                     </div>
                                 </div>
                             </div>
@@ -652,109 +502,24 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     </div>
                 </div>
 
-                {/* Volume Anomalies */}
-                <div className="glass-card" style={{ padding: '1.25rem' }}>
-                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <BarChart2 size={14} /> Volume Anomalies
+                {/* X Feed */}
+                <div className="glass-card" style={{ padding: '1.25rem', gridColumn: 'span 2' }}>
+                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <MessageSquare size={14} color="#1DA1F2" /> Social Sentiment Flow
                     </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {volumeAnomalies.map(stock => (
-                            <div
-                                key={stock.symbol}
-                                className="glass-card-hover"
-                                onClick={() => handleAction(stock.symbol)}
-                                style={{
-                                    padding: '0.75rem',
-                                    borderRadius: '8px',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    border: '1px solid transparent'
-                                }}
-                            >
-                                <div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <span style={{ fontWeight: 700 }}>{stock.symbol}</span>
-                                        <span style={{ fontSize: '0.7rem', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px' }}>{stock.vol} Vol</span>
-                                    </div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{stock.reason}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
+                        {socialPosts.slice(0, 10).map(post => (
+                            <div key={post.id} style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                                    <span style={{ fontWeight: 800, fontSize: '0.85rem' }}>{post.author}</span>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{new Date(post.timestamp).toLocaleTimeString()}</span>
                                 </div>
-                                <div style={{ color: stock.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 600 }}>
-                                    {stock.change > 0 ? '+' : ''}{stock.change}%
-                                </div>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: 0 }}>{post.content}</p>
                             </div>
                         ))}
                     </div>
                 </div>
-
-                {/* X Pulse / Social Feed */}
-                <div className="glass-card x-pulse-card" style={{ padding: '1.25rem', gridColumn: 'span 2' }}>
-                    <style>{`
-                        @media (max-width: 1024px) {
-                            .x-pulse-card { grid-column: span 1 !important; }
-                        }
-                    `}</style>
-                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <MessageSquare size={14} color="#1DA1F2" /> X Market Pulse
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                        {socialPosts.map(post => (
-                            <div key={post.id} style={{
-                                padding: '1rem',
-                                background: 'rgba(255,255,255,0.02)',
-                                borderRadius: '12px',
-                                borderLeft: `3px solid ${post.sentiment === 'positive' ? 'var(--color-success)' : post.sentiment === 'negative' ? 'var(--color-error)' : 'var(--glass-border)'}`
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{post.author}</span>
-                                        <span style={{ color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>{post.handle}</span>
-                                        {post.isVerified && <ShieldCheck size={14} color="#1DA1F2" />}
-                                    </div>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>
-                                        {new Date(post.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                </div>
-                                <p style={{ fontSize: '0.85rem', lineHeight: '1.4', margin: '0 0 0.5rem 0', color: 'var(--color-text-secondary)' }}>
-                                    {post.content}
-                                </p>
-                                {post.symbol && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                        <span
-                                            onClick={() => handleAction(post.symbol!)}
-                                            style={{
-                                                fontSize: '0.75rem',
-                                                fontWeight: 800,
-                                                color: 'var(--color-accent)',
-                                                cursor: 'pointer',
-                                                background: 'rgba(99, 102, 241, 0.1)',
-                                                padding: '2px 6px',
-                                                borderRadius: '4px'
-                                            }}
-                                        >
-                                            ${post.symbol}
-                                        </span>
-                                        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Weight: {post.weight}/10</span>
-
-                                        <a
-                                            href={post.url || `https://x.com/search?q=${encodeURIComponent(post.symbol || post.author)}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            style={{ marginLeft: 'auto', color: '#1DA1F2', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
-                                        >
-                                            <Globe size={12} /> {post.url ? 'View Real Link' : 'View on X Pulse'}
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
             </div>
-
         </div>
     );
 };

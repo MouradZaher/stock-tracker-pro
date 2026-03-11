@@ -68,12 +68,15 @@ export interface PortfolioPosition {
   profitLossPercent: number;
   sector: string;
   dividends: Dividend[];
-  currency?: string;  // ISO 4217 — 'USD' | 'EGP' | 'AED' etc.
+  currency?: string;  // e.g. 'USD', 'EGP', 'AED'
+  marketValueUSD?: number; // Normalized value
 }
 
 export interface PortfolioSummary {
-  totalValue: number;
+  totalValue: number; // Sum of local values (legacy)
+  normalizedTotalValueUSD: number; // Accurate sum in USD
   totalCost: number;
+  normalizedTotalCostUSD: number;
   totalProfitLoss: number;
   totalProfitLossPercent: number;
   positions: PortfolioPosition[];
@@ -94,6 +97,8 @@ export interface StockRecommendation {
     rsi: number | null;
     ma50: number | null;
     ma200: number | null;
+    targetPrice: number;
+    marketRegime: 'bull' | 'bear' | 'sideways';
   };
   fundamentals: {
     peRatio: number | null;
@@ -101,6 +106,9 @@ export interface StockRecommendation {
     pegRatio: number | null;
     valueScore?: number;
     growthScore?: number;
+    momentumScore?: number;
+    riskScore?: number;
+    sectorScore?: number;
   };
 }
 
@@ -119,7 +127,7 @@ export interface SearchResult {
 }
 
 // Tab types
-export type TabType = 'search' | 'portfolio' | 'recommendations' | 'watchlist' | 'pulse' | 'notifications';
+export type TabType = 'search' | 'portfolio' | 'recommendations' | 'watchlist' | 'pulse' | 'notifications' | 'intelligence';
 
 // Social & Notifications
 export interface SocialPost {

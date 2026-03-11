@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PROVIDERS, parsers, markProviderFailed, markProviderSuccess, getAvailableProviders, API_KEYS, type StockQuote } from './dataProviders';
+import { fetchExchangeRates, convertToUSD } from './currencyService';
 import type { Stock, CompanyProfile, Dividend } from '../types';
 import { getAllSymbols, getMarketForSymbol } from '../data/sectors';
 import { calculateRSI } from '../utils/calculations';
@@ -164,6 +165,44 @@ const fetchFromFMP = async (symbol: string): Promise<StockQuote | null> => {
 // MAIN MULTI-SOURCE FETCH
 // ============================================
 
+const fetchInParallel = async (symbol: string): Promise<StockQuote | null> => {
+    // 1. Identify which providers are healthy and have keys
+    const available = getAvailableProviders().filter(id => id !== 'yahoo'); // Yahoo is handled by proxy
+    
+    if (available.length === 0) return null;
+
+    // 2. Prepare racing promises
+    const racers = available.slice(0, 3).map(async (providerId) => {
+        try {
+            let quote: StockQuote | null = null;
+            switch (providerId) {
+                case 'finnhub': quote = await fetchFromFinnhub(symbol); break;
+                case 'alphaVantage': quote = await fetchFromAlphaVantage(symbol); break;
+                case 'twelveData': quote = await fetchFromTwelveData(symbol); break;
+                case 'fmp': quote = await fetchFromFMP(symbol); break;
+            }
+            if (quote && quote.price > 0) return quote;
+            throw new Error('Fallback required');
+        } catch (err) {
+            throw err;
+        }
+    });
+
+    // 3. Add proxy as a racer (usually the most reliable)
+    const proxyRacer = fetchFromProxy(symbol).then(q => {
+        if (q && q.price > 0) return q;
+        throw new Error('Proxy failed');
+    });
+
+    try {
+        // RACE! First one to return a valid price wins.
+        return await Promise.any([...racers, proxyRacer]);
+    } catch (e) {
+        // All racers failed
+        return null;
+    }
+};
+
 const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> => {
     const cacheKey = `quote_${symbol}`;
 
@@ -179,44 +218,16 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
         else if (market === 'abudhabi') searchSymbol = `${symbol}.AD`;
     }
 
-    // 3. Try serverless proxy first (Tier 1 - Multi-Quote)
-    let result = await fetchFromProxy(searchSymbol);
+    // 3. Try Parallel Racing (Tier 1 - High Frequency)
+    let result = await fetchInParallel(searchSymbol);
+    
     if (result && result.price > 0) {
         setCachedData(cacheKey, result);
         setCachedData(`last_good_${symbol}`, result);
         return result;
     }
 
-    // 4. Fallback to Direct API Providers (Tier 2-10)
-    const availableProviderIds = getAvailableProviders();
-
-    for (const providerId of availableProviderIds) {
-        // Skip providers that are part of the proxy already (handled in Tier 1)
-        if (providerId === 'yahoo') continue;
-
-        try {
-            let quote: StockQuote | null = null;
-
-            // Map provider ID to its specific fetcher function
-            switch (providerId) {
-                case 'finnhub': quote = await fetchFromFinnhub(symbol); break;
-                case 'alphaVantage': quote = await fetchFromAlphaVantage(symbol); break;
-                case 'twelveData': quote = await fetchFromTwelveData(symbol); break;
-                case 'fmp': quote = await fetchFromFMP(symbol); break;
-                // Add more cases as fetchers are implemented for other providers in dataProviders.ts
-            }
-
-            if (quote && quote.price > 0) {
-                setCachedData(cacheKey, quote);
-                setCachedData(`last_good_${symbol}`, quote);
-                return quote;
-            }
-        } catch (err) {
-            console.warn(`❌ Source ${providerId} failed for ${symbol}`);
-        }
-    }
-
-    // 5. Use last known good price (Safety Net)
+    // 4. Use last known good price (Safety Net)
     const lastGood = getCachedData(`last_good_${symbol}`, GOOD_PRICE_CACHE_DURATION);
     if (lastGood) {
         return {

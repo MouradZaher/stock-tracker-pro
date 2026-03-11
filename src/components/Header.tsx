@@ -38,6 +38,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: Eye },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+        { id: 'intelligence', label: 'Intelligence', icon: Sparkles },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 

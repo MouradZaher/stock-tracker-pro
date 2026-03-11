@@ -65,12 +65,14 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             getSummary();
 
             const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
+            const normalizedTotalValueUSD = positions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
             const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
             const totalProfitLoss = totalValue - totalCost;
             const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
 
             return {
                 totalValue,
+                normalizedTotalValueUSD,
                 totalCost,
                 totalProfitLoss,
                 totalProfitLossPercent,
@@ -80,6 +82,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             console.error('Error getting portfolio summary:', error);
             return {
                 totalValue: 0,
+                normalizedTotalValueUSD: 0,
                 totalCost: 0,
                 totalProfitLoss: 0,
                 totalProfitLossPercent: 0,
@@ -350,7 +353,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }, [positions]);
 
     return (
-        <div className="portfolio-container">
+        <div className="portfolio-container tab-content-wrapper">
             {/* ... existing header and summary ... */}
             <div className="portfolio-header" style={{
                 display: 'flex',
@@ -371,6 +374,23 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         gap: '12px'
                     }}>
                         Portfolio Assets
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '4px 10px',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            borderRadius: '20px',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            fontSize: '0.6rem',
+                            color: 'var(--color-error)',
+                            fontWeight: 900,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
+                        }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
+                            Live Pulse
+                        </div>
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -451,7 +471,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         alignItems: 'center',
                         gap: '6px'
                     }}>
-                        <BarChart2 size={14} /> Total Portfolio Value
+                        <BarChart2 size={14} /> Global Assets (USD)
                     </div>
                     <div className="summary-value" style={{
                         fontSize: '1.75rem',
@@ -459,7 +479,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         letterSpacing: '-0.02em',
                         color: 'var(--color-text-primary)'
                     }}>
-                        {fmt(summary.totalValue)}
+                        {formatCurrency(summary.normalizedTotalValueUSD)}
                     </div>
                 </div>
 

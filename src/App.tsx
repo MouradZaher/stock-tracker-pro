@@ -15,8 +15,10 @@ import { MarketProvider } from './contexts/MarketContext';
 // Lazy load heavy components
 const Portfolio = lazy(() => import('./components/Portfolio'));
 const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
+const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioIntelligencePanel'));
 
 import WatchlistSidebar from './components/WatchlistSidebar';
+import AIChatWidget from './components/AIChatWidget';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
 import AdminDashboard from './components/AdminDashboard';
@@ -29,7 +31,6 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { usePortfolioStore } from './hooks/usePortfolio';
 import { useWatchlist } from './hooks/useWatchlist';
 import PriceAlertManager from './components/PriceAlertManager';
-import AIChatWidget from './components/AIChatWidget';
 
 import './index.css';
 import './styles/ios-mobile.css';
@@ -210,6 +211,15 @@ function MainLayout({
               <ErrorBoundary>
                 <Suspense fallback={<PageSkeleton />}>
                   <AIRecommendations onSelectStock={handleSelectSymbol} />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          } />
+          <Route path="/intelligence" element={
+            <div className="tab-content">
+              <ErrorBoundary>
+                <Suspense fallback={<PageSkeleton />}>
+                  <PortfolioIntelligencePanel />
                 </Suspense>
               </ErrorBoundary>
             </div>

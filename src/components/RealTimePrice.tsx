@@ -21,10 +21,12 @@ const RealTimePrice: React.FC<RealTimePriceProps> = ({ price, className = '', st
             className={`${className} ${flashClass}`}
             style={{
                 ...style,
-                transition: 'background-color 0.5s ease',
-                padding: '2px 4px',
-                borderRadius: '4px',
-                display: 'inline-block'
+                transition: 'all 0.5s ease',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                display: 'inline-block',
+                fontWeight: 700,
+                fontFamily: "'JetBrains Mono', monospace"
             }}
         >
             {showCurrency ? formatCurrency(price) : price.toFixed(2)}
