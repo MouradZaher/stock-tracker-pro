@@ -24,8 +24,8 @@ const TopBar: React.FC = () => {
             const data = await getMultipleQuotes(SYMBOLS);
             return data;
         },
-        refetchInterval: 15000,
-        staleTime: 5000,
+        refetchInterval: 3000,
+        staleTime: 1000,
         retry: 2,
     });
 

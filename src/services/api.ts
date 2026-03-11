@@ -2,9 +2,9 @@ import axios from 'axios';
 
 export const REFRESH_INTERVALS = {
     MARKET_STATUS: 30000, // 30 seconds
-    STOCK_PRICE: 5000,    // 5 seconds for live feel without rate limiting
-    PORTFOLIO: 5000,      // 5 seconds
-    WATCHLIST: 5000,      // 5 seconds
+    STOCK_PRICE: 3000,    // 3 seconds
+    PORTFOLIO: 3000,      // 3 seconds
+    WATCHLIST: 3000,      // 3 seconds
 };
 
 export const YAHOO_ENDPOINT = 'quote';
