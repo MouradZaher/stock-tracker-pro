@@ -38,10 +38,12 @@ export const formatCurrencyForMarket = (value: number, currency: string): string
 };
 
 // Format percentage
-export const formatPercent = (value: number, decimals: number = 2): string => {
-    const symbol = value >= 0 ? '+' : '';
-    const formatted = `${symbol}${value.toFixed(decimals)}%`;
-    const emoji = value > 0 ? '📈' : value < 0 ? '📉' : '➖';
+export const formatPercent = (value: any, decimals: number = 2): string => {
+    const n = Number(value);
+    if (isNaN(n)) return '0.00%';
+    const symbol = n >= 0 ? '+' : '';
+    const formatted = `${symbol}${n.toFixed(decimals)}%`;
+    const emoji = n > 0 ? '📈' : n < 0 ? '📉' : '➖';
     return `${emoji} ${formatted}`;
 };
 
@@ -97,8 +99,9 @@ export const formatTimeAgo = (date: Date): string => {
 };
 
 // Get change indicator class
-export const getChangeClass = (value: number): string => {
-    if (value > 0) return 'positive';
-    if (value < 0) return 'negative';
+export const getChangeClass = (value: any): string => {
+    const n = Number(value);
+    if (n > 0) return 'positive';
+    if (n < 0) return 'negative';
     return 'neutral';
 };

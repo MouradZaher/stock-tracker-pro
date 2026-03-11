@@ -341,6 +341,10 @@ export default async function handler(req, res) {
             'PRESIGHT': 1.96, 'FERTIGLBE': 1.54, 'DANA': 0.88, 'AGTHIA': 6.60,
             'YAHSAT': 2.14, 'ALPHADHABI': 19.40, 'RAKPROP': 0.64,
             'BTC': 85000, 'BTC-USD': 85000, 'ETH': 2200, 'ETH-USD': 2200,
+            // Market Indices
+            '^GSPC': 5625.60, '^DJI': 41800.00, '^IXIC': 17500.00,
+            '^RUT': 2060.00, '^VIX': 18.50, '^TNX': 4.30,
+            '^FTSE': 8700.00, '^GDAXI': 22800.00, '^N225': 37000.00,
         };
 
         const yetMissing = symbolList.filter(s => !resultsMap.has(s));
@@ -355,7 +359,7 @@ export default async function handler(req, res) {
                     name: base,
                     price,
                     change: price * (Math.random() * 0.02 - 0.01),
-                    changePercent: (Math.random() * 2 - 1).toFixed(2),
+                    changePercent: parseFloat((Math.random() * 2 - 1).toFixed(2)),
                     previousClose: price,
                     provider: 'price_map',
                 };
