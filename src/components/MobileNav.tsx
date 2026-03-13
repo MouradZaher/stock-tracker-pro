@@ -14,7 +14,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
 
     const navItems: { id: TabType; label: string; icon: React.ElementType }[] = [
         { id: 'search', label: 'Home', icon: LayoutDashboard },
-        { id: 'intelligence', label: 'AI Pro', icon: Brain },
+        { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
         { id: 'pulse', label: 'Pulse', icon: Activity },

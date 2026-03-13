@@ -13,10 +13,10 @@ interface Message {
 const AIChatWidget: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        {
-            role: 'assistant',
-            content: "Hello! I'm your AI Portfolio Assistant. Ask me to 'Analyze NVDA' or 'How is my portfolio risk?'",
-            timestamp: new Date()
+        { 
+            role: 'assistant', 
+            content: "Hello! I'm your AI Portfolio Assistant. Ask me to 'Analyze NVDA' or 'How is my portfolio risk?'", 
+            timestamp: new Date() 
         }
     ]);
     const [input, setInput] = useState('');
@@ -118,13 +118,13 @@ const AIChatWidget: React.FC = () => {
                 const totalEGP = egyptPos.reduce((s, p) => s + p.marketValue, 0);
                 response = `🇪🇬 **Egyptian Portfolio Intelligence**\n\n` +
                           `Tracking **${egyptPos.length}** positions in the EGX market.\n` +
-                          `Total Value: **${totalEGP.toLocaleString()} EGP**\n\n` +
-                          `Market Note: Your exposure is primarily in **Financial Services** and **Consumer Defensive** via Azimut and Obour Land.`;
+                          `Total Exposure: **${formatCurrency(totalEGP)}**.\n\n` +
+                          `AI View: Monitoring EGP volatility and central bank policy impact on these specific names.`;
             } else {
-                response = "I'm monitoring the global markets across all your synchronized tabs. Ask me to 'Analyze a stock', 'Check my risk', or 'Show my winners'.";
+                response = "I'm processing your portfolio data. You can ask me to 'Analyze NVDA', 'Check my risk', or 'Show my winners'.";
             }
-        } catch (e) {
-            response = "The AI engine is currently re-indexing data. Please retry in a moment.";
+        } catch (error) {
+            response = "I encountered a synchronization error. Please re-check the ticker or your portfolio connectivity.";
         }
 
         setTimeout(() => {
@@ -134,79 +134,152 @@ const AIChatWidget: React.FC = () => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[9999] flex flex-column align-items-end" style={{ gap: '1rem' }}>
+        <div 
+            style={{ 
+                position: 'fixed', 
+                bottom: '16px', 
+                right: '16px', 
+                zIndex: 9999, 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'flex-end', 
+                gap: '10px' 
+            }}
+        >
             {isOpen && (
                 <div 
-                    className="glass-card shadow-2xl flex flex-column animate-in slide-in-from-bottom-5 duration-300"
+                    className="glass-card animate-in slide-in-from-bottom-5 duration-300"
                     style={{
-                        width: '400px',
-                        height: '580px',
-                        borderRadius: '28px',
+                        width: '320px',
+                        height: '480px',
+                        borderRadius: '20px',
                         overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
                         border: '1px solid rgba(255,255,255,0.15)',
-                        background: 'rgba(15, 23, 42, 0.92)',
+                        background: 'rgba(15, 23, 42, 0.98)',
                         backdropFilter: 'blur(30px)',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.2)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.25)',
                     }}
                 >
                     {/* Header */}
-                    <div className="p-5 flex align-items-center justify-content-between" style={{ 
+                    <div style={{ 
+                        padding: '16px 20px', 
                         background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexShrink: 0
                     }}>
-                        <div className="flex align-items-center gap-3 text-white">
-                            <div className="w-10 h-10 rounded-xl bg-white/20 flex align-items-center justify-content-center backdrop-blur-md">
-                                <Bot size={24} className="text-white" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'white' }}>
+                            <div style={{ 
+                                width: '40px', 
+                                height: '40px', 
+                                borderRadius: '12px', 
+                                background: 'rgba(255,255,255,0.2)', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                backdropFilter: 'blur(10px)' 
+                            }}>
+                                <Bot size={24} color="white" />
                             </div>
                             <div>
-                                <h3 className="m-0 text-md font-extrabold tracking-tight">AI Financial Brain</h3>
-                                <div className="flex align-items-center gap-1.5 mt-0.5">
-                                    <div className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]"></div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Intelligence Active</span>
+                                <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, letterSpacing: '-0.01em', color: 'white' }}>AI Financial Brain</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                                    <div style={{ 
+                                        width: '8px', 
+                                        height: '8px', 
+                                        borderRadius: '50%', 
+                                        background: '#4ade80', 
+                                        boxShadow: '0 0 8px rgba(74,222,128,0.5)' 
+                                    }} />
+                                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, color: 'white' }}>Intelligence Active</span>
                                 </div>
                             </div>
                         </div>
-                        <button onClick={() => setIsOpen(false)} className="w-8 h-8 rounded-full flex align-items-center justify-content-center hover:bg-white/10 text-white transition-all">
+                        <button 
+                            onClick={() => setIsOpen(false)} 
+                            style={{ 
+                                width: '32px', 
+                                height: '32px', 
+                                borderRadius: '50%', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                background: 'rgba(255,255,255,0.1)', 
+                                border: 'none', 
+                                color: 'white', 
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                        >
                             <X size={18} />
                         </button>
                     </div>
 
-                    {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-5 flex flex-column gap-5 style-scrollbar" style={{ 
-                        background: 'radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent)' 
-                    }}>
+                    {/* Messages Container */}
+                    <div 
+                        className="style-scrollbar"
+                        style={{ 
+                            flex: 1, 
+                            overflowY: 'auto', 
+                            padding: '20px', 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '20px',
+                            background: 'radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent)'
+                        }}
+                    >
                         {messages.map((m, i) => (
-                            <div key={i} className={`flex ${m.role === 'user' ? 'justify-content-end' : 'justify-content-start'}`}>
-                                <div className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'} max-w-[90%]`}>
-                                    <div className={`w-8 h-8 rounded-lg flex align-items-center justify-content-center shrink-0 ${
-                                        m.role === 'user' ? 'bg-blue-600/20 text-blue-400' : 'bg-slate-800 text-blue-400 border border-slate-700'
-                                    }`}>
+                            <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start', width: '100%' }}>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    gap: '12px', 
+                                    flexDirection: m.role === 'user' ? 'row-reverse' : 'row', 
+                                    maxWidth: '90%' 
+                                }}>
+                                    <div style={{ 
+                                        width: '32px', 
+                                        height: '32px', 
+                                        borderRadius: '8px', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        flexShrink: 0,
+                                        background: m.role === 'user' ? 'rgba(37, 99, 235, 0.2)' : '#1e293b',
+                                        color: '#60a5fa',
+                                        border: m.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.1)'
+                                    }}>
                                         {m.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                                     </div>
-                                    <div 
-                                        className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                                            m.role === 'user' 
-                                            ? 'bg-blue-600/90 text-white rounded-tr-none shadow-lg' 
-                                            : 'bg-slate-800/80 text-slate-200 rounded-tl-none border border-slate-700/50 backdrop-blur-sm'
-                                        }`}
-                                    >
+                                    <div style={{ 
+                                        padding: '12px 16px', 
+                                        borderRadius: '16px', 
+                                        fontSize: '0.85rem', 
+                                        lineHeight: 1.5,
+                                        background: m.role === 'user' ? '#2563eb' : 'rgba(30, 41, 59, 0.8)',
+                                        color: m.role === 'user' ? 'white' : '#e2e8f0',
+                                        border: m.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.05)',
+                                        borderTopLeftRadius: m.role === 'user' ? '16px' : '2px',
+                                        borderTopRightRadius: m.role === 'user' ? '2px' : '16px'
+                                    }}>
                                         {m.content}
                                     </div>
                                 </div>
                             </div>
                         ))}
                         {isTyping && (
-                            <div className="flex justify-content-start">
-                                <div className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-slate-800 flex align-items-center justify-content-center border border-slate-700">
-                                        <Bot size={16} className="text-blue-400" />
+                            <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <Bot size={16} color="#60a5fa" />
                                     </div>
-                                    <div className="bg-slate-800/80 p-4 rounded-2xl rounded-tl-none border border-slate-700/50">
-                                        <div className="flex gap-1.5 items-end h-4">
-                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
-                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                                        </div>
+                                    <div style={{ padding: '12px 16px', background: 'rgba(30, 41, 59, 0.8)', borderRadius: '16px', borderTopLeftRadius: '2px' }}>
+                                        <Bot size={16} style={{ opacity: 0.5 }} />
                                     </div>
                                 </div>
                             </div>
@@ -214,22 +287,51 @@ const AIChatWidget: React.FC = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input */}
-                    <div className="p-5 border-t border-white/5 bg-slate-900/80 backdrop-blur-xl">
-                        <div className="flex gap-3 p-1.5 bg-slate-800/50 rounded-2xl border border-white/5 focus-within:border-blue-500/50 transition-all">
+                    {/* Input Footer */}
+                    <div style={{ padding: '16px 20px', background: 'rgba(15, 23, 42, 0.8)', borderTop: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
+                        <div style={{ 
+                            display: 'flex', 
+                            gap: '12px', 
+                            background: 'rgba(30, 41, 59, 0.5)', 
+                            borderRadius: '14px', 
+                            padding: '6px', 
+                            border: '1px solid rgba(255,255,255,0.1)'
+                        }}>
                             <input
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                                placeholder="Ask a question..."
-                                className="flex-1 bg-transparent border-none px-3 py-2 text-sm text-white focus:outline-none placeholder:text-slate-500"
+                                placeholder="Ask about stocks, risk, winners..."
+                                style={{ 
+                                    flex: 1, 
+                                    background: 'transparent', 
+                                    border: 'none', 
+                                    padding: '8px 12px', 
+                                    fontSize: '0.85rem', 
+                                    color: 'white', 
+                                    outline: 'none' 
+                                }}
                             />
                             <button 
                                 onClick={handleSend}
-                                className="w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-xl text-white transition-all flex align-items-center justify-content-center shadow-lg"
+                                style={{ 
+                                    width: '36px', 
+                                    height: '36px', 
+                                    borderRadius: '10px', 
+                                    background: '#2563eb', 
+                                    color: 'white', 
+                                    border: 'none', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    cursor: 'pointer',
+                                    transition: 'background 0.2s'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.background = '#3b82f6'}
+                                onMouseOut={(e) => e.currentTarget.style.background = '#2563eb'}
                             >
-                                <Send size={18} />
+                                <Send size={16} />
                             </button>
                         </div>
                     </div>
@@ -238,19 +340,38 @@ const AIChatWidget: React.FC = () => {
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-16 h-16 rounded-2xl shadow-2xl flex align-items-center justify-content-center text-white transition-all group active:scale-95"
+                className="shadow-2xl transition-all group active:scale-95"
                 style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
                     background: 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)',
                     boxShadow: '0 12px 40px rgba(59, 130, 246, 0.4)',
-                    border: '1px solid rgba(255,255,255,0.2)'
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    cursor: 'pointer'
                 }}
             >
                 {isOpen ? (
-                    <X size={28} className="animate-in fade-in duration-300" />
+                    <X size={24} className="animate-in fade-in duration-300" />
                 ) : (
-                    <div className="relative">
-                        <MessageSquare size={28} className="group-hover:scale-110 transition-transform" />
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
+                    <div className="relative" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <MessageSquare size={24} className="group-hover:scale-110 transition-transform" />
+                        <div 
+                            className="absolute animate-pulse" 
+                            style={{ 
+                                top: '-4px', 
+                                right: '-4px', 
+                                width: '12px', 
+                                height: '12px', 
+                                background: '#ef4444', 
+                                borderRadius: '50%', 
+                                border: '2px solid white' 
+                            }}
+                        ></div>
                     </div>
                 )}
             </button>

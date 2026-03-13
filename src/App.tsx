@@ -34,6 +34,8 @@ import PriceAlertManager from './components/PriceAlertManager';
 
 import './index.css';
 import './styles/ios-mobile.css';
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,102 +140,87 @@ function MainLayout({
   }, [location.search, navigate, selectedSymbol, setSelectedSymbol]);
 
   return (
-    <div className="app">
+    <div className="app" style={{ display: 'flex', minHeight: '100vh' }}>
       <ErrorBoundary>
-        <TopBar />
-        <Header
-        activeTab={activeTab}
+        <Sidebar 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange} 
+          onLogout={logout} 
+          showAdmin={role === 'admin'}
+          onAdminClick={() => setIsAdminOpen(true)}
+        />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width, 260px)', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
+          <TopBar />
+          <Header
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onLogout={logout}
+            showAdmin={role === 'admin'}
+            onAdminClick={() => setIsAdminOpen(true)}
+          />
 
-        onTabChange={handleTabChange}
-        onLogout={logout}
-        showAdmin={role === 'admin'}
-        onAdminClick={() => setIsAdminOpen(true)}
-      />
+          <WatchlistSidebar
+            isOpen={isWatchlistOpen}
+            onClose={() => setIsWatchlistOpen(false)}
+            onSelectSymbol={handleSelectSymbol}
+          />
 
-      <WatchlistSidebar
-        isOpen={isWatchlistOpen}
-        onClose={() => setIsWatchlistOpen(false)}
-        onSelectSymbol={handleSelectSymbol}
-      />
+          <AdminDashboard
+            isOpen={isAdminOpen}
+            onClose={() => setIsAdminOpen(false)}
+          />
 
-      <AdminDashboard
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-      />
-
-      <main className="main-content" style={{ flex: 1, position: 'relative' }}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/search" replace />} />
-          {/* ===== LOCKED: Desktop Home Tab Layout — DO NOT MODIFY (approved 2026-02-16) ===== */}
-          <Route path="/search" element={
-            <div
-              className="tab-content home-tab-content"
-              style={{
-                position: 'relative'
-              }}
-            >
-              {!selectedSymbol ? (
-                <div className="heatmap-wrapper" style={{
-                  flex: 1,
-                  position: 'relative',
-                  height: '500px', // Robust height for visibility on all devices
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <StockHeatmap />
+          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 'calc(var(--header-height) + 32px)' }}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/search" replace />} />
+              <Route path="/search" element={
+                <div className="tab-content dashboard-page">
+                  {!selectedSymbol ? (
+                    <Dashboard onSelectSymbol={handleSelectSymbol} />
+                  ) : (
+                    <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
+                      <StockDetail
+                        symbol={selectedSymbol}
+                        onBack={() => setSelectedSymbol(null)}
+                      />
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
-                  <StockDetail
-                    symbol={selectedSymbol}
-                    onBack={() => setSelectedSymbol(null)}
-                  />
+              } />
+              <Route path="/watchlist" element={
+                <div className="tab-content">
+                  <WatchlistPage onSelectSymbol={handleSelectSymbol} />
                 </div>
-              )}
-            </div>
-          } />
-          <Route path="/watchlist" element={
-            <div className="tab-content">
-              <WatchlistPage onSelectSymbol={handleSelectSymbol} />
-            </div>
-          } />
-          <Route path="/portfolio" element={
-            <div className="tab-content">
-              <ErrorBoundary>
-                <Suspense fallback={<PageSkeleton />}>
-                  <Portfolio onSelectSymbol={handleSelectSymbol} />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-          } />
-          <Route path="/recommendations" element={
-            <div className="tab-content">
-              <ErrorBoundary>
-                <Suspense fallback={<PageSkeleton />}>
-                  <AIRecommendations onSelectStock={handleSelectSymbol} />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-          } />
-          <Route path="/intelligence" element={
-            <div className="tab-content">
-              <ErrorBoundary>
-                <Suspense fallback={<PageSkeleton />}>
-                  <PortfolioIntelligencePanel />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-          } />
-          <Route path="/pulse" element={
-            <div className="tab-content">
-              <MarketPulsePage onSelectStock={handleSelectSymbol} />
-            </div>
-          } />
-          <Route path="*" element={<Navigate to="/search" replace />} />
-        </Routes>
-      </main>
-
+              } />
+              <Route path="/portfolio" element={
+                <div className="tab-content">
+                  <ErrorBoundary>
+                    <Suspense fallback={<PageSkeleton />}>
+                      <Portfolio onSelectSymbol={handleSelectSymbol} />
+                    </Suspense>
+                  </ErrorBoundary>
+                </div>
+              } />
+              <Route path="/recommendations" element={
+                <div className="tab-content">
+                  <ErrorBoundary>
+                    <Suspense fallback={<PageSkeleton />}>
+                      <AIRecommendations onSelectStock={handleSelectSymbol} />
+                    </Suspense>
+                  </ErrorBoundary>
+                </div>
+              } />
+              <Route path="/pulse" element={
+                <div className="tab-content">
+                  <MarketPulsePage onSelectStock={handleSelectSymbol} />
+                </div>
+              } />
+              <Route path="*" element={<Navigate to="/search" replace />} />
+            </Routes>
+          </main>
+        </div>
       </ErrorBoundary>
+      <div className="noise-overlay" />
       <AIChatWidget />
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
     </div>

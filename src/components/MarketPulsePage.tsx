@@ -10,6 +10,7 @@ import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../
 import { useMarket } from '../contexts/MarketContext';
 import EarningsCalendar from './EarningsCalendar';
 import OptionsFlowSimulator from './OptionsFlowSimulator';
+import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -361,6 +362,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     ))}
                 </div>
             </div>
+
+            {/* ═══ AI STRATEGY INTELLIGENCE HUB ═══ */}
+            <div style={{ margin: '0 1rem 2rem 1rem' }}>
+                <AIStrategyIntelliHub />
+            </div>
+
 
             {/* ═══ LIVE AI ALPHA INTELLIGENCE ═══ */}
             <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>

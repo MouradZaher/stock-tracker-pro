@@ -38,7 +38,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: Eye },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
-        { id: 'intelligence', label: 'Intelligence', icon: Sparkles },
         { id: 'pulse', label: 'Pulse', icon: Activity },
     ];
 
@@ -127,30 +126,34 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     </span>
                 </div>
 
-                {/* ── Center Nav (desktop only) ─────────── */}
-                <div className="header-center desktop-only" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-                    <nav className="header-nav" style={{ display: 'flex', alignItems: 'center', gap: '3px' }} role="navigation" aria-label="Main navigation">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                className={`header-tab ${activeTab === tab.id ? 'active' : ''}`}
-                                onClick={() => handleTabClick(tab.id)}
-                                aria-label={`Navigate to ${tab.label}`}
-                                aria-current={activeTab === tab.id ? 'page' : undefined}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                    padding: '2px 10px',
-                                    fontSize: '0.7rem',
-                                    height: '28px'
-                                }}
-                            >
-                                <tab.icon size={12} strokeWidth={2.0} />
-                                {tab.label}
-                            </button>
-                        ))}
-                    </nav>
+                {/* ── Market Indices (Center) ────────────────── */}
+                <div className="header-center desktop-only" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, overflow: 'hidden' }}>
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '24px', 
+                        padding: '6px 20px', 
+                        background: 'rgba(255,255,255,0.03)', 
+                        borderRadius: '20px', 
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        fontSize: '0.75rem',
+                        fontWeight: 700
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ color: 'var(--color-text-tertiary)' }}>S&P 500</span>
+                            <span style={{ color: 'var(--color-success)' }}>5,123.42 (+0.82%)</span>
+                        </div>
+                        <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.1)' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ color: 'var(--color-text-tertiary)' }}>NASDAQ</span>
+                            <span style={{ color: 'var(--color-success)' }}>16,248.52 (+1.24%)</span>
+                        </div>
+                        <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.1)' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ color: 'var(--color-text-tertiary)' }}>VIX</span>
+                            <span style={{ color: 'var(--color-error)' }}>14.28 (-4.2%)</span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* ── Actions (right-aligned) ───────────── */}
