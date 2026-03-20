@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
+import TermsModal from './components/TermsModal';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -57,6 +58,11 @@ function AppContent() {
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  
+  // Track Terms of Use acceptance
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState<boolean>(() => {
+    return localStorage.getItem('hasAcceptedTerms') === 'true';
+  });
 
   // Auto-sync portfolio prices on login/refresh to replace $150 placeholders
   useEffect(() => {
@@ -75,8 +81,19 @@ function AppContent() {
 
   const role = user?.role || 'user';
 
+  const handleAcceptTerms = () => {
+    localStorage.setItem('hasAcceptedTerms', 'true');
+    setHasAcceptedTerms(true);
+  };
+
   return (
     <BrowserRouter>
+      {!hasAcceptedTerms && (
+        <TermsModal 
+          onAccept={handleAcceptTerms} 
+          onDecline={logout} 
+        />
+      )}
       <MainLayout
         role={role}
         logout={logout}
