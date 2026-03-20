@@ -15,7 +15,7 @@ const PricingPage: React.FC = () => {
       border: '1px solid',
       borderColor: recommended ? 'transparent' : 'var(--color-border)',
       borderRadius: '24px',
-      padding: '1.5rem',
+      padding: '1.25rem',
       display: 'flex',
       flexDirection: 'column',
       gap: '1rem',
@@ -85,32 +85,35 @@ const PricingPage: React.FC = () => {
         Start for Free
       </button>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.5rem', flex: 1 }}>
         <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0, marginBottom: '4px' }}>
           Features
         </p>
-        {features.map((feature: string, idx: number) => (
-          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ 
-              width: '16px', height: '16px', 
-              borderRadius: '50%', 
-              background: recommended ? 'rgba(255,255,255,0.2)' : 'var(--color-accent-light)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-            }}>
-              <Check size={10} color={recommended ? 'white' : 'var(--color-accent)'} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 8px' }}>
+          {features.map((feature: string, idx: number) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+              <div style={{ 
+                width: '14px', height: '14px', 
+                borderRadius: '50%', 
+                background: recommended ? 'rgba(255,255,255,0.2)' : 'var(--color-accent-light)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                marginTop: '1px'
+              }}>
+                <Check size={8} color={recommended ? 'white' : 'var(--color-accent)'} />
+              </div>
+              <span style={{ fontSize: '0.75rem', color: recommended ? 'white' : 'var(--color-text-secondary)', lineHeight: 1.2 }}>
+                {feature}
+              </span>
             </div>
-            <span style={{ fontSize: '0.82rem', color: recommended ? 'white' : 'var(--color-text-secondary)', lineHeight: 1.2 }}>
-              {feature}
-            </span>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1100px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+    <div style={{ padding: '1rem', maxWidth: '1100px', margin: '0 auto', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         <div style={{ 
           display: 'inline-block',
           padding: '6px 12px',
@@ -209,7 +212,7 @@ const PricingPage: React.FC = () => {
         />
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '4rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+      <div style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
         <p>To subscribe, please click "Start for Free" to email us directly at <strong>admin@stocktrackerpro.com</strong></p>
       </div>
     </div>
