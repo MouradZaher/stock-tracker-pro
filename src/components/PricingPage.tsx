@@ -113,7 +113,7 @@ const PricingPage: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '1.5rem 1rem 0.5rem', maxWidth: '1100px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'hidden', width: '100%' }}>
+    <div style={{ padding: '5vh 1rem 0.5rem', maxWidth: '1100px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'hidden', width: '100%' }}>
       <div style={{ textAlign: 'center', marginBottom: '1rem', flexShrink: 0 }}>
         <div style={{ 
           display: 'inline-block',
