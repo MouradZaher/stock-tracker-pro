@@ -85,9 +85,16 @@ function AppContent() {
 
   const role = user?.role || 'user';
 
+  const handleLogout = () => {
+    localStorage.removeItem('hasAcceptedTerms');
+    setHasAcceptedTerms(false);
+    logout();
+  };
+
   const handleOnboardingComplete = (choice: 'sample' | 'fresh') => {
     localStorage.setItem('hasAcceptedTerms', 'true');
     setHasAcceptedTerms(true);
+    setIsTutorialOpen(true);
     
     // If choice is fresh, we do nothing. If sample, ideally we load sample data
     if (choice === 'sample') {
@@ -105,7 +112,7 @@ function AppContent() {
       {!hasAcceptedTerms && (
         <OnboardingModal 
           onComplete={handleOnboardingComplete} 
-          onDecline={logout} 
+          onDecline={handleLogout} 
         />
       )}
       {isTutorialOpen && (
@@ -121,7 +128,7 @@ function AppContent() {
       )}
       <MainLayout
         role={role}
-        logout={logout}
+        logout={handleLogout}
         selectedSymbol={selectedSymbol}
         setSelectedSymbol={setSelectedSymbol}
         isWatchlistOpen={isWatchlistOpen}
@@ -217,11 +224,11 @@ function MainLayout({
             <Routes>
               <Route path="/" element={<Navigate to="/search" replace />} />
               <Route path="/search" element={
-                <div className="tab-content dashboard-page" style={{ padding: 0, margin: 0, height: '100%' }}>
+                <div style={{ position: 'fixed', top: 'var(--header-height)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)' }}>
                   {!selectedSymbol ? (
                     <Dashboard onSelectSymbol={handleSelectSymbol} />
                   ) : (
-                    <div style={{ width: '100%', padding: '1rem', paddingBottom: '80px' }}>
+                    <div style={{ width: '100%', height: '100%', overflowY: 'auto', padding: '1rem', paddingBottom: '80px' }}>
                       <StockDetail
                         symbol={selectedSymbol}
                         onBack={() => setSelectedSymbol(null)}

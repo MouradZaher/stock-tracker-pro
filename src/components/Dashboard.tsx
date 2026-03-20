@@ -9,7 +9,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
   return (
-    <div className="dashboard-container" style={{ width: '100%', height: 'calc(100vh - var(--header-height) - 40px)', padding: 0, margin: 0 }}>
+    <div className="dashboard-container" style={{ width: '100%', height: '100%', padding: 0, margin: 0 }}>
       {/* Full-screen Heatmap Container - Maximized */}
       <div
         style={{

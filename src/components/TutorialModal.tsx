@@ -8,31 +8,42 @@ interface TutorialModalProps {
 
 const tutorialContent = [
   {
-    category: 'Getting Started',
-    title: 'Welcome to Stock Tracker Pro',
-    description: 'Stock Tracker Pro helps you track your trades, manage portfolios, analyze performance, and stay on top of taxes. This tutorial walks you through every feature.',
+    category: 'Home',
+    title: 'Market Heatmap',
+    description: 'The Home tab features a live, interactive market heatmap. Visualize the entire stock market at a glance, filtered by sectors or indices, to instantly spot daily trend leaders and laggards.',
     tips: [
-      'Use the top nav to switch between pages.',
-      'You can reopen this tutorial anytime from the help button (?) in the top menu.'
+      'Click any block on the heatmap to jump straight to its detailed analysis page.'
     ]
   },
   {
-    category: 'Dashboard',
-    title: 'P&L Overview',
-    description: 'The dashboard shows your total profit & loss across all portfolios at a glance. The summary cards display today\'s P&L, total realized gains, and unrealized gains.',
-    tips: ['Click any summary card to navigate to the relevant detail page.']
+    category: 'AI',
+    title: 'AI Recommendations',
+    description: 'Leverage our advanced predictive AI. This tab offers automated stock screens, predictive charting, and algorithmic trade ideas based on real-time market sentiment and technicals.',
+    tips: ['Check the AI score confidently before making decisions.']
   },
   {
-    category: 'Open Trades',
-    title: 'Real-time Position Tracking',
-    description: 'The Open Trades section lists your current trades with real-time price data. Each row shows the ticker, quantity, average cost, current price, and unrealized P&L.',
-    tips: ['Click a trade row to see full details and trade history.']
+    category: 'Watch',
+    title: 'Watchlist',
+    description: 'Keep a close eye on your favorite assets. The Watch tab lets you add stocks and crypto to a personalized list, tracking their live prices and daily changes instantly.',
+    tips: ['Use the sidebar to quickly swap between your saved lists.']
   },
   {
-    category: 'Quick Actions',
-    title: 'Managing Your Data',
-    description: 'Use the quick action buttons to add a trade, import a CSV, or jump to common tasks without navigating away from the dashboard.',
-    tips: []
+    category: 'Portfolio',
+    title: 'Portfolio Tracking',
+    description: 'Your command center for all your holdings. Track your P&L, manage multiple portfolios, import CSV data from brokers, and monitor total asset diversity.',
+    tips: ['Click the Settings gear in the top right to enable dividend and news notifications for your holdings.']
+  },
+  {
+    category: 'Pulse',
+    title: 'Market Pulse',
+    description: 'Stay updated with the heartbeat of the market! The Pulse tab aggregates breaking financial news, social media sentiment, and major economic events in real-time.',
+    tips: ['Look for the AI sentiment indicator next to news articles to quickly gauge market reactions.']
+  },
+  {
+    category: 'Pro',
+    title: 'Pro Subscriptions',
+    description: 'Upgrade your experience! The Pro tab details our premium features including unlimited portfolios, automatic broker sync via SnapTrade, and advanced predictive AI charting.',
+    tips: ['All Pro features come with a 30-day free trial.']
   }
 ];
 
@@ -93,7 +104,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose, onOpenAI }) => {
           </button>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {['Getting Started', 'Dashboard', 'Trades List', 'CSV Import', 'Portfolio', 'Broker Connections'].map((item, idx) => (
+            {['Home', 'AI', 'Watch', 'Portfolio', 'Pulse', 'Pro'].map((item, idx) => (
               <button key={item} onClick={() => setActiveStep(Math.min(idx, tutorialContent.length - 1))} style={{
                 background: idx === activeStep ? 'rgba(255,255,255,0.05)' : 'transparent',
                 border: 'none',
