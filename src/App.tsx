@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import OnboardingModal from './components/OnboardingModal';
 import TutorialModal from './components/TutorialModal';
+import SettingsModal from './components/SettingsModal';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -60,6 +61,7 @@ function AppContent() {
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   // Track Terms of Use acceptance
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState<boolean>(() => {
@@ -112,6 +114,11 @@ function AppContent() {
           onOpenAI={handleOpenAI}
         />
       )}
+      {isSettingsOpen && (
+        <SettingsModal 
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      )}
       <MainLayout
         role={role}
         logout={logout}
@@ -122,6 +129,7 @@ function AppContent() {
         isAdminOpen={isAdminOpen}
         setIsAdminOpen={setIsAdminOpen}
         onOpenTutorial={() => setIsTutorialOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
     </BrowserRouter>
   );
@@ -137,6 +145,7 @@ interface MainLayoutProps {
   isAdminOpen: boolean;
   setIsAdminOpen: (open: boolean) => void;
   onOpenTutorial: () => void;
+  onOpenSettings: () => void;
 }
 
 function MainLayout({
@@ -148,7 +157,8 @@ function MainLayout({
   setIsWatchlistOpen,
   isAdminOpen,
   setIsAdminOpen,
-  onOpenTutorial
+  onOpenTutorial,
+  onOpenSettings
 }: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -189,6 +199,7 @@ function MainLayout({
             showAdmin={role === 'admin'}
             onAdminClick={() => setIsAdminOpen(true)}
             onOpenTutorial={onOpenTutorial}
+            onOpenSettings={onOpenSettings}
           />
 
           <WatchlistSidebar

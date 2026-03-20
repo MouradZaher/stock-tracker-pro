@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity, Brain, HelpCircle } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity, Brain, HelpCircle, Settings as SettingsIcon } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -14,9 +14,10 @@ interface HeaderProps {
     showAdmin?: boolean;
     onAdminClick?: () => void;
     onOpenTutorial?: () => void;
+    onOpenSettings?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick, onOpenTutorial }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick, onOpenTutorial, onOpenSettings }) => {
     const { theme, toggleTheme } = useTheme();
     const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
     const { selectedMarket, setMarket, setHoverMarket } = useMarket();
@@ -257,6 +258,37 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         </>,
                         document.body
                     )}
+
+                    {/* Help / Tutorial */}
+                    <button
+                        style={{ ...iconBtn }}
+                        onClick={() => { soundService.playTap(); onOpenTutorial?.(); }}
+                        aria-label="Help & Tutorial"
+                        title="Help & Tutorial"
+                    >
+                        <HelpCircle size={iconSize} strokeWidth={2.0} />
+                    </button>
+
+                    {/* Support Email */}
+                    <a
+                        href="mailto:support@stocktrackerpro.com"
+                        style={{ ...iconBtn, textDecoration: 'none' }}
+                        onClick={() => soundService.playTap()}
+                        aria-label="Contact Support"
+                        title="Contact Support"
+                    >
+                        <MessageSquare size={iconSize} strokeWidth={2.0} />
+                    </a>
+
+                    {/* Settings */}
+                    <button
+                        style={{ ...iconBtn }}
+                        onClick={() => { soundService.playTap(); onOpenSettings?.(); }}
+                        aria-label="Settings"
+                        title="Settings"
+                    >
+                        <SettingsIcon size={iconSize} strokeWidth={2.0} />
+                    </button>
 
                     {/* Admin icon */}
                     {showAdmin && (
