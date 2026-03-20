@@ -8,6 +8,15 @@ interface TutorialModalProps {
 
 const tutorialContent = [
   {
+    category: 'Getting Started',
+    title: 'Welcome to Stock Tracker Pro',
+    description: 'Stock Tracker Pro helps you track your trades, manage portfolios, analyze performance, and stay on top of taxes. This tutorial walks you through every feature.',
+    tips: [
+      'Use the sidebar to navigate between tabs.',
+      'You can reopen this tutorial anytime from the top menu.'
+    ]
+  },
+  {
     category: 'Home',
     title: 'Market Heatmap',
     description: 'The Home tab features a live, interactive market heatmap. Visualize the entire stock market at a glance, filtered by sectors or indices, to instantly spot daily trend leaders and laggards.',
@@ -104,7 +113,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose, onOpenAI }) => {
           </button>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {['Home', 'AI', 'Watch', 'Portfolio', 'Pulse', 'Pro'].map((item, idx) => (
+            {['Getting Started', 'Home', 'AI', 'Watch', 'Portfolio', 'Pulse', 'Pro'].map((item, idx) => (
               <button key={item} onClick={() => setActiveStep(Math.min(idx, tutorialContent.length - 1))} style={{
                 background: idx === activeStep ? 'rgba(255,255,255,0.05)' : 'transparent',
                 border: 'none',
