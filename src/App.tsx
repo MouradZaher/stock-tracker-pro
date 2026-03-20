@@ -143,6 +143,7 @@ function MainLayout({
   return (
     <div className="app" style={{ display: 'flex', minHeight: '100vh' }}>
       <ErrorBoundary>
+        <TopBar />
         <Sidebar 
           activeTab={activeTab} 
           onTabChange={handleTabChange} 
@@ -151,7 +152,6 @@ function MainLayout({
           onAdminClick={() => setIsAdminOpen(true)}
         />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width, 240px)', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
-          <TopBar />
           <Header
             activeTab={activeTab}
             onTabChange={handleTabChange}
