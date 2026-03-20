@@ -220,7 +220,7 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
 
-          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 0 }}>
+          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 'var(--header-height)', display: 'flex', flexDirection: 'column' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
