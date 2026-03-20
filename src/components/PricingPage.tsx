@@ -22,6 +22,7 @@ const PricingPage: React.FC = () => {
       flex: '1',
       minWidth: '280px',
       maxWidth: '350px',
+      maxHeight: '100%',
       position: 'relative',
       overflow: 'hidden',
       boxShadow: recommended ? '0 20px 40px rgba(59, 130, 246, 0.2)' : 'none',
@@ -85,11 +86,11 @@ const PricingPage: React.FC = () => {
         Start for Free
       </button>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.5rem', flex: 1 }}>
-        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0, marginBottom: '4px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.5rem', flex: 1, minHeight: 0 }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0, marginBottom: '4px', flexShrink: 0 }}>
           Features
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 8px', overflowY: 'auto', paddingRight: '4px', paddingBottom: '4px' }}>
           {features.map((feature: string, idx: number) => (
             <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
               <div style={{ 
@@ -112,8 +113,8 @@ const PricingPage: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '1rem', maxWidth: '1100px', margin: '0 auto', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+    <div style={{ padding: '0.5rem 1rem', maxWidth: '1100px', margin: '0 auto', height: 'calc(100vh - var(--header-height) - 40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
+      <div style={{ textAlign: 'center', marginBottom: '1rem', flexShrink: 0 }}>
         <div style={{ 
           display: 'inline-block',
           padding: '6px 12px',
@@ -138,7 +139,9 @@ const PricingPage: React.FC = () => {
         display: 'flex', 
         justifyContent: 'center', 
         gap: '1.5rem',
-        alignItems: 'stretch'
+        alignItems: 'stretch',
+        flex: 1,
+        minHeight: 0
       }}>
         <PlanCard 
           title="Starter"
@@ -212,7 +215,7 @@ const PricingPage: React.FC = () => {
         />
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+      <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem', flexShrink: 0 }}>
         <p>To subscribe, please click "Start for Free" to email us directly at <strong>admin@stocktrackerpro.com</strong></p>
       </div>
     </div>
