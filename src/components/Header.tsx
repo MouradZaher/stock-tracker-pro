@@ -6,6 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
 import type { TabType } from '../types';
+import MarketCountdown from './MarketCountdown';
 
 interface HeaderProps {
     activeTab: TabType;
@@ -175,7 +176,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
                 {/* ── Actions (right-aligned) ───────────── */}
                 <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-
+                    {/* Market Countdown Clock */}
+                    {!isMobile && <MarketCountdown />}
                     {/* Market Selector */}
                     <div style={{ position: 'relative' }}>
                         <button

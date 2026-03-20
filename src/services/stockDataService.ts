@@ -24,8 +24,9 @@ export const sanitizeSymbol = (raw: string): string => {
     const clean = raw.split('?')[0].trim();
     // Reject literal placeholder {SYMBOL}
     if (clean.startsWith('{') || clean.length === 0) return '';
-    // Allow only valid stock symbol chars: letters, digits, ^, ., -, :
-    return /^[A-Z0-9^.\-:]{1,20}$/i.test(clean) ? clean.toUpperCase() : '';
+    // Allow only valid stock symbol chars: letters, digits, ^, ., -, :, =
+    // The = is needed for futures contracts like GC=F (Gold), CL=F (Crude Oil)
+    return /^[A-Z0-9^.\-:=]{1,20}$/i.test(clean) ? clean.toUpperCase() : '';
 };
 
 
@@ -837,7 +838,7 @@ export const getSectorPerformance = async (marketId: string = 'us') => {
 
 export const getVolumeAnomalies = async (marketId: string = 'us') => {
     const marketTickers: Record<string, string[]> = {
-        us: ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'MARA', 'NIO', 'META', 'MSFT', 'GOOGL', 'AMZN'],
+        us: ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'JPM', 'COIN', 'BABA', 'META', 'MSFT', 'GOOGL', 'AMZN'],
         egypt: ['COMI', 'TMGH', 'FWRY', 'HRHO', 'EAST', 'ETEL', 'PHDC', 'ORAS', 'SWDY', 'ABUK'],
         abudhabi: ['IHC', 'FAB', 'ETISALAT', 'ADNOCDIST', 'ALDAR', 'ADCB', 'MULTIPLY', 'ADNOCDRILL']
     };

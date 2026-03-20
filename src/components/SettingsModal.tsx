@@ -12,17 +12,30 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<'preferences' | 'notifications' | 'subscription' | 'danger'>('preferences');
   
-  // Fake states for toggles
-  const [emailNotif, setEmailNotif] = useState(true);
-  const [pushNotif, setPushNotif] = useState(true);
-  const [divEmail, setDivEmail] = useState(true);
-  const [divPush, setDivPush] = useState(false);
-  const [newsEmail, setNewsEmail] = useState(true);
-  const [newsPush, setNewsPush] = useState(true);
+  // Persistent local states for toggles
+  const [emailNotif, setEmailNotif] = useState(() => localStorage.getItem('settings_emailNotif') !== 'false');
+  const [pushNotif, setPushNotif] = useState(() => localStorage.getItem('settings_pushNotif') !== 'false');
+  const [divEmail, setDivEmail] = useState(() => localStorage.getItem('settings_divEmail') !== 'false');
+  const [divPush, setDivPush] = useState(() => localStorage.getItem('settings_divPush') === 'true');
+  const [newsEmail, setNewsEmail] = useState(() => localStorage.getItem('settings_newsEmail') !== 'false');
+  const [newsPush, setNewsPush] = useState(() => localStorage.getItem('settings_newsPush') !== 'false');
 
-  const [currency, setCurrency] = useState('USD');
-  const [taxMethod, setTaxMethod] = useState('FIFO');
-  const [benchmark, setBenchmark] = useState('SPY');
+  const [currency, setCurrency] = useState(() => localStorage.getItem('settings_currency') || 'USD');
+  const [taxMethod, setTaxMethod] = useState(() => localStorage.getItem('settings_taxMethod') || 'FIFO');
+  const [benchmark, setBenchmark] = useState(() => localStorage.getItem('settings_benchmark') || 'SPY');
+
+  // Persistence effects
+  React.useEffect(() => {
+    localStorage.setItem('settings_emailNotif', String(emailNotif));
+    localStorage.setItem('settings_pushNotif', String(pushNotif));
+    localStorage.setItem('settings_divEmail', String(divEmail));
+    localStorage.setItem('settings_divPush', String(divPush));
+    localStorage.setItem('settings_newsEmail', String(newsEmail));
+    localStorage.setItem('settings_newsPush', String(newsPush));
+    localStorage.setItem('settings_currency', currency);
+    localStorage.setItem('settings_taxMethod', taxMethod);
+    localStorage.setItem('settings_benchmark', benchmark);
+  }, [emailNotif, pushNotif, divEmail, divPush, newsEmail, newsPush, currency, taxMethod, benchmark]);
 
   const tabs = [
     { id: 'preferences', label: 'Preferences', icon: SettingsIcon },

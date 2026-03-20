@@ -27,6 +27,7 @@ import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
 import AdminDashboard from './components/AdminDashboard';
 import MobileNav from './components/MobileNav';
+import ARIAVoiceAssistant from './components/ARIAVoiceAssistant';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
@@ -220,11 +221,11 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
 
-          <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: 'var(--header-height)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', paddingTop: '96px', minHeight: '100vh' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
-                <div style={{ position: 'fixed', top: 'calc(var(--header-height) + 32px)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)' }}>
+                <div className="tab-content" style={{ padding: 0, height: '100%' }}>
                   {!selectedSymbol ? (
                     <Dashboard onSelectSymbol={handleSelectSymbol} />
                   ) : (
@@ -238,7 +239,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/watchlist" element={
-                <div className="tab-content">
+                <div className="tab-content" style={{ padding: '1rem', paddingBottom: '80px' }}>
                   <WatchlistPage onSelectSymbol={handleSelectSymbol} />
                 </div>
               } />
@@ -252,7 +253,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/recommendations" element={
-                <div className="tab-content">
+                <div className="tab-content" style={{ paddingTop: '1rem' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <AIRecommendations onSelectStock={handleSelectSymbol} />
@@ -266,7 +267,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/pricing" element={
-                <div style={{ position: 'absolute', top: 'var(--header-height)', left: 0, right: 0, bottom: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
+                <div className="tab-content" style={{ overflow: 'hidden' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
@@ -281,6 +282,10 @@ function MainLayout({
       </ErrorBoundary>
       <div className="noise-overlay" />
       <AIChatWidget />
+      <ARIAVoiceAssistant
+        onNavigate={handleTabChange}
+        onSelectSymbol={handleSelectSymbol}
+      />
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
     </div>
   );

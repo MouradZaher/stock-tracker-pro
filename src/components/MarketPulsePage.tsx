@@ -17,15 +17,15 @@ interface MarketPulsePageProps {
 }
 
 const MARKET_STREAMS = [
-    { name: 'Bloomberg', fullName: 'Bloomberg Television', origin: 'Global Finance', color: '#FF6600', logo: '📈', videoId: 'dp8PhLsUcFE', region: 'USA' },
-    { name: 'CNBC', fullName: 'CNBC Live', origin: 'US Markets', color: '#0066FF', logo: '💹', videoId: 'M9VmRFXD-QA', region: 'USA' },
-    { name: 'Fox News', fullName: 'Fox Business', origin: 'US Finance', color: '#003087', logo: '🦊', videoId: 'oc_E1Z_zO0A', region: 'USA' },
-    { name: 'Sky News', fullName: 'Sky News Live', origin: 'UK International', color: '#E00034', logo: '🌐', videoId: '9Auq9mYxFEE', region: 'UK' },
-    { name: 'Euronews', fullName: 'Euronews Live', origin: 'European Markets', color: '#00548F', logo: '🇪🇺', videoId: 'r24NvEkAnyU', region: 'EU' },
-    { name: 'DW', fullName: 'DW News', origin: 'Germany / Global', color: '#D00000', logo: '🇩🇪', videoId: 's-5-5g6jEGE', region: 'Germany' },
-    { name: 'France 24', fullName: 'France 24 English', origin: 'France / Global', color: '#E60019', logo: '🇫🇷', videoId: 'h3MuIUNCCLI', region: 'France' },
-    { name: 'Al Jazeera', fullName: 'Al Jazeera English', origin: 'MENA / Global', color: '#009BB8', logo: '🌍', videoId: 'mHGASMFnjVg', region: 'Qatar' },
-    { name: 'Al Arabiya', fullName: 'Al Arabiya Live', origin: 'Arabic Markets', color: '#C8102E', logo: '📡', videoId: 'Jg8NWbPKUP4', region: 'UAE' },
+    { name: 'Bloomberg', fullName: 'Bloomberg Television', origin: 'Global Finance', color: '#FF6600', logo: '📈', channelId: 'UC--FGqQyq-oN_d2gS9i3cBA', fallbackId: 'dp8PhLsUcFE', region: 'USA' },
+    { name: 'CNBC', fullName: 'CNBC Live', origin: 'US Markets', color: '#0066FF', logo: '💹', channelId: 'UCvJJ_dzjViJCoLf5uKUTwoA', fallbackId: 'M9VmRFXD-QA', region: 'USA' },
+    { name: 'Fox Business', fullName: 'Fox Business', origin: 'US Finance', color: '#003087', logo: '🦊', channelId: 'UCCXoCcu9Rp7NPbTzIvogpZg', fallbackId: 'oc_E1Z_zO0A', region: 'USA' },
+    { name: 'Sky News', fullName: 'Sky News Live', origin: 'UK International', color: '#E00034', logo: '🌐', channelId: 'UCkkABfG_3hPzPMO_o_1J_iA', fallbackId: '9Auq9mYxFEE', region: 'UK' },
+    { name: 'Euronews', fullName: 'Euronews Live', origin: 'European Markets', color: '#00548F', logo: '🇪🇺', channelId: 'UCpPq3L9d38XWvA8qX-GAwzA', fallbackId: 'r24NvEkAnyU', region: 'EU' },
+    { name: 'DW News', fullName: 'DW News', origin: 'Germany / Global', color: '#D00000', logo: '🇩🇪', channelId: 'UCknLrEeNf7L_P7m88_o_k6A', fallbackId: 's-5-5g6jEGE', region: 'Germany' },
+    { name: 'France 24', fullName: 'France 24 English', origin: 'France / Global', color: '#E60019', logo: '🇫🇷', channelId: 'UCCCpD1oN_aiC4Y1-Pj3h37A', fallbackId: 'h3MuIUNCCLI', region: 'France' },
+    { name: 'Al Jazeera', fullName: 'Al Jazeera English', origin: 'MENA / Global', color: '#009BB8', logo: '🌍', channelId: 'UCoMdktP4KWve3C-HAW5Sj0Q', fallbackId: 'mHGASMFnjVg', region: 'Qatar' },
+    { name: 'Al Arabiya', fullName: 'Al Arabiya Live', origin: 'Arabic Markets', color: '#C8102E', logo: '📡', channelId: 'UCahpxixMCwoANAftn6IxkTg', fallbackId: 'Jg8NWbPKUP4', region: 'UAE' },
 ];
 
 // Inline stream player component — shows a single active stream with channel selector strip
@@ -39,12 +39,17 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Video Player */}
             <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
                 <iframe
-                    key={`${active.videoId}-${muted}`}
-                    src={`https://www.youtube.com/embed/${active.videoId}?autoplay=1&mute=${muted ? 1 : 0}&controls=1&rel=0&modestbranding=1`}
+                    key={`${active.channelId}-${muted}`}
+                    src={`https://www.youtube.com/embed/live_stream?channel=${active.channelId}&autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     title={active.fullName}
+                    onError={() => {
+                        // If channel embed fails, try direct fallback video with US region override
+                        const el = document.querySelector(`iframe[title='${active.fullName}']`) as HTMLIFrameElement;
+                        if (el && active.fallbackId) el.src = `https://www.youtube.com/embed/${active.fallbackId}?autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&gl=US&hl=en`;
+                    }}
                 />
             </div>
 
@@ -62,12 +67,29 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                         {muted ? '🔇 Muted' : '🔊 Live'}
                     </button>
                     <a
-                        href={`https://www.youtube.com/watch?v=${active.videoId}`}
+                        href={`https://www.youtube.com/channel/${active.channelId}/live`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '0.7rem', textDecoration: 'none' }}
+                        style={{ 
+                            background: '#FF0000', 
+                            border: 'none', 
+                            borderRadius: '8px', 
+                            padding: '6px 10px', 
+                            cursor: 'pointer', 
+                            color: 'white', 
+                            fontSize: '0.7rem', 
+                            fontWeight: 800,
+                            textDecoration: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            boxShadow: '0 0 15px rgba(255,0,0,0.3)',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
-                        ↗ YouTube
+                        <ExternalLink size={12} /> YouTube
                     </a>
                 </div>
             </div>
@@ -75,10 +97,10 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Channel Selector Strip */}
             <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none' }}>
                 {streams.map((ch) => {
-                    const isActive = ch.videoId === active.videoId;
+                    const isActive = ch.channelId === active.channelId;
                     return (
                         <button
-                            key={ch.videoId}
+                            key={ch.channelId}
                             onClick={() => setActive(ch)}
                             style={{
                                 flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px',
@@ -296,7 +318,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             boxSizing: 'border-box',
             background: 'var(--color-bg-primary)',
             overflowX: 'hidden',
-            padding: '0 0 var(--spacing-xl) 0'
+            paddingRight: '0',
+            paddingBottom: 'var(--spacing-xl)',
+            paddingLeft: '0'
         }}>
             {/* ── Breaking News Ticker (Smooth Marquee) ── */}
             {breakingNews && breakingNews.length > 0 && (

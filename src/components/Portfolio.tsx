@@ -1369,9 +1369,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             <div className="form-group" style={{ marginBottom: '1.5rem' }}>
                                 <label className="form-label" style={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--color-text-tertiary)', marginBottom: '0.75rem', display: 'block' }}>Asset Search</label>
                                 <SymbolSearchInput
-                                    placeholder="Search e.g. AAPL, BTC, ETH"
+                                    placeholder={`Search ${selectedMarket.name} assets...`}
                                     onSelect={(symbol) => setFormData({ ...formData, symbol })}
                                     initialValue={formData.symbol}
+                                    marketId={selectedMarket.id}
                                     autoFocus
                                 />
                             </div>

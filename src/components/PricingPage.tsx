@@ -121,24 +121,24 @@ const PricingPage: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '5vh 1rem 0.5rem', maxWidth: '1100px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'hidden', width: '100%' }}>
-      <div style={{ textAlign: 'center', marginBottom: '1rem', flexShrink: 0 }}>
+    <div style={{ padding: '3vh 1rem 0.5rem', maxWidth: '1100px', margin: '0 auto', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'hidden', width: '100%' }}>
+      <div style={{ textAlign: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
         <div style={{ 
           display: 'inline-block',
-          padding: '6px 12px',
+          padding: '4px 10px',
           background: 'var(--color-success-light)',
           color: 'var(--color-success)',
           borderRadius: '20px',
-          fontSize: '0.8rem',
+          fontSize: '0.75rem',
           fontWeight: 800,
-          marginBottom: '1rem'
+          marginBottom: '0.75rem'
         }}>
           30-DAY FREE TRIAL
         </div>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: '0 0 0.5rem 0' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: '0 0 0.25rem 0' }}>
           Simple, transparent pricing
         </h1>
-        <p style={{ fontSize: '1rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', margin: 0 }}>
           No payment card required. Prices include all applicable taxes.
         </p>
       </div>

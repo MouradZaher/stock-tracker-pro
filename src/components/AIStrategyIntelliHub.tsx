@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { aiStrategyService, AI_STRATEGIES } from '../services/aiStrategyService';
 import type { StrategyResult } from '../services/aiStrategyService';
+import { useMarket } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 
@@ -29,6 +30,7 @@ const AIStrategyIntelliHub: React.FC = () => {
     const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
     const [strategyResult, setStrategyResult] = useState<StrategyResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const { selectedMarket } = useMarket();
 
     const handleRunStrategy = async (id: string) => {
         soundService.playTap();
@@ -37,7 +39,7 @@ const AIStrategyIntelliHub: React.FC = () => {
         setStrategyResult(null);
 
         try {
-            const result = await aiStrategyService.getStrategy(id);
+            const result = await aiStrategyService.getStrategy(id, selectedMarket.id);
             setStrategyResult(result);
             soundService.playSuccess();
         } catch (error) {

@@ -439,7 +439,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     // ─── MAIN OVERVIEW ───────────────────────────────────────────────────
     return (
-        <div className="portfolio-container tab-content-wrapper" style={{ paddingTop: '0', paddingBottom: '120px' }}>
+        <div className="portfolio-container tab-content-wrapper" style={{ paddingBottom: '120px' }}>
             {!detailSymbol && (
                 <div style={{ 
                     display: 'flex', 
