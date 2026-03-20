@@ -266,7 +266,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/pricing" element={
-                <div className="tab-content">
+                <div style={{ height: 'calc(100vh - var(--header-height) - 32px)', overflow: 'hidden', padding: 0, margin: 0, width: '100%' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
