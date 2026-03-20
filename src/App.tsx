@@ -224,7 +224,7 @@ function MainLayout({
             <Routes>
               <Route path="/" element={<Navigate to="/search" replace />} />
               <Route path="/search" element={
-                <div style={{ position: 'fixed', top: 'var(--header-height)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)' }}>
+                <div style={{ position: 'fixed', top: 'calc(var(--header-height) + 32px)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)' }}>
                   {!selectedSymbol ? (
                     <Dashboard onSelectSymbol={handleSelectSymbol} />
                   ) : (
