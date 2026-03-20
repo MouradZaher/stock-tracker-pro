@@ -1,0 +1,17 @@
+{
+  "name": "anti-proj-server",
+  "version": "1.0.0",
+  "description": "MCP Express Backend",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "ollama": "^0.5.1"
+  }
+}

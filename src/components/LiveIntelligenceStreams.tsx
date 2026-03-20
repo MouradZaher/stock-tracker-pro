@@ -6,19 +6,21 @@ interface Channel {
     name: string;
     shortName: string;
     youtubeId: string;
+    videoId: string;
     logo: string;
     color: string;
     region: string;
     category: string;
 }
 
-// Live stream channel list with verified YouTube live IDs
+// Live stream channel list with confirmed current Video IDs to bypass Error 153
 const CHANNELS: Channel[] = [
     {
         id: 'bloomberg',
         name: 'Bloomberg Television',
         shortName: 'Bloomberg',
-        youtubeId: 'dp8PhLsUcFE',
+        youtubeId: 'UCIALMKvObZNtJ6AmdCLP7Lg',
+        videoId: 'iEpJwprxDdk',
         logo: '📈',
         color: '#FF6600',
         region: 'USA',
@@ -28,17 +30,19 @@ const CHANNELS: Channel[] = [
         id: 'cnbc',
         name: 'CNBC Live',
         shortName: 'CNBC',
-        youtubeId: 'M9VmRFXD-QA',
+        youtubeId: 'UCvJJ_dzjViJCoLf5uKUTwoA',
+        videoId: '9NyxcX3rhQs',
         logo: '💹',
         color: '#0066FF',
         region: 'USA',
         category: 'Finance'
     },
     {
-        id: 'foxbusiness',
-        name: 'Fox Business',
+        id: 'foxnews',
+        name: 'LiveNOW from FOX',
         shortName: 'Fox News',
-        youtubeId: 'oc_E1Z_zO0A',
+        youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
+        videoId: 'C96oohpWBGw', // 24/7 stable live stream ID
         logo: '🦊',
         color: '#003087',
         region: 'USA',
@@ -48,7 +52,8 @@ const CHANNELS: Channel[] = [
         id: 'skynews',
         name: 'Sky News',
         shortName: 'Sky News',
-        youtubeId: '9Auq9mYxFEE',
+        youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
+        videoId: 'YDvsBbKfLPA',
         logo: '🌐',
         color: '#E00034',
         region: 'UK',
@@ -58,7 +63,8 @@ const CHANNELS: Channel[] = [
         id: 'euronews',
         name: 'Euronews',
         shortName: 'Euronews',
-        youtubeId: 'r24NvEkAnyU',
+        youtubeId: 'UCSrZ3UV4jOidv8ppoVuvW9Q',
+        videoId: 'pykpO5kQJ98',
         logo: '🇪🇺',
         color: '#00548F',
         region: 'EU',
@@ -68,7 +74,8 @@ const CHANNELS: Channel[] = [
         id: 'dw',
         name: 'DW News',
         shortName: 'DW',
-        youtubeId: 's-5-5g6jEGE',
+        youtubeId: 'UCknLrEdhRCp1aegoMqRaCZg',
+        videoId: 'LuKwFajn37U',
         logo: '🇩🇪',
         color: '#D00000',
         region: 'Germany',
@@ -78,7 +85,8 @@ const CHANNELS: Channel[] = [
         id: 'france24',
         name: 'France 24',
         shortName: 'France 24',
-        youtubeId: 'h3MuIUNCCLI',
+        youtubeId: 'UCQfwfsi5VrQ8yKZ-UWmAEFg',
+        videoId: 'Ap-UM1O9RBU',
         logo: '🇫🇷',
         color: '#E60019',
         region: 'France',
@@ -88,7 +96,8 @@ const CHANNELS: Channel[] = [
         id: 'aljazeera',
         name: 'Al Jazeera English',
         shortName: 'Al Jazeera',
-        youtubeId: 'mHGASMFnjVg',
+        youtubeId: 'UCNye-wNBqNL5ZzHSJj3l8Bg',
+        videoId: 'gCNeDWCI0vo',
         logo: '🌍',
         color: '#009BB8',
         region: 'Qatar',
@@ -96,9 +105,10 @@ const CHANNELS: Channel[] = [
     },
     {
         id: 'alarabiya',
-        name: 'Al Arabiya',
+        name: 'Al Arabiya English',
         shortName: 'Al Arabiya',
-        youtubeId: 'Jg8NWbPKUP4',
+        youtubeId: 'UCIZJ9a6P_nxCFJTmL0gh_IQ',
+        videoId: 'n7eQejkXbnM', // Fallback to Al Arabiya main if English is off-air
         logo: '📡',
         color: '#C8102E',
         region: 'UAE',
@@ -138,8 +148,11 @@ const LiveIntelligenceStreams: React.FC = () => {
         }
     };
 
-    // YouTube embed URL with autoplay, muted by default
-    const embedUrl = `https://www.youtube.com/embed/${activeChannel.youtubeId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1`;
+    // Use specific Video ID if available to bypass Error 153 configuration issues
+    // Fall back to live_stream?channel= only if videoId is empty
+    const embedUrl = activeChannel.videoId 
+        ? `https://www.youtube.com/embed/${activeChannel.videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`
+        : `https://www.youtube.com/embed/live_stream?channel=${activeChannel.youtubeId}&autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`;
 
     return (
         <div className="glass-card live-streams-card" style={{
@@ -278,7 +291,7 @@ const LiveIntelligenceStreams: React.FC = () => {
                                 <RefreshCw size={14} /> Retry
                             </button>
                             <a
-                                href={`https://www.youtube.com/watch?v=${activeChannel.youtubeId}`}
+                                href={`https://www.youtube.com/channel/${activeChannel.youtubeId}/live`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{
@@ -296,7 +309,7 @@ const LiveIntelligenceStreams: React.FC = () => {
 
                 <iframe
                     ref={iframeRef}
-                    key={`${activeChannel.id}-${isMuted}`}
+                    key={activeChannel.id}
                     src={embedUrl}
                     style={{
                         position: 'absolute', top: 0, left: 0,
@@ -385,7 +398,7 @@ const LiveIntelligenceStreams: React.FC = () => {
                 {/* Direct Link Row */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                     <a
-                        href={`https://www.youtube.com/watch?v=${activeChannel.youtubeId}`}
+                        href={`https://www.youtube.com/channel/${activeChannel.youtubeId}/live`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{

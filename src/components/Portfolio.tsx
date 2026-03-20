@@ -423,42 +423,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <button
-                        className="glass-button"
-                        onClick={async () => {
-                            const egyptPositions = [
-                                { symbol: 'AZG', name: 'Azimut Egypt Equity Fund', units: 10771, avgCost: 21.03, currentPrice: 28.51, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'AZO', name: 'Azimut Egypt Opportunistic', units: 2708, avgCost: 31.79, currentPrice: 43.13, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'BAL', name: 'Balanced Fund', units: 5109, avgCost: 1.00, currentPrice: 1.19, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'BCO', name: 'Banque du Caire Fund', units: 3632, avgCost: 1.38, currentPrice: 1.36, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'BFF', name: 'Banque Misr Fixed Income', units: 119, avgCost: 42.01, currentPrice: 42.00, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'BIN', name: 'Banque Misr Islamic Fund', units: 3291, avgCost: 1.52, currentPrice: 1.57, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'BMM', name: 'Banque Misr Money Market', units: 62526, avgCost: 1.33, currentPrice: 1.68, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'CI30', name: 'CI Capital EGX 30 Fund', units: 1441, avgCost: 20.81, currentPrice: 32.08, sector: 'Financial Services', currency: 'EGP', dividends: [] },
-                                { symbol: 'OLFI', name: 'Obour Land', units: 66, avgCost: 6.90, currentPrice: 10.53, sector: 'Consumer Defensive', currency: 'EGP', dividends: [] },
-                                { symbol: 'SKPC', name: 'Sidi Kerir Petrocl', units: 2, avgCost: 0.01, currentPrice: 18.35, sector: 'Basic Materials', currency: 'EGP', dividends: [] }
-                            ];
-                            const { addMultiplePositions } = usePortfolioStore.getState();
-                            await addMultiplePositions(egyptPositions, user?.id || 'bypass-user');
-                            toast.success('Egyptian assets integrated successfully!');
-                        }}
-                        style={{
-                            background: 'rgba(217, 119, 6, 0.1)',
-                            border: '1px solid rgba(217, 119, 6, 0.3)',
-                            padding: '0.75rem 1.5rem',
-                            borderRadius: '12px',
-                            fontWeight: 700,
-                            fontSize: '0.9rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            color: '#fbbf24',
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        <RefreshCw size={16} />
-                        <span>Sync Egypt Assets</span>
-                    </button>
-                    <button
                         className="btn btn-primary"
                         onClick={() => setShowModal(true)}
                         style={{

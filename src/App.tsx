@@ -62,8 +62,8 @@ function AppContent() {
   useEffect(() => {
     if (isAuthenticated) {
       syncPrices();
-      // Also sync every 30 seconds
-      const interval = setInterval(syncPrices, 30000);
+      // Also sync every 5 seconds for "sync by seconds" feel
+      const interval = setInterval(syncPrices, 5000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, syncPrices]);
@@ -149,7 +149,7 @@ function MainLayout({
           showAdmin={role === 'admin'}
           onAdminClick={() => setIsAdminOpen(true)}
         />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width, 260px)', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width, 240px)', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
           <TopBar />
           <Header
             activeTab={activeTab}

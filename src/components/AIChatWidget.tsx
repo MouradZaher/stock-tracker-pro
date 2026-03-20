@@ -8,6 +8,7 @@ interface Message {
     role: 'user' | 'assistant';
     content: string;
     timestamp: Date;
+    toolsUsed?: string[];
 }
 
 const AIChatWidget: React.FC = () => {
@@ -37,100 +38,49 @@ const AIChatWidget: React.FC = () => {
 
         const userMsg = input.trim();
         setInput('');
-        setMessages(prev => [...prev, { role: 'user', content: userMsg, timestamp: new Date() }]);
+        
+        const newMessages = [...messages, { role: 'user', content: userMsg, timestamp: new Date() }];
+        setMessages(newMessages as Message[]);
         setIsTyping(true);
 
-        // Process Response
-        const lowMsg = userMsg.toLowerCase();
-        let response = "";
-
         try {
-            if (lowMsg.includes('analyze') || lowMsg.includes('check') || lowMsg.includes('tell me about')) {
-                const words = lowMsg.replace(/[?!.]/g, '').split(' ');
-                const symbol = words.find(w => w.length >= 2 && w.length <= 8 && !['analyze', 'check', 'the', 'stock', 'about', 'tell', 'me'].includes(w));
-                
-                if (symbol) {
-                    const rec = await analyzeSymbol(symbol.toUpperCase());
-                    if (rec) {
-                        response = `📈 **${rec.name} (${rec.symbol}) Intelligence Report**\n\n` +
-                                 `Rating: **${rec.recommendation}** | Alpha Score: **${rec.score}/100**\n\n` +
-                                 `**Strategic Insights:**\n${rec.reasoning.map(r => `• ${r}`).join('\n')}\n\n` +
-                                 `**Price Physics:**\n• Current: $${rec.price.toFixed(2)}\n` +
-                                 `• Technical Target: **$${rec.technicalIndicators.targetPrice.toFixed(2)}**\n` +
-                                 `• Regime: **${rec.technicalIndicators.marketRegime.toUpperCase()}**`;
-                    } else {
-                        response = `I couldn't aggregate enough high-conviction data for **${symbol.toUpperCase()}** right now. Re-verifying tickers...`;
-                    }
-                } else {
-                    response = "Which instrument should I scan? Example: 'Analyze NVDA' or 'Analyze AZG.CA'.";
-                }
-            } else if (lowMsg.includes('winner') || lowMsg.includes('best')) {
-                const winners = [...positions].sort((a, b) => (b.profitLossPercent || 0) - (a.profitLossPercent || 0));
-                if (winners.length > 0) {
-                    const top = winners[0];
-                    response = `🏆 **Top Performer Identified**\n\n**${top.symbol}** is leading your portfolio with a return of **${(top.profitLossPercent || 0).toFixed(2)}%**.\nTotal gain: **${formatCurrency(top.profitLoss)}**.\n\nStrategy: AI recommends maintaining exposure while trailing stops are active.`;
-                } else {
-                    response = "You don't have any active positions to rank yet.";
-                }
-            } else if (lowMsg.includes('loser') || lowMsg.includes('worst')) {
-                const losers = [...positions].sort((a, b) => (a.profitLossPercent || 0) - (b.profitLossPercent || 0));
-                if (losers.length > 0) {
-                    const bottom = losers[0];
-                    response = `📉 **Underperformer Alert**\n\n**${bottom.symbol}** is your current laggard, down **${(bottom.profitLossPercent || 0).toFixed(2)}%**.\nUnrealized loss: **${formatCurrency(bottom.profitLoss)}**.\n\nAI Scan: Checking for tax-loss harvesting or recovery setup... Consider reviewing the 'Sector Rotation' signals.`;
-                } else {
-                    response = "All positions are looking solid or no data available.";
-                }
-            } else if (lowMsg.includes('sector') || lowMsg.includes('exposure') || lowMsg.includes('divers')) {
-                const sectors: Record<string, number> = {};
-                const summary = getSummary();
-                positions.forEach(p => {
-                    const s = p.sector || 'Uncategorized';
-                    sectors[s] = (sectors[s] || 0) + p.marketValue;
-                });
-                
-                const sortedSectors = Object.entries(sectors).sort((a, b) => b[1] - a[1]);
-                response = `🏢 **Intelligence: Sector Exposure Analysis**\n\n${sortedSectors.map(([name, val]) => `• **${name}**: ${((val / summary.totalValue) * 100).toFixed(1)}%`).join('\n')}\n\n` +
-                          `${sortedSectors.length > 4 ? '✅ Diversification tier: **Institutional**.' : '⚠️ Concentration detected. Consider rotating capital into low-correlation sectors.'}`;
-            } else if (lowMsg.includes('risk') || lowMsg.includes('safe') || lowMsg.includes('crash')) {
-                const summary = getSummary();
-                const totalValue = summary.totalValue;
-                const highRisk = positions.filter(p => (p.profitLossPercent || 0) < -15 || ['NVDA', 'TSLA', 'COIN', 'BTC-USD'].includes(p.symbol));
-                const hedge = positions.filter(p => ['GLD', 'SLV', 'VOO', 'SPY', 'TLT', 'AZG'].includes(p.symbol));
-                
-                const riskPct = (highRisk.reduce((s, p) => s + p.marketValue, 0) / totalValue) * 100;
-                const hedgePct = (hedge.reduce((s, p) => s + p.marketValue, 0) / totalValue) * 100;
+            // Prepare messages for Ollama API (exclude timestamps to avoid format issues)
+            const apiMessages = newMessages.map(m => ({
+                role: m.role,
+                content: m.content
+            }));
 
-                response = `🛡️ **Portfolio Stress Test Summary**\n\n` +
-                          `• **Beta Exposure**: ${riskPct > 40 ? 'High' : 'Moderate'}\n` +
-                          `• **Aggressive Assets**: ${riskPct.toFixed(1)}%\n` +
-                          `• **Hedging Layers**: ${hedgePct.toFixed(1)}%\n\n` +
-                          `${riskPct > hedgePct ? '⚠️ Your portfolio is "Risk-On". A 10% market drop could impact you by ~12-14%.' : '✅ Balanced structure. Your defensive layers (GLD, SLV, Funds) are providing significant protection.'}`;
-            } else if (lowMsg.includes('help') || lowMsg.includes('what can you do')) {
-                response = "🧠 **Intelligence Commands:**\n\n" +
-                          "• `Analyze [Symbol]` — Deep technical & fundamental scan\n" +
-                          "• `Risk profile` — Stress test and beta analysis\n" +
-                          "• `My winners` — Rank best performers\n" +
-                          "• `Sector exposure` — Breakdown by industry\n" +
-                          "• `Egypt assets` — Detail your EGP holdings\n\n" +
-                          "How can I assist your strategy today?";
-            } else if (lowMsg.includes('egypt')) {
-                const egyptPos = positions.filter(p => p.symbol.endsWith('.CA') || ['AZG', 'AZO', 'CI30', 'BMM', 'OLFI'].includes(p.symbol));
-                const totalEGP = egyptPos.reduce((s, p) => s + p.marketValue, 0);
-                response = `🇪🇬 **Egyptian Portfolio Intelligence**\n\n` +
-                          `Tracking **${egyptPos.length}** positions in the EGX market.\n` +
-                          `Total Exposure: **${formatCurrency(totalEGP)}**.\n\n` +
-                          `AI View: Monitoring EGP volatility and central bank policy impact on these specific names.`;
-            } else {
-                response = "I'm processing your portfolio data. You can ask me to 'Analyze NVDA', 'Check my risk', or 'Show my winners'.";
+            const response = await fetch('http://localhost:3001/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ messages: apiMessages })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to connect to AI server');
             }
-        } catch (error) {
-            response = "I encountered a synchronization error. Please re-check the ticker or your portfolio connectivity.";
-        }
 
-        setTimeout(() => {
-            setMessages(prev => [...prev, { role: 'assistant', content: response, timestamp: new Date() }]);
+            const data = await response.json();
+            
+            setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: data.message.content, 
+                timestamp: new Date(),
+                toolsUsed: data.tools_used
+            }]);
+        } catch (error: any) {
+            console.error("Chat Error:", error);
+            setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: `⚠️ System Error: ${error.message}. Is the backend server running?`, 
+                timestamp: new Date() 
+            }]);
+        } finally {
             setIsTyping(false);
-        }, 800);
+        }
     };
 
     return (
@@ -268,6 +218,21 @@ const AIChatWidget: React.FC = () => {
                                         borderTopRightRadius: m.role === 'user' ? '2px' : '16px'
                                     }}>
                                         {m.content}
+                                        {m.toolsUsed && m.toolsUsed.length > 0 && (
+                                            <div style={{
+                                                marginTop: '8px',
+                                                paddingTop: '8px',
+                                                borderTop: '1px solid rgba(255,255,255,0.1)',
+                                                fontSize: '0.75rem',
+                                                color: '#10b981',
+                                                display: 'flex',
+                                                gap: '6px',
+                                                alignItems: 'center'
+                                            }}>
+                                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+                                                Agent Actions: {m.toolsUsed.join(', ')}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

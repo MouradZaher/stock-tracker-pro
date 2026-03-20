@@ -213,24 +213,28 @@ const fetchWithFallbacks = async (symbol: string): Promise<StockQuote | null> =>
     // 2. Prepare symbol (add market suffix if missing)
     let searchSymbol = symbol;
     
-    // Specialized Egypt Mapping
+    // Specialized Egypt Mapping (Using .MA suffix as requested for these assets)
     const egyptMapping: Record<string, string> = {
-        'GOUR': 'OLFI.CA', // Obour Land
-        'COMI': 'COMI.CA',
-        'TMGH': 'TMGH.CA',
-        'FWRY': 'FWRY.CA',
-        'SKPC': 'SKPC.CA',
-        // Mutual funds often use specialized tickers on Bloomberg/Reuters but might be on Yahoo
-        'AZG': 'AZG.CA', 
-        'AZO': 'AZO.CA',
-        'CI30': 'CI30.CA',
+        'GOUR': 'OLFI.MA', // Obour Land
+        'COMI': 'COMI.MA',
+        'TMGH': 'TMGH.MA',
+        'FWRY': 'FWRY.MA',
+        'SKPC': 'SKPC.MA',
+        'AZG': 'AZG.MA',
+        'AZO': 'AZO.MA',
+        'BAL': 'BAL.MA',
+        'BCO': 'BCO.MA',
+        'BFF': 'BFF.MA',
+        'BIN': 'BIN.MA',
+        'BMM': 'BMM.MA',
+        'CI30': 'CI30.MA',
     };
 
     if (egyptMapping[symbol]) {
         searchSymbol = egyptMapping[symbol];
     } else if (!symbol.includes('.')) {
         const market = getMarketForSymbol(symbol);
-        if (market === 'egypt') searchSymbol = `${symbol}.CA`;
+        if (market === 'egypt') searchSymbol = `${symbol}.MA`;
         else if (market === 'abudhabi') searchSymbol = `${symbol}.AD`;
     }
 
@@ -583,7 +587,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
         const mappedSymbols = symbols.map(s => {
             if (s.includes('.')) return s;
             const market = getMarketForSymbol(s);
-            if (market === 'egypt') return `${s}.CA`;
+            if (market === 'egypt') return `${s}.MA`;
             if (market === 'abudhabi') return `${s}.AD`;
             return s;
         });

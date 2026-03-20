@@ -249,6 +249,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             await new Promise(r => setTimeout(r, 600));
             setScanLog(prev => [...prev, logs[i]]);
             setScanProgress(((i + 1) / logs.length) * 100);
+            soundService.playWorking(); // "Like it was working" sound
         }
 
         await new Promise(r => setTimeout(r, 800));
@@ -502,7 +503,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     <h3 style={{ fontSize: '0.85rem', color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Zap size={16} /> How Our AI Strategy Works
                     </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
                         {[
                             { label: 'Technical Analysis (40pts)', color: 'rgba(99,102,241,', desc: 'RSI momentum, MA crossovers, price vs moving average, and trend confirmation.' },
                             { label: 'Fundamentals (20pts)', color: 'rgba(16,185,129,', desc: 'P/E analysis, EPS growth, and valuation relative to sector peers.' },

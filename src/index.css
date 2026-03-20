@@ -180,6 +180,16 @@
 
 @media (max-width: 768px) {
   .bento-span-8, .bento-span-6, .bento-span-4, .bento-span-3 { grid-column: span 12; }
+  
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
 }
 
 /* Custom Premium Scrollbar */

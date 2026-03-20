@@ -54,6 +54,25 @@ class SoundService {
         setTimeout(() => this.createOscillator(1108.73, 'sine', 0.2, 0.03), 50); // C#6
         setTimeout(() => this.createOscillator(1318.51, 'sine', 0.25, 0.03), 100); // E6
     }
+
+    // Audible cue for when a user prompt needs attention
+    playPrompt() {
+        setTimeout(() => this.createOscillator(440, 'sine', 0.1, 0.05), 0); // A4
+        setTimeout(() => this.createOscillator(880, 'sine', 0.2, 0.05), 150); // A5
+    }
+
+    // Audible cue for task completion
+    playComplete() {
+        setTimeout(() => this.createOscillator(523.25, 'sine', 0.1, 0.04), 0);
+        setTimeout(() => this.createOscillator(659.25, 'sine', 0.1, 0.04), 80);
+        setTimeout(() => this.createOscillator(783.99, 'sine', 0.1, 0.04), 160);
+        setTimeout(() => this.createOscillator(1046.50, 'sine', 0.3, 0.06), 240);
+    }
+
+    // Light pulse to indicate background activity ("working" sound)
+    playWorking() {
+        this.createOscillator(600, 'sine', 0.05, 0.02);
+    }
 }
 
 export const soundService = new SoundService();
