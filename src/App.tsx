@@ -274,7 +274,7 @@ function MainLayout({
                   </ErrorBoundary>
                 </div>
               } />
-              <Route path="*" element={<Navigate to="/home" replace />} />
+              <Route path="*" element={<Navigate to={{ pathname: '/home', search: location.search }} replace />} />
             </Routes>
           </main>
         </div>
