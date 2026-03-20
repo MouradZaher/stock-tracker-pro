@@ -18,6 +18,9 @@ import TradeAnalysisPanel from './TradeAnalysisPanel';
 import RealTimePrice from './RealTimePrice';
 import { useMarket } from '../contexts/MarketContext';
 
+import { aiStrategyService } from '../services/aiStrategyService';
+import { CheckCircle } from 'lucide-react';
+
 interface StockDetailProps {
     symbol: string;
     onBack?: () => void;
@@ -26,8 +29,28 @@ interface StockDetailProps {
 const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
     const [showAlerts, setShowAlerts] = useState(false);
+    const [activeModule, setActiveModule] = useState<string>('wall-street');
+    const [analysisData, setAnalysisData] = useState<any>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    
     const { user } = useAuth();
     const { selectedMarket } = useMarket();
+
+    useEffect(() => {
+        const fetchAnalysis = async () => {
+            setIsAnalyzing(true);
+            try {
+                const result = await aiStrategyService.getInstitutionalAnalysis(symbol, activeModule, selectedMarket.id);
+                setAnalysisData(result);
+            } catch (err) {
+                console.error("Analysis failed", err);
+            } finally {
+                setIsAnalyzing(false);
+            }
+        };
+
+        fetchAnalysis();
+    }, [symbol, activeModule, selectedMarket.id]);
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
     const { positions } = usePortfolioStore();
 
@@ -455,8 +478,408 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                 changePercent={stock.changePercent}
             />
 
-            {/* AI Insights */}
-            <div className="section" style={{ marginTop: '1rem' }}>
+            {/* Institutional Alpha Intelligence Hub */}
+            <div className="section" style={{ marginTop: '2.5rem' }}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '1.5rem',
+                    borderBottom: '1px solid var(--glass-border)',
+                    paddingBottom: '1rem'
+                }}>
+                    <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+                        <Shield size={24} className="text-accent" />
+                        Institutional Alpha Intelligence
+                    </h3>
+                    <div style={{
+                        fontSize: '0.7rem',
+                        background: 'var(--color-accent-light)',
+                        color: 'var(--color-accent)',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontWeight: 800,
+                        letterSpacing: '0.05em'
+                    }}>
+                        SENIOR ANALYST ACCESS
+                    </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2rem' }}>
+                    {/* Module Selection Sidebar */}
+                    <div className="glass-card" style={{ padding: '1rem', height: 'fit-content', position: 'sticky', top: '120px' }}>
+                        {[
+                            { id: 'wall-street', label: 'Wall Street Research', icon: <Briefcase size={16} /> },
+                            { id: 'financial-breakdown', label: '5Y Financial Audit', icon: <DollarSign size={16} /> },
+                            { id: 'moat-analysis', label: 'Competitive Moat', icon: <Shield size={16} /> },
+                            { id: 'valuation', label: 'DCF Valuation Model', icon: <Target size={16} /> },
+                            { id: 'risk-analysis', label: 'Strategic Risk Matrix', icon: <Activity size={16} /> },
+                            { id: 'growth-potential', label: 'Growth Potential', icon: <TrendingUp size={16} /> },
+                            { id: 'hedge-fund', label: 'Hedge Fund Thesis', icon: <Users size={16} /> },
+                            { id: 'bull-bear', label: 'Bull vs Bear Debate', icon: <Edit size={16} /> },
+                            { id: 'earnings-breakdown', label: 'Earnings Analysis', icon: <Layers size={16} /> },
+                            { id: 'buy-hold-avoid', label: 'Final Verdict', icon: <CheckCircle size={16} /> }
+                        ].map(mod => (
+                            <button
+                                key={mod.id}
+                                onClick={() => setActiveModule(mod.id)}
+                                style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    background: activeModule === mod.id ? 'var(--color-accent)' : 'transparent',
+                                    color: activeModule === mod.id ? '#fff' : 'var(--color-text-secondary)',
+                                    border: 'none',
+                                    textAlign: 'left',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    marginBottom: '4px',
+                                    fontWeight: activeModule === mod.id ? 700 : 500
+                                }}
+                            >
+                                {mod.icon}
+                                <span style={{ fontSize: '0.85rem' }}>{mod.label}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Report Display Area */}
+                    <div className="glass-card" style={{ padding: '2rem', minHeight: '500px', background: 'rgba(255,255,255,0.01)', position: 'relative', overflow: 'hidden' }}>
+                        {isAnalyzing ? (
+                            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                <div className="spinner" style={{ width: '40px', height: '40px', marginBottom: '1.5rem' }} />
+                                <div style={{ fontSize: '1rem', fontWeight: 700, animation: 'pulse 1.5s infinite' }}>
+                                    ARIA AI is synthesizing institutional data...
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem' }}>
+                                    CROSS-REFERENCING BLOOMBERG & REUTERS FEED
+                                </div>
+                            </div>
+                        ) : analysisData ? (
+                            <div className="animate-fade-in-up">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+                                    <div>
+                                        <h4 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{analysisData.title}</h4>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>
+                                            Generated by ARIA Intelligence • Institutional Grade Output
+                                        </div>
+                                    </div>
+                                    {analysisData.rating && (
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>RATING</div>
+                                            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-success)' }}>{analysisData.rating}</div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {activeModule === 'wall-street' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                        {analysisData.sections.map((s: any, i: number) => (
+                                            <div key={i}>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', marginBottom: '6px' }}>{s.heading}</div>
+                                                <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>{s.content}</p>
+                                            </div>
+                                        ))}
+                                        <div style={{ marginTop: '1rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
+                                            <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Scenario Analysis</div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                                                <div style={{ textAlign: 'center' }}>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>BULL</div>
+                                                    <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.bull}</div>
+                                                </div>
+                                                <div style={{ textAlign: 'center', borderLeft: '1px solid var(--glass-border)', borderRight: '1px solid var(--glass-border)' }}>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800 }}>BASE</div>
+                                                    <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.base}</div>
+                                                </div>
+                                                <div style={{ textAlign: 'center' }}>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-error)', fontWeight: 800 }}>BEAR</div>
+                                                    <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.bear}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'financial-breakdown' && (
+                                    <div>
+                                        <p style={{ fontSize: '1.1rem', color: 'var(--color-text-primary)', marginBottom: '2rem' }}>{analysisData.summary}</p>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                                            {analysisData.metrics.map((m: any, i: number) => (
+                                                <div key={i} className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>{m.label}</div>
+                                                    <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{m.value}</div>
+                                                    <div style={{ fontSize: '0.6rem', color: m.trend === 'up' ? 'var(--color-success)' : 'var(--color-text-tertiary)', fontWeight: 800 }}>{m.trend.toUpperCase()}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div style={{ padding: '1.25rem', borderRadius: '12px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 800, textAlign: 'center' }}>
+                                            FINANCIAL HEALTH: {analysisData.verdict}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'moat-analysis' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '3.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{analysisData.score}</div>
+                                            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Overall Moat Rating</div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                            {analysisData.factors.map((f: any, i: number) => (
+                                                <div key={i}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                                        <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{f.name}</span>
+                                                        <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-accent)' }}>{f.score}/10</span>
+                                                    </div>
+                                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
+                                                        <div style={{ height: '100%', width: `${f.score * 10}%`, background: 'var(--color-accent)', borderRadius: '2px' }} />
+                                                    </div>
+                                                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>{f.description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                                            <strong>Competitive Advantage:</strong> {analysisData.competitorComparison}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'valuation' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>INTRINSIC VALUE</div>
+                                                <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>${analysisData.intrinsicValue}</div>
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', border: '2px solid var(--color-success)' }}>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', fontWeight: 800, marginBottom: '4px' }}>VERDICT</div>
+                                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-success)' }}>{analysisData.conclusion}</div>
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>DCF ESTIMATE</div>
+                                                <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{analysisData.dcfEstimate}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
+                                            <p>Our model indicates that <strong>{symbol}</strong> is currently trading at a discount. {analysisData.methodology}</p>
+                                            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>Trailing P/E: <strong>{analysisData.currentPE}x</strong></span>
+                                                <span>Industry Avg: <strong>{analysisData.industryAvgPE}x</strong></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'risk-analysis' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                                <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Top Ranked Risks</div>
+                                                {analysisData.ranking.map((r: string, i: number) => (
+                                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                                        <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--color-error-light)', color: 'var(--color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800 }}>{i + 1}</div>
+                                                        <div style={{ fontSize: '0.9rem' }}>{r}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                                <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Risk Detail Matrix</div>
+                                                {analysisData.risks.map((r: any, i: number) => (
+                                                    <div key={i} style={{ marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{r.type}</span>
+                                                            <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: '4px', background: r.level === 'High' ? 'var(--color-error-light)' : 'var(--color-warning-light)', color: r.level === 'High' ? 'var(--color-error)' : 'var(--color-warning)', fontWeight: 800 }}>{r.level}</span>
+                                                        </div>
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{r.detail}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'growth-potential' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                            <div>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase' }}>Available Market</div>
+                                                <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{analysisData.marketSize}</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-success)', textTransform: 'uppercase' }}>Industry CAGR</div>
+                                                <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{analysisData.industryGrowth}</div>
+                                            </div>
+                                        </div>
+                                        <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                            <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Expansion Opportunities</div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                                {analysisData.opportunities.map((o: string, i: number) => (
+                                                    <div key={i} style={{ padding: '8px 16px', borderRadius: '20px', background: 'var(--color-accent-light)', color: 'var(--color-accent)', fontSize: '0.85rem', fontWeight: 700 }}>{o}</div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{analysisData.projection}</p>
+                                    </div>
+                                )}
+
+                                {activeModule === 'hedge-fund' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                        <div className="glass-card" style={{ padding: '2rem', borderLeft: '6px solid var(--color-accent)', background: 'rgba(99, 102, 241, 0.05)' }}>
+                                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', marginBottom: '8px' }}>The Thesis</div>
+                                            <div style={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: 1.4 }}>"{analysisData.thesis}"</div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                            <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-success-light)' }}>
+                                                <div style={{ fontWeight: 800, color: 'var(--color-success)', marginBottom: '8px' }}>Bull Case (Why Buy)</div>
+                                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{analysisData.buyReason}</p>
+                                            </div>
+                                            <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-error-light)' }}>
+                                                <div style={{ fontWeight: 800, color: 'var(--color-error)', marginBottom: '8px' }}>Bear Case (Why Avoid)</div>
+                                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{analysisData.avoidReason}</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
+                                            <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Upcoming Catalysts</div>
+                                            {analysisData.catalysts.map((c: string, i: number) => (
+                                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-warning)' }} />
+                                                    <div style={{ fontSize: '0.9rem' }}>{c}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'bull-bear' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                            <div className="glass-card" style={{ padding: '2rem', borderTop: '4px solid var(--color-success)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+                                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                                                        <TrendingUp size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontWeight: 800 }}>{analysisData.bull.analyst}</div>
+                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>SENIOR ANALYST</div>
+                                                    </div>
+                                                </div>
+                                                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>"{analysisData.bull.argument}"</p>
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '2rem', borderTop: '4px solid var(--color-error)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+                                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                                                        <TrendingDown size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontWeight: 800 }}>{analysisData.bear.analyst}</div>
+                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>SENIOR ANALYST</div>
+                                                    </div>
+                                                </div>
+                                                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>"{analysisData.bear.argument}"</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-accent-light)', textAlign: 'center' }}>
+                                            <div style={{ fontWeight: 800, color: 'var(--color-accent)', marginBottom: '8px' }}>Institutional Conclusion</div>
+                                            <p style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{analysisData.conclusion}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'earnings-breakdown' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                                    <span style={{ fontWeight: 800 }}>Revenue Performance</span>
+                                                    <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 800 }}>{analysisData.revenue.status}</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                    <div>
+                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>REPORTED</div>
+                                                        <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{analysisData.revenue.actual}</div>
+                                                    </div>
+                                                    <div style={{ textAlign: 'right' }}>
+                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>EXPECTED</div>
+                                                        <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{analysisData.revenue.estimate}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                                    <span style={{ fontWeight: 800 }}>EPS Performance</span>
+                                                    <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 800 }}>{analysisData.eps.status}</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                    <div>
+                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>REPORTED</div>
+                                                        <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{analysisData.eps.actual}</div>
+                                                    </div>
+                                                    <div style={{ textAlign: 'right' }}>
+                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>EXPECTED</div>
+                                                        <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{analysisData.eps.estimate}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5rem' }}>
+                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                                <div style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Key Performance Metrics</div>
+                                                <div style={{ fontSize: '1rem', color: 'var(--color-text-secondary)' }}>{analysisData.keyMetrics}</div>
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '1.5rem', background: 'var(--color-success-light)' }}>
+                                                <div style={{ fontWeight: 800, color: 'var(--color-success)', marginBottom: '0.5rem' }}>Market Response</div>
+                                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-success)' }}>{analysisData.marketReaction}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{ padding: '1rem 1.5rem', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
+                                            <strong>Forward Guidance:</strong> {analysisData.guidance}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeModule === 'buy-hold-avoid' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '2rem', padding: '2rem 0' }}>
+                                        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 0 50px rgba(16, 185, 129, 0.3)' }}>
+                                            <CheckCircle size={64} />
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-success)', marginBottom: '0.5rem' }}>ARIA FINAL VERDICT: {analysisData.verdict}</div>
+                                            <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', maxWidth: '500px', margin: '0 auto' }}>{analysisData.summary}</p>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', width: '100%', maxWidth: '600px' }}>
+                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginBottom: '4px' }}>1-YEAR OUTLOOK</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{analysisData.shortTerm}</div>
+                                            </div>
+                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginBottom: '4px' }}>5-YEAR OUTLOOK</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{analysisData.longTerm}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-tertiary)' }}>
+                                Select a research module to begin analysis.
+                            </div>
+                        )}
+                        <style>{`
+                            @keyframes pulse {
+                                0% { opacity: 0.6; transform: scale(0.98); }
+                                50% { opacity: 1; transform: scale(1); }
+                                100% { opacity: 0.6; transform: scale(0.98); }
+                            }
+                        `}</style>
+                    </div>
+                </div>
+            </div>
+
+            {/* AI Insights (Original) */}
+            <div className="section" style={{ marginTop: '2.5rem' }}>
                 <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)' }} />
                     AI Market Analysis
