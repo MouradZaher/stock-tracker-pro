@@ -3,7 +3,7 @@ import {
     Zap, Shield, TrendingUp, AlertTriangle, 
     BarChart2, Globe, Search, ArrowRight, 
     ChevronRight, Info, ExternalLink, RefreshCw,
-    Briefcase, FileText, Activity
+    Briefcase, FileText, Activity, Sparkles
 } from 'lucide-react';
 import { aiStrategyService, AI_STRATEGIES } from '../services/aiStrategyService';
 import type { StrategyResult } from '../services/aiStrategyService';
@@ -62,12 +62,51 @@ const AIStrategyIntelliHub: React.FC = () => {
 
     return (
         <div className="ai-strategy-hub" style={{ padding: '0 0.5rem' }}>
-            <div style={{ marginBottom: '2rem' }}>
+            <div style={{ marginBottom: '2.5rem' }}>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Zap size={24} color="var(--color-warning)" /> AI Strategy Intelligence Hub
                 </h2>
                 <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
                     Advanced market analysis engines for institutional-grade decision making.
+                </p>
+            </div>
+
+            {/* Institutional Deep Dive Engine */}
+            <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2.5rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%)', border: '1px solid var(--color-accent-light)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Shield size={20} className="text-accent" />
+                        <span style={{ fontWeight: 800, fontSize: '1rem' }}>Institutional Deep Dive Engine</span>
+                    </div>
+                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-accent)', background: 'var(--color-accent-light)', padding: '2px 10px', borderRadius: '20px' }}>
+                        10 MODULES ACTIVE
+                    </div>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ position: 'relative', flex: 1 }}>
+                        <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} size={18} />
+                        <input 
+                            type="text" 
+                            placeholder="Search Ticker for Full Wall Street Analysis (e.g. NVDA, AAPL)..." 
+                            style={{ width: '100%', padding: '12px 12px 12px 40px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', color: 'white' }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    const symbol = e.currentTarget.value.toUpperCase();
+                                    if (symbol) {
+                                        window.location.hash = `#/stock/${symbol}`;
+                                        toast.success(`Opening Institutional Report for ${symbol}`);
+                                    }
+                                }
+                            }}
+                        />
+                    </div>
+                    <button className="btn btn-primary" style={{ padding: '0 1.5rem' }}>
+                        Run Alpha Report
+                    </button>
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Sparkles size={12} className="text-accent" />
+                    Generates 5-Year Financial Audit, DCF Valuation, Risk Matrix, and Bull/Bear Debates.
                 </p>
             </div>
 

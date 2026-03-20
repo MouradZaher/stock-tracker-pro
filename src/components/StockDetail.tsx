@@ -39,6 +39,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     useEffect(() => {
         const fetchAnalysis = async () => {
             setIsAnalyzing(true);
+            setAnalysisData(null); // Clear previous data to prevent stale data UI crashes
             try {
                 const result = await aiStrategyService.getInstitutionalAnalysis(symbol, activeModule, selectedMarket.id);
                 setAnalysisData(result);
