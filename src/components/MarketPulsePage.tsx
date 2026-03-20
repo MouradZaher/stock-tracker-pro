@@ -16,22 +16,90 @@ interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
 }
 
-const MARKET_STREAMS: Record<string, any[]> = {
-    us: [
-        { name: 'Bloomberg Markets', origin: 'Global Financial', color: '#0000FF', videoId: 'dp8PhLsUcFE' }, // Bloomberg Global Live
-        { name: 'Sky News Business', origin: 'International', color: '#ff0000', videoId: '9p_h_yXb6hA' }, // Sky News Australia Live
-        { name: 'Yahoo Finance Live', origin: 'US Market Focus', color: '#18002d', videoId: 'HlY_mMo96G0' } // Yahoo Finance Live
-    ],
-    egypt: [
-        { name: 'Asharq Business', origin: 'MENA Markets', color: '#B30000', channelId: 'UCpOnmIs5v3X0d796_Eaykbg' },
-        { name: 'CNBC Arabia Live', origin: 'Gulf & Egypt Pulse', color: '#004a99', channelId: 'UCh-l10lT2x3-20Qz6x6T5eQ' },
-        { name: 'Al Arabiya Business', origin: 'Regional Markets', color: '#7a00ff', channelId: 'UC-vT0Y5V_H_9B7tW0Y_X-7A' }
-    ],
-    abudhabi: [
-        { name: 'Sky News Arabia Economy', origin: 'UAE Markets Expert', color: '#e60000', channelId: 'UC8HBBGZat_9T_1vY5j_V9Sg' },
-        { name: 'CNBC Arabia Live', origin: 'Abu Dhabi Exchange', color: '#004a99', channelId: 'UCh-l10lT2x3-20Qz6x6T5eQ' },
-        { name: 'Asharq Business', origin: 'Gulf Business News', color: '#B30000', channelId: 'UCpOnmIs5v3X0d796_Eaykbg' }
-    ]
+const MARKET_STREAMS = [
+    { name: 'Bloomberg', fullName: 'Bloomberg Television', origin: 'Global Finance', color: '#FF6600', logo: '📈', videoId: 'dp8PhLsUcFE', region: 'USA' },
+    { name: 'CNBC', fullName: 'CNBC Live', origin: 'US Markets', color: '#0066FF', logo: '💹', videoId: 'M9VmRFXD-QA', region: 'USA' },
+    { name: 'Fox News', fullName: 'Fox Business', origin: 'US Finance', color: '#003087', logo: '🦊', videoId: 'oc_E1Z_zO0A', region: 'USA' },
+    { name: 'Sky News', fullName: 'Sky News Live', origin: 'UK International', color: '#E00034', logo: '🌐', videoId: '9Auq9mYxFEE', region: 'UK' },
+    { name: 'Euronews', fullName: 'Euronews Live', origin: 'European Markets', color: '#00548F', logo: '🇪🇺', videoId: 'r24NvEkAnyU', region: 'EU' },
+    { name: 'DW', fullName: 'DW News', origin: 'Germany / Global', color: '#D00000', logo: '🇩🇪', videoId: 's-5-5g6jEGE', region: 'Germany' },
+    { name: 'France 24', fullName: 'France 24 English', origin: 'France / Global', color: '#E60019', logo: '🇫🇷', videoId: 'h3MuIUNCCLI', region: 'France' },
+    { name: 'Al Jazeera', fullName: 'Al Jazeera English', origin: 'MENA / Global', color: '#009BB8', logo: '🌍', videoId: 'mHGASMFnjVg', region: 'Qatar' },
+    { name: 'Al Arabiya', fullName: 'Al Arabiya Live', origin: 'Arabic Markets', color: '#C8102E', logo: '📡', videoId: 'Jg8NWbPKUP4', region: 'UAE' },
+];
+
+// Inline stream player component — shows a single active stream with channel selector strip
+const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ streams }) => {
+    const [active, setActive] = useState(streams[0]);
+    const [muted, setMuted] = useState(true);
+    const scrollRef = React.useRef<HTMLDivElement>(null);
+
+    return (
+        <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'rgba(5,5,15,0.85)' }}>
+            {/* Video Player */}
+            <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
+                <iframe
+                    key={`${active.videoId}-${muted}`}
+                    src={`https://www.youtube.com/embed/${active.videoId}?autoplay=1&mute=${muted ? 1 : 0}&controls=1&rel=0&modestbranding=1`}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    title={active.fullName}
+                />
+            </div>
+
+            {/* Channel Info + Controls */}
+            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.4)' }}>
+                <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white' }}>{active.logo} {active.fullName}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{active.origin} • {active.region}</div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button
+                        onClick={() => setMuted(!muted)}
+                        style={{ background: muted ? 'rgba(255,255,255,0.05)' : 'rgba(99,102,241,0.15)', border: `1px solid ${muted ? 'var(--glass-border)' : 'var(--color-accent)'}`, borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: muted ? 'var(--color-text-tertiary)' : 'var(--color-accent)', fontSize: '0.7rem', fontWeight: 700 }}
+                    >
+                        {muted ? '🔇 Muted' : '🔊 Live'}
+                    </button>
+                    <a
+                        href={`https://www.youtube.com/watch?v=${active.videoId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '0.7rem', textDecoration: 'none' }}
+                    >
+                        ↗ YouTube
+                    </a>
+                </div>
+            </div>
+
+            {/* Channel Selector Strip */}
+            <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none' }}>
+                {streams.map((ch) => {
+                    const isActive = ch.videoId === active.videoId;
+                    return (
+                        <button
+                            key={ch.videoId}
+                            onClick={() => setActive(ch)}
+                            style={{
+                                flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px',
+                                padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
+                                border: `1px solid ${isActive ? ch.color : 'var(--glass-border)'}`,
+                                background: isActive ? `${ch.color}20` : 'rgba(255,255,255,0.02)',
+                                color: isActive ? ch.color : 'var(--color-text-secondary)',
+                                fontWeight: isActive ? 800 : 500, fontSize: '0.72rem',
+                                transition: 'all 0.2s ease', whiteSpace: 'nowrap',
+                                boxShadow: isActive ? `0 0 10px ${ch.color}25` : 'none'
+                            }}
+                        >
+                            <span style={{ fontSize: '0.85rem' }}>{ch.logo}</span>
+                            {ch.name}
+                            {isActive && <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: ch.color, display: 'inline-block', animation: 'pulse 1.5s infinite' }} />}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
 };
 
 const MARKET_ALPHA: Record<string, any[]> = {
@@ -405,48 +473,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Live Intelligence Streams</h2>
                 </div>
 
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-                    gap: '1rem'
-                }}>
-                    {(MARKET_STREAMS[effectiveMarket.id] || MARKET_STREAMS.us).map((stream, i) => (
-                        <div key={i} className="glass-card" style={{ padding: '0', overflow: 'hidden', borderRadius: '16px', border: '1px solid var(--glass-borderShadow)' }}>
-                            <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000' }}>
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    src={stream.playlistId
-                                        ? `https://www.youtube.com/embed/videoseries?list=${stream.playlistId}&index=${stream.index || 0}&autoplay=0&mute=1&controls=1&rel=0`
-                                        : stream.videoId
-                                            ? stream.videoId === 'live'
-                                                ? `https://www.youtube.com/embed/live_stream?channel=${stream.channelId || stream.videoId}&autoplay=0&mute=1&controls=1&rel=0`
-                                                : `https://www.youtube.com/embed/${stream.videoId}?autoplay=0&mute=1&controls=1&rel=0`
-                                            : `https://www.youtube.com/embed/live_stream?channel=${stream.channelId}&autoplay=0&mute=1&controls=1&rel=0`}
-                                    title={stream.name}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    style={{ position: 'absolute', top: 0, left: 0 }}
-                                ></iframe>
-                            </div>
-                            <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>{stream.name}</div>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{stream.origin} Network</div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-secondary)' }}>
-                                        <Play size={14} fill="currentColor" />
-                                    </div>
-                                    <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-secondary)' }}>
-                                        <ExternalLink size={14} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                {/* Channel Selector + Video Player */}
+                <LiveStreamsPlayer streams={MARKET_STREAMS} />
             </div>
 
             {/* Main Pulse Grid */}
