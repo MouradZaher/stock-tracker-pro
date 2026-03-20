@@ -33,6 +33,12 @@ const AIChatWidget: React.FC = () => {
         if (isOpen) scrollToBottom();
     }, [messages, isOpen]);
 
+    useEffect(() => {
+        const handleOpenAI = () => setIsOpen(true);
+        window.addEventListener('open-ai-chat', handleOpenAI);
+        return () => window.removeEventListener('open-ai-chat', handleOpenAI);
+    }, []);
+
     const handleSend = async () => {
         if (!input.trim() || isTyping) return;
 

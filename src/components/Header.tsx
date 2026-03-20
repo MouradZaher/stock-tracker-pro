@@ -13,9 +13,10 @@ interface HeaderProps {
     onLogout: () => void;
     showAdmin?: boolean;
     onAdminClick?: () => void;
+    onOpenTutorial?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick, onOpenTutorial }) => {
     const { theme, toggleTheme } = useTheme();
     const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
     const { selectedMarket, setMarket, setHoverMarket } = useMarket();

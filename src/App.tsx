@@ -5,7 +5,8 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
-import TermsModal from './components/TermsModal';
+import OnboardingModal from './components/OnboardingModal';
+import TutorialModal from './components/TutorialModal';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -58,6 +59,7 @@ function AppContent() {
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   
   // Track Terms of Use acceptance
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState<boolean>(() => {
@@ -81,17 +83,33 @@ function AppContent() {
 
   const role = user?.role || 'user';
 
-  const handleAcceptTerms = () => {
+  const handleOnboardingComplete = (choice: 'sample' | 'fresh') => {
     localStorage.setItem('hasAcceptedTerms', 'true');
     setHasAcceptedTerms(true);
+    
+    // If choice is fresh, we do nothing. If sample, ideally we load sample data
+    if (choice === 'sample') {
+      // Future: load explicit sample trades here
+      console.log('User elected to explore with sample data');
+    }
+  };
+
+  const handleOpenAI = () => {
+    window.dispatchEvent(new CustomEvent('open-ai-chat'));
   };
 
   return (
     <BrowserRouter>
       {!hasAcceptedTerms && (
-        <TermsModal 
-          onAccept={handleAcceptTerms} 
+        <OnboardingModal 
+          onComplete={handleOnboardingComplete} 
           onDecline={logout} 
+        />
+      )}
+      {isTutorialOpen && (
+        <TutorialModal 
+          onClose={() => setIsTutorialOpen(false)}
+          onOpenAI={handleOpenAI}
         />
       )}
       <MainLayout
@@ -103,6 +121,7 @@ function AppContent() {
         setIsWatchlistOpen={setIsWatchlistOpen}
         isAdminOpen={isAdminOpen}
         setIsAdminOpen={setIsAdminOpen}
+        onOpenTutorial={() => setIsTutorialOpen(true)}
       />
     </BrowserRouter>
   );
@@ -117,6 +136,7 @@ interface MainLayoutProps {
   setIsWatchlistOpen: (open: boolean) => void;
   isAdminOpen: boolean;
   setIsAdminOpen: (open: boolean) => void;
+  onOpenTutorial: () => void;
 }
 
 function MainLayout({
@@ -127,7 +147,8 @@ function MainLayout({
   isWatchlistOpen,
   setIsWatchlistOpen,
   isAdminOpen,
-  setIsAdminOpen
+  setIsAdminOpen,
+  onOpenTutorial
 }: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -167,6 +188,7 @@ function MainLayout({
             onLogout={logout}
             showAdmin={role === 'admin'}
             onAdminClick={() => setIsAdminOpen(true)}
+            onOpenTutorial={onOpenTutorial}
           />
 
           <WatchlistSidebar
