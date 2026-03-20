@@ -39,6 +39,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         { id: 'watchlist', label: 'Watch', icon: Eye },
         { id: 'portfolio', label: 'Portfolio', icon: PieChart },
         { id: 'pulse', label: 'Pulse', icon: Activity },
+        { id: 'pricing', label: 'Pro', icon: Star },
     ];
 
     const handleTabClick = (tabId: TabType) => {
@@ -133,8 +134,41 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     </span>
                 </div>
 
-                {/* ── Spacer ────────────────────────────── */}
-                <div style={{ flex: 1 }} />
+                {/* ── Center Navigation ─────────────────── */}
+                <div className="desktop-only" style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem' }}>
+                    {tabs.map(tab => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => handleTabClick(tab.id)}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: isActive ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    padding: '4px',
+                                    borderBottom: isActive ? '2px solid var(--color-accent)' : '2px solid transparent',
+                                }}
+                                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+                                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
+                            >
+                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                                    {tab.label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <div className="mobile-only" style={{ flex: 1 }} />
 
 
                 {/* ── Actions (right-aligned) ───────────── */}

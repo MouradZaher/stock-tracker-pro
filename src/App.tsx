@@ -35,7 +35,6 @@ import PriceAlertManager from './components/PriceAlertManager';
 
 import './index.css';
 import './styles/ios-mobile.css';
-import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 
 const queryClient = new QueryClient({
@@ -144,14 +143,7 @@ function MainLayout({
     <div className="app" style={{ display: 'flex', minHeight: '100vh' }}>
       <ErrorBoundary>
         <TopBar />
-        <Sidebar 
-          activeTab={activeTab} 
-          onTabChange={handleTabChange} 
-          onLogout={logout} 
-          showAdmin={role === 'admin'}
-          onAdminClick={() => setIsAdminOpen(true)}
-        />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width, 240px)', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
           <Header
             activeTab={activeTab}
             onTabChange={handleTabChange}
