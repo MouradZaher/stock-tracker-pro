@@ -197,7 +197,7 @@ function MainLayout({
   return (
     <div className="app" style={{ display: 'flex', minHeight: '100vh' }}>
       <ErrorBoundary>
-        <TopBar />
+        <TopBar onSelectSymbol={handleSelectSymbol} />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
           <Header
             activeTab={activeTab}

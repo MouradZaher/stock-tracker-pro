@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { getMarketForSymbol } from '../data/sectors';
 
 interface TradingViewChartProps {
     symbol: string;
@@ -13,6 +14,15 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({ symbol }) => {
         // Clear previous widget
         containerRef.current.innerHTML = '';
 
+        const getTradingViewSymbol = (s: string) => {
+            const market = getMarketForSymbol(s);
+            if (market === 'egypt') return `EGX:${s}`;
+            if (market === 'abudhabi') return `ADX:${s}`;
+            return s;
+        };
+
+        const tvSymbol = getTradingViewSymbol(symbol);
+
         // Create TradingView widget
         const script = document.createElement('script');
         script.src = 'https://s3.tradingview.com/tv.js';
@@ -22,7 +32,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({ symbol }) => {
                 new (window as any).TradingView.widget({
                     width: '100%',
                     height: 400,
-                    symbol: symbol,
+                    symbol: tvSymbol,
                     interval: 'D',
                     timezone: 'America/New_York',
                     theme: 'dark',

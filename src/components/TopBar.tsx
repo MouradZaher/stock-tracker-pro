@@ -17,7 +17,11 @@ const FALLBACK_DATA = [
     { symbol: 'NFLX', price: 685.00, change: 1.50, isUp: true }
 ];
 
-const TopBar: React.FC = () => {
+interface TopBarProps {
+    onSelectSymbol?: (symbol: string) => void;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
     const { data: quotes } = useQuery({
         queryKey: ['topBarQuotes'],
         queryFn: async () => {
@@ -101,7 +105,21 @@ const TopBar: React.FC = () => {
         }}>
             <div className="scrolling-content" style={{ display: 'flex', gap: '2rem' }}>
                 {[...tickerItems, ...tickerItems, ...tickerItems].map((item, idx) => (
-                    <div key={`${item.symbol}-${idx}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div 
+                        key={`${item.symbol}-${idx}`} 
+                        onClick={() => onSelectSymbol?.(item.symbol === 'S&P 500' ? '^GSPC' : item.symbol)}
+                        style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '6px',
+                            cursor: 'pointer',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
                         <span style={{ fontWeight: 700, color: 'var(--color-text-secondary)' }}>{item.symbol}</span>
                         <span style={{ fontFamily: 'monospace' }}>{formatPrice(item.price)}</span>
                         <span style={{
