@@ -110,7 +110,14 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 height: 'var(--header-height)',
                 gap: '0.5rem',
                 borderBottom: '1px solid var(--color-border)',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                position: 'fixed',
+                top: '32px', // Below TopBar
+                left: 0,
+                right: 0,
+                zIndex: 1001,
+                background: 'rgba(10, 10, 15, 0.85)',
+                backdropFilter: 'blur(16px)'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
                 <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>

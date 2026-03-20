@@ -8,6 +8,7 @@ import Header from './components/Header';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
+import TopBar from './components/TopBar';
 import { PageSkeleton } from './components/LoadingSkeleton';
 import { MarketProvider } from './contexts/MarketContext';
 
@@ -150,6 +151,7 @@ function MainLayout({
           onAdminClick={() => setIsAdminOpen(true)}
         />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width, 240px)', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
+          <TopBar />
           <Header
             activeTab={activeTab}
             onTabChange={handleTabChange}
@@ -169,7 +171,7 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
 
-          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 'calc(var(--header-height) + 0px)' }}>
+          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 'calc(var(--header-height) + 32px)' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/search" replace />} />
               <Route path="/search" element={

@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         position: 'fixed',
         left: 0,
         top: 0,
-        zIndex: 1000,
+        zIndex: 990,
         background: 'rgba(10, 10, 15, 0.87)',
         borderRight: '1px solid var(--glass-border)',
         display: 'flex',
