@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Brain, Eye, PieChart, Activity, ChevronRight, Menu, X } from 'lucide-react';
+import { Home, Brain, Eye, PieChart, Activity, ChevronRight, Menu, X, Star } from 'lucide-react';
 import { soundService } from '../services/soundService';
 import type { TabType } from '../types';
 
@@ -20,6 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     { id: 'watchlist', label: 'Watchlist', icon: Eye },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },
     { id: 'pulse', label: 'Market Pulse', icon: Activity },
+    { id: 'pricing', label: 'Upgrade to Pro', icon: Star },
   ];
 
   const handleTabClick = (tabId: TabType) => {

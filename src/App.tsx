@@ -16,6 +16,7 @@ import { MarketProvider } from './contexts/MarketContext';
 const Portfolio = lazy(() => import('./components/Portfolio'));
 const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
 const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioIntelligencePanel'));
+const PricingPage = lazy(() => import('./components/PricingPage'));
 
 import WatchlistSidebar from './components/WatchlistSidebar';
 import AIChatWidget from './components/AIChatWidget';
@@ -116,7 +117,7 @@ function MainLayout({
   const navigate = useNavigate();
 
   const currentPath = location.pathname.substring(1) || 'search';
-  const activeTab = (['search', 'watchlist', 'portfolio', 'recommendations', 'pulse'].includes(currentPath) ? currentPath : 'search') as TabType;
+  const activeTab = (['search', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing'].includes(currentPath) ? currentPath : 'search') as TabType;
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/${tab}`);
@@ -213,6 +214,15 @@ function MainLayout({
               <Route path="/pulse" element={
                 <div className="tab-content">
                   <MarketPulsePage onSelectStock={handleSelectSymbol} />
+                </div>
+              } />
+              <Route path="/pricing" element={
+                <div className="tab-content">
+                  <ErrorBoundary>
+                    <Suspense fallback={<PageSkeleton />}>
+                      <PricingPage />
+                    </Suspense>
+                  </ErrorBoundary>
                 </div>
               } />
               <Route path="*" element={<Navigate to="/search" replace />} />
