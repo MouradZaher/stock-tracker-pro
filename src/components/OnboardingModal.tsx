@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, AlertCircle, CheckCircle2, DollarSign, TrendingUp, Briefcase, Link as LinkIcon, Lock, Star, BarChart2, Rocket } from 'lucide-react';
+import { Shield, DollarSign, TrendingUp, Briefcase, Link as LinkIcon, Lock, Star, BarChart2, Rocket } from 'lucide-react';
 
 interface OnboardingModalProps {
   onComplete: (choice: 'sample' | 'fresh') => void;

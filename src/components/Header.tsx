@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity, Brain } from 'lucide-react';
+import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity, Brain, HelpCircle } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';

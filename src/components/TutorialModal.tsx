@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, HelpCircle, Activity, Box, LayoutPanelLeft, ArrowDownToLine, Wallet, FileText, Settings, Download, Bell, PieChart, Info, Bot } from 'lucide-react';
+import { X, Info, Bot } from 'lucide-react';
 
 interface TutorialModalProps {
   onClose: () => void;
