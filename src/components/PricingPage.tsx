@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { TabType } from '../types';
 import { soundService } from '../services/soundService';
 import { Check, Mail } from 'lucide-react';
 
 const PricingPage: React.FC = () => {
+  useEffect(() => {
+    // FORCE lock the browser viewport when pricing is mounted
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.setProperty('overflow', 'hidden', 'important');
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
   const handleSelectPlan = (planName: string) => {
     soundService.playTap();
     window.location.href = `mailto:admin@stocktrackerpro.com?subject=Interested in ${planName} Plan&body=Hi, I am interested in subscribing to the ${planName} plan.`;
@@ -15,10 +23,10 @@ const PricingPage: React.FC = () => {
       border: '1px solid',
       borderColor: recommended ? 'transparent' : 'var(--color-border)',
       borderRadius: '24px',
-      padding: '1.25rem',
+      padding: '1rem',
       display: 'flex',
       flexDirection: 'column',
-      gap: '1rem',
+      gap: '0.75rem',
       flex: '1',
       minWidth: '280px',
       maxHeight: '100%',
@@ -87,10 +95,10 @@ const PricingPage: React.FC = () => {
       </button>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.5rem', flex: 1, minHeight: 0 }}>
-        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0, marginBottom: '4px', flexShrink: 0 }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0, marginBottom: '2px', flexShrink: 0 }}>
           Features
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 8px', overflowY: 'auto', paddingRight: '4px', paddingBottom: '4px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 6px', overflow: 'hidden' }}>
           {features.map((feature: string, idx: number) => (
             <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
               <div style={{ 
@@ -138,7 +146,7 @@ const PricingPage: React.FC = () => {
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
-        gap: '1.5rem',
+        gap: '1rem',
         alignItems: 'stretch',
         flex: 1,
         minHeight: 0
