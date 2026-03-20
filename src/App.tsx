@@ -266,7 +266,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/pricing" element={
-                <div style={{ flex: 1, overflow: 'hidden', padding: 0, margin: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ position: 'absolute', top: 'var(--header-height)', left: 0, right: 0, bottom: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
