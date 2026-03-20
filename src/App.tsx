@@ -220,7 +220,7 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
 
-          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 'var(--header-height)', display: 'flex', flexDirection: 'column' }}>
+          <main className="main-content" style={{ flex: 1, position: 'relative', paddingTop: 'var(--header-height)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
@@ -266,7 +266,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/pricing" element={
-                <div style={{ position: 'fixed', top: 'calc(var(--header-height) + 32px)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)', overflow: 'hidden' }}>
+                <div style={{ flex: 1, overflow: 'hidden', padding: 0, margin: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
