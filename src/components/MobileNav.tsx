@@ -13,7 +13,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const { triggerLight } = useHaptics();
 
     const navItems: { id: TabType; label: string; icon: React.ElementType }[] = [
-        { id: 'search', label: 'Home', icon: LayoutDashboard },
+        { id: 'home', label: 'Home', icon: LayoutDashboard },
         { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: List },
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },

@@ -123,7 +123,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 backdropFilter: 'blur(16px)'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
-                <div className="header-logo" onClick={() => handleTabClick('search')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div className="header-logo" onClick={() => handleTabClick('home')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <div className="logo-icon" style={{ padding: '2px', borderRadius: '4px' }}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
