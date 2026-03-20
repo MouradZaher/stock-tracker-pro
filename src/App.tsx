@@ -266,7 +266,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/pricing" element={
-                <div style={{ height: 'calc(100vh - var(--header-height) - 32px)', overflow: 'hidden', padding: 0, margin: 0, width: '100%' }}>
+                <div style={{ position: 'fixed', top: 'calc(var(--header-height) + 32px)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)', overflow: 'hidden' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
