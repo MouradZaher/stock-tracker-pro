@@ -15,7 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const menuItems = [
-    { id: 'search', label: 'Dashboard', icon: Home },
+    { id: 'home', label: 'Dashboard', icon: Home },
     { id: 'recommendations', label: 'AI Intelligence', icon: Brain },
     { id: 'watchlist', label: 'Watchlist', icon: Eye },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },

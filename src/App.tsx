@@ -170,17 +170,17 @@ function MainLayout({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const currentPath = location.pathname.substring(1) || 'search';
-  const activeTab = (['search', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing'].includes(currentPath) ? currentPath : 'search') as TabType;
+  const currentPath = location.pathname.substring(1) || 'home';
+  const activeTab = (['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing'].includes(currentPath) ? currentPath : 'home') as TabType;
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/${tab}`);
-    if (tab !== 'search') setSelectedSymbol(null);
+    if (tab !== 'home') setSelectedSymbol(null);
   };
 
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
-    navigate('/search');
+    navigate('/home');
   };
 
   // Listen for symbol query parameters (from heatmap deep-linking)
@@ -220,10 +220,10 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
 
-          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 'calc(var(--header-height) + 32px)' }}>
+          <main className="main-content" style={{ flex: 1, position: 'relative', marginTop: 0 }}>
             <Routes>
-              <Route path="/" element={<Navigate to="/search" replace />} />
-              <Route path="/search" element={
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={
                 <div style={{ position: 'fixed', top: 'calc(var(--header-height) + 32px)', left: 0, right: 0, bottom: 0, zIndex: 0, background: 'var(--color-bg-primary)' }}>
                   {!selectedSymbol ? (
                     <Dashboard onSelectSymbol={handleSelectSymbol} />
@@ -274,7 +274,7 @@ function MainLayout({
                   </ErrorBoundary>
                 </div>
               } />
-              <Route path="*" element={<Navigate to="/search" replace />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
           </main>
         </div>
