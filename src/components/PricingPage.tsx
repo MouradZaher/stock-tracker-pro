@@ -15,12 +15,13 @@ const PricingPage: React.FC = () => {
       border: '1px solid',
       borderColor: recommended ? 'transparent' : 'var(--color-border)',
       borderRadius: '24px',
-      padding: '2rem',
+      padding: '1.5rem',
       display: 'flex',
       flexDirection: 'column',
-      gap: '1.5rem',
-      flex: '1 1 300px',
-      maxWidth: '400px',
+      gap: '1rem',
+      flex: '1',
+      minWidth: '280px',
+      maxWidth: '350px',
       position: 'relative',
       overflow: 'hidden',
       boxShadow: recommended ? '0 20px 40px rgba(59, 130, 246, 0.2)' : 'none',
@@ -45,15 +46,15 @@ const PricingPage: React.FC = () => {
       )}
       
       <div>
-        <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: recommended ? 'white' : 'var(--color-text-primary)' }}>{title}</h3>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: recommended ? 'white' : 'var(--color-text-primary)' }}>{title}</h3>
       </div>
       
       <div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-          <span style={{ fontSize: '2.5rem', fontWeight: 900, color: recommended ? 'white' : 'var(--color-text-primary)' }}>${monthPrice}</span>
-          <span style={{ fontSize: '0.9rem', color: recommended ? 'rgba(255,255,255,0.8)' : 'var(--color-text-tertiary)' }}>USD / mo</span>
+          <span style={{ fontSize: '2rem', fontWeight: 900, color: recommended ? 'white' : 'var(--color-text-primary)' }}>${monthPrice}</span>
+          <span style={{ fontSize: '0.85rem', color: recommended ? 'rgba(255,255,255,0.8)' : 'var(--color-text-tertiary)' }}>USD / mo</span>
         </div>
-        <div style={{ fontSize: '0.85rem', color: recommended ? 'rgba(255,255,255,0.7)' : 'var(--color-text-tertiary)', marginTop: '8px' }}>
+        <div style={{ fontSize: '0.8rem', color: recommended ? 'rgba(255,255,255,0.7)' : 'var(--color-text-tertiary)', marginTop: '4px' }}>
           ${yearPrice} billed annually
         </div>
       </div>
@@ -84,21 +85,21 @@ const PricingPage: React.FC = () => {
         Start for Free
       </button>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
-        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.5rem' }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: recommended ? 'rgba(255,255,255,0.9)' : 'var(--color-text-primary)', margin: 0, marginBottom: '4px' }}>
           Features
         </p>
         {features.map((feature: string, idx: number) => (
-          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ 
-              width: '18px', height: '18px', 
+              width: '16px', height: '16px', 
               borderRadius: '50%', 
               background: recommended ? 'rgba(255,255,255,0.2)' : 'var(--color-accent-light)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
             }}>
               <Check size={10} color={recommended ? 'white' : 'var(--color-accent)'} />
             </div>
-            <span style={{ fontSize: '0.9rem', color: recommended ? 'white' : 'var(--color-text-secondary)' }}>
+            <span style={{ fontSize: '0.82rem', color: recommended ? 'white' : 'var(--color-text-secondary)', lineHeight: 1.2 }}>
               {feature}
             </span>
           </div>
@@ -108,24 +109,24 @@ const PricingPage: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+    <div style={{ padding: '2rem', maxWidth: '1100px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
         <div style={{ 
           display: 'inline-block',
-          padding: '8px 16px',
+          padding: '6px 12px',
           background: 'var(--color-success-light)',
           color: 'var(--color-success)',
           borderRadius: '20px',
-          fontSize: '0.85rem',
+          fontSize: '0.8rem',
           fontWeight: 800,
           marginBottom: '1rem'
         }}>
           30-DAY FREE TRIAL
         </div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: '0 0 1rem 0' }}>
+        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: '0 0 0.5rem 0' }}>
           Simple, transparent pricing
         </h1>
-        <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+        <p style={{ fontSize: '1rem', color: 'var(--color-text-secondary)', margin: 0 }}>
           No payment card required. Prices include all applicable taxes.
         </p>
       </div>
@@ -133,9 +134,8 @@ const PricingPage: React.FC = () => {
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
-        gap: '2rem',
-        flexWrap: 'wrap',
-        alignItems: 'center'
+        gap: '1.5rem',
+        alignItems: 'stretch'
       }}>
         <PlanCard 
           title="Starter"

@@ -332,16 +332,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         )}
                     </button>
 
-                    {/* Theme toggle */}
-                    <button
-                        style={iconBtn}
-                        onClick={() => { soundService.playTap(); toggleTheme(); }}
-                        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                        title={`${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-                    >
-                        {theme === 'dark' ? <Sun size={iconSize} strokeWidth={2.0} /> : <Moon size={iconSize} strokeWidth={2.0} />}
-                    </button>
-
                     {/* Logout */}
                     <button
                         style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)' }}

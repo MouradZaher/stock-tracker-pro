@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Settings as SettingsIcon, Bell, CreditCard, AlertTriangle, Shield, CheckCircle2, ChevronDown, Mail, Smartphone, RefreshCw, Trash2, Info, Star } from 'lucide-react';
+import { X, Settings as SettingsIcon, Bell, CreditCard, AlertTriangle, Shield, CheckCircle2, ChevronDown, Mail, Smartphone, RefreshCw, Trash2, Info, Star, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -8,6 +9,7 @@ interface SettingsModalProps {
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onDeleteAccount }) => {
+  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<'preferences' | 'notifications' | 'subscription' | 'danger'>('preferences');
   
   // Fake states for toggles
@@ -107,8 +109,33 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
 
             {/* PREFERENCES TAB */}
             {activeTab === 'preferences' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                
+                {/* Theme Section */}
+                <div>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 1rem 0', color: 'var(--color-text-primary)' }}>Appearance</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {theme === 'dark' ? <Moon color="var(--color-text-secondary)" size={20} /> : <Sun color="var(--color-text-secondary)" size={20} />}
+                      <div>
+                        <div style={{ fontWeight: 600 }}>Theme Mode</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>Toggle between light and dark mode</div>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={toggleTheme}
+                      style={{ 
+                        padding: '8px 16px', background: 'var(--color-bg-elevated)', border: '1px solid var(--glass-border)', 
+                        color: 'var(--color-text-primary)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600
+                      }}
+                    >
+                      {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Base Currency</label>
                   <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
                     <select 
@@ -157,6 +184,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
                   <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', margin: 0, marginTop: '4px' }}>
                     Used for performance comparison, alpha, beta, and risk metrics calculations
                   </p>
+                </div>
                 </div>
               </div>
             )}
