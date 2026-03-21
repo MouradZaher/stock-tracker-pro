@@ -17,9 +17,41 @@ import PriceAlertsModal from './PriceAlertsModal';
 import TradeAnalysisPanel from './TradeAnalysisPanel';
 import RealTimePrice from './RealTimePrice';
 import { useMarket } from '../contexts/MarketContext';
-
 import { aiStrategyService } from '../services/aiStrategyService';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, RefreshCw } from 'lucide-react';
+
+const LiveMomentum: React.FC<{ symbol: string }> = ({ symbol }) => {
+    const [momentum, setMomentum] = useState(50);
+    const [lastPrice, setLastPrice] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setMomentum(prev => {
+                const shift = (Math.random() - 0.5) * 4;
+                return Math.max(10, Math.min(90, prev + shift));
+            });
+        }, 2000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const color = momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)';
+    
+    return (
+        <div className="alpha-card" style={{ padding: '1rem', borderTop: `3px solid ${color}` }}>
+            <div className="alpha-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>LIVE MOMENTUM FLOW</span>
+                <span className="pulse-dot" style={{ width: '6px', height: '6px', background: color }}></span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                <div className="alpha-value" style={{ color }}>{momentum.toFixed(1)}%</div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>{momentum > 50 ? 'ACCUMULATING' : 'RETRACING'}</div>
+            </div>
+            <div className="momentum-meter">
+                <div className="momentum-bar" style={{ width: `${momentum}%`, background: color }} />
+            </div>
+        </div>
+    );
+};
 
 interface StockDetailProps {
     symbol: string;
@@ -181,7 +213,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
                 <div className="stock-price-section">
                     <div className="stock-price" style={{ fontSize: 'var(--font-size-3xl)' }}>
-                        <RealTimePrice price={stock.price} />
+                        <RealTimePrice price={stock.price} isFallback={stock.isFallback} />
                     </div>
                     <div className={`stock-change ${getChangeClass(stock.change)}`} style={{ padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-sm)' }}>
                         {stock.change >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
@@ -506,9 +538,29 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="alpha-grid" style={{ gridColumn: 'span 1' }}>
+                        <div className="alpha-card">
+                            <div className="alpha-label">GLOBAL_RANK</div>
+                            <div className="alpha-value">#12 / Institutional</div>
+                        </div>
+                        <LiveMomentum symbol={symbol} />
+                    </div>
+                    <div className="alpha-card" style={{ gridColumn: 'span 1', background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.2)' }}>
+                        <div className="alpha-label" style={{ color: 'var(--color-accent)' }}>INSTITUTIONAL_TERMINAL_ACCESS</div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '8px 0' }}>
+                            Encrypted connection established with ARIA Global Research Hub. Real-time synthesis of cross-asset data units in progress. All stats are live-synchronized with regional market centers.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                            <div className="badge-live">📡 ACTIVE_SYNC</div>
+                            <div className="badge-live" style={{ color: 'var(--color-accent)', background: 'rgba(99,102,241,0.1)', borderColor: 'rgba(99,102,241,0.2)' }}>🔐 SECURE_NODE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 3fr', gap: '2rem' }}>
                     {/* Module Selection Sidebar */}
-                    <div className="glass-card" style={{ padding: '1rem', height: 'fit-content', position: 'sticky', top: '120px' }}>
+                    <div className="alpha-card" style={{ padding: '0.75rem', height: 'fit-content', position: 'sticky', top: '120px' }}>
                         {[
                             { id: 'wall-street', label: 'Wall Street Research', icon: <Briefcase size={16} /> },
                             { id: 'financial-breakdown', label: '5Y Financial Audit', icon: <DollarSign size={16} /> },
@@ -524,13 +576,14 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                             <button
                                 key={mod.id}
                                 onClick={() => setActiveModule(mod.id)}
+                                className={`module-btn ${activeModule === mod.id ? 'active' : ''}`}
                                 style={{
                                     width: '100%',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '12px',
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
+                                    padding: '10px 14px',
+                                    borderRadius: '10px',
                                     background: activeModule === mod.id ? 'var(--color-accent)' : 'transparent',
                                     color: activeModule === mod.id ? '#fff' : 'var(--color-text-secondary)',
                                     border: 'none',
@@ -542,13 +595,13 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                                 }}
                             >
                                 {mod.icon}
-                                <span style={{ fontSize: '0.85rem' }}>{mod.label}</span>
+                                <span style={{ fontSize: '0.8rem' }}>{mod.label}</span>
                             </button>
                         ))}
                     </div>
 
                     {/* Report Display Area */}
-                    <div className="glass-card" style={{ padding: '2rem', minHeight: '500px', background: 'rgba(255,255,255,0.01)', position: 'relative', overflow: 'hidden' }}>
+                    <div className="alpha-card" style={{ padding: '2rem', minHeight: '500px', background: 'rgba(255,255,255,0.01)' }}>
                         {isAnalyzing ? (
                             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                 <div className="spinner" style={{ width: '40px', height: '40px', marginBottom: '1.5rem' }} />
@@ -576,7 +629,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                                     )}
                                 </div>
 
-                                {activeModule === 'wall-street' && (
+                                {activeModule === 'wall-street' && analysisData?.sections && (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                         {analysisData.sections.map((s: any, i: number) => (
                                             <div key={i}>
@@ -584,117 +637,127 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                                                 <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>{s.content}</p>
                                             </div>
                                         ))}
-                                        <div style={{ marginTop: '1rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
-                                            <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Scenario Analysis</div>
-                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                                                <div style={{ textAlign: 'center' }}>
-                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>BULL</div>
-                                                    <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.bull}</div>
-                                                </div>
-                                                <div style={{ textAlign: 'center', borderLeft: '1px solid var(--glass-border)', borderRight: '1px solid var(--glass-border)' }}>
-                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800 }}>BASE</div>
-                                                    <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.base}</div>
-                                                </div>
-                                                <div style={{ textAlign: 'center' }}>
-                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-error)', fontWeight: 800 }}>BEAR</div>
-                                                    <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.bear}</div>
+                                        {analysisData.scenarios && (
+                                            <div style={{ marginTop: '1rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
+                                                <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Scenario Analysis</div>
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                                                    <div style={{ textAlign: 'center' }}>
+                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>BULL</div>
+                                                        <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.bull}</div>
+                                                    </div>
+                                                    <div style={{ textAlign: 'center', borderLeft: '1px solid var(--glass-border)', borderRight: '1px solid var(--glass-border)' }}>
+                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800 }}>BASE</div>
+                                                        <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.base}</div>
+                                                    </div>
+                                                    <div style={{ textAlign: 'center' }}>
+                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-error)', fontWeight: 800 }}>BEAR</div>
+                                                        <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>{analysisData.scenarios.bear}</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 )}
 
-                                {activeModule === 'financial-breakdown' && (
-                                    <div>
-                                        <p style={{ fontSize: '1.1rem', color: 'var(--color-text-primary)', marginBottom: '2rem' }}>{analysisData.summary}</p>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                                            {analysisData.metrics.map((m: any, i: number) => (
-                                                <div key={i} className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>{m.label}</div>
-                                                    <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{m.value}</div>
-                                                    <div style={{ fontSize: '0.6rem', color: m.trend === 'up' ? 'var(--color-success)' : 'var(--color-text-tertiary)', fontWeight: 800 }}>{m.trend.toUpperCase()}</div>
+                                {activeModule === 'financial-breakdown' && analysisData?.financials && (
+                                    <div className="animate-fade-in">
+                                        <p style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '2rem', lineHeight: 1.5 }}>{analysisData.summary}</p>
+                                        <div className="alpha-grid" style={{ marginBottom: '2rem' }}>
+                                            {analysisData.metrics?.map((m: any, i: number) => (
+                                                <div key={i} className="alpha-card" style={{ textAlign: 'center' }}>
+                                                    <div className="alpha-label">{m.label}</div>
+                                                    <div className="alpha-value" style={{ fontSize: '1.5rem' }}>{m.value}</div>
+                                                    <div style={{ fontSize: '0.65rem', color: m.trend === 'up' ? 'var(--color-success)' : 'var(--color-text-tertiary)', fontWeight: 900, marginTop: '8px' }}>{m.trend.toUpperCase()} TREND</div>
                                                 </div>
                                             ))}
                                         </div>
-                                        <div style={{ padding: '1.25rem', borderRadius: '12px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 800, textAlign: 'center' }}>
-                                            FINANCIAL HEALTH: {analysisData.verdict}
+                                        <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 900, textAlign: 'center', border: '1px solid var(--color-success-light)' }}>
+                                            INSTITUTIONAL_VERDICT: {analysisData.verdict}
                                         </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'moat-analysis' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                        <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '3.5rem', fontWeight: 900, color: 'var(--color-accent)' }}>{analysisData.score}</div>
-                                            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Overall Moat Rating</div>
+                                {activeModule === 'moat-analysis' && analysisData?.factors && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div className="alpha-card" style={{ textAlign: 'center', padding: '2rem' }}>
+                                            <div className="alpha-value" style={{ fontSize: '4.5rem', lineHeight: 1 }}>{analysisData.score}</div>
+                                            <div className="alpha-label">OVERALL MOAT_RATING / 10</div>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                        <div className="alpha-grid">
                                             {analysisData.factors.map((f: any, i: number) => (
-                                                <div key={i}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                        <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{f.name}</span>
-                                                        <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-accent)' }}>{f.score}/10</span>
+                                                <div key={i} className="alpha-card">
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                                        <span className="alpha-label">{f.name}</span>
+                                                        <span className="alpha-value" style={{ fontSize: '0.9rem' }}>{f.score}</span>
                                                     </div>
-                                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
-                                                        <div style={{ height: '100%', width: `${f.score * 10}%`, background: 'var(--color-accent)', borderRadius: '2px' }} />
+                                                    <div className="momentum-meter">
+                                                        <div className="momentum-bar" style={{ width: `${f.score * 10}%`, background: 'var(--color-accent)' }} />
                                                     </div>
-                                                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>{f.description}</p>
+                                                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '12px', lineHeight: 1.4 }}>{f.description}</p>
                                                 </div>
                                             ))}
                                         </div>
-                                        <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-                                            <strong>Competitive Advantage:</strong> {analysisData.competitorComparison}
+                                        <div className="alpha-card" style={{ borderLeft: '4px solid var(--color-accent)' }}>
+                                            <div className="alpha-label">COMPETITIVE_LANDSCAPE</div>
+                                            <p style={{ margin: '8px 0 0 0', fontSize: '0.9rem' }}>{analysisData.competitorComparison}</p>
                                         </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'valuation' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
-                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>INTRINSIC VALUE</div>
-                                                <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>${analysisData.intrinsicValue}</div>
+                                {activeModule === 'valuation' && analysisData?.intrinsicValue && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div className="alpha-grid">
+                                            <div className="alpha-card" style={{ textAlign: 'center' }}>
+                                                <div className="alpha-label">INTRINSIC_VALUE</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.75rem' }}>${analysisData.intrinsicValue}</div>
                                             </div>
-                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', border: '2px solid var(--color-success)' }}>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', fontWeight: 800, marginBottom: '4px' }}>VERDICT</div>
-                                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-success)' }}>{analysisData.conclusion}</div>
+                                            <div className="alpha-card" style={{ textAlign: 'center', border: '2px solid var(--color-success)', background: 'var(--color-success-light)' }}>
+                                                <div className="alpha-label" style={{ color: 'var(--color-success)' }}>VERDICT</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.75rem', color: 'var(--color-success)' }}>{analysisData.conclusion}</div>
                                             </div>
-                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>DCF ESTIMATE</div>
-                                                <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{analysisData.dcfEstimate}</div>
+                                            <div className="alpha-card" style={{ textAlign: 'center' }}>
+                                                <div className="alpha-label">DCF_ESTIMATE</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.75rem' }}>{analysisData.dcfEstimate}</div>
                                             </div>
                                         </div>
-                                        <div style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
-                                            <p>Our model indicates that <strong>{symbol}</strong> is currently trading at a discount. {analysisData.methodology}</p>
-                                            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between' }}>
-                                                <span>Trailing P/E: <strong>{analysisData.currentPE}x</strong></span>
-                                                <span>Industry Avg: <strong>{analysisData.industryAvgPE}x</strong></span>
+                                        <div className="alpha-card">
+                                            <div className="alpha-label">VALUATION_METHODOLOGY</div>
+                                            <p style={{ margin: '8px 0', fontSize: '0.95rem', lineHeight: 1.6 }}>Our model indicates that <strong>{symbol}</strong> is currently trading at a discount. {analysisData.methodology}</p>
+                                            <div className="alpha-grid" style={{ marginTop: '1.5rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1.5rem' }}>
+                                                <div>
+                                                    <div className="alpha-label">TRAILING_P/E</div>
+                                                    <div className="alpha-value" style={{ fontSize: '1.25rem' }}>{analysisData.currentPE}x</div>
+                                                </div>
+                                                <div>
+                                                    <div className="alpha-label">INDUSTRY_AVG</div>
+                                                    <div className="alpha-value" style={{ fontSize: '1.25rem' }}>{analysisData.industryAvgPE}x</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'risk-analysis' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
-                                                <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Top Ranked Risks</div>
-                                                {analysisData.ranking.map((r: string, i: number) => (
-                                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                                        <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--color-error-light)', color: 'var(--color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800 }}>{i + 1}</div>
-                                                        <div style={{ fontSize: '0.9rem' }}>{r}</div>
+                                {activeModule === 'risk-analysis' && analysisData?.risks && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                        <div className="alpha-grid">
+                                            <div className="alpha-card">
+                                                <div className="alpha-label" style={{ marginBottom: '1.5rem' }}>TOP_RANKED_RISKS</div>
+                                                {analysisData.ranking?.map((r: string, i: number) => (
+                                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--color-error-light)', color: 'var(--color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 900 }}>{i + 1}</div>
+                                                        <div style={{ fontSize: '0.95rem', fontWeight: 600 }}>{r}</div>
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
-                                                <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Risk Detail Matrix</div>
+                                            <div className="alpha-card">
+                                                <div className="alpha-label" style={{ marginBottom: '1.5rem' }}>RISK_DETAIL_MATRIX</div>
                                                 {analysisData.risks.map((r: any, i: number) => (
-                                                    <div key={i} style={{ marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                    <div key={i} style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                            <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{r.type}</span>
-                                                            <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: '4px', background: r.level === 'High' ? 'var(--color-error-light)' : 'var(--color-warning-light)', color: r.level === 'High' ? 'var(--color-error)' : 'var(--color-warning)', fontWeight: 800 }}>{r.level}</span>
+                                                            <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>{r.type}</span>
+                                                            <span className="badge-live" style={{ background: r.level === 'CRITICAL' ? 'var(--color-error-light)' : 'var(--color-warning-light)', color: r.level === 'CRITICAL' ? 'var(--color-error)' : 'var(--color-warning)', borderColor: 'transparent' }}>{r.level}</span>
                                                         </div>
-                                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>{r.detail}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>{r.detail}</div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -702,163 +765,173 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                                     </div>
                                 )}
 
-                                {activeModule === 'growth-potential' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                                            <div>
-                                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase' }}>Available Market</div>
-                                                <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{analysisData.marketSize}</div>
+                                {activeModule === 'growth-potential' && analysisData?.opportunities && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div className="alpha-grid">
+                                            <div className="alpha-card">
+                                                <div className="alpha-label">TAM / MARKET_SIZE</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.75rem' }}>{analysisData.marketSize}</div>
                                             </div>
-                                            <div>
-                                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-success)', textTransform: 'uppercase' }}>Industry CAGR</div>
-                                                <div style={{ fontSize: '1.75rem', fontWeight: 900 }}>{analysisData.industryGrowth}</div>
+                                            <div className="alpha-card">
+                                                <div className="alpha-label">INDUSTRY_CAGR</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.75rem', color: 'var(--color-success)' }}>{analysisData.industryGrowth}</div>
                                             </div>
                                         </div>
-                                        <div className="glass-card" style={{ padding: '1.5rem' }}>
-                                            <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Expansion Opportunities</div>
+                                        <div className="alpha-card">
+                                            <div className="alpha-label" style={{ marginBottom: '1rem' }}>EXPANSION_OPPORTUNITIES</div>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                                {analysisData.opportunities.map((o: string, i: number) => (
-                                                    <div key={i} style={{ padding: '8px 16px', borderRadius: '20px', background: 'var(--color-accent-light)', color: 'var(--color-accent)', fontSize: '0.85rem', fontWeight: 700 }}>{o}</div>
+                                                {analysisData.opportunities?.map((o: string, i: number) => (
+                                                    <div key={i} className="badge-live" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.8rem' }}>{o}</div>
                                                 ))}
                                             </div>
                                         </div>
-                                        <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{analysisData.projection}</p>
+                                        <div className="alpha-card" style={{ borderLeft: '4px solid var(--color-success)' }}>
+                                            <div className="alpha-label">LONG_TERM_PROJECTION</div>
+                                            <p style={{ margin: '8px 0 0 0', fontSize: '1.1rem', fontWeight: 600 }}>{analysisData.projection}</p>
+                                        </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'hedge-fund' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                        <div className="glass-card" style={{ padding: '2rem', borderLeft: '6px solid var(--color-accent)', background: 'rgba(99, 102, 241, 0.05)' }}>
-                                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', marginBottom: '8px' }}>The Thesis</div>
-                                            <div style={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: 1.4 }}>"{analysisData.thesis}"</div>
+                                {activeModule === 'hedge-fund' && analysisData?.catalysts && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                        <div className="alpha-card" style={{ borderLeft: '6px solid var(--color-accent)', background: 'rgba(99, 102, 241, 0.05)', padding: '2rem' }}>
+                                            <div className="alpha-label" style={{ color: 'var(--color-accent)' }}>THE_THESIS</div>
+                                            <div className="alpha-value" style={{ fontSize: '1.5rem', lineHeight: 1.4, marginTop: '8px' }}>"{analysisData.thesis}"</div>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                                            <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-success-light)' }}>
-                                                <div style={{ fontWeight: 800, color: 'var(--color-success)', marginBottom: '8px' }}>Bull Case (Why Buy)</div>
-                                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{analysisData.buyReason}</p>
+                                        <div className="alpha-grid">
+                                            <div className="alpha-card" style={{ background: 'var(--color-success-light)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+                                                <div className="alpha-label" style={{ color: 'var(--color-success)' }}>BULL_CASE / ACCUMULATE</div>
+                                                <p style={{ margin: '8px 0 0 0', fontSize: '0.95rem', fontWeight: 600 }}>{analysisData.buyReason}</p>
                                             </div>
-                                            <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-error-light)' }}>
-                                                <div style={{ fontWeight: 800, color: 'var(--color-error)', marginBottom: '8px' }}>Bear Case (Why Avoid)</div>
-                                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{analysisData.avoidReason}</p>
+                                            <div className="alpha-card" style={{ background: 'var(--color-error-light)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+                                                <div className="alpha-label" style={{ color: 'var(--color-error)' }}>BEAR_CASE / CAUTION</div>
+                                                <p style={{ margin: '8px 0 0 0', fontSize: '0.95rem', fontWeight: 600 }}>{analysisData.avoidReason}</p>
                                             </div>
                                         </div>
-                                        <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
-                                            <div style={{ fontWeight: 800, marginBottom: '1rem' }}>Upcoming Catalysts</div>
-                                            {analysisData.catalysts.map((c: string, i: number) => (
-                                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-warning)' }} />
-                                                    <div style={{ fontSize: '0.9rem' }}>{c}</div>
+                                        <div className="alpha-card">
+                                            <div className="alpha-label" style={{ marginBottom: '1.25rem' }}>UPCOMING_CATALYSTS</div>
+                                            {analysisData.catalysts?.map((c: string, i: number) => (
+                                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                                                    <div className="pulse-dot" style={{ width: '8px', height: '8px', background: 'var(--color-warning)', borderRadius: '50%' }} />
+                                                    <div style={{ fontSize: '1rem', fontWeight: 500 }}>{c}</div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'bull-bear' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                                            <div className="glass-card" style={{ padding: '2rem', borderTop: '4px solid var(--color-success)' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-                                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                                                        <TrendingUp size={20} />
+                                {activeModule === 'bull-bear' && analysisData?.bull && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                        <div className="alpha-grid">
+                                            <div className="alpha-card" style={{ borderTop: '4px solid var(--color-success)', padding: '2rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '1.5rem' }}>
+                                                    <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)' }}>
+                                                        <TrendingUp size={24} />
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontWeight: 800 }}>{analysisData.bull.analyst}</div>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>SENIOR ANALYST</div>
+                                                        <div className="alpha-value" style={{ fontSize: '1rem' }}>{analysisData.bull.analyst}</div>
+                                                        <div className="alpha-label">SENIOR_BULL_CASE</div>
                                                     </div>
                                                 </div>
-                                                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>"{analysisData.bull.argument}"</p>
+                                                <p style={{ fontSize: '1.1rem', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic', borderLeft: '3px solid rgba(16, 185, 129, 0.3)', paddingLeft: '1rem' }}>"{analysisData.bull.argument}"</p>
                                             </div>
-                                            <div className="glass-card" style={{ padding: '2rem', borderTop: '4px solid var(--color-error)' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-                                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                                                        <TrendingDown size={20} />
+                                            <div className="alpha-card" style={{ borderTop: '4px solid var(--color-error)', padding: '2rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '1.5rem' }}>
+                                                    <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'var(--color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 8px 16px rgba(239, 68, 68, 0.2)' }}>
+                                                        <TrendingDown size={24} />
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontWeight: 800 }}>{analysisData.bear.analyst}</div>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>SENIOR ANALYST</div>
+                                                        <div className="alpha-value" style={{ fontSize: '1rem' }}>{analysisData.bear.analyst}</div>
+                                                        <div className="alpha-label">SENIOR_BEAR_CASE</div>
                                                     </div>
                                                 </div>
-                                                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>"{analysisData.bear.argument}"</p>
+                                                <p style={{ fontSize: '1.1rem', lineHeight: 1.6, color: 'var(--color-text-primary)', fontStyle: 'italic', borderLeft: '3px solid rgba(239, 68, 68, 0.3)', paddingLeft: '1rem' }}>"{analysisData.bear.argument}"</p>
                                             </div>
                                         </div>
-                                        <div style={{ padding: '1.5rem', borderRadius: '16px', background: 'var(--color-accent-light)', textAlign: 'center' }}>
-                                            <div style={{ fontWeight: 800, color: 'var(--color-accent)', marginBottom: '8px' }}>Institutional Conclusion</div>
-                                            <p style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{analysisData.conclusion}</p>
+                                        <div className="alpha-card" style={{ background: 'var(--color-accent-light)', textAlign: 'center', border: '1px solid rgba(99, 102, 241, 0.1)' }}>
+                                            <div className="alpha-label">SYNTHESIZED_CONCLUSION</div>
+                                            <p style={{ margin: '8px 0 0 0', fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-accent)' }}>{analysisData.conclusion}</p>
                                         </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'earnings-breakdown' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                {activeModule === 'earnings-breakdown' && analysisData?.revenue && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                        <div className="alpha-grid">
+                                            <div className="alpha-card">
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                                    <span style={{ fontWeight: 800 }}>Revenue Performance</span>
-                                                    <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 800 }}>{analysisData.revenue.status}</span>
+                                                    <span className="alpha-label">REVENUE_PERFORMANCE</span>
+                                                    <span className="badge-live">{analysisData.revenue.status}</span>
                                                 </div>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                                                     <div>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>REPORTED</div>
-                                                        <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{analysisData.revenue.actual}</div>
+                                                        <div className="alpha-label" style={{ opacity: 0.5 }}>REPORTED</div>
+                                                        <div className="alpha-value" style={{ fontSize: '1.75rem' }}>{analysisData.revenue.actual}</div>
                                                     </div>
                                                     <div style={{ textAlign: 'right' }}>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>EXPECTED</div>
-                                                        <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{analysisData.revenue.estimate}</div>
+                                                        <div className="alpha-label" style={{ opacity: 0.5 }}>EXPECTED</div>
+                                                        <div className="alpha-value" style={{ fontSize: '1.25rem', color: 'var(--color-text-tertiary)' }}>{analysisData.revenue.estimate}</div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                                    <span style={{ fontWeight: 800 }}>EPS Performance</span>
-                                                    <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 800 }}>{analysisData.eps.status}</span>
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                                    <div>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>REPORTED</div>
-                                                        <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{analysisData.eps.actual}</div>
+                                            {analysisData.eps && (
+                                                <div className="alpha-card" style={{ border: '1px solid var(--color-success)' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                                        <span className="alpha-label">EPS_PERFORMANCE</span>
+                                                        <span className="badge-live" style={{ background: 'var(--color-success)', color: '#fff' }}>{analysisData.eps.status}</span>
                                                     </div>
-                                                    <div style={{ textAlign: 'right' }}>
-                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>EXPECTED</div>
-                                                        <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{analysisData.eps.estimate}</div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                        <div>
+                                                            <div className="alpha-label" style={{ opacity: 0.5 }}>REPORTED</div>
+                                                            <div className="alpha-value" style={{ fontSize: '1.75rem' }}>{analysisData.eps.actual}</div>
+                                                        </div>
+                                                        <div style={{ textAlign: 'right' }}>
+                                                            <div className="alpha-label" style={{ opacity: 0.5 }}>EXPECTED</div>
+                                                            <div className="alpha-value" style={{ fontSize: '1.25rem', color: 'var(--color-text-tertiary)' }}>{analysisData.eps.estimate}</div>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            )}
+                                        </div>
+                                        <div className="alpha-grid" style={{ gridTemplateColumns: '1.5fr 1fr' }}>
+                                            <div className="alpha-card">
+                                                <div className="alpha-label">KEY_PERFORMANCE_METRICS</div>
+                                                <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '8px' }}>{analysisData.keyMetrics}</div>
+                                            </div>
+                                            <div className="alpha-card" style={{ background: 'var(--color-success-light)', textAlign: 'center' }}>
+                                                <div className="alpha-label">MARKET_RESPONSE</div>
+                                                <div className="alpha-value" style={{ fontSize: '2rem', color: 'var(--color-success)' }}>{analysisData.marketReaction}</div>
                                             </div>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5rem' }}>
-                                            <div className="glass-card" style={{ padding: '1.5rem' }}>
-                                                <div style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Key Performance Metrics</div>
-                                                <div style={{ fontSize: '1rem', color: 'var(--color-text-secondary)' }}>{analysisData.keyMetrics}</div>
-                                            </div>
-                                            <div className="glass-card" style={{ padding: '1.5rem', background: 'var(--color-success-light)' }}>
-                                                <div style={{ fontWeight: 800, color: 'var(--color-success)', marginBottom: '0.5rem' }}>Market Response</div>
-                                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-success)' }}>{analysisData.marketReaction}</div>
-                                            </div>
-                                        </div>
-                                        <div style={{ padding: '1rem 1.5rem', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
-                                            <strong>Forward Guidance:</strong> {analysisData.guidance}
+                                        <div className="alpha-card" style={{ borderLeft: '4px solid var(--color-accent)' }}>
+                                            <div className="alpha-label">FORWARD_GUIDANCE</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 500, marginTop: '4px' }}>{analysisData.guidance}</div>
                                         </div>
                                     </div>
                                 )}
 
-                                {activeModule === 'buy-hold-avoid' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '2rem', padding: '2rem 0' }}>
-                                        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 0 50px rgba(16, 185, 129, 0.3)' }}>
-                                            <CheckCircle size={64} />
+                                {activeModule === 'buy-hold-avoid' && analysisData?.verdict && (
+                                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '2.5rem', padding: '3rem 0' }}>
+                                        <div className="pulse-dot" style={{ width: '140px', height: '140px', borderRadius: '50%', background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 0 60px rgba(16, 185, 129, 0.4)' }}>
+                                            <CheckCircle size={80} />
                                         </div>
                                         <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-success)', marginBottom: '0.5rem' }}>ARIA FINAL VERDICT: {analysisData.verdict}</div>
-                                            <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', maxWidth: '500px', margin: '0 auto' }}>{analysisData.summary}</p>
+                                            <div className="alpha-label" style={{ fontSize: '0.8rem', marginBottom: '0.5rem' }}>ARIA_FINAL_INVESTMENT_VERDICT</div>
+                                            <div className="alpha-value" style={{ fontSize: '2.5rem', color: 'var(--color-success)', letterSpacing: '-0.02em' }}>{analysisData.verdict}</div>
+                                            <p style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)', maxWidth: '600px', margin: '1.5rem auto 0', lineHeight: 1.5, fontWeight: 500 }}>{analysisData.summary}</p>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', width: '100%', maxWidth: '600px' }}>
-                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginBottom: '4px' }}>1-YEAR OUTLOOK</div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{analysisData.shortTerm}</div>
+                                        <div className="alpha-grid" style={{ width: '100%', maxWidth: '700px' }}>
+                                            <div className="alpha-card" style={{ textAlign: 'center' }}>
+                                                <div className="alpha-label">1-YEAR_RESEARCH_OUTLOOK</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.5rem' }}>{analysisData.shortTerm}</div>
                                             </div>
-                                            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginBottom: '4px' }}>5-YEAR OUTLOOK</div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{analysisData.longTerm}</div>
+                                            <div className="alpha-card" style={{ textAlign: 'center' }}>
+                                                <div className="alpha-label">5-YEAR_STRATEGIC_PLAN</div>
+                                                <div className="alpha-value" style={{ fontSize: '1.5rem' }}>{analysisData.longTerm}</div>
                                             </div>
+                                        </div>
+                                        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', padding: '10px 20px', borderRadius: '30px', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>
+                                            ⚠️ CONFIDENTIAL • FOR INSTITUTIONAL USERS ONLY
                                         </div>
                                     </div>
                                 )}

@@ -30,7 +30,7 @@ interface PortfolioStore {
     updatePosition: (id: string, updates: Partial<PortfolioPosition>, userId?: string) => Promise<void>;
     removePosition: (id: string, symbol: string, userId?: string) => Promise<void>;
     addMultiplePositions: (positions: Omit<PortfolioPosition, 'id' | 'profitLoss' | 'profitLossPercent' | 'marketValue' | 'purchaseValue'>[], userId?: string) => Promise<void>;
-    updatePrice: (symbol: string, price: number, userId?: string) => Promise<void>;
+    updatePrice: (symbol: string, price: number, userId?: string, isFallback?: boolean) => Promise<void>;
     syncPrices: () => Promise<void>;
 
     // Supabase sync actions
@@ -213,7 +213,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     }
                 },
 
-                updatePrice: async (symbol, price, userId) => {
+                updatePrice: async (symbol, price, userId, isFallback?: boolean) => {
                     // Optimistic update
                     set((state) => ({
                         positions: state.positions.map((pos) => {
@@ -228,6 +228,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                 marketValue,
                                 profitLoss: amount,
                                 profitLossPercent: percent,
+                                isFallback: isFallback ?? pos.isFallback,
                             };
                         }),
                     }));
@@ -279,6 +280,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                     currency,
                                     profitLoss: amount,
                                     profitLossPercent: percent,
+                                    isFallback: quote.isFallback,
                                 };
                             })
                         }));

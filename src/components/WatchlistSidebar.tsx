@@ -6,6 +6,7 @@ import { getStockData, getMultipleQuotes } from '../services/stockDataService';
 import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatters';
 import type { Stock } from '../types';
 import { useMarket } from '../contexts/MarketContext';
+import RealTimePrice from './RealTimePrice';
 
 interface WatchlistSidebarProps {
     isOpen: boolean;
@@ -48,8 +49,8 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
 
         if (isOpen) {
             fetchWatchlistData();
-            // Poll every 15 seconds while open
-            const interval = setInterval(fetchWatchlistData, 15000);
+            // Poll every 3 seconds while open for ultra-live feel
+            const interval = setInterval(fetchWatchlistData, 3000);
             return () => clearInterval(interval);
         }
     }, [isOpen, watchlist]);
@@ -103,7 +104,12 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                                                 <span style={{ fontWeight: 800, fontSize: '0.75rem', color: selectedMarket.color, textTransform: 'uppercase' }}>{selectedMarket.indexName}</span>
-                                                <span style={{ fontWeight: 700 }}>{formatCurrency(indexStock.price)}</span>
+                                                <RealTimePrice 
+                                                    price={indexStock.price} 
+                                                    isFallback={indexStock.isFallback}
+                                                    showCurrency={true} 
+                                                    style={{ fontSize: '0.875rem' }} 
+                                                />
                                             </div>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
                                                 <span style={{ color: 'var(--color-text-tertiary)' }}>Market Index</span>
@@ -125,9 +131,14 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                                     }}>
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                                                <span style={{ fontWeight: 'bold' }}>{symbol}</span>
+                                                <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>{symbol}</span>
                                                 {stock && (
-                                                    <span style={{ fontWeight: 600 }}>{formatCurrency(stock.price)}</span>
+                                                    <RealTimePrice 
+                                                        price={stock.price} 
+                                                        isFallback={stock.isFallback}
+                                                        showCurrency={true} 
+                                                        style={{ fontSize: '0.9rem' }} 
+                                                    />
                                                 )}
                                             </div>
                                             {stock ? (

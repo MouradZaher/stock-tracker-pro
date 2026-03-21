@@ -19,6 +19,7 @@ export interface StockQuote {
     dividendYield: number;
     fiftyTwoWeekHigh: number;
     fiftyTwoWeekLow: number;
+    provider?: string;
 }
 
 export interface DataProvider {

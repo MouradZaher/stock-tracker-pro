@@ -143,26 +143,16 @@ class AIStrategyService {
 
     async getSentimentArbitrage(marketId: string = 'us'): Promise<StrategyResult> {
         const isEgypt = marketId === 'egypt';
-        
         return {
             id: AI_STRATEGIES.SENTIMENT_ARBITRAGE,
-            name: 'Sentiment vs. Fundamentals Arbitrage',
+            name: 'Sentiment Arbitrage',
             description: `Exploiting fear mispricing in ${marketId.toUpperCase()} quality stocks.`,
             recommendation: 'Accumulate High-Quality Fear Gaps',
-            metrics: {
-                'Sentiment Gap': '38%',
-                'Fundamental Score': 'A+',
-            },
-            reasoning: [
-                isEgypt ? 'COMI: Regulatory fear vs Record Profits.' : 'GOOGL: AI fear vs FCF dominance.',
-                'Market sentiment is detached from underlying earnings power.'
-            ],
-            sources: ['Social Sentiment', 'Earnings Analytics'],
+            metrics: { 'Sentiment Gap': '38%', 'Fundamental Score': 'A+' },
+            reasoning: [isEgypt ? 'COMI: Regulatory fear vs Profits.' : 'GOOGL: AI fear vs FCF dominance.'],
+            sources: ['Social Sentiment'],
             riskLevel: 'Medium',
-            actionableItems: [
-                `Buy the sentiment dip`,
-                `Set long-term hold alerts`,
-            ]
+            actionableItems: [`Buy the sentiment dip`, `Set hold alerts`]
         };
     }
 
@@ -240,16 +230,20 @@ class AIStrategyService {
                             content: `Revenue growth is tracking at +12% YoY. Operating margins remain robust at 28%. Debt levels are manageable with a Net Debt/EBITDA of 1.4x.`
                         },
                         {
+                            heading: "Industry Trends",
+                            content: `Sector rotation favors ${stock?.profile?.sector || 'technology'} as AI-driven productivity gains become the primary growth catalyst. ${symbol} is positioned at the top of the adoption curve.`
+                        },
+                        {
                             heading: "Key Risks",
-                            content: "Macroeconomic headwinds, regulatory scrutiny in primary markets, and potential input cost inflation."
+                            content: "1. Regulatory threats (High)\n2. Competition (Medium)\n3. Macro slowdown (Low)"
                         },
                         {
                             heading: "Valuation vs Competitors",
-                            content: `${symbol} trades at a 15% premium to peers, justified by superior RoIC and projected multi-year secular growth.`
+                            content: `${symbol} trades at a P/E of ${(stock?.stock?.peRatio || 25).toFixed(1)}x vs industry average of 18.5x. Valuation is stretched but justified by FCF yield.`
                         },
                         {
                             heading: "12-24 Month Outlook",
-                            content: "Positive. We expect continued market share gains and margin expansion through operational efficiencies."
+                            content: "Bull Case: +25% | Base Case: +12% | Bear Case: -15%. Professional recommendation remains OVERWEIGHT."
                         }
                     ],
                     scenarios: {
@@ -297,12 +291,12 @@ class AIStrategyService {
                 return {
                     title: "Strategic Risk Matrix",
                     risks: [
-                        { level: "High", type: "Regulation", detail: "Antitrust and data privacy laws." },
-                        { level: "Medium", type: "Competition", detail: "Emerging AI-first competitors." },
-                        { level: "Medium", type: "Macro", detail: "Interest rate sensitivity." },
-                        { level: "Low", type: "Management", detail: "Succession planning." }
+                        { level: "CRITICAL", type: "Regulatory", detail: "Most dangerous: Antitrust and regional compliance." },
+                        { level: "HIGH", type: "Disruption", detail: "Emerging AI-first competitors eroding moat." },
+                        { level: "MEDIUM", type: "Financial", detail: "Interest rate sensitivity on debt tranches." },
+                        { level: "LOW", type: "Execution", detail: "Management succession and scale-up." }
                     ],
-                    ranking: ["Regulatory", "Competitive Disruption", "Monetary Policy", "Execution Risk"]
+                    ranking: ["Regulatory Threats", "Industry Disruption", "Monetary Policy", "Execution Risk"]
                 };
             case 'growth-potential':
                 return {

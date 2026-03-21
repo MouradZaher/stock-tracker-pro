@@ -23,7 +23,7 @@ export const usePriceFlash = (price: number) => {
             // Reset class after animation duration
             timeoutRef.current = setTimeout(() => {
                 setFlashClass('');
-            }, 1500);
+            }, 800);
         }
     }, [price]);
 

@@ -9,6 +9,7 @@ import { aiStrategyService, AI_STRATEGIES } from '../services/aiStrategyService'
 import type { StrategyResult } from '../services/aiStrategyService';
 import { useMarket } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 // Simple Fallback for MessageSquare if not found in Lucide (usually it is)
@@ -27,6 +28,7 @@ const STRATEGY_METADATA: Record<string, { icon: any, color: string, label: strin
 };
 
 const AIStrategyIntelliHub: React.FC = () => {
+    const navigate = useNavigate();
     const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
     const [strategyResult, setStrategyResult] = useState<StrategyResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -90,17 +92,26 @@ const AIStrategyIntelliHub: React.FC = () => {
                             placeholder="Search Ticker for Full Wall Street Analysis (e.g. NVDA, AAPL)..." 
                             style={{ width: '100%', padding: '12px 12px 12px 40px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', color: 'white' }}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
                                     const symbol = e.currentTarget.value.toUpperCase();
                                     if (symbol) {
-                                        window.location.hash = `#/stock/${symbol}`;
+                                        navigate(`/home?symbol=${symbol}`);
                                         toast.success(`Opening Institutional Report for ${symbol}`);
                                     }
-                                }
                             }}
                         />
                     </div>
-                    <button className="btn btn-primary" style={{ padding: '0 1.5rem' }}>
+                    <button 
+                        className="btn btn-primary" 
+                        style={{ padding: '0 1.5rem' }}
+                        onClick={() => {
+                            const input = document.querySelector('input[placeholder*="Search Ticker"]') as HTMLInputElement;
+                            if (input && input.value) {
+                                const symbol = input.value.toUpperCase();
+                                navigate(`/home?symbol=${symbol}`);
+                                toast.success(`Opening Institutional Report for ${symbol}`);
+                            }
+                        }}
+                    >
                         Run Alpha Report
                     </button>
                 </div>
@@ -164,7 +175,6 @@ const AIStrategyIntelliHub: React.FC = () => {
                                 </div>
                             </div>
                             <ChevronRight size={18} color="var(--color-text-tertiary)" />
-                            
                             {isActive && isLoading && (
                                 <div style={{ position: 'absolute', bottom: 0, left: 0, height: '3px', width: '100%', background: meta.color, animation: 'loading-bar 1.5s infinite' }} />
                             )}

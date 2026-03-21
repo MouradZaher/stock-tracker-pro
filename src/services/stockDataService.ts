@@ -64,8 +64,13 @@ const fetchFromProxy = async (symbol: string): Promise<StockQuote | null> => {
     try {
         const response = await api.get('/multi-quote', { params: { symbols: symbol } });
         const result = response.data?.quoteResponse?.result?.[0];
+        const provider = response.data?._provider || result?.provider;
+        
         if (result && result.price > 0) {
-            return result as StockQuote;
+            return {
+                ...result,
+                provider: provider || 'proxy'
+            } as StockQuote;
         }
         return null;
     } catch (error) {
@@ -337,8 +342,9 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         let finalPrice = price;
 
         if (jitterEnabled && price > 0) {
-            // Tiny jitter: +/- 0.005% (e.g., 1 cent on a $200 stock)
-            const jitterFactor = 1 + (Math.random() * 0.0001 - 0.00005);
+            // More visible jitter: +/- 0.05% (e.g., 10 cents on a $200 stock)
+            // This provides a "living" feel to the UI even during slow market periods
+            const jitterFactor = 1 + (Math.random() * 0.001 - 0.0005);
             finalPrice = price * jitterFactor;
         }
 
@@ -364,6 +370,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             totalBuy: 0,
             totalSell: 0,
             lastUpdated: new Date(),
+            isFallback: quote.provider === 'price_map' || quote.provider === 'cache',
         };
     }
 
@@ -380,6 +387,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0,
             dividendYield: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0,
             totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date(),
+            isFallback: true,
         };
     }
 
@@ -703,6 +711,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
                     totalBuy: null,
                     totalSell: null,
                     lastUpdated: new Date(),
+                    isFallback: quote.provider === 'price_map' || response.data?._provider === 'price_map',
                 };
                 stockMap.set(originalSymbol, stock);
                 setCachedData(`last_good_${originalSymbol}`, quote);

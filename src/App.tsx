@@ -73,8 +73,8 @@ function AppContent() {
   useEffect(() => {
     if (isAuthenticated) {
       syncPrices();
-      // Also sync every 5 seconds for "sync by seconds" feel
-      const interval = setInterval(syncPrices, 5000);
+      // Also sync every 2 seconds for "sync by seconds" feel
+      const interval = setInterval(syncPrices, 2000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, syncPrices]);

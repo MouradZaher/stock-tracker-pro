@@ -21,6 +21,7 @@ export interface Stock {
   totalBuy: number | null;
   totalSell: number | null;
   lastUpdated: Date;
+  isFallback?: boolean;
 }
 
 export interface CompanyProfile {
@@ -71,6 +72,7 @@ export interface PortfolioPosition {
   currency?: string;  // e.g. 'USD', 'EGP', 'AED'
   marketValueUSD?: number; // Normalized value
   purchaseValueUSD?: number; // Normalized cost
+  isFallback?: boolean;
 }
 
 export interface PortfolioSummary {

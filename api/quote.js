@@ -34,6 +34,8 @@ const PRICE_FLOORS = {
     'SPY': 560.00,
     'QQQ': 420.00,
     'VTI': 230.00,
+    'TSLA': 300.00,
+    'NVDA': 120.00,
 };
 
 function getMarket(symbol) {
@@ -249,13 +251,13 @@ export default async function handler(req, res) {
     // Prices calibrated March 2026. LRCX 10:1 split Jun-2024. CMG 50:1 split Jun-2024.
     const PRICE_MAP = {
         // === MEGA-CAP TECH ===
-        'AAPL': 210.00, 'MSFT': 390.00, 'NVDA': 110.00, 'GOOGL': 168.00, 'GOOG': 169.00,
-        'META': 580.00, 'AMZN': 210.00, 'TSLA': 232.00, 'AVGO': 200.00, 'ORCL': 175.00,
-        'ADBE': 380.00, 'CRM': 300.00, 'AMD': 105.00, 'NFLX': 980.00, 'TSM': 185.00,
-        'ASML': 760.00, 'LRCX': 73.00,
-        'INTC': 20.00, 'TXN': 175.00, 'QCOM': 155.00,
-        'AMAT': 160.00, 'MU': 93.00, 'WDC': 43.00, 'SNDK': 43.00, 'IBM': 240.00,
-        'NOW': 950.00, 'PANW': 190.00, 'INTU': 620.00, 'PLTR': 90.00, 'AI': 26.00, 'SMCI': 38.00,
+        'AAPL': 242.00, 'MSFT': 425.00, 'NVDA': 136.00, 'GOOGL': 192.00, 'GOOG': 193.00,
+        'META': 595.00, 'AMZN': 224.00, 'TSLA': 367.50, 'AVGO': 210.00, 'ORCL': 185.00,
+        'ADBE': 410.00, 'CRM': 320.00, 'AMD': 145.00, 'NFLX': 1050.00, 'TSM': 195.00,
+        'ASML': 810.00, 'LRCX': 82.00,
+        'INTC': 24.00, 'TXN': 195.00, 'QCOM': 175.00,
+        'AMAT': 180.00, 'MU': 112.00, 'WDC': 58.00, 'SNDK': 58.00, 'IBM': 255.00,
+        'NOW': 1020.00, 'PANW': 210.00, 'INTU': 680.00, 'PLTR': 94.50, 'AI': 32.00, 'SMCI': 42.00,
         // === HEALTHCARE ===
         'UNH': 510.00, 'JNJ': 155.00, 'LLY': 810.00, 'ABBV': 190.00, 'MRK': 92.00,
         'PFE': 26.00, 'TMO': 495.00, 'ABT': 124.00, 'DHR': 195.00, 'ISRG': 540.00,
