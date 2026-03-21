@@ -25,7 +25,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete, onDecline
   if (step === 1) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 'var(--spacing-md)' }}>
-        <div className="glass-card" style={{ maxWidth: '700px', width: '100%', maxHeight: '85vh', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
+        <div className="glass-card animate-fade-in" style={{ maxWidth: '700px', width: '100%', maxHeight: '85vh', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
           <div style={{ padding: 'var(--spacing-xl)', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ background: 'var(--color-accent-light)', padding: '12px', borderRadius: 'var(--radius-full)' }}><Shield size={28} color="var(--color-accent)" /></div>
             <div>
@@ -60,7 +60,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete, onDecline
   if (step === 2) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 'var(--spacing-md)' }}>
-        <div className="glass-card" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
+        <div className="glass-card animate-fade-in" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
           <div style={{ textAlign: 'center' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>Welcome to Stock Tracker Pro</h2>
             <p style={{ color: 'var(--color-text-secondary)' }}>Here's what you can do with your account.</p>
@@ -103,7 +103,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete, onDecline
   if (step === 3) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 'var(--spacing-md)' }}>
-        <div className="glass-card" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
+        <div className="glass-card animate-fade-in" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
           <div style={{ textAlign: 'center' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>Connect Your Broker</h2>
             <p style={{ color: 'var(--color-text-secondary)' }}>Auto-sync your trades from 20+ brokerages — no manual entry needed.</p>
@@ -145,7 +145,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete, onDecline
   // STEP 4: Get Started
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 'var(--spacing-md)' }}>
-      <div className="glass-card" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
+      <div className="glass-card animate-fade-in" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>Get Started</h2>
           <p style={{ color: 'var(--color-text-secondary)' }}>Would you like to explore with sample data or start fresh?</p>

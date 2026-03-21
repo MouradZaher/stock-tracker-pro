@@ -69,7 +69,7 @@ const MiniSparkline: React.FC<MiniSparklineProps> = ({
     }
 
     return (
-        <svg width={width} height={height} style={{ overflow: 'visible', filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.3))' }}>
+        <svg width={width} height={height} style={{ overflow: 'visible', filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.3))', transform: 'translateZ(0)', willChange: 'transform' }}>
             <path
                 d={pathData}
                 fill="none"

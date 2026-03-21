@@ -136,12 +136,15 @@ const AIStrategyIntelliHub: React.FC = () => {
                         <div 
                             key={id}
                             onClick={() => handleRunStrategy(id)}
-                            className="glass-card-hover"
+                            className="glass-card interactive"
                             style={{
                                 padding: '1.25rem',
                                 borderRadius: '16px',
-                                background: isActive ? `${meta.color}15` : 'rgba(255,255,255,0.03)',
-                                border: `1px solid ${isActive ? meta.color : 'rgba(255,255,255,0.05)'}`,
+                                background: isActive ? `${meta.color}15` : 'var(--glass-bg)',
+                                backdropFilter: 'var(--glass-blur)',
+                                WebkitBackdropFilter: 'var(--glass-blur)',
+                                border: `1px solid ${isActive ? meta.color : 'var(--glass-border)'}`,
+                                boxShadow: 'var(--glass-shadow)',
                                 cursor: 'pointer',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 display: 'flex',
