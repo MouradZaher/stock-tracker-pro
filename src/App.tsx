@@ -220,21 +220,18 @@ function MainLayout({
             isOpen={isAdminOpen}
             onClose={() => setIsAdminOpen(false)}
           />
-
-          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', paddingTop: '96px', minHeight: '100vh' }}>
+          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', paddingTop: '96px', height: '100%', minHeight: '100dvh' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
-                <div className="tab-content" style={{ padding: 0, height: '100%' }}>
+                <div className={`tab-content ${!selectedSymbol ? 'home-tab-content' : ''}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
                   {!selectedSymbol ? (
                     <Dashboard onSelectSymbol={handleSelectSymbol} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', overflowY: 'auto', padding: '1rem' }}>
-                      <StockDetail
-                        symbol={selectedSymbol}
-                        onBack={() => setSelectedSymbol(null)}
-                      />
-                    </div>
+                    <StockDetail
+                      symbol={selectedSymbol}
+                      onBack={() => setSelectedSymbol(null)}
+                    />
                   )}
                 </div>
               } />
