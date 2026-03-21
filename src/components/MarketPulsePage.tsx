@@ -33,7 +33,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
     const scrollRef = React.useRef<HTMLDivElement>(null);
 
     return (
-        <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'rgba(5,5,15,0.85)', position: 'relative' }}>
+        <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)', position: 'relative' }}>
             {/* Stream Status Overlay */}
             <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10, display: 'flex', gap: '8px' }}>
                 <div style={{ background: 'rgba(0,255,100,0.2)', border: '1px solid #00FF66', borderRadius: '4px', padding: '2px 6px', fontSize: '0.6rem', color: '#00FF66', fontWeight: 900, backdropFilter: 'blur(4px)' }}>
@@ -58,7 +58,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             </div>
 
             {/* Channel Info + Controls */}
-            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.4)' }}>
+            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
                 <div>
                     <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white' }}>{active.logo} {active.fullName}</div>
                     <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{active.origin} • {active.region}</div>

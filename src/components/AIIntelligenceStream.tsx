@@ -46,7 +46,9 @@ const AIIntelligenceStream: React.FC = () => {
                 gap: '0.75rem',
                 padding: '0.5rem 1rem',
                 borderRadius: '12px',
-                background: 'rgba(10, 10, 20, 0.4)',
+                background: 'var(--glass-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                WebkitBackdropFilter: 'var(--glass-blur)',
                 border: '1px solid var(--color-accent-light)',
                 minHeight: '44px',
                 overflow: 'hidden'
