@@ -194,7 +194,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     );
 
     return (
-        <div className="watchlist-page dashboard-container" style={{ padding: '0 var(--spacing-md)' }}>
+        <div className="watchlist-page dashboard-container">
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',

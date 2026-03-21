@@ -305,7 +305,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     if (detailSymbol) {
         return (
-            <div className="portfolio-container ai-detail-view" style={{ paddingTop: '0', animation: 'fadeIn 0.3s ease', paddingBottom: '100px' }}>
+            <div className="tab-content ai-detail-view" style={{ paddingTop: '0', animation: 'fadeIn 0.3s ease' }}>
                 <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <button onClick={() => { setDetailSymbol(null); setDetailRec(null); setDetailStockData(null); }} className="btn btn-icon glass-button">
@@ -439,7 +439,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     // ─── MAIN OVERVIEW ───────────────────────────────────────────────────
     return (
-        <div className="portfolio-container tab-content-wrapper" style={{ paddingBottom: '120px' }}>
+        <div className="tab-content ai-recommendations-wrapper">
             {!detailSymbol && (
                 <div style={{ 
                     display: 'flex', 

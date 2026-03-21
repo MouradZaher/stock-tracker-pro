@@ -353,7 +353,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }, [positions]);
 
     return (
-        <div className="portfolio-container tab-content-wrapper">
+        <div className="tab-content portfolio-main-container">
             {/* ... existing header and summary ... */}
             <div className="portfolio-header" style={{
                 display: 'flex',

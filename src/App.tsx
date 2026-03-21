@@ -199,7 +199,7 @@ function MainLayout({
     <div className="app" style={{ display: 'flex', minHeight: '100vh' }}>
       <ErrorBoundary>
         <TopBar onSelectSymbol={handleSelectSymbol} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
           <Header
             activeTab={activeTab}
             onTabChange={handleTabChange}
@@ -220,7 +220,7 @@ function MainLayout({
             isOpen={isAdminOpen}
             onClose={() => setIsAdminOpen(false)}
           />
-          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', paddingTop: '96px', height: '100%', minHeight: '100dvh' }}>
+          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, boxSizing: 'border-box', paddingTop: '96px' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={

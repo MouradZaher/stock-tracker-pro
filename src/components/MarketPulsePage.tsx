@@ -329,16 +329,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div className="market-pulse-page tab-content-wrapper" style={{
-            maxWidth: '100%',
-            margin: '0 auto',
-            boxSizing: 'border-box',
-            background: 'var(--color-bg-primary)',
-            overflowX: 'hidden',
-            paddingRight: '0',
-            paddingBottom: 'var(--spacing-xl)',
-            paddingLeft: '0'
-        }}>
+        <div className="tab-content market-pulse-main">
             {/* ── Breaking News Ticker (Smooth Marquee) ── */}
             {breakingNews && breakingNews.length > 0 && (
                 <div
