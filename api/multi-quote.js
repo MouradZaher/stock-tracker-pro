@@ -47,14 +47,16 @@ const PRICE_FLOORS = {
     'GLD': 400.00,  // floor: $400 — broker confirmed $475.70
     'SLV': 55.00,   // floor: $55  — broker confirmed $77.52
     // S&P500 ETFs
-    'VOO': 580.00,  // floor: $580 — broker confirmed $620.75
-    'SPY': 560.00,
-    'QQQ': 420.00,
+    'VOO': 540.00,  // floor: $540 — current $597.94
+    'SPY': 530.00,
+    'QQQ': 520.00,  // floor: $520 — current $582.06
     // Index ETFs
-    'VTI': 230.00,
+    'VTI': 260.00,
     // Stocks (to detect broken/stale Yahoo data)
-    'TSLA': 300.00, // TSLA shouldn't be below $300 in Jan 2025
-    'NVDA': 120.00,
+    'TSLA': 320.00, // floor: $320 — current $367.96 
+    'NVDA': 150.00, // floor: $150 — current $172.70
+    'AAPL': 220.00, // floor: $220 — current $248.28
+    'NFLX': 80.00,  // floor: $80  — current $91.82 (Post-split)
 };
 
 function getMarket(symbol) {
@@ -342,9 +344,9 @@ export default async function handler(req, res) {
         // === Tier 5: PRICE_MAP static fallback === March 2026 calibration
         const PRICE_MAP = {
             // MEGA-CAP TECH
-            'AAPL': 242.00, 'MSFT': 425.00, 'NVDA': 136.00, 'GOOGL': 192.00, 'GOOG': 193.00,
-            'META': 595.00, 'AMZN': 224.00, 'TSLA': 367.50, 'AVGO': 210.00, 'ORCL': 185.00,
-            'ADBE': 410.00, 'CRM': 320.00, 'AMD': 145.00, 'NFLX': 1050.00, 'TSM': 195.00,
+            'AAPL': 248.28, 'MSFT': 381.87, 'NVDA': 172.70, 'GOOGL': 301.00, 'GOOG': 301.00,
+            'META': 593.66, 'AMZN': 205.37, 'TSLA': 367.96, 'AVGO': 310.51, 'ORCL': 185.00,
+            'ADBE': 510.00, 'CRM': 320.00, 'AMD': 193.85, 'NFLX': 91.82, 'TSM': 195.00,
             'ASML': 810.00, 'LRCX': 82.00,
             'INTC': 24.00, 'TXN': 195.00, 'QCOM': 175.00,
             'AMAT': 180.00, 'MU': 112.00, 'WDC': 58.00, 'SNDK': 58.00, 'IBM': 255.00,

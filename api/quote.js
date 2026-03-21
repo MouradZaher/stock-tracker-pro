@@ -251,9 +251,9 @@ export default async function handler(req, res) {
     // Prices calibrated March 2026. LRCX 10:1 split Jun-2024. CMG 50:1 split Jun-2024.
     const PRICE_MAP = {
         // === MEGA-CAP TECH ===
-        'AAPL': 242.00, 'MSFT': 425.00, 'NVDA': 136.00, 'GOOGL': 192.00, 'GOOG': 193.00,
-        'META': 595.00, 'AMZN': 224.00, 'TSLA': 367.50, 'AVGO': 210.00, 'ORCL': 185.00,
-        'ADBE': 410.00, 'CRM': 320.00, 'AMD': 145.00, 'NFLX': 1050.00, 'TSM': 195.00,
+        'AAPL': 248.28, 'MSFT': 381.87, 'NVDA': 172.70, 'GOOGL': 301.00, 'GOOG': 301.00,
+        'META': 593.66, 'AMZN': 205.37, 'TSLA': 367.96, 'AVGO': 310.51, 'ORCL': 185.00,
+        'ADBE': 510.00, 'CRM': 320.00, 'AMD': 193.85, 'NFLX': 91.82, 'TSM': 195.00,
         'ASML': 810.00, 'LRCX': 82.00,
         'INTC': 24.00, 'TXN': 195.00, 'QCOM': 175.00,
         'AMAT': 180.00, 'MU': 112.00, 'WDC': 58.00, 'SNDK': 58.00, 'IBM': 255.00,
