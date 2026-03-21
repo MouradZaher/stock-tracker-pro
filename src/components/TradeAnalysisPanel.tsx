@@ -150,19 +150,21 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
             {/* Collapsible Header */}
             <button
                 onClick={() => setExpanded(p => !p)}
+                className="hover-glow"
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     width: '100%',
-                    padding: '1rem 1.25rem',
+                    padding: '1.25rem 1.5rem',
                     background: expanded
-                        ? 'rgba(99, 102, 241, 0.08)'
-                        : 'rgba(255,255,255,0.03)',
-                    border: `1px solid ${expanded ? 'rgba(99,102,241,0.25)' : 'var(--glass-border)'}`,
-                    borderRadius: expanded ? '14px 14px 0 0' : '14px',
+                        ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)'
+                        : 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+                    border: `1px solid ${expanded ? 'rgba(99,102,241,0.3)' : 'var(--glass-border)'}`,
+                    borderRadius: expanded ? '16px 16px 0 0' : '16px',
                     cursor: 'pointer',
-                    transition: 'all 0.25s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: expanded ? '0 4px 20px rgba(99,102,241,0.15)' : '0 4px 15px rgba(0,0,0,0.1)',
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -253,26 +255,27 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
                 <div
                     className="panel-expansion"
                     style={{
-                        border: '1px solid rgba(99,102,241,0.25)',
+                        border: '1px solid rgba(99,102,241,0.3)',
                         marginTop: showConfig ? '0.5rem' : '0',
                         borderTop: 'none',
-                        borderRadius: '0 0 14px 14px',
+                        borderRadius: '0 0 16px 16px',
                         padding: '1.5rem',
-                        background: 'rgba(10, 10, 20, 0.5)',
-                        backdropFilter: 'blur(10px)',
+                        background: 'rgba(10, 10, 20, 0.6)',
+                        backdropFilter: 'blur(20px)',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '1.25rem',
+                        gap: '1.5rem',
                     }}>
 
                     {/* AI Thesis */}
-                    <div style={{
-                        padding: '1.25rem',
+                    <div className="hover-glow" style={{
+                        padding: '1.5rem',
                         background: analysis.setup.bias === 'BULLISH' ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)' :
                             analysis.setup.bias === 'BEARISH' ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%)' :
                                 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%)',
-                        border: `1px solid ${analysis.setup.bias === 'BULLISH' ? 'var(--color-success-light)' : analysis.setup.bias === 'BEARISH' ? 'var(--color-error)' : 'var(--color-warning)'}`,
-                        borderRadius: '12px',
+                        border: `1px solid ${analysis.setup.bias === 'BULLISH' ? 'rgba(16, 185, 129, 0.3)' : analysis.setup.bias === 'BEARISH' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+                        borderRadius: '16px',
+                        boxShadow: `0 4px 20px ${analysis.setup.bias === 'BULLISH' ? 'rgba(16, 185, 129, 0.1)' : analysis.setup.bias === 'BEARISH' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)'}`,
                         marginBottom: '0.5rem'
                     }}>
                         <h3 style={{

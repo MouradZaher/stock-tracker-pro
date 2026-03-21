@@ -37,17 +37,17 @@ const LiveMomentum: React.FC<{ symbol: string }> = ({ symbol }) => {
     const color = momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)';
     
     return (
-        <div className="alpha-card" style={{ padding: '1rem', borderTop: `3px solid ${color}` }}>
-            <div className="alpha-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div className="alpha-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', borderTop: `4px solid ${color}`, background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+            <div className="alpha-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', letterSpacing: '0.1em' }}>
                 <span>LIVE MOMENTUM FLOW</span>
-                <span className="pulse-dot" style={{ width: '6px', height: '6px', background: color }}></span>
+                <span className="pulse-dot" style={{ width: '8px', height: '8px', background: color, boxShadow: `0 0 10px ${color}` }}></span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <div className="alpha-value" style={{ color }}>{momentum.toFixed(1)}%</div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>{momentum > 50 ? 'ACCUMULATING' : 'RETRACING'}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '0.5rem' }}>
+                <div className="alpha-value" style={{ color, fontSize: '2rem', fontWeight: 900, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{momentum.toFixed(1)}%</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>{momentum > 50 ? 'ACCUMULATING' : 'RETRACING'}</div>
             </div>
-            <div className="momentum-meter">
-                <div className="momentum-bar" style={{ width: `${momentum}%`, background: color }} />
+            <div className="momentum-meter" style={{ height: '6px', marginTop: '1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div className="momentum-bar" style={{ width: `${momentum}%`, background: color, height: '100%', transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 10px ${color}` }} />
             </div>
         </div>
     );
@@ -144,11 +144,15 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     return (
         <div className="stock-detail">
             {/* Header */}
-            <div className="stock-header glass-card" style={{
-                padding: 'var(--spacing-lg)',
+            <div className="stock-header glass-card hover-glow" style={{
+                padding: '2.5rem',
                 marginBottom: 'var(--spacing-xl)',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%)',
+                border: '1px solid var(--glass-border)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                borderRadius: '24px'
             }}>
                 <div style={{
                     position: 'absolute',

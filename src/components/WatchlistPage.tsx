@@ -175,20 +175,21 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     };
 
     const EmptyState = () => (
-        <div style={{
+        <div className="hover-glow" style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '4rem 2rem',
             textAlign: 'center',
-            background: 'rgba(255,255,255,0.02)',
-            borderRadius: 'var(--radius-lg)',
-            border: '1px dashed var(--glass-border)'
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+            borderRadius: '24px',
+            border: '1px dashed var(--glass-border)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
         }}>
-            <Star size={40} color="var(--color-warning)" style={{ opacity: 0.3, marginBottom: '1rem' }} />
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Your watchlist is empty</h3>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', maxWidth: '300px' }}>
+            <Star size={48} color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 15px rgba(245, 158, 11, 0.4))', marginBottom: '1rem' }} />
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 800 }}>Your watchlist is empty</h3>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', maxWidth: '300px', lineHeight: 1.5 }}>
                 Search for symbols above or use the quick add options below.
             </p>
         </div>
@@ -231,7 +232,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                             <p style={{ color: 'var(--color-text-tertiary)' }}>Fetching market data...</p>
                         </div>
                     ) : (
-                        <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                        <div className="glass-card hover-glow" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                             <table className="compact-table">
                                 <thead>
                                     <tr>

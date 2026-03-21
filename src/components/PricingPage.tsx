@@ -18,24 +18,25 @@ const PricingPage: React.FC = () => {
   };
 
   const PlanCard = ({ title, monthPrice, yearPrice, features, recommended = false }: any) => (
-    <div style={{
-      background: recommended ? 'var(--gradient-primary)' : 'var(--glass-bg)',
+    <div className={recommended ? "hover-glow" : "glass-card"} style={{
+      background: recommended ? 'linear-gradient(135deg, var(--color-accent) 0%, #4F46E5 100%)' : 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
       border: '1px solid',
-      borderColor: recommended ? 'transparent' : 'var(--color-border)',
+      borderColor: recommended ? 'rgba(255,255,255,0.2)' : 'var(--glass-border)',
       borderRadius: '24px',
-      padding: '1rem',
+      padding: '2rem 1.5rem',
       display: 'flex',
       flexDirection: 'column',
-      gap: '0.75rem',
+      gap: '1rem',
       flex: '1',
       minWidth: '280px',
       maxHeight: '100%',
       minHeight: 0,
       position: 'relative',
       overflow: 'hidden',
-      boxShadow: recommended ? '0 20px 40px rgba(59, 130, 246, 0.2)' : 'none',
-      transform: recommended ? 'scale(1.02)' : 'none',
-      zIndex: recommended ? 2 : 1
+      boxShadow: recommended ? '0 20px 40px rgba(99, 102, 241, 0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+      transform: recommended ? 'scale(1.04)' : 'none',
+      zIndex: recommended ? 2 : 1,
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
     }}>
       {recommended && (
         <div style={{
@@ -69,12 +70,13 @@ const PricingPage: React.FC = () => {
       </div>
 
       <button
+        className="hover-glow"
         onClick={() => handleSelectPlan(title)}
         style={{
           width: '100%',
-          padding: '1rem',
-          borderRadius: '12px',
-          background: recommended ? 'white' : 'var(--color-accent)',
+          padding: '1.25rem',
+          borderRadius: '16px',
+          background: recommended ? 'white' : 'linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%)',
           color: recommended ? 'var(--color-accent)' : 'white',
           border: 'none',
           fontSize: '1rem',
@@ -85,7 +87,8 @@ const PricingPage: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           gap: '8px',
-          transition: 'transform 0.2s',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: recommended ? '0 8px 16px rgba(0,0,0,0.1)' : '0 8px 16px rgba(99, 102, 241, 0.2)',
         }}
         onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
         onMouseOut={e => e.currentTarget.style.transform = 'none'}
