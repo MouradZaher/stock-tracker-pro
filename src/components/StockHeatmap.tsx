@@ -79,8 +79,11 @@ const StockHeatmap: React.FC = () => {
 
                 const widgetContainer = document.createElement('div');
                 widgetContainer.className = 'tradingview-widget-container__widget';
-                widgetContainer.style.height = '100%';
-                widgetContainer.style.width = '100%';
+                widgetContainer.style.position = 'absolute';
+                widgetContainer.style.top = '0';
+                widgetContainer.style.bottom = '0';
+                widgetContainer.style.left = '0';
+                widgetContainer.style.right = '0';
 
                 container.appendChild(widgetContainer);
                 widgetContainer.appendChild(script);
@@ -132,10 +135,11 @@ const StockHeatmap: React.FC = () => {
                         className="tradingview-widget-container"
                         ref={containerRef}
                         style={{
-                            flex: 1,
-                            width: '100%',
-                            height: '100%',
-                            position: 'relative',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
                             overflow: 'hidden',
                             touchAction: 'pan-x pan-y',
                             pointerEvents: 'auto',
