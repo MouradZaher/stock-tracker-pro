@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, TrendingUp, TrendingDown, Clock, Info, ExternalLink, Activity, PieChart, Shield, Target, Plus, Bell, Trash2, Save, X, Edit, Layers, Globe, Sparkles, Users, Briefcase, DollarSign } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, Info, ExternalLink, Activity, PieChart, Shield, Target, Plus, Bell, Trash2, Save, X, Edit, Layers, Globe, Sparkles, Users, Briefcase, DollarSign, Zap } from 'lucide-react';
 
 import { getStockData, getStockNews } from '../services/stockDataService';
 import { REFRESH_INTERVALS } from '../services/api';
@@ -564,6 +564,13 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         {[
                             { id: 'wall-street', label: 'Wall Street Research', icon: <Briefcase size={16} /> },
                             { id: 'financial-breakdown', label: '5Y Financial Audit', icon: <DollarSign size={16} /> },
+                            { id: 'earnings-quality', label: 'Earnings Quality Forensic', icon: <Shield size={16} /> },
+                            { id: 'earnings-call', label: 'Earnings Call Intel', icon: <Activity size={16} /> },
+                            { id: 'short-thesis', label: 'Short Thesis Constructor', icon: <TrendingDown size={16} /> },
+                            { id: 'macro-regime', label: 'Macro Regime Positioning', icon: <Globe size={16} /> },
+                            { id: 'activist-setup', label: 'Activist & Event Setup', icon: <Users size={16} /> },
+                            { id: 'thirteen-f-intel', label: '13F Holdings Intel', icon: <Layers size={16} /> },
+                            { id: 'competitive-intel', label: 'Competitive Intel Brief', icon: <Zap size={16} /> },
                             { id: 'moat-analysis', label: 'Competitive Moat', icon: <Shield size={16} /> },
                             { id: 'valuation', label: 'DCF Valuation Model', icon: <Target size={16} /> },
                             { id: 'risk-analysis', label: 'Strategic Risk Matrix', icon: <Activity size={16} /> },

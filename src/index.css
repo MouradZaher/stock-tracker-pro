@@ -334,9 +334,9 @@ html[data-theme='light'] {
   }
 
   .home-tab-content {
-    min-height: calc(100vh - (var(--header-height) + 32px)) !important;
-    padding: 1rem !important;
-    /* Contain it for better aesthetics */
+    height: calc(100vh - 96px) !important;
+    min-height: calc(100vh - 96px) !important;
+    padding: 0 !important;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -426,6 +426,14 @@ html[data-theme='light'] {
   padding-top: 1rem;
   width: 100%;
   height: 100%;
+  padding-bottom: 90px; /* Clear mobile nav footer */
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .tab-content {
+    padding-bottom: 2rem;
+  }
 }
 
 @keyframes tab-entry {

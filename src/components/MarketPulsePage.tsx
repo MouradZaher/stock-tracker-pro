@@ -49,8 +49,8 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Video Player */}
             <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
                 <iframe
-                    key={`${active.channelId}-${muted}`}
-                    src={`https://www.youtube.com/embed/live_stream?channel=${active.channelId}&autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en&origin=https://stocktracker.pro`}
+                    key={`${active.fallbackId || active.channelId}-${muted}`}
+                    src={`https://www.youtube.com/embed/${active.fallbackId || 'live_stream?channel=' + active.channelId}?autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
