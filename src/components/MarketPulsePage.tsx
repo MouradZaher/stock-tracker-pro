@@ -9,7 +9,6 @@ import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../
 import { useMarket } from '../contexts/MarketContext';
 import EarningsCalendar from './EarningsCalendar';
 import OptionsFlowSimulator from './OptionsFlowSimulator';
-import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -412,98 +411,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
             </div>
 
-            {/* ═══ GLOBAL MACRO INTELLIGENCE ═══ */}
-            <div style={{
-                marginBottom: '1.25rem',
-                margin: '0 1rem 1.25rem 1rem',
-                padding: '1.25rem',
-                background: 'rgba(59, 130, 246, 0.08)',
-                borderRadius: '16px',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
-            }}>
-                <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'rgba(59, 130, 246, 0.1)', filter: 'blur(80px)', borderRadius: '50%', pointerEvents: 'none' }}></div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', position: 'relative', zIndex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{
-                            padding: '6px',
-                            borderRadius: '8px',
-                            background: 'rgba(59, 130, 246, 0.15)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            animation: 'pulse-blue 3s infinite ease-in-out',
-                            boxShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
-                        }}>
-                            <Globe size={18} color="#3b82f6" />
-                        </div>
-                        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Global Macro Intelligence</h2>
-                    </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', position: 'relative', zIndex: 1 }}>
-                    {(macroData.length > 0 ? macroData : []).map((item, i) => (
-                        <div key={i} className="glass-card-hover" style={{
-                            padding: '1.25rem',
-                            background: 'rgba(255,255,255,0.03)',
-                            borderRadius: '16px',
-                            border: '1px solid rgba(255,255,255,0.05)'
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
-                                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white' }}>{item.label}</div>
-                                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: item.color, background: `${item.color}15`, padding: '2px 8px', borderRadius: '6px', textTransform: 'uppercase', border: `1px solid ${item.color}30` }}>{item.status}</div>
-                            </div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: '0 0 12px 0', minHeight: '3em' }}>{item.desc}</p>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>TACTICAL_ACTION:</div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <Zap size={10} /> {item.action}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* ═══ AI STRATEGY INTELLIGENCE HUB ═══ */}
-            <div style={{ margin: '0 1rem 2rem 1rem' }}>
-                <AIStrategyIntelliHub />
-            </div>
-
-
-            {/* ═══ LIVE AI ALPHA INTELLIGENCE ═══ */}
-            <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                    <div className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }}></div>
-                    <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Top Alpha Recommendations</h2>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
-                    {(MARKET_ALPHA[effectiveMarket.id] || MARKET_ALPHA.us).map((stock, idx) => (
-                        <div key={idx} className="glass-card-hover" style={{
-                            minWidth: '160px',
-                            padding: '1.25rem',
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-                            borderRadius: '16px',
-                            border: '1px solid var(--glass-border)',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
-                        }} onClick={() => handleAction(stock.symbol)}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                <span style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{stock.symbol}</span>
-                                <span style={{ fontSize: '0.75rem', fontWeight: 900, color: stock.color, background: `${stock.color}15`, padding: '2px 6px', borderRadius: '6px' }}>{stock.score}%</span>
-                            </div>
-                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'white', background: `${stock.color}30`, padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase', width: 'fit-content', border: `1px solid ${stock.color}40` }}>
-                                {stock.rec}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* ═══ LIVE WORLD FINANCIAL NETWORKS ═══ */}
             <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem' }}>
@@ -523,7 +430,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 margin: '0 1rem 1.5rem 1rem'
             }}>
                 {/* Fear & Greed Gauge */}
-                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                         <div>
                             <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -543,15 +450,15 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     </div>
                 </div>
 
-                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                     <EarningsCalendar />
                 </div>
                 
-                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                     <OptionsFlowSimulator />
                 </div>
 
-                <div className="glass-card" style={{ padding: '1.25rem' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                     <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Layers size={14} /> Industry Rotation
                     </h3>
@@ -576,7 +483,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 {/* X Feed */}
-                <div className="glass-card" style={{ padding: '1.25rem', gridColumn: 'span 2' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.25rem', gridColumn: 'span 2', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                     <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <MessageSquare size={14} color="#1DA1F2" /> Social Sentiment Flow
                     </h3>
