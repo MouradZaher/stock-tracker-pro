@@ -111,6 +111,18 @@
         font-size: 0.6rem !important;
         border-radius: 8px !important;
         line-height: 1;
+        position: relative;
+    }
+
+    /* Expand touch target to 44x44px for Apple HIG compliance */
+    .header-actions button::after {
+        content: '';
+        position: absolute;
+        top: -11px;
+        bottom: -11px;
+        left: -11px;
+        right: -11px;
+        z-index: 10;
     }
 
     /* Force icon sizing inside action buttons */
