@@ -344,7 +344,33 @@ html[data-theme='light'] {
   box-shadow: var(--glass-shadow);
 }
 
-/* Heatmap Responsive Wrapper — Contained for both mobile and desktop */
+/* ============================================================
+   GLOBAL HEATMAP & HOME TAB FLUID LAYOUT
+   ============================================================ */
+body:has(.home-tab-content) {
+  overflow-y: hidden !important; /* Lock outer scroll, let interior handle it */
+}
+
+.main-content:has(.home-tab-content) {
+  padding-top: var(--total-header-height) !important;
+  padding-bottom: 0 !important;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.home-tab-content {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .heatmap-main-wrapper {
   flex: 1;
   width: 100%;
@@ -355,69 +381,24 @@ html[data-theme='light'] {
 }
 
 .heatmap-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  flex: 1;
+  position: relative;
+  width: 100%;
+  min-height: 0;
   border-radius: 0;
   overflow: hidden;
   z-index: 50;
   background: var(--color-bg-primary);
   border: none;
-  touch-action: none;
+  touch-action: pan-x pan-y;
 }
 
+/* Ensure mobile nav clearance */
 @media (max-width: 768px) {
-  .heatmap-wrapper {
-    /* Ensure absolute heatmap doesn't go under fixed footer */
-    bottom: 85px !important;
-  }
-}
-
-@media (min-width: 768px) {
-  .heatmap-wrapper {
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    border-radius: 0;
-    border: none;
-  }
-}
-
-/* ============================================================
-   LOCKED: Desktop Home Tab Layout - DO NOT MODIFY
-   Final layout approved 2026-02-16. Any changes to this block
-   will break the heatmap sizing on desktop.
-   ============================================================ */
-@media (min-width: 1025px) {
-  body:has(.home-tab-content) {
-    overflow-y: hidden !important;
-  }
-
-  .main-content:has(.home-tab-content) {
-    padding-top: var(--total-header-height) !important;
-    padding-bottom: 0 !important;
-  }
-
   .home-tab-content {
-    flex: 1;
-    height: 100%;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .heatmap-wrapper {
-    flex: 1;
-    position: relative;
-    width: 100%;
-    min-height: 0;
+    padding-bottom: 85px; /* Offset for mobile bottom nav */
   }
 }
-
 /* END LOCKED: Desktop Home Tab Layout */
 
 .ai-signal-card {
