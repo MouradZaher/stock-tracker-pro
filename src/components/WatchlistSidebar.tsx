@@ -7,6 +7,7 @@ import { formatCurrency, formatPercent, getChangeClass } from '../utils/formatte
 import type { Stock } from '../types';
 import { useMarket } from '../contexts/MarketContext';
 import RealTimePrice from './RealTimePrice';
+import CompanyLogo from './CompanyLogo';
 
 interface WatchlistSidebarProps {
     isOpen: boolean;
@@ -129,18 +130,20 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                                         onSelectSymbol(symbol);
                                         onClose();
                                     }}>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                                                <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>{symbol}</span>
-                                                {stock && (
-                                                    <RealTimePrice 
-                                                        price={stock.price} 
-                                                        isFallback={stock.isFallback}
-                                                        showCurrency={true} 
-                                                        style={{ fontSize: '0.9rem' }} 
-                                                    />
-                                                )}
-                                            </div>
+                                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <CompanyLogo symbol={symbol} size={32} />
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                                    <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>{symbol}</span>
+                                                    {stock && (
+                                                        <RealTimePrice 
+                                                            price={stock.price} 
+                                                            isFallback={stock.isFallback}
+                                                            showCurrency={true} 
+                                                            style={{ fontSize: '0.9rem' }} 
+                                                        />
+                                                    )}
+                                                </div>
                                             {stock ? (
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                                                     <span style={{ color: 'var(--color-text-secondary)' }}>{stock.name.substring(0, 15)}{stock.name.length > 15 ? '...' : ''}</span>
@@ -152,6 +155,7 @@ const WatchlistSidebar: React.FC<WatchlistSidebarProps> = ({ isOpen, onClose, on
                                             ) : (
                                                 <div className="skeleton" style={{ height: '1rem', width: '100%' }} />
                                             )}
+                                            </div>
                                         </div>
                                         <button
                                             className="btn-icon delete-btn"

@@ -6,6 +6,7 @@ import { formatCurrency } from '../utils/formatters';
 import CorrelationMatrix from './CorrelationMatrix';
 import OptionsFlowSimulator from './OptionsFlowSimulator';
 import AlphaForesightPlot from './AlphaForesightPlot';
+import CompanyLogo from './CompanyLogo';
 
 const PortfolioIntelligencePanel: React.FC = () => {
     const { positions } = usePortfolioStore();
@@ -146,6 +147,7 @@ const PortfolioIntelligencePanel: React.FC = () => {
                                             <div className="p-1.5 rounded-lg bg-red-500/10 text-red-400">
                                                 <AlertTriangle size={14} />
                                             </div>
+                                            <CompanyLogo symbol={opp.symbol} size={20} className="ml-1" />
                                             <h4 className="m-0 text-sm font-black tracking-tight">{opp.symbol} Yield Optimization</h4>
                                         </div>
                                         <div className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-tighter border border-red-500/20">
@@ -213,7 +215,10 @@ const PortfolioIntelligencePanel: React.FC = () => {
                             {entryPoints.map((p, i) => (
                                 <div key={i} className="glass-card p-6 border border-white/5 relative overflow-hidden" style={{ borderRadius: '24px' }}>
                                     <div className="flex align-items-center justify-content-between mb-4">
-                                        <div className="text-xl font-black text-white">{p.symbol}</div>
+                                        <div className="flex align-items-center gap-2">
+                                            <CompanyLogo symbol={p.symbol} size={28} />
+                                            <div className="text-xl font-black text-white">{p.symbol}</div>
+                                        </div>
                                         <div className="text-[10px] font-black uppercase bg-blue-500 text-white px-2 py-0.5 rounded">
                                             {p.confidence}% CONFIDENCE
                                         </div>

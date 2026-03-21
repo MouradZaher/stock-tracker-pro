@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 import { searchSymbols } from '../services/stockDataService';
+import CompanyLogo from './CompanyLogo';
 
 interface SymbolSearchInputProps {
     onSelect: (symbol: string) => void;
@@ -166,9 +167,12 @@ const SymbolSearchInput: React.FC<SymbolSearchInputProps> = ({
                             onClick={() => handleSelect(result.symbol)}
                             onMouseEnter={() => setSelectedIndex(index)}
                         >
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{result.symbol}</span>
-                                <span style={{ fontSize: '0.75rem', opacity: 0.6, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{result.name}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <CompanyLogo symbol={result.symbol} size={32} />
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{result.symbol}</span>
+                                    <span style={{ fontSize: '0.75rem', opacity: 0.6, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{result.name}</span>
+                                </div>
                             </div>
                             <span style={{ fontSize: '0.7rem', opacity: 0.5, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{result.type}</span>
                         </div>

@@ -18,7 +18,7 @@ import { analyzeSymbol, getTacticalRebalancing, type RebalancingAction } from '.
 import type { StockRecommendation } from '../types';
 import RealTimePrice from './RealTimePrice';
 import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
-
+import CompanyLogo from './CompanyLogo';
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
 }
@@ -752,20 +752,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                         >
                                                             <td style={{ paddingLeft: '1.5rem' }}>
                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                                    <div style={{
-                                                                        width: '32px',
-                                                                        height: '32px',
-                                                                        borderRadius: '8px',
-                                                                        background: 'rgba(255,255,255,0.05)',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center',
-                                                                        fontSize: '0.75rem',
-                                                                        fontWeight: 800,
-                                                                        color: 'var(--color-accent)'
-                                                                    }}>
-                                                                        {position.symbol.substring(0, 1)}
-                                                                    </div>
+                                                                    <CompanyLogo symbol={position.symbol} size={36} />
                                                                     <div>
                                                                         <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{position.symbol}</div>
                                                                         <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{position.name}</div>

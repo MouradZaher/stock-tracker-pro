@@ -1,6 +1,7 @@
 import React from 'react';
 import { Zap, TrendingUp, TrendingDown, Target, MousePointerClick } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
+import CompanyLogo from './CompanyLogo';
 
 interface OptionsTrade {
     symbol: string;
@@ -37,11 +38,14 @@ const OptionsFlowSimulator: React.FC = () => {
                 <div key={i} className="glass-card p-3 animate-in fade-in duration-500" style={{ borderRadius: '16px', background: 'rgba(255,255,255,0.02)' }}>
                     <div className="flex align-items-center justify-content-between">
                         <div className="flex align-items-center gap-2">
-                            <span className="text-sm font-black text-white">{trade.symbol}</span>
-                            <span className={`px-1.5 py-0.5 rounded text-[8px] font-black ${trade.type === 'CALL' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                {trade.strike} {trade.type}
-                            </span>
-                            <span className="text-[10px] text-slate-500 font-bold">{trade.expiry}</span>
+                            <CompanyLogo symbol={trade.symbol} size={24} />
+                            <div className="flex align-items-center gap-2">
+                                <span className="text-sm font-black text-white">{trade.symbol}</span>
+                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-black ${trade.type === 'CALL' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                    {trade.strike} {trade.type}
+                                </span>
+                                <span className="text-[10px] text-slate-500 font-bold">{trade.expiry}</span>
+                            </div>
                         </div>
                         <div className={`text-xs font-black ${trade.sentiment === 'Bullish' ? 'text-green-400' : 'text-red-400'}`}>
                             {formatCurrency(trade.value)}
