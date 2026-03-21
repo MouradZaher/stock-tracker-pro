@@ -14,11 +14,10 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
 
     const navItems: { id: TabType; label: string; icon: React.ElementType }[] = [
         { id: 'home', label: 'Home', icon: LayoutDashboard },
-        { id: 'recommendations', label: 'AI', icon: Brain },
         { id: 'watchlist', label: 'Watch', icon: List },
+        { id: 'recommendations', label: 'Command', icon: Brain }, // This will be the central button
         { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
         { id: 'pulse', label: 'Pulse', icon: Activity },
-        { id: 'pricing', label: 'Pro', icon: Star },
     ];
 
     const handleTabClick = (tabId: TabType) => {
@@ -40,95 +39,89 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
 
     return (
         <nav
-            className="mobile-nav-container"
+            className="mobile-nav-container glass-glow"
             role="navigation"
             aria-label="Main navigation"
             style={{
-                /* ─── LOCKED: pinned to absolute bottom of viewport ─── */
                 position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                width: '100%',
+                bottom: 20, // Floating look
+                left: '5%',
+                right: '5%',
+                width: '90%',
                 zIndex: 1001,
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-                background: 'var(--glass-bg)',
-                backdropFilter: 'var(--glass-blur)',
-                WebkitBackdropFilter: 'var(--glass-blur)',
-                borderTop: '1px solid var(--glass-border)',
-                boxShadow: '0 -4px 24px rgba(0,0,0,0.3)',
+                background: 'rgba(15, 15, 25, 0.85)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02)',
+                borderRadius: '24px',
             }}
         >
-            {/* Nav pill — equal-width tabs across 390px */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-around',
-                padding: '5px 0',
+                padding: '8px 5px',
                 width: '100%',
+                position: 'relative'
             }}>
-                {navItems.map((item) => {
+                {navItems.map((item, index) => {
                     const isActive = activeTab === item.id;
-                    const isAI = item.id === 'recommendations';
+                    const isCommand = item.id === 'recommendations';
                     const IconComponent = item.icon;
 
-                    const accentColor = isAI ? '#c084fc' : 'var(--color-accent)';
-                    const accentBg = isAI
-                        ? 'linear-gradient(135deg, rgba(139,92,246,0.28), rgba(168,85,247,0.28))'
-                        : 'var(--color-accent-light)';
-                    const accentShadow = isAI
-                        ? '0 0 16px rgba(168,85,247,0.35)'
-                        : '0 0 14px rgba(99,102,241,0.3)';
+                    if (isCommand) {
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => handleTabClick(item.id)}
+                                style={{
+                                    width: '64px',
+                                    height: '64px',
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, var(--color-accent), #c084fc)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '4px solid rgba(15, 15, 25, 0.9)',
+                                    boxShadow: '0 8px 16px rgba(0,0,0,0.3), 0 0 20px rgba(139, 92, 246, 0.4)',
+                                    marginTop: '-35px', // Lifted
+                                    position: 'relative',
+                                    zIndex: 10,
+                                    cursor: 'pointer',
+                                    WebkitTapHighlightColor: 'transparent',
+                                    transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                    color: 'white'
+                                }}
+                                className="command-hub-btn"
+                            >
+                                <IconComponent size={30} strokeWidth={2.5} />
+                            </button>
+                        );
+                    }
 
                     return (
                         <button
                             key={item.id}
                             onClick={() => handleTabClick(item.id)}
                             aria-label={item.label}
-                            aria-current={isActive ? 'page' : undefined}
                             style={{
-                                /* Flex child — equal share of 390px width */
                                 flex: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '3px',
-                                padding: '4px 2px',
+                                gap: '4px',
                                 background: 'transparent',
                                 border: 'none',
                                 cursor: 'pointer',
                                 WebkitTapHighlightColor: 'transparent',
-                                transition: 'transform 0.15s ease',
+                                color: isActive ? 'var(--color-accent)' : 'rgba(255,255,255,0.4)',
+                                transition: 'all 0.2s ease',
                             }}
                         >
-                            {/* Icon container */}
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '30px',
-                                height: '26px',
-                                borderRadius: '8px',
-                                background: isActive ? accentBg : 'transparent',
-                                color: isActive ? accentColor : 'var(--color-text-tertiary)',
-                                boxShadow: isActive ? accentShadow : 'none',
-                                transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
-                            }}>
-                                <IconComponent size={17} strokeWidth={isActive ? 2.5 : 1.8} />
-                            </div>
-
-                            {/* Label */}
-                            <span style={{
-                                fontSize: '0.58rem',
-                                fontWeight: isActive ? 700 : 500,
-                                color: isActive ? accentColor : 'var(--color-text-tertiary)',
-                                letterSpacing: '0.01em',
-                                transition: 'color 0.2s ease',
-                                lineHeight: 1,
-                            }}>
-                                {item.label}
-                            </span>
+                             <IconComponent size={20} strokeWidth={isActive ? 2.5 : 1.5} />
+                             <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500 }}>{item.label}</span>
                         </button>
                     );
                 })}

@@ -5,6 +5,7 @@ import { portfolioAnalyticsService, type StressTestResult, type TaxLossOpportuni
 import { formatCurrency } from '../utils/formatters';
 import CorrelationMatrix from './CorrelationMatrix';
 import OptionsFlowSimulator from './OptionsFlowSimulator';
+import AlphaForesightPlot from './AlphaForesightPlot';
 
 const PortfolioIntelligencePanel: React.FC = () => {
     const { positions } = usePortfolioStore();
@@ -232,7 +233,7 @@ const PortfolioIntelligencePanel: React.FC = () => {
                 )}
 
                 {activeTab === 'alpha' && benchmarkData && (
-                    <div className="flex flex-column gap-4">
+                    <div className="flex flex-column gap-6">
                         <div className="mb-2">
                             <h3 className="text-lg font-bold text-white flex align-items-center gap-2">
                                 <BarChart3 size={18} className="text-purple-400" />
@@ -269,6 +270,9 @@ const PortfolioIntelligencePanel: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Mega Deep Dive advanced visualization */}
+                        <AlphaForesightPlot />
 
                         <div className="p-5 bg-blue-600/5 border border-blue-600/10 rounded-2xl">
                             <p className="m-0 text-xs text-blue-400/80 leading-relaxed font-medium">

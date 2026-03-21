@@ -74,6 +74,9 @@ interface MarketContextType {
     setHoverMarket: (id: MarketId | null) => void;
     /** Resolves the effective market: hover preview if active, otherwise the committed selection */
     effectiveMarket: Market;
+    /** Global market sentiment score (0-100) */
+    sentimentScore: number;
+    setSentimentScore: (score: number) => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -81,6 +84,7 @@ const MarketContext = createContext<MarketContextType | undefined>(undefined);
 export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [selectedMarketId, setSelectedMarketId] = useState<MarketId>('us');
     const [hoverMarketId, setHoverMarketId] = useState<MarketId | null>(null);
+    const [sentimentScore, setSentimentScore] = useState<number>(50);
 
     const selectedMarket = MARKETS.find(m => m.id === selectedMarketId) ?? MARKETS[0];
     const effectiveMarket = (hoverMarketId ? MARKETS.find(m => m.id === hoverMarketId) : null) ?? selectedMarket;
@@ -89,7 +93,15 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const setHoverMarket = (id: MarketId | null) => setHoverMarketId(id);
 
     return (
-        <MarketContext.Provider value={{ selectedMarket, setMarket, hoverMarketId, setHoverMarket, effectiveMarket }}>
+        <MarketContext.Provider value={{ 
+            selectedMarket, 
+            setMarket, 
+            hoverMarketId, 
+            setHoverMarket, 
+            effectiveMarket,
+            sentimentScore,
+            setSentimentScore
+        }}>
             {children}
         </MarketContext.Provider>
     );

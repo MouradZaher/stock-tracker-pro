@@ -135,11 +135,14 @@
        MAIN CONTENT AREA
        --------------------------------------------------------- */
     .main-content {
-        flex: 1;
-        padding-top: calc(var(--mobile-header-height) + var(--safe-area-top) + 12px);
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        padding-bottom: var(--mobile-nav-height);
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        /* Accounting for TopBar (32px) + Header (56px) + Safe Area + Padding */
+        padding-top: calc(32px + var(--mobile-header-height) + var(--safe-area-top) + 8px);
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        padding-bottom: calc(var(--mobile-nav-height) + 12px);
         overflow: visible;
         position: relative;
         min-height: 0;
@@ -168,12 +171,15 @@
        TAB CONTENT — natural scrolling
        --------------------------------------------------------- */
     .tab-content {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
         height: auto !important;
         min-height: 100% !important;
         width: 100% !important;
         overflow-y: visible !important;
         overflow-x: hidden !important;
-        padding-bottom: calc(var(--mobile-nav-height) + 24px + var(--safe-area-bottom)) !important;
+        padding-bottom: calc(var(--mobile-nav-height) + 32px + var(--safe-area-bottom)) !important;
         scroll-behavior: smooth;
         position: relative;
     }
@@ -185,7 +191,7 @@
 
     /* Home tab content - constrained for single screen */
     .home-tab-content {
-        height: calc(100dvh - var(--mobile-header-height) - var(--mobile-nav-height) - var(--safe-area-top) - var(--safe-area-bottom)) !important;
+        height: calc(100dvh - 32px - var(--mobile-header-height) - var(--mobile-nav-height) - var(--safe-area-top) - var(--safe-area-bottom)) !important;
         overflow: hidden !important;
         touch-action: none;
         padding: 0 !important;
@@ -283,6 +289,20 @@
 
     .keyboard-open .main-content {
         padding-bottom: 0;
+    }
+
+    /* Fixed Floating Buttons Overlap - Mega Deep Dive Layout Fix */
+    .aria-voice-assistant-trigger,
+    .ai-chat-widget-trigger {
+        bottom: calc(var(--mobile-nav-height) + 80px + var(--safe-area-bottom)) !important;
+        transform: scale(0.8);
+        z-index: 1005;
+    }
+
+    /* Target specific class names if they exist */
+    [class*="VoiceAssistant"],
+    [class*="ChatWidget"] {
+        bottom: calc(var(--mobile-nav-height) + 40px + var(--safe-area-bottom)) !important;
     }
 }
 

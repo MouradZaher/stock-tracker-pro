@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
 import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe, Play, ExternalLink, Info, Sparkles } from 'lucide-react';
 import type { NewsArticle, SocialPost } from '../types';
 import { socialFeedService } from '../services/SocialFeedService';
-
 import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 import EarningsCalendar from './EarningsCalendar';
@@ -166,7 +165,7 @@ const MARKET_ALPHA: Record<string, any[]> = {
 };
 
 const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
-    const { effectiveMarket } = useMarket();
+    const { effectiveMarket, setSentimentScore } = useMarket();
     const handleAction = useCallback((symbol: string) => {
         soundService.playTap();
         onSelectStock?.(symbol);
@@ -311,6 +310,11 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
 
     const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
 
+    /** Global Theme Update (Mega Deep Dive Innovation) */
+    useEffect(() => {
+        setSentimentScore(sentimentScore);
+    }, [sentimentScore, setSentimentScore]);
+
     useEffect(() => {
         const fetchSocial = async () => {
             const posts = await socialFeedService.getGlobalFeed();
@@ -379,30 +383,31 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             )}
 
             {/* Header Area */}
-            <div className="pulse-page-header" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 1rem' }}>
+            <div className="pulse-page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '1rem 1.5rem', borderBottom: '1px solid var(--glass-border)', background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)' }}>
                 <div>
-                    <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <h1 style={{ fontSize: '2.75rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '16px', letterSpacing: '-0.03em' }}>
                         Market Pulse
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
-                            padding: '4px 12px',
+                            padding: '6px 14px',
                             background: 'rgba(239, 68, 68, 0.1)',
-                            borderRadius: '20px',
-                            border: '1px solid rgba(239, 68, 68, 0.2)',
-                            fontSize: '0.65rem',
+                            borderRadius: '24px',
+                            border: '1px solid rgba(239, 68, 68, 0.25)',
+                            fontSize: '0.7rem',
                             color: 'var(--color-error)',
                             fontWeight: 900,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.05em'
+                            letterSpacing: '0.08em',
+                            boxShadow: '0 0 20px rgba(239, 68, 68, 0.15)'
                         }}>
                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
                             Pulse Active
                         </div>
                     </h1>
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', margin: 0 }}>
-                        Real-time institutional grade market intelligence.
+                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.95rem', margin: 0, fontWeight: 500 }}>
+                        Real-time institutional grade market intelligence and sentiment analysis.
                     </p>
                 </div>
             </div>
@@ -476,21 +481,22 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Top Alpha Recommendations</h2>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
+                <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
                     {(MARKET_ALPHA[effectiveMarket.id] || MARKET_ALPHA.us).map((stock, idx) => (
                         <div key={idx} className="glass-card-hover" style={{
-                            minWidth: '140px',
-                            padding: '1rem',
-                            background: 'rgba(255,255,255,0.03)',
-                            borderRadius: '14px',
+                            minWidth: '160px',
+                            padding: '1.25rem',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+                            borderRadius: '16px',
                             border: '1px solid var(--glass-border)',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
                         }} onClick={() => handleAction(stock.symbol)}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <span style={{ fontWeight: 900, fontSize: '1rem' }}>{stock.symbol}</span>
-                                <span style={{ fontSize: '0.65rem', fontWeight: 900, color: stock.color }}>{stock.score}%</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <span style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{stock.symbol}</span>
+                                <span style={{ fontSize: '0.75rem', fontWeight: 900, color: stock.color, background: `${stock.color}15`, padding: '2px 6px', borderRadius: '6px' }}>{stock.score}%</span>
                             </div>
-                            <div style={{ fontSize: '0.6rem', fontWeight: 800, color: 'white', background: `${stock.color}20`, padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', width: 'fit-content' }}>
+                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'white', background: `${stock.color}30`, padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase', width: 'fit-content', border: `1px solid ${stock.color}40` }}>
                                 {stock.rec}
                             </div>
                         </div>

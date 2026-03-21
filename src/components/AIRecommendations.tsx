@@ -574,11 +574,11 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
                                     <div style={{ display: 'flex', gap: '4px' }}>
-                                        <div style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-tertiary)' }}>
+                                        <div style={{ fontSize: '0.65rem', fontWeight: 800, padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
                                             {stock.sector}
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
+                                    <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                                         {stock.price ? formatCurrency(stock.price) : '--'}
                                     </div>
                                 </div>
@@ -591,29 +591,30 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 <div style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                         <div>
-                            <h2 style={{ fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <img src={selectedMarket.flagUrl} alt="" style={{ width: '16px', height: '11px', borderRadius: '2px', objectFit: 'cover' }} />
-                                {selectedMarket.indexName} Market Pulse
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <img src={selectedMarket.flagUrl} alt="" style={{ width: '20px', height: '14px', borderRadius: '3px', objectFit: 'cover', boxShadow: '0 0 8px rgba(0,0,0,0.5)' }} />
+                                {selectedMarket.indexName} Alpha Signals
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    padding: '4px 10px',
-                                    background: 'rgba(239, 68, 68, 0.1)',
-                                    borderRadius: '20px',
-                                    border: '1px solid rgba(239, 68, 68, 0.2)',
-                                    fontSize: '0.6rem',
-                                    color: 'var(--color-error)',
+                                    padding: '4px 12px',
+                                    background: 'rgba(16, 185, 129, 0.1)',
+                                    borderRadius: '24px',
+                                    border: '1px solid rgba(16, 185, 129, 0.25)',
+                                    fontSize: '0.65rem',
+                                    color: 'var(--color-success)',
                                     fontWeight: 900,
                                     textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
+                                    letterSpacing: '0.08em',
+                                    boxShadow: '0 0 15px rgba(16, 185, 129, 0.15)'
                                 }}>
-                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
-                                    Live Engine
+                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-success)', animation: 'pulse-glow 1.5s infinite' }} />
+                                    Active Matrix
                                 </div>
                             </h2>
-                            <p style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>
-                                Rules: 5% stock, 20% sector limit
+                            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '4px', fontWeight: 600 }}>
+                                Engine Rules: Max 5% per stock, 20% sector limit
                             </p>
                         </div>
                     </div>

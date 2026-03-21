@@ -24,6 +24,13 @@ const AIChatWidget: React.FC = () => {
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { positions, getSummary } = usePortfolioStore();
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -92,15 +99,15 @@ const AIChatWidget: React.FC = () => {
 
     return (
         <div 
+            className={`ai-chat-widget-trigger-container ${isMobile ? 'ai-chat-widget-trigger' : ''}`}
             style={{ 
                 position: 'fixed', 
-                bottom: '16px', 
-                right: '16px', 
                 zIndex: 9999, 
                 display: 'flex', 
                 flexDirection: 'column', 
                 alignItems: 'flex-end', 
-                gap: '10px' 
+                gap: '10px',
+                right: '16px'
             }}
         >
             {isOpen && (
@@ -312,7 +319,7 @@ const AIChatWidget: React.FC = () => {
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="shadow-2xl transition-all group active:scale-95"
+                className="ai-chat-widget-trigger shadow-2xl transition-all group active:scale-95"
                 style={{
                     width: '56px',
                     height: '56px',
@@ -323,7 +330,7 @@ const AIChatWidget: React.FC = () => {
                     color: 'white',
                     background: 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)',
                     boxShadow: '0 12px 40px rgba(59, 130, 246, 0.4)',
-                    border: '1px solid rgba(255,255,255,0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     cursor: 'pointer'
                 }}
             >

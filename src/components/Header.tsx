@@ -85,27 +85,27 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     };
 
     const iconBtn: React.CSSProperties = {
-        background: 'var(--glass-bg)',
+        background: 'rgba(255, 255, 255, 0.03)',
         border: '1px solid var(--glass-border)',
-        borderRadius: '6px',
+        borderRadius: '8px',
         color: 'var(--color-text-secondary)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: isMobile ? '2px 3px' : '2px 4px',
-        transition: 'var(--transition-fast)',
-        gap: '3px',
-        fontSize: '0.6rem',
-        fontWeight: 600,
+        padding: isMobile ? '4px' : '6px',
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        gap: '4px',
+        fontSize: '0.7rem',
+        fontWeight: 700,
         whiteSpace: 'nowrap' as const,
-        height: btnH,
-        minWidth: btnH,
+        height: isMobile ? '28px' : '32px',
+        minWidth: isMobile ? '28px' : '32px',
     };
 
     return (
         <>
-            <header className="header glass-blur" role="banner" style={{
+            <header className="header" role="banner" style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -113,27 +113,53 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 padding: '0 var(--spacing-xl)',
                 height: 'var(--header-height)',
                 gap: '0.5rem',
-                borderBottom: '1px solid var(--color-border)',
+                borderBottom: '1px solid var(--glass-border)',
                 boxSizing: 'border-box',
                 position: 'fixed',
                 top: '32px', // Below TopBar
                 left: 0,
                 right: 0,
                 zIndex: 1001,
-                background: 'rgba(10, 10, 15, 0.85)',
-                backdropFilter: 'blur(16px)'
+                background: 'var(--glass-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                boxShadow: 'var(--glass-shadow)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
                 {/* ── Logo ─────────────────────────────── */}
-                <div className="header-logo" onClick={() => handleTabClick('home')} style={{ cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <div className="logo-icon" style={{ padding: '2px', borderRadius: '4px' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
-                        </svg>
+                <div className="header-logo" onClick={() => handleTabClick('home')} style={{ 
+                    cursor: 'pointer', 
+                    flexShrink: 0, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    padding: '6px 12px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid var(--glass-border)',
+                    transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+                >
+                    <div className="logo-icon" style={{ 
+                        padding: '4px', 
+                        borderRadius: '6px',
+                        background: 'var(--gradient-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <Zap size={16} color="white" fill="white" />
                     </div>
-                    <span className="logo-text" style={{ fontSize: '0.85rem', fontWeight: 800 }}>
-                        StockTracker <span style={{ color: 'var(--color-accent)', marginLeft: '1px' }}>PRO</span>
+                    <span className="logo-text" style={{ 
+                        fontSize: '0.9rem', 
+                        fontWeight: 900, 
+                        letterSpacing: '-0.02em',
+                        background: 'linear-gradient(to right, #fff, rgba(255,255,255,0.7))',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>
+                        StockTracker<span style={{ color: 'var(--color-accent)', WebkitTextFillColor: 'var(--color-accent)' }}>PRO</span>
                     </span>
                 </div>
 
@@ -158,14 +184,36 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                                     padding: '4px',
                                     borderBottom: isActive ? '2px solid var(--color-accent)' : '2px solid transparent',
+                                    position: 'relative'
                                 }}
                                 onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
                                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
                             >
-                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                                <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ 
+                                    filter: isActive ? 'drop-shadow(0 0 8px var(--color-accent-light))' : 'none',
+                                    transition: 'all 0.3s ease'
+                                }} />
+                                <span style={{ 
+                                    fontSize: '0.65rem', 
+                                    fontWeight: isActive ? 800 : 500, 
+                                    letterSpacing: '0.05em', 
+                                    textTransform: 'uppercase',
+                                    opacity: isActive ? 1 : 0.7
+                                }}>
                                     {tab.label}
                                 </span>
+                                {isActive && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '-2px',
+                                        left: '15%',
+                                        right: '15%',
+                                        height: '2px',
+                                        background: 'var(--color-accent)',
+                                        boxShadow: '0 0 12px var(--color-accent)',
+                                        borderRadius: '2px'
+                                    }} />
+                                )}
                             </button>
                         );
                     })}

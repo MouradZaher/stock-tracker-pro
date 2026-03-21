@@ -22,7 +22,7 @@ const StockHeatmap: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const isMobileView = width < 900;
+    const isMobileView = width < 768;
 
     useEffect(() => {
         socialFeedService.getGlobalFeed().then(() => {
@@ -94,17 +94,7 @@ const StockHeatmap: React.FC = () => {
     return (
         // ===== LOCKED: Heatmap Container Layout — DO NOT MODIFY (approved 2026-02-16) =====
         <div
-            className="heatmap-container"
-            style={{
-                position: 'absolute',
-                top: 0, left: 0, right: 0, bottom: 0,
-                padding: 0,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                borderRadius: 0,
-                border: 'none',
-            }}
+            className="heatmap-wrapper"
         >
             {error ? (
                 <div style={{

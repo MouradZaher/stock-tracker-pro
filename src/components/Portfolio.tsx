@@ -356,39 +356,41 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         <div className="tab-content portfolio-main-container">
             {/* ... existing header and summary ... */}
             <div className="portfolio-header" style={{
+                marginBottom: '2.5rem',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
-                marginBottom: '2rem',
-                paddingBottom: '1rem',
-                borderBottom: '1px solid rgba(255,255,255,0.05)'
+                padding: '1rem 1.5rem',
+                borderBottom: '1px solid var(--glass-border)',
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)'
             }}>
                 <div>
                     <h2 style={{
                         margin: 0,
-                        fontSize: '1.75rem',
-                        fontWeight: 800,
-                        letterSpacing: '-0.02em',
+                        fontSize: '2.75rem',
+                        fontWeight: 900,
+                        letterSpacing: '-0.03em',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '12px'
+                        gap: '16px'
                     }}>
                         Portfolio Assets
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
-                            padding: '4px 10px',
+                            padding: '6px 14px',
                             background: 'rgba(239, 68, 68, 0.1)',
-                            borderRadius: '20px',
-                            border: '1px solid rgba(239, 68, 68, 0.2)',
-                            fontSize: '0.6rem',
+                            borderRadius: '24px',
+                            border: '1px solid rgba(239, 68, 68, 0.25)',
+                            fontSize: '0.7rem',
                             color: 'var(--color-error)',
                             fontWeight: 900,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.05em'
+                            letterSpacing: '0.08em',
+                            boxShadow: '0 0 20px rgba(239, 68, 68, 0.15)'
                         }}>
-                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
                             Live Pulse
                         </div>
                         <div style={{
@@ -453,108 +455,116 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 gap: '1.25rem',
                 marginBottom: '2rem'
             }}>
-                <div className="summary-card glass-card" style={{
-                    padding: '1.25rem',
+                <div className="summary-card glass-card hover-glow" style={{
+                    padding: '1.5rem',
                     position: 'relative',
                     overflow: 'hidden',
-                    border: '1px solid var(--glass-border-bright)'
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+                    border: '1px solid var(--glass-border)',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
                 }}>
                     <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
-                        <BarChart2 size={100} />
+                        <BarChart2 size={120} />
                     </div>
                     <div className="summary-label" style={{
-                        fontSize: '0.75rem',
+                        fontSize: '0.8rem',
                         color: 'var(--color-text-tertiary)',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        fontWeight: 700,
-                        marginBottom: '0.5rem',
+                        letterSpacing: '0.1em',
+                        fontWeight: 800,
+                        marginBottom: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '8px'
                     }}>
-                        <BarChart2 size={14} /> Global Assets (USD)
+                        <BarChart2 size={16} /> Global Assets (USD)
                     </div>
                     <div className="summary-value" style={{
-                        fontSize: '1.75rem',
-                        fontWeight: 800,
-                        letterSpacing: '-0.02em',
-                        color: 'var(--color-text-primary)'
+                        fontSize: '2rem',
+                        fontWeight: 900,
+                        letterSpacing: '-0.03em',
+                        color: 'white',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
                     }}>
                         {formatCurrency(summary.normalizedTotalValueUSD)}
                     </div>
                 </div>
 
-                <div className={`summary-card glass-card ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`} style={{
-                    padding: '1.25rem',
+                <div className={`summary-card glass-card hover-glow ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`} style={{
+                    padding: '1.5rem',
                     position: 'relative',
                     overflow: 'hidden',
-                    border: '1px solid var(--glass-border-bright)',
-                    background: summary.totalProfitLoss >= 0 ? 'rgba(16, 185, 129, 0.03)' : 'rgba(239, 68, 68, 0.03)'
+                    border: '1px solid var(--glass-border)',
+                    background: summary.totalProfitLoss >= 0 ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%)' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.02) 100%)',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
                 }}>
                     <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
-                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={100} /> : <TrendingDown size={100} />}
+                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={120} /> : <TrendingDown size={120} />}
                     </div>
                     <div className="summary-label" style={{
-                        fontSize: '0.75rem',
+                        fontSize: '0.8rem',
                         color: 'var(--color-text-tertiary)',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        fontWeight: 700,
-                        marginBottom: '0.5rem',
+                        letterSpacing: '0.1em',
+                        fontWeight: 800,
+                        marginBottom: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '8px'
                     }}>
-                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                         Total Profit / Loss
                     </div>
                     <div className="summary-value" style={{
-                        fontSize: '1.75rem',
-                        fontWeight: 800,
-                        letterSpacing: '-0.02em',
+                        fontSize: '2rem',
+                        fontWeight: 900,
+                        letterSpacing: '-0.03em',
                         color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)',
                         display: 'flex',
                         alignItems: 'baseline',
-                        gap: '8px'
+                        gap: '10px',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
                     }}>
                         {fmt(summary.totalProfitLoss)}
-                        <span style={{ fontSize: '1rem', fontWeight: 600, opacity: 0.8 }}>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 700, opacity: 0.9 }}>
                             ({formatPercent(summary.totalProfitLossPercent)})
                         </span>
                     </div>
                 </div>
 
-                <div className="summary-card glass-card" style={{
-                    padding: '1.25rem',
+                <div className="summary-card glass-card hover-glow" style={{
+                    padding: '1.5rem',
                     position: 'relative',
                     overflow: 'hidden',
-                    border: '1px solid var(--glass-border-bright)'
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+                    border: '1px solid var(--glass-border)',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
                 }}>
                     <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
-                        <ShieldCheck size={100} />
+                        <ShieldCheck size={120} />
                     </div>
                     <div className="summary-label" style={{
-                        fontSize: '0.75rem',
+                        fontSize: '0.8rem',
                         color: 'var(--color-text-tertiary)',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        fontWeight: 700,
-                        marginBottom: '0.5rem',
+                        letterSpacing: '0.1em',
+                        fontWeight: 800,
+                        marginBottom: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '8px'
                     }}>
-                        <ShieldCheck size={14} /> Portfolio Health
+                        <ShieldCheck size={16} /> Portfolio Health
                     </div>
                     <div className="summary-value" style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 800,
-                        letterSpacing: '-0.02em',
+                        fontSize: '1.75rem',
+                        fontWeight: 900,
+                        letterSpacing: '-0.03em',
                         color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px'
+                        gap: '12px',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
                     }}>
                         {!hasAllocationWarnings ? 'Optimized' : 'Rebalance Required'}
                         <div style={{

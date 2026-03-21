@@ -28,6 +28,7 @@ import MarketPulsePage from './components/MarketPulsePage';
 import AdminDashboard from './components/AdminDashboard';
 import MobileNav from './components/MobileNav';
 import ARIAVoiceAssistant from './components/ARIAVoiceAssistant';
+import ThemeMoodManager from './components/ThemeMoodManager';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
@@ -196,10 +197,10 @@ function MainLayout({
   }, [location.search, navigate, selectedSymbol, setSelectedSymbol]);
 
   return (
-    <div className="app" style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="app">
       <ErrorBoundary>
         <TopBar onSelectSymbol={handleSelectSymbol} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} className="main-wrapper">
+        <div className="main-wrapper">
           <Header
             activeTab={activeTab}
             onTabChange={handleTabChange}
@@ -220,11 +221,11 @@ function MainLayout({
             isOpen={isAdminOpen}
             onClose={() => setIsAdminOpen(false)}
           />
-          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, boxSizing: 'border-box', paddingTop: '96px' }}>
+          <main className="main-content">
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
-                <div className={`tab-content ${!selectedSymbol ? 'home-tab-content' : ''}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div className={`tab-content ${!selectedSymbol ? 'home-tab-content' : ''}`}>
                   {!selectedSymbol ? (
                     <Dashboard onSelectSymbol={handleSelectSymbol} />
                   ) : (
@@ -308,7 +309,9 @@ function App() {
                 }}
               />
               <PriceAlertManager />
-              <AppContent />
+              <ThemeMoodManager>
+                <AppContent />
+              </ThemeMoodManager>
             </QueryClientProvider>
           </NotificationProvider>
         </PinAuthProvider>

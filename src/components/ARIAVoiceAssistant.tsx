@@ -177,9 +177,9 @@ const ARIAVoiceAssistant: React.FC<ARIAVoiceAssistantProps> = ({ onNavigate, onS
             {/* Floating ARIA button */}
             <button
                 onClick={isOpen ? () => setIsOpen(false) : handleOpen}
+                className="aria-voice-assistant-trigger"
                 style={{
                     position: 'fixed',
-                    bottom: '80px',
                     right: '20px',
                     width: '52px',
                     height: '52px',

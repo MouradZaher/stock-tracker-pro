@@ -16,6 +16,7 @@ import { useMarket } from '../contexts/MarketContext';
 import IndexComponents from './IndexComponents';
 import FamousHoldings from './FamousHoldings';
 import RealTimePrice from './RealTimePrice';
+import MiniSparkline from './MiniSparkline';
 
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
@@ -195,21 +196,26 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
 
     return (
         <div className="watchlist-page dashboard-container">
-            <div style={{
+            <div className="section-header" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '1rem 0',
+                padding: '1.5rem 0',
                 borderBottom: '1px solid var(--glass-border)',
-                marginBottom: '1rem'
+                marginBottom: '1.5rem'
             }}>
-                <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, fontSize: '1.25rem' }}>
-                    <Star size={24} fill="currentColor" className="text-warning" />
-                    {selectedMarket.name} Terminal
-                </h2>
-                <div style={{ width: '100%', maxWidth: '350px' }}>
+                <div>
+                    <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>
+                        <Star size={28} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.4))' }} />
+                        {selectedMarket.name} Terminal
+                    </h2>
+                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
+                        Real-time tracking and AI insights for your selected market assets.
+                    </p>
+                </div>
+                <div style={{ width: '100%', maxWidth: '380px' }}>
                     <SymbolSearchInput
-                        placeholder={`Quick add ${selectedMarket.name} symbol...`}
+                        placeholder={`Search ${selectedMarket.shortName} Market Alpha...`}
                         marketId={selectedMarket.id}
                         onSelect={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)}
                     />
@@ -240,32 +246,48 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                 <tbody>
                                     {/* Market Benchmark Row */}
                                     {selectedMarket && stockData[selectedMarket.indexSymbol.replace('%5E', '^')] && (
-                                        <tr style={{ background: `${selectedMarket.color}0a` }}>
-                                            <td style={{ borderRadius: '8px 0 0 8px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                    <Zap size={14} style={{ color: selectedMarket.color }} />
+                                        <tr style={{ 
+                                            background: `linear-gradient(to right, ${selectedMarket.color}15, transparent)`,
+                                            borderLeft: `3px solid ${selectedMarket.color}`
+                                        }}>
+                                            <td style={{ paddingLeft: '1.25rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <div style={{
+                                                        width: '28px',
+                                                        height: '28px',
+                                                        borderRadius: '8px',
+                                                        background: `${selectedMarket.color}20`,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: selectedMarket.color
+                                                    }}>
+                                                        <Zap size={14} fill="currentColor" />
+                                                    </div>
                                                     <div>
-                                                        <div style={{ fontWeight: 800, fontSize: '0.85rem' }}>{selectedMarket.indexName}</div>
-                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>MARKET BENCHMARK</div>
+                                                        <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'white' }}>{selectedMarket.indexName}</div>
+                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.05em' }}>MARKET BENCHMARK</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td style={{ fontWeight: 800 }}>
+                                            <td style={{ fontWeight: 900, fontSize: '1rem' }}>
                                                 <RealTimePrice price={stockData[selectedMarket.indexSymbol.replace('%5E', '^')].price} />
                                             </td>
-                                            <td className={getChangeClass(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].change)}>
+                                            <td className={getChangeClass(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].change)} style={{ fontWeight: 800 }}>
                                                 {formatPercent(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].changePercent)}
                                             </td>
                                             <td>
-                                                <span style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)' }}>Institutional Reference</span>
-                                            </td>
-                                            <td>
-                                                <div style={{ opacity: 0.5, transform: 'scale(0.8)', transformOrigin: 'left' }}>
-                                                    <InteractiveSparkline data={[100, 102, 101, 104, 103, 106]} color={selectedMarket.color} />
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>
+                                                    <Activity size={12} /> Institutional Alpha Ref
                                                 </div>
                                             </td>
-                                            <td style={{ textAlign: 'center', borderRadius: '0 8px 8px 0' }}>
-                                                <Activity size={16} style={{ opacity: 0.3 }} />
+                                            <td>
+                                                <div style={{ opacity: 0.8, transform: 'scale(1.1)' }}>
+                                                    <MiniSparkline symbol={selectedMarket.indexSymbol.replace('%5E', '^')} color={selectedMarket.color} />
+                                                </div>
+                                            </td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: selectedMarket.color, margin: '0 auto', animation: 'pulse-glow 2s infinite' }} />
                                             </td>
                                         </tr>
                                     )}
@@ -283,8 +305,6 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                     {watchlist.map(symbol => {
                                         const stock = stockData[symbol];
                                         if (!stock) return null;
-                                        const trendColor = stock.change >= 0 ? '#10B981' : '#EF4444';
-                                        const mockTrend = Array.from({ length: 8 }, () => stock.price * (0.99 + Math.random() * 0.02));
 
                                         return (
                                             <tr key={symbol} onClick={() => onSelectSymbol(symbol)} style={{ cursor: 'pointer' }}>
@@ -324,7 +344,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                     ) : '--'}
                                                 </td>
                                                 <td>
-                                                    <InteractiveSparkline data={mockTrend} color={trendColor} />
+                                                    <MiniSparkline symbol={symbol} />
                                                 </td>
                                                 <td style={{ textAlign: 'center', borderRadius: '0 8px 8px 0' }}>
                                                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
