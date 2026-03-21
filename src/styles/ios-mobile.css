@@ -246,6 +246,9 @@
     .glass-card {
         word-break: break-word;
         overflow-wrap: break-word;
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
     /* Prevent iOS input zoom (must be 16px+) */
@@ -375,6 +378,7 @@
 
     .glass-card {
         padding: 0.6rem;
+        border-radius: var(--radius-lg);
     }
 
     .btn {
