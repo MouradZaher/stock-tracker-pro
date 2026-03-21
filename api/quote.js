@@ -91,7 +91,11 @@ export default async function handler(req, res) {
         return res.status(429).json({ error: 'Too many requests. Please slow down.' });
     }
     if (!symbols) return res.status(400).json({ error: 'Missing symbols parameter' });
-    if (!isValidSymbol(symbols)) return res.status(400).json({ error: 'Invalid symbol format' });
+    const rawSymbol = symbols.split(',')[0].trim();
+    const symbol = rawSymbol.trim().toUpperCase();
+    if (!/^[A-Z0-9.,^:\-=]{1,20}$/i.test(symbol)) {
+        return res.status(400).json({ error: 'Invalid symbol format' });
+    }
 
     const origin = req.headers.origin;
     const isAllowedOrigin = !origin || origin.includes('vercel.app') || origin.includes('localhost');
@@ -106,7 +110,6 @@ export default async function handler(req, res) {
 
     const isSummary = !!modules;
     const isChart = req.query.chart === 'true';
-    const rawSymbol = symbols.split(',')[0].trim();
     const market = getMarket(rawSymbol);
 
     // ── CRYPTO: use CoinGecko ─────────────────────────────────
@@ -286,14 +289,17 @@ export default async function handler(req, res) {
         'LIN': 400.00, 'APD': 265.00, 'FCX': 36.00, 'UUUU': 17.00,
         // === UTILITIES ===
         'NEE': 69.00, 'DUK': 99.00, 'SO': 85.00,
-        // === REAL ESTATE ===
+        // === REAL ESTATE & COMMODITIES ===
         'AMT': 185.00, 'PLD': 105.00, 'SPG': 160.00,
-        // === ETFs/INDEX FUNDS ===
-        'VOO': 620.75, 'SPY': 619.00, 'QQQ': 498.00, 'VTI': 273.00, 'IWM': 200.00,
+        'GC=F': 4664.00, 'GLD': 466.00, 'SLV': 77.52, 'USO': 72.00, 'TLT': 84.00,
+        // === ETFs & INDICES ===
+        'VOO': 598.00, 'SPY': 598.00, 'QQQ': 582.00, 'VTI': 273.00, 'IWM': 200.00,
         'DIA': 425.00, 'VGT': 530.00, 'VHT': 235.00, 'VFH': 97.00,
-        'XLK': 215.00, 'XLV': 145.00, 'XLF': 48.00, 'XLE': 87.00,
-        // === COMMODITIES ===
-        'GLD': 475.70, 'SLV': 77.52, 'USO': 72.00, 'TLT': 84.00,
+        'XLK': 235.00, 'XLV': 145.00, 'XLF': 49.00, 'XLE': 59.00,
+        'XLI': 162.00, 'XLY': 108.00, 'XLP': 81.00, 'XLB': 47.00, 'XLU': 45.00, 'XLRE': 42.00,
+        'COIN': 198.00, 'PLTR': 94.50,
+        '^GSPC': 5600.00, '^DJI': 41800.00, '^IXIC': 17600.00,
+        '^RUT': 2060.00, '^VIX': 20.00, '^TNX': 4.30,
         // === EGYPT ===
         'COMI': 123.00, 'TMGH': 77.50, 'FWRY': 17.50, 'HRHO': 16.80, 'EAST': 18.40,
         'EFID': 12.20, 'EMFD': 7.80, 'ADIB': 19.40, 'ETEL': 86.00, 'ABUK': 58.40,

@@ -44,8 +44,11 @@ const COINGECKO_IDS = {
 // and fall through to PRICE_MAP. Update whenever broker confirms new prices.
 const PRICE_FLOORS = {
     // Commodities ETFs (gold/silver have rallied significantly)
-    'GLD': 400.00,  // floor: $400 — broker confirmed $475.70
+    'GLD': 440.00,  // floor: $440 — current $466.00
     'SLV': 55.00,   // floor: $55  — broker confirmed $77.52
+    // Sector ETFs
+    'XLI': 140.00,  'XLY': 90.00,  'XLP': 70.00,  'XLB': 40.00,
+    'XLU': 40.00,   'XLE': 50.00,  'XLRE': 38.00, 'XLF': 44.00,
     // S&P500 ETFs
     'VOO': 540.00,  // floor: $540 — current $597.94
     'SPY': 530.00,
@@ -259,7 +262,7 @@ export default async function handler(req, res) {
         const rawList = symbols.split(',').map(s => s.trim()).filter(Boolean);
         const symbolList = rawList.filter(s => {
             if (s.includes('?') || s.includes('{') || s.includes(' ')) return false;
-            return /^[A-Z0-9.,^:\-]{1,20}$/i.test(s);
+            return /^[A-Z0-9.,^:\-=]{1,20}$/i.test(s);
         });
         if (symbolList.length === 0) {
             return res.status(400).json({ error: 'No valid symbols provided' });
@@ -382,11 +385,14 @@ export default async function handler(req, res) {
             // REAL ESTATE
             'AMT': 185.00, 'PLD': 105.00, 'SPG': 160.00,
             // ETFs
-            'VOO': 620.75, 'SPY': 619.00, 'QQQ': 498.00, 'VTI': 273.00, 'IWM': 200.00,
+            'VOO': 598.00, 'SPY': 598.00, 'QQQ': 582.00, 'VTI': 273.00, 'IWM': 200.00,
             'DIA': 425.00, 'VGT': 530.00, 'VHT': 235.00, 'VFH': 97.00,
-            'XLK': 215.00, 'XLV': 145.00, 'XLF': 48.00, 'XLE': 87.00,
+            'XLK': 235.00, 'XLV': 145.00, 'XLF': 49.00, 'XLE': 59.00,
+            'XLI': 162.00, 'XLY': 108.00, 'XLP': 81.00, 'XLB': 47.00, 'XLU': 45.00, 'XLRE': 42.00,
             // COMMODITIES
-            'GLD': 475.70, 'SLV': 77.52, 'USO': 72.00, 'TLT': 84.00,
+            'GC=F': 4664.00, 'GLD': 466.00, 'SLV': 77.52, 'USO': 72.00, 'TLT': 84.00,
+            // INDIVIDUAL (FIX MISSING)
+            'COIN': 198.00, 'PLTR': 94.50,
             // EGYPT
             'COMI': 123.00, 'TMGH': 77.50, 'FWRY': 17.50, 'HRHO': 16.80, 'EAST': 18.40,
             'EFID': 12.20, 'EMFD': 7.80, 'ADIB': 19.40, 'ETEL': 86.00, 'ABUK': 58.40,
