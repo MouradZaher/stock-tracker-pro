@@ -17,9 +17,18 @@ const StockHeatmap: React.FC = () => {
     const [width, setWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        const handleResize = () => setWidth(window.innerWidth);
+        let timeoutId: ReturnType<typeof setTimeout>;
+        const handleResize = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                setWidth(window.innerWidth);
+            }, 100); // Throttle resize events to 100ms
+        };
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', handleResize);
+        }
     }, []);
 
     const isMobileView = width < 768;
@@ -138,4 +147,4 @@ const StockHeatmap: React.FC = () => {
     );
 };
 
-export default StockHeatmap;
+export default React.memo(StockHeatmap);

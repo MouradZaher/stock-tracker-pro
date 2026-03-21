@@ -14,6 +14,9 @@ export const MULTI_QUOTE_ENDPOINT = 'multi-quote';
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 1000; // 1 second - ultra fast updates
 
+// Promise pooling for in-flight requests (Concurrency Deduplication)
+const inFlightRequests = new Map<string, Promise<any>>();
+
 export const getCachedData = (key: string) => {
     const cached = cache.get(key);
     if (!cached) return null;
@@ -28,6 +31,36 @@ export const getCachedData = (key: string) => {
 
 export const setCachedData = (key: string, data: any) => {
     cache.set(key, { data, timestamp: Date.now() });
+};
+
+/**
+ * Advanced Fetch wrapper with deduping & caching.
+ * Prevents 10 components from firing 10 identical network requests at the exact same millisecond.
+ */
+export const fetchWithCacheAndPool = async (key: string, fetchFn: () => Promise<any>) => {
+    // 1. Check valid cache
+    const cached = getCachedData(key);
+    if (cached) return cached;
+
+    // 2. Check if a request for this exact key is already in-flight
+    if (inFlightRequests.has(key)) {
+        return inFlightRequests.get(key);
+    }
+
+    // 3. Create the request, store the promise, await, cache, return
+    const promise = fetchFn()
+        .then((data) => {
+            setCachedData(key, data);
+            inFlightRequests.delete(key);
+            return data;
+        })
+        .catch((error) => {
+            inFlightRequests.delete(key);
+            throw error;
+        });
+
+    inFlightRequests.set(key, promise);
+    return promise;
 };
 
 // API base URL - prioritize local /api for development

@@ -67,4 +67,4 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({ symbol }) => {
     );
 };
 
-export default TradingViewChart;
+export default React.memo(TradingViewChart);

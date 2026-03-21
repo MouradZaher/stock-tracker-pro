@@ -36,9 +36,10 @@ const api = axios.create({
 });
 
 // ============================================
-// CACHING LAYER
+// CACHING LAYER & PROMISE POOLING
 // ============================================
 const cache = new Map<string, { data: any; timestamp: number }>();
+const inFlightRequests = new Map<string, Promise<any>>();
 const CACHE_DURATION = 1000; // 1 second for near real-time
 const GOOD_PRICE_CACHE_DURATION = 300000; // 5 minutes for fallback prices
 
@@ -46,13 +47,30 @@ export const getCachedData = (key: string, maxAge = CACHE_DURATION) => {
     const cached = cache.get(key);
     if (!cached) return null;
     if (Date.now() - cached.timestamp > maxAge) {
-        return null;
+        return null; // Don't delete yet, fallback might need it, just return null for 'fresh' check
     }
     return cached.data;
 };
 
 export const setCachedData = (key: string, data: any) => {
     cache.set(key, { data, timestamp: Date.now() });
+};
+
+/**
+ * Concurrency Deduping Wrapper
+ * If 5 components request the exact same symbol simultaneously,
+ * only 1 actual network race is fired. The other 4 await the same Promise.
+ */
+const withPromisePool = async <T>(key: string, fetchFn: () => Promise<T>): Promise<T> => {
+    if (inFlightRequests.has(key)) {
+        return inFlightRequests.get(key) as Promise<T>;
+    }
+    const promise = fetchFn().finally(() => {
+        // Wait a microtick before deleting to ensure subsequent synchronous calls catch the cache
+        setTimeout(() => inFlightRequests.delete(key), 50);
+    });
+    inFlightRequests.set(key, promise);
+    return promise;
 };
 
 // ============================================
@@ -292,14 +310,22 @@ const INDEX_FALLBACK_PRICES: Record<string, { price: number; name: string }> = {
 // PUBLIC API
 // ============================================
 
-// Get stock quote with multi-source fallback
+// Get stock quote with multi-source fallback (Wrapped with Concurrency Pool)
 export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
     const symbol = sanitizeSymbol(rawSymbol);
     if (!symbol) {
         console.warn(`⚠️ Invalid/polluted symbol rejected: "${rawSymbol}"`);
         return { symbol: rawSymbol, name: 'Invalid Symbol', price: 0, change: 0, changePercent: 0, previousClose: 0, open: 0, high: 0, low: 0, volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0, dividendYield: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0, totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date() };
     }
-    const quote = await fetchWithFallbacks(symbol);
+    
+    // Check if we have a fresh 1-second cache BEFORE joining the pool
+    const cacheKey = `quote_full_${symbol}`;
+    const instantCache = getCachedData(cacheKey, CACHE_DURATION);
+    if (instantCache) return instantCache;
+
+    return withPromisePool(cacheKey, async () => {
+        const quote = await fetchWithFallbacks(symbol);
+        let finalStock: Stock;
 
     if (quote && quote.price > 0) {
         const price = quote.price;
@@ -348,7 +374,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             finalPrice = price * jitterFactor;
         }
 
-        return {
+        finalStock = {
             symbol,
             name: quote.name || symbol,
             price: finalPrice,
@@ -372,6 +398,8 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             lastUpdated: new Date(),
             isFallback: quote.provider === 'price_map' || quote.provider === 'cache',
         };
+        setCachedData(`quote_full_${symbol}`, finalStock);
+        return finalStock;
     }
 
     // Return unavailable placeholder — but first check index fallback
@@ -379,7 +407,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
     if (indexFallback) {
         const jitter = 1 + (Math.random() * 0.001 - 0.0005);
         const p = indexFallback.price * jitter;
-        return {
+        finalStock = {
             symbol, name: indexFallback.name, price: p,
             change: p * (Math.random() * 0.02 - 0.01),
             changePercent: parseFloat((Math.random() * 2 - 1).toFixed(2)),
@@ -389,11 +417,13 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date(),
             isFallback: true,
         };
+        setCachedData(`quote_full_${symbol}`, finalStock);
+        return finalStock;
     }
 
     console.error(`❌ All sources failed for ${symbol}`);
 
-    return {
+    finalStock = {
         symbol,
         name: `${symbol} (Unavailable)`,
         price: 0,
@@ -416,6 +446,9 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         totalSell: 0,
         lastUpdated: new Date(),
     };
+    setCachedData(`quote_full_${symbol}`, finalStock);
+    return finalStock;
+    }); // end withPromisePool
 };
 
 // Get comprehensive stock data including profile and growth metrics
@@ -666,10 +699,18 @@ export const getGrowthMetrics = async (symbol: string) => {
     }
 };
 
-// Get multiple quotes efficiently with multi-source
+// Get multiple quotes efficiently with multi-source (Wrapped with Concurrency Pool)
 export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, Stock>> => {
-    const stockMap = new Map<string, Stock>();
-    if (symbols.length === 0) return stockMap;
+    // Determine unique sorted cache key for this exact batch query
+    const cacheKey = `multi_quote_${[...symbols].sort().join(',')}`;
+    
+    // Check instant cache
+    const instantCache = getCachedData(cacheKey, CACHE_DURATION);
+    if (instantCache) return instantCache as Map<string, Stock>;
+
+    return withPromisePool(cacheKey, async () => {
+        const stockMap = new Map<string, Stock>();
+        if (symbols.length === 0) return stockMap;
 
     // Try batch request first via proxy
     try {
@@ -762,7 +803,9 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
         }
     }
 
+    setCachedData(cacheKey, stockMap);
     return stockMap;
+    }); // end withPromisePool
 };
 
 // ============================================
