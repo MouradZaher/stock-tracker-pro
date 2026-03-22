@@ -22,7 +22,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Bloomberg',
         youtubeId: 'UCIALMKvObZNtJ6AmdCLP7Lg',
         videoId: '', 
-        logo: 'https://logo.clearbit.com/bloomberg.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=bloomberg.com',
         color: '#FF6600',
         region: 'Global',
         category: 'Finance'
@@ -33,7 +33,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'CNBC',
         youtubeId: 'UCvJJ_dzjViJCoLf5uKUTwoA',
         videoId: '',
-        logo: 'https://logo.clearbit.com/cnbc.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=cnbc.com',
         color: '#0066FF',
         region: 'Global',
         category: 'Finance'
@@ -44,7 +44,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Fox News',
         youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
         videoId: 'OrCH6XEzMwI', // Direct stable ID
-        logo: 'https://logo.clearbit.com/foxnews.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=foxnews.com',
         color: '#003087',
         region: 'USA',
         category: 'News'
@@ -55,7 +55,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Sky News',
         youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
         videoId: 'YDvsBbKfLPA', // Direct stable ID
-        logo: 'https://logo.clearbit.com/sky.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=sky.com',
         color: '#E00034',
         region: 'UK',
         category: 'News'
@@ -66,7 +66,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Euronews',
         youtubeId: 'UCSrZ3UV4jOidv8ppoVuvW9Q',
         videoId: 'pykpO5kQJ98', // Direct stable ID
-        logo: 'https://logo.clearbit.com/euronews.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=euronews.com',
         color: '#00548F',
         region: 'Europe',
         category: 'News'
@@ -77,7 +77,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'DW',
         youtubeId: 'UCknLrEdhRCp1aegoMqRaCZg',
         videoId: '',
-        logo: 'https://logo.clearbit.com/dw.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=dw.com',
         color: '#D00000',
         region: 'Germany',
         category: 'News'
@@ -88,7 +88,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'France 24',
         youtubeId: 'UCCCPCZNChQdGa9EkATeye4g',
         videoId: '',
-        logo: 'https://logo.clearbit.com/france24.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=france24.com',
         color: '#E60019',
         region: 'France',
         category: 'News'
@@ -99,7 +99,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Al Jazeera',
         youtubeId: 'UCfiwzLy-8yKzIbsmZTzxDgw',
         videoId: '',
-        logo: 'https://logo.clearbit.com/aljazeera.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=aljazeera.com',
         color: '#009BB8',
         region: 'Global',
         category: 'News'
@@ -110,7 +110,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Al Arabiya',
         youtubeId: 'UCahpxixMCwoANAftn6IxkTg',
         videoId: '',
-        logo: 'https://logo.clearbit.com/alarabiya.net',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=alarabiya.net',
         color: '#C8102E',
         region: 'Arabic',
         category: 'Arabic'
@@ -121,7 +121,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Asharq News',
         youtubeId: 'UCRJUVYt9gjg8MnlGacySUdg',
         videoId: '',
-        logo: 'https://logo.clearbit.com/asharq.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=asharq.com',
         color: '#000000',
         region: 'Arabic',
         category: 'Arabic'
@@ -132,7 +132,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Asharq Biz',
         youtubeId: 'UCxjpGbfoLy6oodYdiyzQE4g',
         videoId: '',
-        logo: 'https://logo.clearbit.com/asharq.com', // Sharing the base domain
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=asharq.com', 
         color: '#FFD700',
         region: 'Arabic',
         category: 'Finance'
@@ -143,7 +143,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Sky Arabia',
         youtubeId: 'UCIJXOvggjKtCagMfxvcCzAA',
         videoId: '',
-        logo: 'https://logo.clearbit.com/skynewsarabia.com',
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=skynewsarabia.com',
         color: '#E00034',
         region: 'Arabic',
         category: 'Arabic'
