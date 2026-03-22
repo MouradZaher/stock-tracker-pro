@@ -43,7 +43,7 @@ export const CHANNELS: Channel[] = [
         name: 'LiveNOW from FOX',
         shortName: 'Fox News',
         youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
-        videoId: '',
+        videoId: 'OrCH6XEzMwI', // Direct stable ID
         logo: '🦊',
         color: '#003087',
         region: 'USA',
@@ -54,7 +54,7 @@ export const CHANNELS: Channel[] = [
         name: 'Sky News Live',
         shortName: 'Sky News',
         youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
-        videoId: '',
+        videoId: 'YDvsBbKfLPA', // Direct stable ID
         logo: '🌐',
         color: '#E00034',
         region: 'UK',
@@ -65,7 +65,7 @@ export const CHANNELS: Channel[] = [
         name: 'Euronews English',
         shortName: 'Euronews',
         youtubeId: 'UCSrZ3UV4jOidv8ppoVuvW9Q',
-        videoId: '',
+        videoId: 'pykpO5kQJ98', // Direct stable ID
         logo: '🇪🇺',
         color: '#00548F',
         region: 'Europe',
@@ -380,7 +380,8 @@ const LiveIntelligenceStreams: React.FC = () => {
                         ref={scrollRef}
                         style={{
                             display: 'flex', gap: '0.5rem', overflowX: 'auto',
-                            scrollbarWidth: 'none', flex: 1
+                            scrollbarWidth: 'none', flex: 1, flexWrap: 'nowrap',
+                            msOverflowStyle: 'none'
                         }}
                     >
                         {filteredChannels.map(channel => {
@@ -390,7 +391,7 @@ const LiveIntelligenceStreams: React.FC = () => {
                                     key={channel.id}
                                     onClick={() => switchChannel(channel)}
                                     style={{
-                                        flexShrink: 0,
+                                        flex: '0 0 auto',
                                         display: 'flex', alignItems: 'center', gap: '6px',
                                         padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
                                         border: `1px solid ${isActive ? channel.color : 'var(--glass-border)'}`,
@@ -400,7 +401,8 @@ const LiveIntelligenceStreams: React.FC = () => {
                                         fontSize: '0.75rem',
                                         transition: 'all 0.2s ease',
                                         boxShadow: isActive ? `0 0 12px ${channel.color}30` : 'none',
-                                        whiteSpace: 'nowrap'
+                                        whiteSpace: 'nowrap',
+                                        minWidth: 'fit-content'
                                     }}
                                 >
                                     <span style={{ fontSize: '0.9rem' }}>{channel.logo}</span>

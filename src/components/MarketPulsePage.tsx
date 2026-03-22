@@ -107,7 +107,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             </div>
 
             {/* Channel Selector Strip */}
-            <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none' }}>
+            <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none', flexWrap: 'nowrap', msOverflowStyle: 'none' }}>
                 {streams.map((ch) => {
                     const isActive = ch.id === active.id;
                     return (
@@ -115,14 +115,15 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                             key={ch.id}
                             onClick={() => setActive(ch)}
                             style={{
-                                flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px',
+                                flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '5px',
                                 padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
                                 border: `1px solid ${isActive ? ch.color : 'var(--glass-border)'}`,
                                 background: isActive ? `${ch.color}20` : 'rgba(255,255,255,0.02)',
                                 color: isActive ? ch.color : 'var(--color-text-secondary)',
                                 fontWeight: isActive ? 800 : 500, fontSize: '0.72rem',
                                 transition: 'all 0.2s ease', whiteSpace: 'nowrap',
-                                boxShadow: isActive ? `0 0 10px ${ch.color}25` : 'none'
+                                boxShadow: isActive ? `0 0 10px ${ch.color}25` : 'none',
+                                minWidth: 'fit-content'
                             }}
                         >
                             <span style={{ fontSize: '0.85rem' }}>{ch.logo}</span>
