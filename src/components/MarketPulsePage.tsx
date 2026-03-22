@@ -503,23 +503,100 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 </div>
 
                 {/* Fear & Greed Gauge */}
-                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', position: 'relative', zIndex: 2 }}>
                         <div>
-                            <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Zap size={16} color="var(--color-warning)" /> Fear & Greed Index
+                            <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Zap size={16} color="var(--color-warning)" fill="var(--color-warning)" /> Fear & Greed
                             </h3>
-                            <div style={{ fontSize: '2rem', fontWeight: 900, color: sentimentColor, marginTop: '0.25rem' }}>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: sentimentColor, marginTop: '0.5rem', textShadow: `0 0 20px ${sentimentColor}40`, letterSpacing: '-0.02em' }}>
                                 {sentimentScore.toFixed(0)}
                             </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>MOOD</div>
-                            <div style={{ fontSize: '1rem', fontWeight: 800, color: sentimentColor }}>{overallSentiment.toUpperCase()}</div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.1em' }}>MARKET MOOD</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: sentimentColor, textShadow: `0 0 10px ${sentimentColor}30` }}>{overallSentiment.toUpperCase()}</div>
                         </div>
                     </div>
-                    <div style={{ height: '10px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
-                        <div style={{ width: `${sentimentScore}%`, height: '100%', background: sentimentColor, boxShadow: `0 0 10px ${sentimentColor}40`, transition: 'width 1s ease' }} />
+
+                    {/* Premium SVG Gauge */}
+                    <div style={{ position: 'relative', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="220" height="120" viewBox="0 0 220 120">
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#EF4444" />
+                                    <stop offset="50%" stopColor="#F59E0B" />
+                                    <stop offset="100%" stopColor="#10B981" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            {/* Track */}
+                            <path 
+                                d="M 30 100 A 80 80 0 0 1 190 100" 
+                                fill="none" 
+                                stroke="rgba(255,255,255,0.05)" 
+                                strokeWidth="12" 
+                                strokeLinecap="round" 
+                            />
+                            {/* Gradient Fill */}
+                            <path 
+                                d="M 30 100 A 80 80 0 0 1 190 100" 
+                                fill="none" 
+                                stroke="url(#gaugeGradient)" 
+                                strokeWidth="12" 
+                                strokeLinecap="round" 
+                                strokeDasharray="251.32" 
+                                strokeDashoffset={251.32 - (251.32 * (sentimentScore / 100))}
+                                style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+                                filter="url(#glow)"
+                            />
+                            {/* Needle Pivot */}
+                            <circle cx="110" cy="100" r="6" fill="white" />
+                            {/* Needle */}
+                            <line 
+                                x1="110" y1="100" 
+                                x2={110 + 70 * Math.cos((180 - (sentimentScore * 1.8)) * Math.PI / 180)} 
+                                y2={100 - 70 * Math.sin((180 - (sentimentScore * 1.8)) * Math.PI / 180)} 
+                                stroke="white" 
+                                strokeWidth="3" 
+                                strokeLinecap="round" 
+                                style={{ transition: 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+                            />
+                        </svg>
+                        
+                        {/* Status Pulse */}
+                        <div style={{ 
+                            position: 'absolute', 
+                            bottom: '10px', 
+                            left: '50%', 
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            background: `${sentimentColor}15`,
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            border: `1px solid ${sentimentColor}30`,
+                            fontSize: '0.65rem',
+                            fontWeight: 800,
+                            color: sentimentColor,
+                            animation: 'pulse 2s infinite'
+                        }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: sentimentColor }} />
+                            REAL-TIME PULSE
+                        </div>
+                    </div>
+
+                    {/* Tick Marks */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', marginTop: '-10px' }}>
+                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900 }}>EXTREME FEAR</span>
+                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900 }}>EXTREME GREED</span>
                     </div>
                 </div>
 
@@ -531,43 +608,80 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     <OptionsFlowSimulator />
                 </div>
 
-                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Layers size={14} /> Industry Rotation
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                <div className="glass-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Layers size={18} color="var(--color-accent)" /> Industry Rotation
+                        </h3>
+                        {sectorData.length > 0 && (
+                            <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '4px 10px', borderRadius: '20px', border: '1px solid var(--color-success-light)' }}>
+                                {sectorData.filter(s => s.change > 0).length}/{sectorData.length} BULLISH
+                            </div>
+                        )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {sectorData.map(sector => (
-                            <div key={sector.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <div style={{ fontSize: '1.2rem' }}>{sector.icon}</div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                        <span style={{ fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sector.name}</span>
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
-                                        </span>
+                            <div key={sector.name} className="group" style={{ cursor: 'pointer' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '8px' }}>
+                                    <div style={{ 
+                                        width: '32px', height: '32px', borderRadius: '10px', 
+                                        background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem',
+                                        transition: 'all 0.3s ease'
+                                    }}>
+                                        {sector.icon}
                                     </div>
-                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
-                                        <div style={{ width: `${Math.min(100, Math.abs(sector.change) * 20)}%`, height: '100%', background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', borderRadius: '2px' }} />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sector.name}</span>
+                                            <span style={{ fontSize: '0.85rem', fontWeight: 900, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                                {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
+                                            </span>
+                                        </div>
                                     </div>
+                                </div>
+                                <div style={{ height: '6px', background: 'rgba(255,255,255,0.03)', borderRadius: '3px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.02)' }}>
+                                    <div 
+                                        style={{ 
+                                            width: `${Math.min(100, Math.abs(sector.change) * 25)}%`, 
+                                            height: '100%', 
+                                            background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', 
+                                            borderRadius: '3px',
+                                            boxShadow: sector.change >= 0 ? '0 0 10px rgba(16, 185, 129, 0.3)' : '0 0 10px rgba(239, 68, 68, 0.3)',
+                                            transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                                        }} 
+                                    />
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* X Feed */}
-                <div className="glass-card hover-glow" style={{ padding: '1.25rem', gridColumn: 'span 2', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-                    <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <MessageSquare size={14} color="#1DA1F2" /> Social Sentiment Flow
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
+                {/* Social Feed */}
+                <div className="glass-card hover-glow" style={{ padding: '1.5rem', gridColumn: 'span 2', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <MessageSquare size={18} color="#1DA1F2" fill="rgba(29, 161, 242, 0.1)" /> Social Sentiment Flow
+                        </h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className="pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FF66', boxShadow: '0 0 10px #00FF66' }} />
+                            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>24/7 LIVE FEED</span>
+                        </div>
+                    </div>
+                    <div className="custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '8px' }}>
                         {socialPosts.slice(0, 10).map(post => (
-                            <div key={post.id} style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                                    <span style={{ fontWeight: 800, fontSize: '0.85rem' }}>{post.author}</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{new Date(post.timestamp).toLocaleTimeString()}</span>
+                            <div key={post.id} className="group" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--glass-border)', transition: 'all 0.3s ease', cursor: 'pointer' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 900, color: 'white' }}>
+                                            {post.author[0]}
+                                        </div>
+                                        <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'white' }}>{post.author}</span>
+                                        {post.author.includes('Wall St') && <ShieldCheck size={12} color="var(--color-accent)" />}
+                                    </div>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{new Date(post.timestamp).toLocaleTimeString()}</span>
                                 </div>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: 0 }}>{post.content}</p>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: '1.6', fontWeight: 500 }}>{post.content}</p>
                             </div>
                         ))}
                     </div>
