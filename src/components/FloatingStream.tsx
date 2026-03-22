@@ -13,6 +13,12 @@ const FloatingStream: React.FC = () => {
     const [dragMode, setDragMode] = useState<'move' | 'resize' | null>(null);
     const [initialDrag, setInitialDrag] = useState({ x: 0, y: 0, w: 0, h: 0 });
 
+    // For mouse-drag scrolling
+    const stripRef = useRef<HTMLDivElement>(null);
+    const [isScrolling, setIsScrolling] = useState(false);
+    const [scrollStartX, setScrollStartX] = useState(0);
+    const [scrollLeft, setScrollLeft] = useState(0);
+
     const containerRef = useRef<HTMLDivElement>(null);
 
     if (!isPiPActive || !activeStream) return null;
@@ -27,6 +33,25 @@ const FloatingStream: React.FC = () => {
             h: size.height 
         });
     };
+
+    // Scroll drag handlers
+    const handleStripMouseDown = (e: React.MouseEvent) => {
+        setIsScrolling(true);
+        setScrollStartX(e.pageX - (stripRef.current?.offsetLeft || 0));
+        setScrollLeft(stripRef.current?.scrollLeft || 0);
+    };
+
+    const handleStripMouseMove = (e: React.MouseEvent) => {
+        if (!isScrolling) return;
+        e.preventDefault();
+        const x = e.pageX - (stripRef.current?.offsetLeft || 0);
+        const walk = (x - scrollStartX) * 2; // Scroll speed
+        if (stripRef.current) {
+            stripRef.current.scrollLeft = scrollLeft - walk;
+        }
+    };
+
+    const handleStripMouseUp = () => setIsScrolling(false);
 
     useEffect(() => {
         const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -48,9 +73,12 @@ const FloatingStream: React.FC = () => {
             }
         };
 
-        const handleGlobalMouseUp = () => setDragMode(null);
+        const handleGlobalMouseUp = () => {
+            setDragMode(null);
+            setIsScrolling(false);
+        };
 
-        if (dragMode) {
+        if (dragMode || isScrolling) {
             window.addEventListener('mousemove', handleGlobalMouseMove);
             window.addEventListener('mouseup', handleGlobalMouseUp);
         }
@@ -58,7 +86,7 @@ const FloatingStream: React.FC = () => {
             window.removeEventListener('mousemove', handleGlobalMouseMove);
             window.removeEventListener('mouseup', handleGlobalMouseUp);
         };
-    }, [dragMode, initialDrag, size]);
+    }, [dragMode, isScrolling, initialDrag, size, scrollLeft, scrollStartX]);
 
     const handleRestore = () => {
         setPiPActive(false);
@@ -71,7 +99,7 @@ const FloatingStream: React.FC = () => {
             style={{
                 position: 'fixed',
                 left: `${Math.max(0, Math.min(window.innerWidth - size.width, position.x))}px`,
-                top: `${Math.max(0, Math.min(window.innerHeight - size.height - 40, position.y))}px`,
+                top: `${Math.max(0, Math.min(window.innerHeight - size.height - 80, position.y))}px`,
                 width: `${size.width}px`,
                 zIndex: 9999,
                 borderRadius: '16px',
@@ -140,7 +168,7 @@ const FloatingStream: React.FC = () => {
                         ? `https://www.youtube.com/embed/${activeStream.videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1`
                         : `https://www.youtube.com/embed/live_stream?channel=${activeStream.youtubeId}&autoplay=1&mute=${isMuted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1`
                     }
-                    style={{ width: '100%', height: '100%', border: 'none' }}
+                    style={{ width: '100%', height: '100%', border: 'none', pointerEvents: dragMode ? 'none' : 'auto' }}
                     allow="autoplay; encrypted-media; picture-in-picture"
                     title={activeStream.name}
                 />
@@ -152,49 +180,61 @@ const FloatingStream: React.FC = () => {
                         position: 'absolute',
                         right: 0,
                         bottom: 0,
-                        width: '15px',
-                        height: '15px',
+                        width: '20px',
+                        height: '20px',
                         cursor: 'nwse-resize',
                         zIndex: 10,
-                        background: 'linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.2) 50%)',
+                        background: 'linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.15) 50%)',
                         borderRadius: '0 0 16px 0'
                     }}
                 />
             </div>
 
-            {/* Channel Selection Strip (Under it) */}
-            <div style={{
-                padding: '6px',
-                background: 'rgba(0,0,0,0.8)',
-                display: 'flex',
-                gap: '6px',
-                overflowX: 'auto',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
-                whiteSpace: 'nowrap'
-            }} className="no-scrollbar">
+            {/* Channel Selection Strip (Box Rectangle) */}
+            <div 
+                ref={stripRef}
+                onMouseDown={handleStripMouseDown}
+                onMouseMove={handleStripMouseMove}
+                onMouseLeave={handleStripMouseUp}
+                onMouseUp={handleStripMouseUp}
+                style={{
+                    padding: '8px',
+                    background: 'rgba(5, 5, 10, 0.95)',
+                    display: 'flex',
+                    gap: '6px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    whiteSpace: 'nowrap',
+                    cursor: isScrolling ? 'grabbing' : 'grab',
+                    userSelect: 'none'
+                }} className="no-scrollbar"
+            >
                 {CHANNELS.map(ch => (
                     <button
                         key={ch.id}
-                        onClick={() => setActiveStream(ch)}
+                        onClick={() => {
+                            if (!isScrolling) setActiveStream(ch);
+                        }}
                         style={{
                             flex: '0 0 auto',
-                            padding: '4px 8px',
-                            borderRadius: '6px',
+                            padding: '6px 10px',
+                            borderRadius: '8px',
                             border: `1px solid ${activeStream.id === ch.id ? ch.color : 'rgba(255,255,255,0.05)'}`,
-                            background: activeStream.id === ch.id ? `${ch.color}20` : 'transparent',
-                            color: activeStream.id === ch.id ? ch.color : 'var(--color-text-tertiary)',
-                            fontSize: '0.6rem',
+                            background: activeStream.id === ch.id ? `${ch.color}25` : 'rgba(255,255,255,0.02)',
+                            color: activeStream.id === ch.id ? ch.color : 'rgba(255,255,255,0.6)',
+                            fontSize: '0.65rem',
                             fontWeight: 800,
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            transition: 'all 0.2s'
+                            gap: '6px',
+                            transition: 'all 0.2s',
+                            pointerEvents: isScrolling ? 'none' : 'auto'
                         }}
                     >
-                        <img src={ch.logo} alt="" style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'white' }} />
+                        <img src={ch.logo} alt="" style={{ width: '14px', height: '14px', borderRadius: '3px', background: 'white', padding: '1px' }} />
                         {ch.shortName}
                     </button>
                 ))}
