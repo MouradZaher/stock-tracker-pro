@@ -1,4 +1,4 @@
-# StockTracker Pro - US Stock Portfolio Tracker
+# StockTracker Pro - US Stock Portfolio Tracker 
 
 A professional, real-time US stock portfolio tracker with AI-powered recommendations, built with React, TypeScript, and Vite.
 
