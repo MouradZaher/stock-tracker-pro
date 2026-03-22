@@ -57,7 +57,21 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Channel Info + Controls */}
             <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
                 <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white' }}>{active.logo} {active.name}</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{
+                            width: '20px', height: '20px', borderRadius: '4px',
+                            background: 'white', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
+                            padding: '2px', border: '1px solid rgba(0,0,0,0.1)'
+                        }}>
+                            <img 
+                                src={active.logo} 
+                                alt={active.shortName}
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            />
+                        </div>
+                        {active.name}
+                    </div>
                     <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{active.category} • {active.region}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -126,8 +140,19 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                                 minWidth: 'fit-content'
                             }}
                         >
-                            <span style={{ fontSize: '0.85rem' }}>{ch.logo}</span>
-                            {ch.name}
+                            <div style={{
+                                width: '16px', height: '16px', borderRadius: '3px',
+                                background: 'white', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
+                                padding: '1px', border: '1px solid rgba(0,0,0,0.1)'
+                            }}>
+                                <img 
+                                    src={ch.logo} 
+                                    alt={ch.shortName}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                />
+                            </div>
+                            {ch.shortName}
                             {isActive && <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: ch.color, display: 'inline-block', animation: 'pulse 1.5s infinite' }} />}
                         </button>
                     );

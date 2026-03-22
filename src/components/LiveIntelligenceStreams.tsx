@@ -22,7 +22,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Bloomberg',
         youtubeId: 'UCIALMKvObZNtJ6AmdCLP7Lg',
         videoId: '', 
-        logo: '📈',
+        logo: 'https://logo.clearbit.com/bloomberg.com',
         color: '#FF6600',
         region: 'Global',
         category: 'Finance'
@@ -33,7 +33,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'CNBC',
         youtubeId: 'UCvJJ_dzjViJCoLf5uKUTwoA',
         videoId: '',
-        logo: '💹',
+        logo: 'https://logo.clearbit.com/cnbc.com',
         color: '#0066FF',
         region: 'Global',
         category: 'Finance'
@@ -44,7 +44,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Fox News',
         youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
         videoId: 'OrCH6XEzMwI', // Direct stable ID
-        logo: '🦊',
+        logo: 'https://logo.clearbit.com/foxnews.com',
         color: '#003087',
         region: 'USA',
         category: 'News'
@@ -55,7 +55,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Sky News',
         youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
         videoId: 'YDvsBbKfLPA', // Direct stable ID
-        logo: '🌐',
+        logo: 'https://logo.clearbit.com/sky.com',
         color: '#E00034',
         region: 'UK',
         category: 'News'
@@ -66,7 +66,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Euronews',
         youtubeId: 'UCSrZ3UV4jOidv8ppoVuvW9Q',
         videoId: 'pykpO5kQJ98', // Direct stable ID
-        logo: '🇪🇺',
+        logo: 'https://logo.clearbit.com/euronews.com',
         color: '#00548F',
         region: 'Europe',
         category: 'News'
@@ -77,7 +77,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'DW',
         youtubeId: 'UCknLrEdhRCp1aegoMqRaCZg',
         videoId: '',
-        logo: '🇩🇪',
+        logo: 'https://logo.clearbit.com/dw.com',
         color: '#D00000',
         region: 'Germany',
         category: 'News'
@@ -88,7 +88,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'France 24',
         youtubeId: 'UCCCPCZNChQdGa9EkATeye4g',
         videoId: '',
-        logo: '🇫🇷',
+        logo: 'https://logo.clearbit.com/france24.com',
         color: '#E60019',
         region: 'France',
         category: 'News'
@@ -99,7 +99,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Al Jazeera',
         youtubeId: 'UCfiwzLy-8yKzIbsmZTzxDgw',
         videoId: '',
-        logo: '🌍',
+        logo: 'https://logo.clearbit.com/aljazeera.com',
         color: '#009BB8',
         region: 'Global',
         category: 'News'
@@ -110,7 +110,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Al Arabiya',
         youtubeId: 'UCahpxixMCwoANAftn6IxkTg',
         videoId: '',
-        logo: '📡',
+        logo: 'https://logo.clearbit.com/alarabiya.net',
         color: '#C8102E',
         region: 'Arabic',
         category: 'Arabic'
@@ -121,7 +121,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Asharq News',
         youtubeId: 'UCRJUVYt9gjg8MnlGacySUdg',
         videoId: '',
-        logo: '🇸🇦',
+        logo: 'https://logo.clearbit.com/asharq.com',
         color: '#000000',
         region: 'Arabic',
         category: 'Arabic'
@@ -132,7 +132,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Asharq Biz',
         youtubeId: 'UCxjpGbfoLy6oodYdiyzQE4g',
         videoId: '',
-        logo: '💰',
+        logo: 'https://logo.clearbit.com/asharq.com', // Sharing the base domain
         color: '#FFD700',
         region: 'Arabic',
         category: 'Finance'
@@ -143,7 +143,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Sky Arabia',
         youtubeId: 'UCIJXOvggjKtCagMfxvcCzAA',
         videoId: '',
-        logo: '🇦🇪',
+        logo: 'https://logo.clearbit.com/skynewsarabia.com',
         color: '#E00034',
         region: 'Arabic',
         category: 'Arabic'
@@ -392,7 +392,7 @@ const LiveIntelligenceStreams: React.FC = () => {
                                     onClick={() => switchChannel(channel)}
                                     style={{
                                         flex: '0 0 auto',
-                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        display: 'flex', alignItems: 'center', gap: '8px',
                                         padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
                                         border: `1px solid ${isActive ? channel.color : 'var(--glass-border)'}`,
                                         background: isActive ? `${channel.color}20` : 'rgba(255,255,255,0.02)',
@@ -405,7 +405,22 @@ const LiveIntelligenceStreams: React.FC = () => {
                                         minWidth: 'fit-content'
                                     }}
                                 >
-                                    <span style={{ fontSize: '0.9rem' }}>{channel.logo}</span>
+                                    <div style={{
+                                        width: '18px', height: '18px', borderRadius: '4px',
+                                        background: 'white', display: 'flex', alignItems: 'center',
+                                        justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
+                                        padding: '1px', border: '1px solid rgba(0,0,0,0.1)'
+                                    }}>
+                                        <img 
+                                            src={channel.logo} 
+                                            alt={channel.shortName}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                                (e.target as HTMLImageElement).parentElement!.innerText = channel.shortName[0];
+                                            }}
+                                        />
+                                    </div>
                                     {channel.shortName}
                                     {isActive && (
                                         <div className="pulse" style={{
