@@ -3,6 +3,7 @@ import { User, Briefcase, Plus, Zap, Target, LineChart, TrendingUp, TrendingDown
 import { formatCurrency } from '../utils/formatters';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
+import CompanyLogo from './CompanyLogo';
 
 // ─── Data Enrichment ────────────────────────────────────────────────────────
 const FAMOUS_PORTFOLIOS = [
@@ -216,21 +217,7 @@ const FamousHoldings: React.FC<FamousHoldingsProps> = ({ onQuickAdd }) => {
                                     <tr key={stock.symbol} className="holding-row" style={{ background: 'rgba(255,255,255,0.02)', transition: 'background 0.2s' }}>
                                         <td style={{ padding: '12px', borderRadius: '12px 0 0 12px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <div style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    borderRadius: '10px',
-                                                    background: 'rgba(0,0,0,0.3)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontWeight: 900,
-                                                    fontSize: '0.8rem',
-                                                    color: 'var(--color-text-primary)',
-                                                    border: '1px solid var(--glass-border)'
-                                                }}>
-                                                    {stock.symbol[0]}
-                                                </div>
+                                                <CompanyLogo symbol={stock.symbol} size={40} />
                                                 <div>
                                                     <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{stock.symbol}</div>
                                                     <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '4px' }}>

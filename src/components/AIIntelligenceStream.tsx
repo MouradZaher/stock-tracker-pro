@@ -67,7 +67,7 @@ const AIIntelligenceStream: React.FC = () => {
                     borderRight: '1px solid var(--color-accent-light)',
                     paddingRight: '0.75rem'
                 }}>
-                    AI Intelligence
+                    LIVE DASHBOARD
                 </div>
 
                 <div className="stream-content" style={{ 

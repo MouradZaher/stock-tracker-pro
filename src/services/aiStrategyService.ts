@@ -358,9 +358,9 @@ class AIStrategyService {
         await new Promise(r => setTimeout(r, 400));
         
         const insights = [
+            `Social sentiment audit: "Panic selling" keywords stabilizing in retail forums. Potentially bottoming. LIVE`,
             `Scanning ${marketId.toUpperCase()} institutional positioning... Divergence detected in Mid-Cap tech.`,
             `Correlation alert: BTC and NVDA coupling reaching 90-day highs. Monitor risk parity.`,
-            `Social sentiment audit: "Panic selling" keywords stabilizing in retail forums. Potentially bottoming.`,
             `13F intelligence: Institutional accumulation doubling in renewable energy sector.`,
             `Volatility regime shift detected. Shifting defensive buffers to 'Ready' state.`,
             `Asymmetric risk detected in ${marketId === 'egypt' ? 'Real Estate' : 'Small Cap Value'} sector. Value gap widening.`,

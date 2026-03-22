@@ -2,6 +2,7 @@ import React from 'react';
 import { Calendar, Bell, Clock, ChevronRight, AlertTriangle, Zap, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { usePortfolioStore } from '../hooks/usePortfolio';
+import CompanyLogo from './CompanyLogo';
 
 interface EarningsEvent {
     symbol: string;
@@ -55,14 +56,15 @@ const EarningsCalendar: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="w-14 h-14 rounded-2xl bg-slate-900 flex flex-column align-items-center justify-content-center border border-white/5 shadow-inner">
+                            <div className="w-14 h-14 rounded-2xl bg-slate-900 flex flex-column align-items-center justify-content-center border border-white/5 shadow-inner shrink-0">
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">{event.date.split('-')[1] === '03' ? 'MAR' : 'APR'}</span>
                                 <span className="text-xl font-black text-white leading-tight">{event.date.split('-')[2]}</span>
                             </div>
                             
-                            <div className="flex-1">
-                                <div className="flex align-items-center gap-2">
-                                    <span className="text-base font-black text-white group-hover:text-blue-400 transition-colors uppercase tracking-tight">{event.symbol}</span>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex align-items-center gap-2 flex-wrap">
+                                    <CompanyLogo symbol={event.symbol} size={24} />
+                                    <span className="text-base font-black text-white group-hover:text-blue-400 transition-colors uppercase tracking-tight truncate">{event.symbol}</span>
                                     <div className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-tighter ${event.time === 'After Market' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/20' : 'bg-blue-500/20 text-blue-400 border border-blue-500/20'}`}>
                                         {event.time === 'After Market' ? 'AMC' : 'BMO'}
                                     </div>

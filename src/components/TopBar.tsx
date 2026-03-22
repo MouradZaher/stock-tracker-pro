@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMultipleQuotes } from '../services/stockDataService';
+import CompanyLogo from './CompanyLogo';
 
 const SYMBOLS = ['TSLA', 'AMZN', 'GOOGL', 'META', '^GSPC', 'AAPL', 'NVDA', 'MSFT', 'NFLX'];
 
@@ -120,6 +121,7 @@ const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
                         onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
+                        <CompanyLogo symbol={item.symbol === 'S&P 500' ? '^GSPC' : item.symbol} size={16} />
                         <span style={{ fontWeight: 700, color: 'var(--color-text-secondary)' }}>{item.symbol}</span>
                         <span style={{ fontFamily: 'monospace' }}>{formatPrice(item.price)}</span>
                         <span style={{

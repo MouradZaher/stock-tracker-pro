@@ -14,35 +14,36 @@ interface Channel {
 }
 
 // Live stream channel list with confirmed current Video IDs to bypass Error 153
+// Live stream channel list with verified UC... IDs for 100% stable /live_stream embedding
 const CHANNELS: Channel[] = [
     {
         id: 'bloomberg',
         name: 'Bloomberg Television',
         shortName: 'Bloomberg',
         youtubeId: 'UCIALMKvObZNtJ6AmdCLP7Lg',
-        videoId: 'iEpJwprxDdk',
+        videoId: '', 
         logo: '📈',
         color: '#FF6600',
-        region: 'USA',
+        region: 'Global',
         category: 'Finance'
     },
     {
         id: 'cnbc',
-        name: 'CNBC Live',
+        name: 'CNBC International',
         shortName: 'CNBC',
         youtubeId: 'UCvJJ_dzjViJCoLf5uKUTwoA',
-        videoId: '9NyxcX3rhQs',
+        videoId: '',
         logo: '💹',
         color: '#0066FF',
-        region: 'USA',
+        region: 'Global',
         category: 'Finance'
     },
     {
-        id: 'foxnews',
+        id: 'livenowfox',
         name: 'LiveNOW from FOX',
         shortName: 'Fox News',
         youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
-        videoId: 'C96oohpWBGw', // 24/7 stable live stream ID
+        videoId: '',
         logo: '🦊',
         color: '#003087',
         region: 'USA',
@@ -50,10 +51,10 @@ const CHANNELS: Channel[] = [
     },
     {
         id: 'skynews',
-        name: 'Sky News',
+        name: 'Sky News Live',
         shortName: 'Sky News',
         youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
-        videoId: 'YDvsBbKfLPA',
+        videoId: '',
         logo: '🌐',
         color: '#E00034',
         region: 'UK',
@@ -61,21 +62,21 @@ const CHANNELS: Channel[] = [
     },
     {
         id: 'euronews',
-        name: 'Euronews',
+        name: 'Euronews English',
         shortName: 'Euronews',
         youtubeId: 'UCSrZ3UV4jOidv8ppoVuvW9Q',
-        videoId: 'pykpO5kQJ98',
+        videoId: '',
         logo: '🇪🇺',
         color: '#00548F',
-        region: 'EU',
+        region: 'Europe',
         category: 'News'
     },
     {
         id: 'dw',
-        name: 'DW News',
+        name: 'DW News Live',
         shortName: 'DW',
         youtubeId: 'UCknLrEdhRCp1aegoMqRaCZg',
-        videoId: 'LuKwFajn37U',
+        videoId: '',
         logo: '🇩🇪',
         color: '#D00000',
         region: 'Germany',
@@ -83,10 +84,10 @@ const CHANNELS: Channel[] = [
     },
     {
         id: 'france24',
-        name: 'France 24',
+        name: 'France 24 English',
         shortName: 'France 24',
-        youtubeId: 'UCQfwfsi5VrQ8yKZ-UWmAEFg',
-        videoId: 'Ap-UM1O9RBU',
+        youtubeId: 'UCCCPCZNChQdGa9EkATeye4g',
+        videoId: '',
         logo: '🇫🇷',
         color: '#E60019',
         region: 'France',
@@ -96,22 +97,55 @@ const CHANNELS: Channel[] = [
         id: 'aljazeera',
         name: 'Al Jazeera English',
         shortName: 'Al Jazeera',
-        youtubeId: 'UCNye-wNBqNL5ZzHSJj3l8Bg',
-        videoId: 'gCNeDWCI0vo',
+        youtubeId: 'UCfiwzLy-8yKzIbsmZTzxDgw',
+        videoId: '',
         logo: '🌍',
         color: '#009BB8',
-        region: 'Qatar',
+        region: 'Global',
         category: 'News'
     },
     {
         id: 'alarabiya',
-        name: 'Al Arabiya English',
+        name: 'Al Arabiya News',
         shortName: 'Al Arabiya',
-        youtubeId: 'UCIZJ9a6P_nxCFJTmL0gh_IQ',
-        videoId: 'n7eQejkXbnM', // Fallback to Al Arabiya main if English is off-air
+        youtubeId: 'UCahpxixMCwoANAftn6IxkTg',
+        videoId: '',
         logo: '📡',
         color: '#C8102E',
-        region: 'UAE',
+        region: 'Arabic',
+        category: 'Arabic'
+    },
+    {
+        id: 'asharqnews',
+        name: 'Asharq News',
+        shortName: 'Asharq News',
+        youtubeId: 'UCRJUVYt9gjg8MnlGacySUdg',
+        videoId: '',
+        logo: '🇸🇦',
+        color: '#000000',
+        region: 'Arabic',
+        category: 'Arabic'
+    },
+    {
+        id: 'asharqbusiness',
+        name: 'Asharq Business',
+        shortName: 'Asharq Biz',
+        youtubeId: 'UCxjpGbfoLy6oodYdiyzQE4g',
+        videoId: '',
+        logo: '💰',
+        color: '#FFD700',
+        region: 'Arabic',
+        category: 'Finance'
+    },
+    {
+        id: 'skynewsarabia',
+        name: 'Sky News Arabia',
+        shortName: 'Sky Arabia',
+        youtubeId: 'UCIJXOvggjKtCagMfxvcCzAA',
+        videoId: '',
+        logo: '🇦🇪',
+        color: '#E00034',
+        region: 'Arabic',
         category: 'Arabic'
     },
 ];

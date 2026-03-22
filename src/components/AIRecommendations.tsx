@@ -14,6 +14,7 @@ import type { MarketId } from '../contexts/MarketContext';
 import AIPerformanceTracker from './AIPerformanceTracker';
 import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 import AIStrategyIntelliHub from './AIStrategyIntelliHub';
+import CompanyLogo from './CompanyLogo';
 
 
 
@@ -317,6 +318,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
                 <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <CompanyLogo symbol={detailSymbol} size={48} />
                         <div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                                 <div style={{ fontSize: '1.75rem', fontWeight: 800, lineHeight: 1 }}>{detailSymbol}</div>
@@ -324,6 +327,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                             </div>
                             <div style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '0.25rem' }}>{detailStockData ? formatCurrency(detailStockData.price) : '...'}</div>
                         </div>
+                    </div>
                         <div style={{ textAlign: 'right' }}>
                             <div style={{ color: (detailStockData?.change || 0) >= 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 700, fontSize: '1rem' }}>
                                 {detailStockData ? (detailStockData.change >= 0 ? '+' : '') : ''}{detailStockData ? (Number(detailStockData.changePercent) || 0).toFixed(2) : '0.00'}%
@@ -505,10 +509,10 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     </h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
                         {[
-                            { label: 'Technical Analysis (40pts)', color: 'rgba(99,102,241,', desc: 'RSI momentum, MA crossovers, price vs moving average, and trend confirmation.' },
-                            { label: 'Fundamentals (20pts)', color: 'rgba(16,185,129,', desc: 'P/E analysis, EPS growth, and valuation relative to sector peers.' },
-                            { label: 'News Sentiment (25pts)', color: 'rgba(59,130,246,', desc: 'Real-time headline analysis with positive/negative sentiment scoring.' },
-                            { label: 'Social Pulse (15pts)', color: 'rgba(168,85,247,', desc: 'Institutional social volume and sentiment tracking smart money flows.' },
+                            { label: 'Technical Forensic (40pts)', color: 'rgba(99,102,241,', desc: 'RSI divergence, HFT liquidity sweeps, and multi-timeframe trend confirmation.' },
+                            { label: 'Value Discovery (25pts)', color: 'rgba(16,185,129,', desc: 'Deep-value auditing: PEG < 1.0, forward yield analysis, and FCF acceleration traps.' },
+                            { label: 'Social Sentiment Audit (25pts)', color: 'rgba(59,130,246,', desc: 'Real-time retail forum analysis. Scanning for "Panic Selling" bottoms and retail capitulation.' },
+                            { label: 'Institutional Flow (10pts)', color: 'rgba(168,85,247,', desc: '13F smart-money tracking and dark pool accumulation signatures.' },
                         ].map((item, i) => (
                             <div key={i} style={{ padding: '0.85rem', background: `${item.color}0.05)`, borderRadius: '10px', border: `1px solid ${item.color}0.15)` }}>
                                 <div style={{ fontSize: '0.65rem', color: `${item.color}1)`, textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>{item.label}</div>
@@ -556,9 +560,12 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                 }}
                             >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <div>
-                                        <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
-                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>{stock.score}% ALPHA</div>
+                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                        <CompanyLogo symbol={stock.symbol} size={32} />
+                                        <div>
+                                            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white' }}>{stock.symbol}</div>
+                                            <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>{stock.score}% ALPHA</div>
+                                        </div>
                                     </div>
                                     <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                         <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Value</div>
@@ -685,8 +692,13 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                                         {recs.map((rec, idx) => (
                                             <tr key={`${rec.symbol}-${idx}`} onClick={() => handleLocalSelect(rec)} style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
                                                 <td style={{ padding: '1rem 1.25rem' }}>
-                                                    <div style={{ fontWeight: 900, color: 'white' }}>{rec.symbol}</div>
-                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{rec.name}</div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <CompanyLogo symbol={rec.symbol} size={28} />
+                                                        <div>
+                                                            <div style={{ fontWeight: 900, color: 'white' }}>{rec.symbol}</div>
+                                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{rec.name}</div>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td style={{ padding: '1rem', textAlign: 'center' }}>
                                                     <div style={{ padding: '2px 8px', borderRadius: '4px', background: rec.score >= 75 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: rec.score >= 75 ? 'var(--color-success)' : 'var(--color-warning)', fontSize: '0.6rem', fontWeight: 900, display: 'inline-block' }}>

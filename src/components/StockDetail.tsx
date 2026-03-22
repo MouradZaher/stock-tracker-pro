@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AIRecommendations from './AIRecommendations';
+import CompanyLogo from './CompanyLogo';
 import PriceAlertsModal from './PriceAlertsModal';
 import TradeAnalysisPanel from './TradeAnalysisPanel';
 import RealTimePrice from './RealTimePrice';
@@ -179,6 +180,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                                 <ArrowLeft size={20} />
                             </button>
                         )}
+                        <CompanyLogo symbol={stock.symbol} size={48} />
                         <div className="stock-symbol">{stock.symbol}</div>
                         <button
                             className={`btn-icon ${inWatchlist ? 'text-warning' : ''}`}

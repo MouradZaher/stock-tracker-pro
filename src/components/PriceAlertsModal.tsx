@@ -3,6 +3,8 @@ import { X, Bell, BellOff, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { usePriceAlerts } from '../hooks/usePriceAlerts';
 import { formatCurrency } from '../utils/formatters';
 
+import CompanyLogo from './CompanyLogo';
+
 interface PriceAlertsModalProps {
     symbol: string;
     currentPrice: number;
@@ -27,7 +29,9 @@ const PriceAlertsModal: React.FC<PriceAlertsModalProps> = ({ symbol, currentPric
             <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px' }}>
                 <div className="modal-header">
                     <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <Bell size={20} className="text-accent" /> Price Alerts: {symbol}
+                        <Bell size={20} className="text-accent" /> 
+                        <CompanyLogo symbol={symbol} size={24} />
+                        Price Alerts: {symbol}
                     </h3>
                     <button className="btn btn-icon glass-button" onClick={onClose}>
                         <X size={20} />

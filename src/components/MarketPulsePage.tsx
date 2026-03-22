@@ -9,6 +9,7 @@ import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../
 import { useMarket } from '../contexts/MarketContext';
 import EarningsCalendar from './EarningsCalendar';
 import OptionsFlowSimulator from './OptionsFlowSimulator';
+import CompanyLogo from './CompanyLogo';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -429,6 +430,56 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 gap: '1rem',
                 margin: '0 1rem 1.5rem 1rem'
             }}>
+                {/* ═══ TOP ALPHA PICKS (Institutional High Conviction) ═══ */}
+                <div className="glass-card hover-glow" style={{ padding: '1.25rem', gridColumn: '1 / -1', border: '1px solid var(--color-accent-light)', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                        <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+                            <Sparkles size={18} color="var(--color-warning)" /> Institutional Alpha Picks
+                        </h3>
+                        <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)', background: 'var(--color-accent-light)', padding: '3px 10px', borderRadius: '12px' }}>
+                            {effectiveMarket.name.toUpperCase()} MARKET
+                        </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                        {MARKET_ALPHA[effectiveMarket.id]?.map((pick) => (
+                            <div 
+                                key={pick.symbol} 
+                                onClick={() => handleAction(pick.symbol)}
+                                style={{ 
+                                    padding: '1rem', 
+                                    background: 'rgba(255,255,255,0.02)', 
+                                    borderRadius: '12px', 
+                                    border: '1px solid var(--glass-border)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                    e.currentTarget.style.borderColor = 'var(--color-accent)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                                    e.currentTarget.style.borderColor = 'var(--glass-border)';
+                                }}
+                            >
+                                <CompanyLogo symbol={pick.symbol} size={40} />
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontWeight: 900, fontSize: '1rem' }}>{pick.symbol}</span>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: pick.color }}>{pick.score}%</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700, marginTop: '2px' }}>
+                                        {pick.rec}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Fear & Greed Gauge */}
                 <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>

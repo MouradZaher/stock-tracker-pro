@@ -12,6 +12,7 @@ import SymbolSearchInput from './SymbolSearchInput';
 import { analyzeSymbol } from '../services/aiRecommendationService';
 import type { StockRecommendation } from '../types';
 import { useMarket } from '../contexts/MarketContext';
+import CompanyLogo from './CompanyLogo';
 
 import IndexComponents from './IndexComponents';
 import FamousHoldings from './FamousHoldings';
@@ -311,20 +312,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                             <tr key={symbol} onClick={() => onSelectSymbol(symbol)} style={{ cursor: 'pointer' }}>
                                                 <td style={{ borderRadius: '8px 0 0 8px' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                        <div style={{
-                                                            width: '32px',
-                                                            height: '32px',
-                                                            borderRadius: '6px',
-                                                            background: 'rgba(99, 102, 241, 0.1)',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            fontWeight: 900,
-                                                            fontSize: '0.75rem',
-                                                            color: 'var(--color-accent)'
-                                                        }}>
-                                                            {symbol}
-                                                        </div>
+                                                        <CompanyLogo symbol={symbol} size={32} />
                                                         <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{stock.name}</div>
                                                     </div>
                                                 </td>

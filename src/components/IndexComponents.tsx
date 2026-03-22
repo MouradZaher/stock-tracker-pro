@@ -4,6 +4,7 @@ import { STOCKS_BY_INDEX } from '../data/sectors';
 import { useMarket } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
+import CompanyLogo from './CompanyLogo';
 
 interface IndexComponentsProps {
     onQuickAdd: (symbol: string) => void;
@@ -69,17 +70,20 @@ const IndexComponents: React.FC<IndexComponentsProps> = ({ onQuickAdd }) => {
                                 e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
                             }}
                         >
-                            <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                <span style={{ fontWeight: 800, fontSize: '0.85rem' }}>{stock.symbol}</span>
-                                <span style={{
-                                    fontSize: '0.7rem',
-                                    color: 'var(--color-text-tertiary)',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                }}>
-                                    {stock.name}
-                                </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden', flex: 1 }}>
+                                <CompanyLogo symbol={stock.symbol} size={28} />
+                                <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                    <span style={{ fontWeight: 800, fontSize: '0.85rem' }}>{stock.symbol}</span>
+                                    <span style={{
+                                        fontSize: '0.7rem',
+                                        color: 'var(--color-text-tertiary)',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {stock.name}
+                                    </span>
+                                </div>
                             </div>
                             <button
                                 className="btn btn-icon glass-button highlight-on-hover"
