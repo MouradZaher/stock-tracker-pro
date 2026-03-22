@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
-import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe, Play, ExternalLink, Info, Sparkles } from 'lucide-react';
+import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe, Play, ExternalLink, Info, Sparkles, Move } from 'lucide-react';
 import type { NewsArticle, SocialPost } from '../types';
 import { socialFeedService } from '../services/SocialFeedService';
 import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../services/stockDataService';
