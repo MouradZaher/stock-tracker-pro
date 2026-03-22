@@ -15,7 +15,7 @@ interface Channel {
 
 // Live stream channel list with confirmed current Video IDs to bypass Error 153
 // Live stream channel list with verified UC... IDs for 100% stable /live_stream embedding
-const CHANNELS: Channel[] = [
+export const CHANNELS: Channel[] = [
     {
         id: 'bloomberg',
         name: 'Bloomberg Television',

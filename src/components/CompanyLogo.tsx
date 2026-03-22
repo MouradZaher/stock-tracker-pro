@@ -12,7 +12,19 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     // Clean symbol (remove ^ for indices, etc) to ensure valid URL and abbreviation
     const cleanSymbol = symbol.replace(/[^a-zA-Z0-9]/g, '');
 
-    if (error || !cleanSymbol) {
+    // List of indices that definitely don't have FMP stock-images
+    const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
+
+    if (error || !cleanSymbol || isIndex) {
+        // Special styling for major indices
+        let indexColor = 'var(--color-bg-elevated)';
+        let indexLabel = cleanSymbol.substring(0, 2).toUpperCase();
+
+        if (cleanSymbol === 'GSPC') { indexColor = '#10B981'; indexLabel = 'SP'; }
+        else if (cleanSymbol === 'DJI') { indexColor = '#3b82f6'; indexLabel = 'DJ'; }
+        else if (cleanSymbol === 'IXIC') { indexColor = '#8B5CF6'; indexLabel = 'NQ'; }
+        else if (cleanSymbol === 'VIX') { indexColor = '#EF4444'; indexLabel = 'VX'; }
+
         return (
             <div 
                 className={`company-logo-fallback ${className}`}
@@ -20,20 +32,21 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
                     width: size,
                     height: size,
                     borderRadius: '50%',
-                    background: 'var(--color-bg-elevated)',
+                    background: indexColor,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: `${size * 0.45}px`,
-                    fontWeight: 800,
-                    color: 'var(--color-text-primary)',
+                    fontSize: `${size * 0.4}px`,
+                    fontWeight: 900,
+                    color: 'white',
                     flexShrink: 0,
-                    border: '1px solid var(--glass-border)',
-                    boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
-                    overflow: 'hidden'
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    boxShadow: 'inset 0 0 10px rgba(0,0,0,0.3)',
+                    overflow: 'hidden',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                 }}
             >
-                {cleanSymbol.substring(0, 2).toUpperCase() || '?'}
+                {indexLabel}
             </div>
         );
     }

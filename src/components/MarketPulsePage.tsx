@@ -11,21 +11,14 @@ import EarningsCalendar from './EarningsCalendar';
 import OptionsFlowSimulator from './OptionsFlowSimulator';
 import CompanyLogo from './CompanyLogo';
 
+import { CHANNELS } from './LiveIntelligenceStreams';
+
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
 }
 
-const MARKET_STREAMS = [
-    { name: 'Bloomberg', fullName: 'Bloomberg Television', origin: 'Global Finance', color: '#FF6600', logo: '📈', channelId: 'UC--FGqQyq-oN_d2gS9i3cBA', fallbackId: 'dp8PhLsUcFE', region: 'USA' },
-    { name: 'CNBC', fullName: 'CNBC Live', origin: 'US Markets', color: '#0066FF', logo: '💹', channelId: 'UCvJJ_dzjViJCoLf5uKUTwoA', fallbackId: 'M9VmRFXD-QA', region: 'USA' },
-    { name: 'Fox Business', fullName: 'Fox Business', origin: 'US Finance', color: '#003087', logo: '🦊', channelId: 'UCCXoCcu9Rp7NPbTzIvogpZg', fallbackId: 'oc_E1Z_zO0A', region: 'USA' },
-    { name: 'Sky News', fullName: 'Sky News Live', origin: 'UK International', color: '#E00034', logo: '🌐', channelId: 'UCkkABfG_3hPzPMO_o_1J_iA', fallbackId: '9Auq9mYxFEE', region: 'UK' },
-    { name: 'Euronews', fullName: 'Euronews Live', origin: 'European Markets', color: '#00548F', logo: '🇪🇺', channelId: 'UCpPq3L9d38XWvA8qX-GAwzA', fallbackId: 'r24NvEkAnyU', region: 'EU' },
-    { name: 'DW News', fullName: 'DW News', origin: 'Germany / Global', color: '#D00000', logo: '🇩🇪', channelId: 'UCknLrEeNf7L_P7m88_o_k6A', fallbackId: 's-5-5g6jEGE', region: 'Germany' },
-    { name: 'France 24', fullName: 'France 24 English', origin: 'France / Global', color: '#E60019', logo: '🇫🇷', channelId: 'UCCCpD1oN_aiC4Y1-Pj3h37A', fallbackId: 'h3MuIUNCCLI', region: 'France' },
-    { name: 'Al Jazeera', fullName: 'Al Jazeera English', origin: 'MENA / Global', color: '#009BB8', logo: '🌍', channelId: 'UCoMdktP4KWve3C-HAW5Sj0Q', fallbackId: 'mHGASMFnjVg', region: 'Qatar' },
-    { name: 'Al Arabiya', fullName: 'Al Arabiya Live', origin: 'Arabic Markets', color: '#C8102E', logo: '📡', channelId: 'UCahpxixMCwoANAftn6IxkTg', fallbackId: 'Jg8NWbPKUP4', region: 'UAE' },
-];
+// Use centralized channels for consistent experience
+const MARKET_STREAMS = CHANNELS;
 
 // Inline stream player component — shows a single active stream with channel selector strip
 const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ streams }) => {
@@ -48,12 +41,15 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Video Player */}
             <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
                 <iframe
-                    key={`${active.fallbackId || active.channelId}-${muted}`}
-                    src={`https://www.youtube.com/embed/${active.fallbackId || 'live_stream?channel=' + active.channelId}?autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`}
+                    key={`${active.id}-${muted}`}
+                    src={active.videoId 
+                        ? `https://www.youtube.com/embed/${active.videoId}?autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`
+                        : `https://www.youtube.com/embed/live_stream?channel=${active.youtubeId}&autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`
+                    }
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
-                    title={active.fullName}
+                    title={active.name}
                     onLoad={() => console.log(`Stream loaded: ${active.name}`)}
                 />
             </div>
@@ -61,8 +57,8 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Channel Info + Controls */}
             <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
                 <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white' }}>{active.logo} {active.fullName}</div>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{active.origin} • {active.region}</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white' }}>{active.logo} {active.name}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{active.category} • {active.region}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <button
@@ -83,7 +79,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                         {muted ? '🔇 Muted' : '🔊 Live'}
                     </button>
                     <a
-                        href={`https://www.youtube.com/channel/${active.channelId}/live`}
+                        href={`https://www.youtube.com/channel/${active.youtubeId}/live`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ 
@@ -113,10 +109,10 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Channel Selector Strip */}
             <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none' }}>
                 {streams.map((ch) => {
-                    const isActive = ch.channelId === active.channelId;
+                    const isActive = ch.id === active.id;
                     return (
                         <button
-                            key={ch.channelId}
+                            key={ch.id}
                             onClick={() => setActive(ch)}
                             style={{
                                 flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px',
