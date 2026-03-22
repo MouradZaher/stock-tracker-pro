@@ -64,21 +64,13 @@ const AIStrategyIntelliHub: React.FC = () => {
 
     return (
         <div className="ai-strategy-hub" style={{ padding: '0 0.5rem' }}>
-            <div style={{ marginBottom: '1rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Zap size={20} color="var(--color-warning)" /> AI Strategy Intelligence Hub
-                </h2>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', margin: 0 }}>
-                    Advanced market analysis engines for institutional-grade decision making.
-                </p>
-            </div>
+            {/* Headers removed */}
 
             {/* Institutional Deep Dive Engine */}
             <div className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%)', border: '1px solid var(--color-accent-light)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Shield size={20} className="text-accent" />
-                        <span style={{ fontWeight: 800, fontSize: '1rem' }}>Institutional Deep Dive Engine</span>
+                        {/* Title removed */}
                     </div>
                     <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-accent)', background: 'var(--color-accent-light)', padding: '2px 10px', borderRadius: '20px' }}>
                         10 MODULES ACTIVE

@@ -37,15 +37,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
 
     return (
         <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)', position: 'relative' }}>
-            {/* Stream Status Overlay */}
-            <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10, display: 'flex', gap: '8px' }}>
-                <div style={{ background: 'rgba(0,255,100,0.2)', border: '1px solid #00FF66', borderRadius: '4px', padding: '2px 6px', fontSize: '0.6rem', color: '#00FF66', fontWeight: 900, backdropFilter: 'blur(4px)' }}>
-                    📡 ENCRYPTED_STREAM_ACTIVE
-                </div>
-                <div style={{ background: 'rgba(59,130,246,0.2)', border: '1px solid #3b82f6', borderRadius: '4px', padding: '2px 6px', fontSize: '0.6rem', color: '#3b82f6', fontWeight: 900, backdropFilter: 'blur(4px)' }}>
-                    🔐 REGION_BYPASS: US_PROXY
-                </div>
-            </div>
+            {/* Stream Status Overlays removed as per request */}
 
             {/* Video Player */}
             <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
@@ -389,26 +381,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             paddingTop: '0'
         }}>
 
-            {/* Header Area */}
-            <div className="pulse-page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '1rem 1.5rem', borderBottom: '1px solid var(--glass-border)', background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)' }}>
-                <div>
-                    <h1 style={{ fontSize: '2.75rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '16px', letterSpacing: '-0.03em' }}>
-                        Institutional Hub
-                    </h1>
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.95rem', margin: 0, fontWeight: 500 }}>
-                        Real-time institutional grade market intelligence and sentiment analysis.
-                    </p>
-                </div>
-            </div>
-
-            {/* ═══ LIVE WORLD FINANCIAL NETWORKS ═══ */}
+            <div style={{ height: '1.5rem' }}></div>
             <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem' }}>
-                    <div className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-error)', boxShadow: '0 0 8px var(--color-error)' }}></div>
-                    <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>Live Intelligence Streams</h2>
-                </div>
-
-                {/* Channel Selector + Video Player */}
                 <LiveStreamsPlayer streams={MARKET_STREAMS} />
             </div>
 

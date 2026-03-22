@@ -426,131 +426,110 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             gap: '1.5rem',
             padding: '1.5rem'
         }}>
-            {!detailSymbol && (
-                <div style={{ 
-                    display: 'flex', 
-                    gap: '0.5rem', 
-                    marginBottom: '0.5rem',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                    background: 'var(--color-bg)',
-                    padding: '1rem 0'
-                }}>
-                    <button onClick={() => setActiveSubTab('pulse')} style={{ borderRadius: '8px', background: activeSubTab === 'pulse' ? 'rgba(99,102,241,0.1)' : 'transparent', color: activeSubTab === 'pulse' ? 'var(--color-accent)' : 'inherit', border: activeSubTab === 'pulse' ? '1px solid var(--color-accent)' : '1px solid transparent', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 700 }}>Market Pulse</button>
-                    <button onClick={() => setActiveSubTab('intelligence')} style={{ borderRadius: '8px', background: activeSubTab === 'intelligence' ? 'rgba(16,185,129,0.1)' : 'transparent', color: activeSubTab === 'intelligence' ? 'var(--color-success)' : 'inherit', border: activeSubTab === 'intelligence' ? '1px solid var(--color-success)' : '1px solid transparent', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 700 }}>Intelligence</button>
-                </div>
-            )}
+            <div style={{ height: '0.5rem' }}></div>
 
-            {activeSubTab === 'pulse' ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1, minHeight: 0 }}>
-                    {/* TOP: AI Strategy Intelligence Hub (Moved from Intelligence) */}
-                    <div style={{ minHeight: 0, overflowY: 'auto', flex: '0 0 auto' }}>
-                        <AIStrategyIntelliHub />
-                    </div>
-
-                    {/* MIDDLE: AI Strategic Scanner */}
-                    <div style={{ flex: '0 0 auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', letterSpacing: '0.15em', fontWeight: 900, margin: 0 }}>AI Strategic Scanner</h3>
-                            <LiveBadge />
-                        </div>
-                        <button 
-                            className="btn btn-primary" 
-                            onClick={runScanner} 
-                            disabled={isScanning} 
-                            style={{ 
-                                width: '100%', 
-                                padding: '1.25rem',
-                                fontSize: '1.1rem',
-                                fontWeight: 900,
-                                background: 'var(--gradient-primary)',
-                                boxShadow: '0 12px 48px rgba(99,102,241,0.4)',
-                                borderRadius: '20px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.1em',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '12px'
-                            }}
-                        >
-                            <Zap size={28} fill="currentColor" />
-                            {isScanning ? 'Processing Market Intelligence...' : 'Initiate Deep AI Scan'}
-                        </button>
-
-                        {isScanning && (
-                            <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
-                                <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${scanProgress}%`, height: '100%', background: 'var(--color-success)', transition: 'width 0.3s ease' }} />
-                                </div>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '8px', fontFamily: 'monospace' }}>
-                                    {scanLog[scanLog.length - 1]}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* BOTTOM: Assets Table (Biggest Box) */}
-                    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                        <div className="table-container glass-card" style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--glass-border-bright)' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'rgba(20,20,30,0.95)', backdropFilter: 'blur(10px)' }}>
-                                    <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.02)' }}>
-                                        <th style={{ textAlign: 'left', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Asset</th>
-                                        <th style={{ textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Signal</th>
-                                        <th style={{ textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Conviction</th>
-                                        <th style={{ textAlign: 'right', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {groupedRecs.map((group) => (
-                                        <React.Fragment key={group.name}>
-                                            <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                                <td colSpan={4} style={{ padding: '0.75rem 1.5rem', fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-accent)' }}>{group.name.toUpperCase()}</td>
-                                            </tr>
-                                            {group.recommendations.map((rec) => (
-                                                <tr 
-                                                    key={rec.symbol} 
-                                                    onClick={() => handleLocalSelect(rec)} 
-                                                    style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)', transition: 'background 0.2s' }}
-                                                    className="hover-bg-blur"
-                                                >
-                                                    <td style={{ padding: '1.25rem 1.5rem' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                            <CompanyLogo symbol={rec.symbol} size={32} />
-                                                            <span style={{ fontWeight: 800, fontSize: '1rem' }}>{rec.symbol}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
-                                                        <span style={{ 
-                                                            padding: '6px 12px', 
-                                                            borderRadius: '8px', 
-                                                            fontSize: '0.75rem', 
-                                                            fontWeight: 900,
-                                                            background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                            color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)'
-                                                        }}>
-                                                            {rec.recommendation.toUpperCase()}
-                                                        </span>
-                                                    </td>
-                                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center', fontWeight: 900, color: getScoreColor(rec.score), fontSize: '1.1rem' }}>{rec.score}%</td>
-                                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right', fontWeight: 700, fontSize: '1.1rem' }}>{formatCurrency(rec.price || 0)}</td>
-                                                </tr>
-                                            ))}
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1, minHeight: 0 }}>
+                {/* TOP: AI Strategy Intelligence Hub */}
+                <div style={{ minHeight: 0, overflowY: 'auto', flex: '0 0 auto' }}>
                     <AIStrategyIntelliHub />
                 </div>
-            )}
+
+                {/* MIDDLE: AI Strategic Scanner */}
+                <div style={{ flex: '0 0 auto' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.25rem' }}>
+                        <LiveBadge />
+                    </div>
+                    <button 
+                        className="btn btn-primary" 
+                        onClick={runScanner} 
+                        disabled={isScanning} 
+                        style={{ 
+                            width: '100%', 
+                            padding: '1.25rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 900,
+                            background: 'var(--gradient-primary)',
+                            boxShadow: '0 12px 48px rgba(99,102,241,0.4)',
+                            borderRadius: '20px',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px'
+                        }}
+                    >
+                        <Zap size={28} fill="currentColor" />
+                        {isScanning ? 'Processing Market Intelligence...' : 'Initiate Deep AI Scan'}
+                    </button>
+
+                    {isScanning && (
+                        <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
+                            <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ width: `${scanProgress}%`, height: '100%', background: 'var(--color-success)', transition: 'width 0.3s ease' }} />
+                            </div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '8px', fontFamily: 'monospace' }}>
+                                {scanLog[scanLog.length - 1]}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* BOTTOM: Assets Table (Biggest Box) */}
+                <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                    <div className="table-container glass-card" style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--glass-border-bright)' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'rgba(20,20,30,0.95)', backdropFilter: 'blur(10px)' }}>
+                                <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.02)' }}>
+                                    <th style={{ textAlign: 'left', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Asset</th>
+                                    <th style={{ textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Signal</th>
+                                    <th style={{ textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Conviction</th>
+                                    <th style={{ textAlign: 'right', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {groupedRecs.map((group) => (
+                                    <React.Fragment key={group.name}>
+                                        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                            <td colSpan={4} style={{ padding: '0.75rem 1.5rem', fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-accent)' }}>{group.name.toUpperCase()}</td>
+                                        </tr>
+                                        {group.recommendations.map((rec) => (
+                                            <tr 
+                                                key={rec.symbol} 
+                                                onClick={() => handleLocalSelect(rec)} 
+                                                style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)', transition: 'background 0.2s' }}
+                                                className="hover-bg-blur"
+                                            >
+                                                <td style={{ padding: '1.25rem 1.5rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <CompanyLogo symbol={rec.symbol} size={32} />
+                                                        <span style={{ fontWeight: 800, fontSize: '1rem' }}>{rec.symbol}</span>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+                                                    <span style={{ 
+                                                        padding: '6px 12px', 
+                                                        borderRadius: '8px', 
+                                                        fontSize: '0.75rem', 
+                                                        fontWeight: 900,
+                                                        background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                        color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)'
+                                                    }}>
+                                                        {rec.recommendation.toUpperCase()}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center', fontWeight: 900, color: getScoreColor(rec.score), fontSize: '1.1rem' }}>{rec.score}%</td>
+                                                <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right', fontWeight: 700, fontSize: '1.1rem' }}>{formatCurrency(rec.price || 0)}</td>
+                                            </tr>
+                                        ))}
+                                    </React.Fragment>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

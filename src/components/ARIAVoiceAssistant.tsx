@@ -45,7 +45,49 @@ const ARIAVoiceAssistant: React.FC<ARIAVoiceAssistantProps> = ({ onNavigate, onS
     const [supported, setSupported] = useState(false);
     const [pulseAnim, setPulseAnim] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const [position, setPosition] = useState({ x: 20, y: 144 }); // Default bottom-right (y is from bottom)
+    const dragRef = useRef<HTMLButtonElement>(null);
+    const offsetRef = useRef({ x: 0, y: 0 });
     const recognitionRef = useRef<any>(null);
+
+    // Draggable Logic
+    const handleMouseDown = (e: React.MouseEvent) => {
+        setIsDragging(true);
+        const rect = dragRef.current?.getBoundingClientRect();
+        if (rect) {
+            // Store offset relative to the current position (bottom-right based)
+            offsetRef.current = {
+                x: window.innerWidth - e.clientX - position.x,
+                y: window.innerHeight - e.clientY - position.y
+            };
+        }
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDragging) return;
+            const newX = window.innerWidth - e.clientX - offsetRef.current.x;
+            const newY = window.innerHeight - e.clientY - offsetRef.current.y;
+            
+            // Constrain to viewport
+            const constrainedX = Math.max(10, Math.min(window.innerWidth - 60, newX));
+            const constrainedY = Math.max(10, Math.min(window.innerHeight - 60, newY));
+            
+            setPosition({ x: constrainedX, y: constrainedY });
+        };
+
+        const handleMouseUp = () => setIsDragging(false);
+
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging]);
 
     // Check if Web Speech API is available
     useEffect(() => {
@@ -176,11 +218,14 @@ const ARIAVoiceAssistant: React.FC<ARIAVoiceAssistantProps> = ({ onNavigate, onS
         <>
             {/* Floating ARIA button */}
             <button
-                onClick={isOpen ? () => setIsOpen(false) : handleOpen}
+                ref={dragRef}
+                onMouseDown={handleMouseDown}
+                onClick={isOpen ? () => !isDragging && setIsOpen(false) : () => !isDragging && handleOpen()}
                 className="aria-voice-assistant-trigger"
                 style={{
                     position: 'fixed',
-                    right: '20px',
+                    right: `${position.x}px`,
+                    bottom: `${position.y}px`,
                     width: '52px',
                     height: '52px',
                     borderRadius: '50%',
@@ -188,17 +233,19 @@ const ARIAVoiceAssistant: React.FC<ARIAVoiceAssistantProps> = ({ onNavigate, onS
                         ? 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)'
                         : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                     border: 'none',
-                    cursor: 'pointer',
+                    cursor: isDragging ? 'grabbing' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: isOpen ? '0 0 20px rgba(99, 102, 241, 0.4)' : '0 4px 15px rgba(0,0,0,0.3)',
                     zIndex: 5000,
-                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    transition: isDragging ? 'none' : 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                     transform: pulseAnim ? 'scale(1.1)' : 'scale(1)',
                     animation: (pulseAnim || isSpeaking) ? 'aria-brain-pulse 2s infinite' : 'none',
+                    userSelect: 'none',
+                    touchAction: 'none'
                 }}
-                title="ARIA - Voice Assistant"
+                title="ARIA - Drag to Reposition, Click to Talk"
                 aria-label="Open ARIA Voice Assistant"
             >
                 {isSpeaking ? <Volume2 size={24} color="white" /> : <Brain size={24} color="white" />}
@@ -208,8 +255,8 @@ const ARIAVoiceAssistant: React.FC<ARIAVoiceAssistantProps> = ({ onNavigate, onS
             {isOpen && (
                 <div style={{
                     position: 'fixed',
-                    bottom: '144px',
-                    right: '20px',
+                    bottom: `${position.y + 64}px`,
+                    right: `${position.x}px`,
                     width: '300px',
                     background: 'rgba(10, 10, 20, 0.95)',
                     backdropFilter: 'blur(20px)',
