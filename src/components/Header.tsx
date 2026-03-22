@@ -106,13 +106,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     return (
         <>
             <header className="header" role="banner" style={{
-                display: 'flex',
-                flexDirection: 'row',
+                display: 'grid',
+                gridTemplateColumns: '1fr auto 1fr',
                 alignItems: 'center',
-                justifyContent: 'space-between',
                 padding: '0 var(--spacing-xl)',
                 height: 'var(--header-height)',
-                gap: '0.5rem',
+                gap: '1rem',
                 borderBottom: '1px solid var(--glass-border)',
                 boxSizing: 'border-box',
                 position: 'fixed',
@@ -128,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 {/* ── Logo ─────────────────────────────── */}
                 <div className="header-logo" onClick={() => handleTabClick('home')} style={{ 
                     cursor: 'pointer', 
-                    flexShrink: 0, 
+                    justifySelf: 'start',
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px',
@@ -219,11 +218,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     })}
                 </div>
 
-                <div className="mobile-only" style={{ flex: 1 }} />
+                <div className="mobile-only" />
 
 
                 {/* ── Actions (right-aligned) ───────────── */}
-                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <div className="header-actions" style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     {/* Market Countdown Clock */}
                     {!isMobile && <MarketCountdown />}
                     {/* Market Selector */}
