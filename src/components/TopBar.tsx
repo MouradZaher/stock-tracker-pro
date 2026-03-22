@@ -90,13 +90,13 @@ const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
     return (
         <div className="top-bar glass-effect" style={{
             width: '100%',
-            height: '32px',
+            height: '28px',
             borderBottom: '1px solid var(--glass-border)',
             display: 'flex',
             alignItems: 'center',
-            padding: '0 1rem',
-            fontSize: '0.75rem',
-            background: 'rgba(0,0,0,0.8)',
+            padding: '0 0.75rem',
+            fontSize: '0.68rem',
+            background: 'rgba(0,0,0,0.85)',
             zIndex: 1100, // Above header
             position: 'fixed',
             top: 0,
@@ -104,7 +104,7 @@ const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
             overflow: 'hidden',
             whiteSpace: 'nowrap'
         }}>
-            <div className="scrolling-content" style={{ display: 'flex', gap: '2rem' }}>
+            <div className="scrolling-content" style={{ display: 'flex', gap: '1.5rem' }}>
                 {[...tickerItems, ...tickerItems, ...tickerItems].map((item, idx) => (
                     <div 
                         key={`${item.symbol}-${idx}`} 
@@ -112,23 +112,24 @@ const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
                         style={{ 
                             display: 'flex', 
                             alignItems: 'center', 
-                            gap: '6px',
+                            gap: '5px',
                             cursor: 'pointer',
-                            padding: '2px 8px',
+                            padding: '1px 6px',
                             borderRadius: '4px',
                             transition: 'background 0.2s'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
-                        <CompanyLogo symbol={item.symbol === 'S&P 500' ? '^GSPC' : item.symbol} size={16} />
-                        <span style={{ fontWeight: 700, color: 'var(--color-text-secondary)' }}>{item.symbol}</span>
-                        <span style={{ fontFamily: 'monospace' }}>{formatPrice(item.price)}</span>
+                        <CompanyLogo symbol={item.symbol === 'S&P 500' ? '^GSPC' : item.symbol} size={14} />
+                        <span style={{ fontWeight: 800, color: 'var(--color-text-secondary)', letterSpacing: '0.02em' }}>{item.symbol}</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{formatPrice(item.price)}</span>
                         <span style={{
                             color: item.isUp ? 'var(--color-success)' : 'var(--color-error)',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '2px'
+                            gap: '2px',
+                            fontWeight: 800
                         }}>
                             {formatChange(item.change)}
                         </span>

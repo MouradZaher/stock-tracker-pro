@@ -64,8 +64,8 @@
   --color-warning-light: rgba(245, 158, 11, 0.15);
 
   /* Global Layout Variables */
-  --header-height: 64px;
-  --topbar-height: 32px;
+  --header-height: 56px;
+  --topbar-height: 28px;
   --total-header-height: calc(var(--header-height) + var(--topbar-height));
 
   /* Gradients */
@@ -111,13 +111,16 @@
   --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
   --shadow-glow: 0 0 20px var(--color-border-glow);
 
-  /* Glass morphism 4.0 - Ultra Premium Deep Dive */
-  --glass-bg: rgba(8, 8, 14, 0.55);
-  --glass-bg-hover: rgba(14, 14, 24, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-border-bright: rgba(255, 255, 255, 0.15);
-  --glass-blur: blur(36px) saturate(220%);
-  --glass-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  /* Premium Glassmorphism & Effects */
+  --glass-bg: rgba(10, 10, 15, 0.7);
+  --glass-blur: blur(24px);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  --glass-glow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+
+  /* Animation Tokens */
+  --anim-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Vibrant Mesh Gradient Colors - Deep Mind Inspiration */
   --mesh-1: rgba(79, 70, 229, 0.25); /* Indigo */

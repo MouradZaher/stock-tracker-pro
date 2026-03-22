@@ -29,6 +29,8 @@ import AdminDashboard from './components/AdminDashboard';
 import MobileNav from './components/MobileNav';
 import ARIAVoiceAssistant from './components/ARIAVoiceAssistant';
 import ThemeMoodManager from './components/ThemeMoodManager';
+import FloatingStream from './components/FloatingStream';
+import { usePiPStore } from './services/usePiPStore';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';
 import PinLoginPage from './pages/PinLoginPage';
@@ -285,6 +287,7 @@ function MainLayout({
         onSelectSymbol={handleSelectSymbol}
       />
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
+      {activeTab !== 'pulse' && <FloatingStream />}
     </div>
   );
 }

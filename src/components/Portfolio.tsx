@@ -19,6 +19,95 @@ import type { StockRecommendation } from '../types';
 import RealTimePrice from './RealTimePrice';
 import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 import CompanyLogo from './CompanyLogo';
+import RiskReturnChart from './RiskReturnChart';
+
+// --- NEW: Scenario Hedging Component ---
+const ScenarioHedging: React.FC<{ positions: any[] }> = ({ positions }) => {
+    const [scenario, setScenario] = useState<'crash' | 'recession' | 'inflation' | 'base'>('base');
+    
+    const scenarios = {
+        base: { label: 'Neutral', impact: 0, color: 'var(--color-text-tertiary)' },
+        crash: { label: 'Flash Crash (-10%)', impact: -10, color: 'var(--color-error)' },
+        recession: { label: 'Bear Market (-25%)', impact: -25, color: 'var(--color-error)' },
+        inflation: { label: 'Stagflation (+5%)', impact: 5, color: 'var(--color-warning)' },
+    };
+
+    const hedgingAssets = positions.filter(p => ['GLD', 'SLV', 'VOO', 'TLT'].includes(p.symbol));
+    const totalValue = positions.reduce((sum, p) => sum + p.marketValue, 0);
+    const hedgeValue = hedgingAssets.reduce((sum, p) => sum + p.marketValue, 0);
+    const hedgeRatio = totalValue > 0 ? (hedgeValue / totalValue) * 100 : 0;
+
+    // Simulated Beta protection: Gold (GLD) protects 0.8x of crash, VOO 0x, etc.
+    const getProtection = () => {
+        let protectedValue = 0;
+        hedgingAssets.forEach(p => {
+            if (p.symbol === 'GLD') protectedValue += p.marketValue * 0.8;
+            if (p.symbol === 'TLT') protectedValue += p.marketValue * 0.6;
+        });
+        return protectedValue;
+    };
+
+    const potentialLoss = (totalValue * (scenarios[scenario].impact / 100));
+    const protectedAmount = scenario === 'base' ? 0 : (getProtection() * (Math.abs(scenarios[scenario].impact) / 100));
+    const netImpact = potentialLoss + protectedAmount;
+
+    return (
+        <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--glass-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <ShieldCheck size={18} color="var(--color-success)" /> Scenario Hedging Simulator
+                </h3>
+                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '4px' }}>
+                    HEDGE RATIO: {hedgeRatio.toFixed(1)}%
+                </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem' }}>
+                {(Object.entries(scenarios) as [keyof typeof scenarios, any][]).map(([key, item]) => (
+                    <button
+                        key={key}
+                        onClick={() => { soundService.playTap(); setScenario(key); }}
+                        style={{
+                            flex: 1,
+                            padding: '10px 6px',
+                            background: scenario === key ? 'rgba(255,255,255,0.05)' : 'transparent',
+                            border: `1px solid ${scenario === key ? item.color : 'rgba(255,255,255,0.05)'}`,
+                            borderRadius: '8px',
+                            fontSize: '0.65rem',
+                            fontWeight: 800,
+                            color: scenario === key ? 'white' : 'var(--color-text-tertiary)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        {item.label}
+                    </button>
+                ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', padding: '1.25rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
+                <div>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Potential Drawdown</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-error)' }}>{potentialLoss === 0 ? '--' : formatCurrency(potentialLoss)}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>Protected Alpha</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-success)' }}>{protectedAmount === 0 ? '--' : `+${formatCurrency(protectedAmount)}`}</div>
+                </div>
+                <div style={{ gridColumn: 'span 2', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.75rem', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>ESTIMATED NET IMPACT</span>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 900, color: netImpact >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                        {netImpact === 0 ? '$0.00' : (netImpact > 0 ? '+' : '') + formatCurrency(netImpact)}
+                    </span>
+                </div>
+            </div>
+
+            <p style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '1rem', lineHeight: 1.4, textAlign: 'center' }}>
+                {hedgeRatio < 15 ? '⚠️ Warning: Hedge ratio below 15%. Portfolio is vulnerable to tail-risk events. Consider adding GLD or TLT.' : '✅ Optimal hedging detected. Strategic assets provide significant downside protection.'}
+            </p>
+        </div>
+    );
+};
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
 }
@@ -353,7 +442,14 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }, [positions]);
 
     return (
-        <div className="tab-content portfolio-main-container">
+        <div className="tab-content portfolio-main-container" style={{ 
+            height: 'calc(100vh - 120px)', 
+            overflowY: 'auto', 
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            paddingTop: '0'
+        }}>
             {/* ... existing header and summary ... */}
             <div className="portfolio-header" style={{
                 marginBottom: '2.5rem',
@@ -636,7 +732,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
 
             {/* Portfolio Content - Main Table and Cards */}
-            {activeSubTab === 'positions' && (
+            {activeSubTab === 'positions' ? (
                 <div style={{ marginBottom: '2rem' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         📊 My Positions
@@ -909,12 +1005,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         </>
                     )}
                 </div>
-            )}
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.4s ease' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
+                        <RiskReturnChart positions={positions} />
+                        <ScenarioHedging positions={positions} />
+                    </div>
 
-            {/* AI/Risk Intelligence Tab Content */}
-            {activeSubTab === 'intelligence' && (
-                <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-                    {/* === SUPER INTELLIGENCE PANEL === */}
                     <div className="glass-card" style={{ padding: '1.75rem', marginBottom: '1.5rem', border: '1px solid var(--glass-border-bright)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
                             <Sparkles size={20} color="var(--color-accent)" />
@@ -1207,7 +1304,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     )}
                 </div>
             )}
-
 
             {/* AI Advice Modal */}
             {showAIAdvice && (

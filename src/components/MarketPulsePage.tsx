@@ -12,6 +12,7 @@ import OptionsFlowSimulator from './OptionsFlowSimulator';
 import CompanyLogo from './CompanyLogo';
 
 import { CHANNELS } from './LiveIntelligenceStreams';
+import { usePiPStore } from '../services/usePiPStore';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -22,8 +23,16 @@ const MARKET_STREAMS = CHANNELS;
 
 // Inline stream player component — shows a single active stream with channel selector strip
 const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ streams }) => {
-    const [active, setActive] = useState(streams[0]);
-    const [muted, setMuted] = useState(true);
+    const { activeStream, setActiveStream, isMuted, setMuted } = usePiPStore();
+    const active = activeStream || streams[0];
+    
+    // Sync local selection to global store on first load if none active
+    useEffect(() => {
+        if (!activeStream) {
+            setActiveStream(streams[0]);
+        }
+    }, [activeStream, setActiveStream, streams]);
+
     const scrollRef = React.useRef<HTMLDivElement>(null);
 
     return (
@@ -41,10 +50,10 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             {/* Video Player */}
             <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
                 <iframe
-                    key={`${active.id}-${muted}`}
+                    key={`${active.id}-${isMuted}`}
                     src={active.videoId 
-                        ? `https://www.youtube.com/embed/${active.videoId}?autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`
-                        : `https://www.youtube.com/embed/live_stream?channel=${active.youtubeId}&autoplay=1&mute=${muted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`
+                        ? `https://www.youtube.com/embed/${active.videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`
+                        : `https://www.youtube.com/embed/live_stream?channel=${active.youtubeId}&autoplay=1&mute=${isMuted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&gl=US&hl=en`
                     }
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -78,8 +87,8 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                     <button
                         onClick={() => {
                             const current = active;
-                            setActive({...streams[0]}); // Jiggle state
-                            setTimeout(() => setActive(current), 50);
+                            setActiveStream({...streams[0]}); // Jiggle state
+                            setTimeout(() => setActiveStream(current), 50);
                             soundService.playTap();
                         }}
                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}
@@ -87,10 +96,10 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                         <RefreshCw size={12} /> Force Sync
                     </button>
                     <button
-                        onClick={() => setMuted(!muted)}
-                        style={{ background: muted ? 'rgba(255,255,255,0.05)' : 'rgba(99,102,241,0.15)', border: `1px solid ${muted ? 'var(--glass-border)' : 'var(--color-accent)'}`, borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: muted ? 'var(--color-text-tertiary)' : 'var(--color-accent)', fontSize: '0.7rem', fontWeight: 700 }}
+                        onClick={() => setMuted(!isMuted)}
+                        style={{ background: isMuted ? 'rgba(255,255,255,0.05)' : 'rgba(99,102,241,0.15)', border: `1px solid ${isMuted ? 'var(--glass-border)' : 'var(--color-accent)'}`, borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: isMuted ? 'var(--color-text-tertiary)' : 'var(--color-accent)', fontSize: '0.7rem', fontWeight: 700 }}
                     >
-                        {muted ? '🔇 Muted' : '🔊 Live'}
+                        {isMuted ? '🔇 Muted' : '🔊 Live'}
                     </button>
                     <a
                         href={`https://www.youtube.com/channel/${active.youtubeId}/live`}
@@ -127,7 +136,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                     return (
                         <button
                             key={ch.id}
-                            onClick={() => setActive(ch)}
+                            onClick={() => setActiveStream(ch)}
                             style={{
                                 flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '5px',
                                 padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
@@ -188,6 +197,22 @@ const MARKET_ALPHA: Record<string, any[]> = {
 
 const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const { effectiveMarket, setSentimentScore } = useMarket();
+    const { activeStream, setPiPActive } = usePiPStore();
+
+    // Reset PiP when on this page
+    useEffect(() => {
+        setPiPActive(false);
+    }, [setPiPActive]);
+
+    // Enable PiP when leaving if a stream is active
+    useEffect(() => {
+        return () => {
+            if (activeStream) {
+                setPiPActive(true);
+            }
+        };
+    }, [activeStream, setPiPActive]);
+
     const handleAction = useCallback((symbol: string) => {
         soundService.playTap();
         onSelectStock?.(symbol);
@@ -355,7 +380,14 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div className="tab-content market-pulse-main">
+        <div className="tab-content market-pulse-main" style={{ 
+            height: 'calc(100vh - 120px)', 
+            overflowY: 'auto', 
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            paddingTop: '0'
+        }}>
             {/* ── Breaking News Ticker (Smooth Marquee) ── */}
             {breakingNews && breakingNews.length > 0 && (
                 <div

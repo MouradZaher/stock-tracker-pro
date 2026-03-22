@@ -33,8 +33,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
     }, []);
-    const iconSize = isMobile ? 11 : 14;
-    const btnH = isMobile ? '20px' : '26px';
+    const iconSize = isMobile ? 10 : 12;
+    const btnH = isMobile ? '18px' : '22px';
 
     const tabs: { id: TabType; label: string; icon: React.ElementType; isCustomIcon?: boolean }[] = [
         { id: 'home', label: 'Home', icon: Home },
@@ -76,31 +76,31 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
     const getNotificationIcon = (type: string) => {
         switch (type) {
-            case 'alert': return <Bell size={14} color="var(--color-error)" />;
-            case 'news': return <Shield size={14} color="var(--color-accent)" />;
-            case 'ai': return <Sparkles size={14} color="var(--color-success)" />;
-            case 'social': return <MessageSquare size={14} color="#1DA1F2" />;
-            default: return <Bell size={14} />;
+            case 'alert': return <Bell size={12} color="var(--color-error)" />;
+            case 'news': return <Shield size={12} color="var(--color-accent)" />;
+            case 'ai': return <Sparkles size={12} color="var(--color-success)" />;
+            case 'social': return <MessageSquare size={12} color="#1DA1F2" />;
+            default: return <Bell size={12} />;
         }
     };
 
     const iconBtn: React.CSSProperties = {
         background: 'rgba(255, 255, 255, 0.03)',
         border: '1px solid var(--glass-border)',
-        borderRadius: '8px',
+        borderRadius: '6px',
         color: 'var(--color-text-secondary)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: isMobile ? '4px' : '6px',
+        padding: isMobile ? '3px' : '5px',
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-        gap: '4px',
-        fontSize: '0.7rem',
+        gap: '3px',
+        fontSize: '0.65rem',
         fontWeight: 700,
         whiteSpace: 'nowrap' as const,
-        height: isMobile ? '28px' : '32px',
-        minWidth: isMobile ? '28px' : '32px',
+        height: isMobile ? '24px' : '28px',
+        minWidth: isMobile ? '24px' : '28px',
     };
 
     return (
@@ -109,13 +109,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0 var(--spacing-xl)',
+                padding: '0 var(--spacing-lg)',
                 height: 'var(--header-height)',
-                gap: '1rem',
+                gap: '0.75rem',
                 borderBottom: '1px solid var(--glass-border)',
                 boxSizing: 'border-box',
                 position: 'fixed',
-                top: '32px', // Below TopBar
+                top: '28px', // Below TopBar
                 left: 0,
                 right: 0,
                 zIndex: 1001,
