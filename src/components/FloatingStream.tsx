@@ -1,15 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Maximize2, Move, Volume2, VolumeX, GripHorizontal, ChevronLeft, ChevronRight, Activity, Search, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef, CSSProperties } from 'react';
+import { X, Maximize2, Volume2, VolumeX, GripHorizontal, ChevronRight, Activity } from 'lucide-react';
 import { usePiPStore } from '../services/usePiPStore';
 import { useNavigate } from 'react-router-dom';
 import { CHANNELS } from './LiveIntelligenceStreams';
+
+interface PiPStream {
+    id: string;
+    name: string;
+    shortName: string;
+    category: string;
+    region: string;
+    logo: string;
+    videoId?: string;
+    youtubeId?: string;
+    color: string;
+}
 
 const FloatingStream: React.FC = () => {
     const { activeStream, setActiveStream, isPiPActive, setPiPActive, isMuted, setMuted } = usePiPStore();
     const navigate = useNavigate();
     
-    // Default position at bottom-right
-    const [position, setPosition] = useState({ x: window.innerWidth - 380, y: window.innerHeight - 360 });
+    // Default position at bottom-right with more padding
+    const [position, setPosition] = useState({ x: window.innerWidth - 380, y: window.innerHeight - 440 });
     const [size, setSize] = useState({ width: 360, height: 202 });
     const [dragMode, setDragMode] = useState<'move' | 'resize' | null>(null);
     const [initialDrag, setInitialDrag] = useState({ x: 0, y: 0, w: 0, h: 0, px: 0, py: 0 });
@@ -18,8 +30,6 @@ const FloatingStream: React.FC = () => {
     const [isScrolling, setIsScrolling] = useState(false);
     const [scrollStartX, setScrollStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
-
-    const containerRef = useRef<HTMLDivElement>(null);
 
     if (!isPiPActive || !activeStream) return null;
 
@@ -46,7 +56,7 @@ const FloatingStream: React.FC = () => {
         if (!isScrolling) return;
         e.preventDefault();
         const x = e.pageX - (stripRef.current?.offsetLeft || 0);
-        const walk = (x - scrollStartX) * 2;
+        const walk = (x - scrollStartX) * 1.5;
         if (stripRef.current) {
             stripRef.current.scrollLeft = scrollLeft - walk;
         }
@@ -67,7 +77,7 @@ const FloatingStream: React.FC = () => {
                 });
             } else if (dragMode === 'resize') {
                 const dw = e.clientX - initialDrag.x;
-                const newWidth = Math.max(200, Math.min(800, initialDrag.w + dw));
+                const newWidth = Math.max(240, Math.min(800, initialDrag.w + dw));
                 const newHeight = newWidth * (9/16);
                 setSize({ width: newWidth, height: newHeight });
             }
@@ -93,33 +103,36 @@ const FloatingStream: React.FC = () => {
         navigate('/pulse');
     };
 
+    // Safe clamped position
+    const clampedX = Math.max(0, Math.min(window.innerWidth - size.width, position.x));
+    const clampedY = Math.max(0, Math.min(window.innerHeight - size.height - 140, position.y));
+
     return (
         <div 
-            ref={containerRef}
             style={{
                 position: 'fixed',
-                left: `${Math.max(0, Math.min(window.innerWidth - size.width, position.x))}px`,
-                top: `${Math.max(0, Math.min(window.innerHeight - size.height - 120, position.y))}px`,
+                left: `${clampedX}px`,
+                top: `${clampedY}px`,
                 width: `${size.width}px`,
                 zIndex: 9999,
-                borderRadius: '20px',
+                borderRadius: '24px',
                 overflow: 'hidden',
-                boxShadow: '0 32px 80px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.1)',
-                background: '#050508',
-                border: '1px solid var(--color-accent-light)',
-                animation: 'pipFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                boxShadow: '0 40px 100px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.1), 0 0 40px rgba(99,102,241,0.2)',
+                background: '#04040a',
+                border: '1px solid rgba(255,255,255,0.08)',
+                animation: 'pipFadeInCustom 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                 display: 'flex',
                 flexDirection: 'column',
                 userSelect: 'none',
-                backdropFilter: 'blur(20px)'
+                backdropFilter: 'blur(30px)'
             }}
         >
-            {/* Header / Drag Bar */}
+            {/* Header / Move Area */}
             <div 
                 onMouseDown={(e) => handleMouseDown(e, 'move')}
                 style={{
-                    padding: '10px 14px',
-                    background: 'rgba(0,0,0,0.5)',
+                    padding: '12px 16px',
+                    background: 'rgba(255,255,255,0.02)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
@@ -127,47 +140,38 @@ const FloatingStream: React.FC = () => {
                     borderBottom: '1px solid rgba(255,255,255,0.05)'
                 }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ 
                         width: '24px', height: '24px', borderRadius: '6px', 
                         background: 'white', display: 'flex', alignItems: 'center', 
-                        justifyContent: 'center', padding: '3px', boxShadow: '0 0 10px rgba(255,255,255,0.2)' 
+                        justifyContent: 'center', padding: '4px'
                     }}>
                         <img src={activeStream.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1 }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1 }}>
                             {activeStream.shortName}
                         </span>
-                        <span style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>LIVE PRO PIP</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                            <div className="pip-live-pulse" />
+                            <span style={{ fontSize: '0.5rem', color: '#10b981', fontWeight: 800 }}>LIVE PRO</span>
+                        </div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                    <button 
-                        onClick={() => setMuted(!isMuted)}
-                        className="pip-action-btn"
-                        title={isMuted ? 'Unmute' : 'Mute'}
-                    >
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => setMuted(!isMuted)} className="p-action">
                         {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
                     </button>
-                    <button 
-                        onClick={handleRestore}
-                        className="pip-action-btn"
-                        title="Expand back to Pulse"
-                    >
+                    <button onClick={handleRestore} className="p-action">
                         <Maximize2 size={14} />
                     </button>
-                    <button 
-                        onClick={() => setPiPActive(false)}
-                        className="pip-action-btn close-btn"
-                        title="Close Stream"
-                    >
+                    <button onClick={() => setPiPActive(false)} className="p-action p-close">
                         <X size={14} />
                     </button>
                 </div>
             </div>
 
-            {/* Video Player */}
+            {/* Content Area */}
             <div style={{ width: '100%', height: `${size.height}px`, position: 'relative', background: '#000' }}>
                 <iframe
                     src={activeStream.videoId 
@@ -179,37 +183,50 @@ const FloatingStream: React.FC = () => {
                     title={activeStream.name}
                 />
                 
-                {/* Visual Resize Indicator (Corner) */}
+                {/* Visual Resize Handle */}
                 <div 
                     onMouseDown={(e) => handleMouseDown(e, 'resize')}
                     style={{
                         position: 'absolute',
-                        right: '4px',
-                        bottom: '4px',
-                        width: '24px',
-                        height: '24px',
+                        right: '6px',
+                        bottom: '6px',
+                        width: '28px',
+                        height: '28px',
                         cursor: 'nwse-resize',
                         zIndex: 10,
                         display: 'flex',
                         alignItems: 'flex-end',
                         justifyContent: 'flex-end',
-                        padding: '2px',
-                        color: 'rgba(255,255,255,0.3)'
+                        color: 'rgba(255,255,255,0.4)',
+                        background: 'linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.1) 50%)',
+                        borderRadius: '0 0 12px 0'
                     }}
                 >
-                    <GripHorizontal size={14} style={{ transform: 'rotate(-45deg)' }} />
+                    <GripHorizontal size={16} style={{ transform: 'rotate(-45deg)' }} />
                 </div>
             </div>
 
-            {/* Channels Box (Rectangle Strip) */}
-            <div style={{ padding: '4px', background: 'rgba(0,0,0,0.8)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            {/* Channels Rectangle Box */}
+            <div style={{ 
+                padding: '12px', 
+                background: 'rgba(0,0,0,0.92)', 
+                borderTop: '1px solid rgba(255,255,255,0.05)'
+            }}>
                 <div 
                     ref={stripRef}
                     onMouseDown={handleStripMouseDown}
                     onMouseMove={handleStripMouseMove}
                     onMouseLeave={handleStripMouseUp}
                     onMouseUp={handleStripMouseUp}
-                    className="pip-channel-strip no-scrollbar"
+                    style={{
+                        display: 'flex',
+                        gap: '10px',
+                        overflowX: 'auto',
+                        cursor: isScrolling ? 'grabbing' : 'grab',
+                        userSelect: 'none',
+                        paddingBottom: '2px'
+                    }}
+                    className="no-scrollbar"
                 >
                     {CHANNELS.map(ch => (
                         <button
@@ -217,104 +234,112 @@ const FloatingStream: React.FC = () => {
                             onClick={() => {
                                 if (!isScrolling) setActiveStream(ch);
                             }}
-                            className={`pip-channel-tile ${activeStream.id === ch.id ? 'active' : ''}`}
-                            style={{ '--accent-color': ch.color } as any}
+                            className={`tile ${activeStream.id === ch.id ? 'active' : ''}`}
+                            style={{ '--c': ch.color } as CSSProperties}
                         >
-                            <img src={ch.logo} alt="" className="tile-logo" />
-                            <span className="tile-name">{ch.shortName}</span>
-                            {activeStream.id === ch.id && <div className="active-dot" style={{ background: ch.color }} />}
+                            <img src={ch.logo} alt="" className="l" />
+                            <span className="n">{ch.shortName}</span>
+                            {activeStream.id === ch.id && <div className="d" style={{ background: ch.color }} />}
                         </button>
                     ))}
                 </div>
             </div>
 
             <style>{`
-                .pip-channel-strip {
-                    display: flex;
-                    gap: 8px;
-                    padding: 8px;
-                    overflow-x: auto;
-                    cursor: grab;
-                    user-select: none;
-                }
-                .pip-channel-strip:active { cursor: grabbing; }
-
-                .pip-channel-tile {
-                    flex: 0 0 70px;
-                    height: 70px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1.5px solid rgba(255,255,255,0.05);
-                    border-radius: 12px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 6px;
-                    cursor: pointer;
-                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-                    position: relative;
-                }
-                .pip-channel-tile:hover {
-                    background: rgba(255,255,255,0.08);
-                    border-color: rgba(255,255,255,0.2);
-                    transform: translateY(-2px);
-                }
-                .pip-channel-tile.active {
-                    background: color-mix(in srgb, var(--accent-color) 15%, transparent);
-                    border-color: var(--accent-color);
-                    box-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 30%, transparent);
-                }
-                .tile-logo {
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 6px;
-                    background: white;
-                    padding: 2px;
-                    object-fit: contain;
-                }
-                .tile-name {
-                    font-size: 0.55rem;
-                    font-weight: 800;
-                    color: rgba(255,255,255,0.7);
-                    text-transform: uppercase;
-                }
-                .pip-channel-tile.active .tile-name { color: white; }
-
-                .active-dot {
-                    position: absolute;
-                    top: 6px;
-                    right: 6px;
-                    width: 5px;
-                    height: 5px;
-                    border-radius: 50%;
-                    box-shadow: 0 0 8px currentColor;
-                }
-
-                .pip-action-btn {
+                .p-action {
                     background: rgba(255,255,255,0.05);
                     border: 1px solid rgba(255,255,255,0.1);
-                    color: rgba(255,255,255,0.6);
-                    padding: 6px;
+                    color: rgba(255,255,255,0.7);
+                    width: 28px;
+                    height: 28px;
                     border-radius: 8px;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
+                    justify-content: center;
                     transition: all 0.2s;
                 }
-                .pip-action-btn:hover {
+                .p-action:hover {
                     background: rgba(255,255,255,0.15);
                     color: white;
+                    transform: translateY(-1px);
                 }
-                .pip-action-btn.close-btn:hover {
-                    background: rgba(239, 68, 68, 0.2);
-                    color: #ff4444;
+                .p-close:hover {
+                    background: rgba(239, 68, 68, 0.25);
+                    color: #ff5555;
                     border-color: rgba(239, 68, 68, 0.3);
+                }
+
+                .tile {
+                    flex: 0 0 76px;
+                    height: 84px; /* More rectangular box */
+                    background: rgba(255,255,255,0.02);
+                    border: 1.5px solid rgba(255,255,255,0.05);
+                    border-radius: 14px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    position: relative;
+                }
+                .tile:hover {
+                    background: rgba(255,255,255,0.06);
+                    border-color: rgba(255,255,255,0.2);
+                    transform: translateY(-3px);
+                }
+                .tile.active {
+                    background: color-mix(in srgb, var(--c) 15%, #12121e);
+                    border-color: var(--c);
+                    box-shadow: 0 0 20px color-mix(in srgb, var(--c) 25%, transparent);
+                }
+                .l {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 6px;
+                    background: white;
+                    padding: 3px;
+                    object-fit: contain;
+                }
+                .n {
+                    font-size: 0.6rem;
+                    font-weight: 900;
+                    color: rgba(255,255,255,0.6);
+                    text-transform: uppercase;
+                    letter-spacing: 0.02em;
+                }
+                .tile.active .n { color: white; }
+
+                .d {
+                    position: absolute;
+                    top: 8px;
+                    right: 8px;
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px currentColor;
+                }
+
+                .pip-live-pulse {
+                    width: 6px;
+                    height: 6px;
+                    background: #10b981;
+                    border-radius: 50%;
+                    animation: pulseLive 1.5s infinite;
+                }
+
+                @keyframes pulseLive {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.5); opacity: 0.5; }
+                    100% { transform: scale(1); opacity: 1; }
                 }
 
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 
-                @keyframes pipFadeIn {
-                    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+                @keyframes pipFadeInCustom {
+                    from { opacity: 0; transform: translateY(40px) scale(0.92); }
                     to { opacity: 1; transform: translateY(0) scale(1); }
                 }
             `}</style>
