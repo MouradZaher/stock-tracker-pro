@@ -141,7 +141,7 @@ const MarketCountdown: React.FC = () => {
                     animation: 'slideUp 0.3s ease-out'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-                        <div style={{ p: '6px', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--color-accent)' }}>
+                        <div style={{ padding: '6px', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--color-accent)' }}>
                             <Clock size={16} />
                         </div>
                         <div>
@@ -161,7 +161,7 @@ const MarketCountdown: React.FC = () => {
                             <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Session Days</span>
                             <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'white' }}>{sessionInfo.label}</span>
                         </div>
-                        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', pt: '0.75rem', marginTop: '4px' }}>
+                        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.75rem', marginTop: '4px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                                 <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>Egypt Time (UTC+2)</span>
                             </div>
@@ -193,7 +193,5 @@ const MarketCountdown: React.FC = () => {
         </div>
     );
 };
-
-export default MarketCountdown;
 
 export default MarketCountdown;
