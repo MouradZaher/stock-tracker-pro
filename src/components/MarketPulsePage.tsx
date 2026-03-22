@@ -23,7 +23,7 @@ const MARKET_STREAMS = CHANNELS;
 
 // Inline stream player component — shows a single active stream with channel selector strip
 const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ streams }) => {
-    const { activeStream, setActiveStream, isMuted, setMuted } = usePiPStore();
+    const { activeStream, setActiveStream, isMuted, setMuted, setPiPActive } = usePiPStore();
     const active = activeStream || streams[0];
     
     // Sync local selection to global store on first load if none active
@@ -92,6 +92,16 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                         style={{ background: isMuted ? 'rgba(255,255,255,0.05)' : 'rgba(99,102,241,0.15)', border: `1px solid ${isMuted ? 'var(--glass-border)' : 'var(--color-accent)'}`, borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: isMuted ? 'var(--color-text-tertiary)' : 'var(--color-accent)', fontSize: '0.7rem', fontWeight: 700 }}
                     >
                         {isMuted ? '🔇 Muted' : '🔊 Live'}
+                    </button>
+                    <button
+                        onClick={() => {
+                            setPiPActive(true);
+                            soundService.playTap();
+                        }}
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}
+                        title="Minimize to Picture-in-Picture"
+                    >
+                        <Move size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Minimize
                     </button>
                     <a
                         href={`https://www.youtube.com/channel/${active.youtubeId}/live`}
