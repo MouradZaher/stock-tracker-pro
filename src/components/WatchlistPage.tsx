@@ -197,14 +197,22 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     );
 
     return (
-        <div className="watchlist-page dashboard-container">
+        <div className="watchlist-page-wrapper" style={{ 
+            height: 'calc(100vh - 120px)', 
+            overflowY: 'auto', 
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            paddingTop: '0'
+        }}>
             <div className="section-header" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '1.5rem 0',
+                padding: '1.5rem 1.5rem',
                 borderBottom: '1px solid var(--glass-border)',
-                marginBottom: '1.5rem'
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)',
+                marginBottom: '1rem'
             }}>
                 <div>
                     <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>
@@ -224,7 +232,13 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                 </div>
             </div>
 
-            <div className="dashboard-grid">
+            <div className="dashboard-grid" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'minmax(0, 1fr) 350px', 
+                gap: '1.5rem', 
+                padding: '0 1.5rem 1.5rem 1.5rem',
+                flex: 1
+            }}>
                 {/* Main Content: Personal Watchlist Table */}
                 <div className="dashboard-column">
                     {loading && Object.keys(stockData).length === 0 ? (

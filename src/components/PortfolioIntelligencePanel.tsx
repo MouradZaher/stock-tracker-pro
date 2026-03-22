@@ -48,7 +48,15 @@ const PortfolioIntelligencePanel: React.FC = () => {
     }
 
     return (
-        <div className="p-4 flex flex-column gap-6 animate-in fade-in duration-500" style={{ paddingBottom: '100px' }}>
+        <div className="portfolio-intelligence-wrapper" style={{ 
+            height: 'calc(100vh - 120px)', 
+            overflowY: 'auto', 
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '1.5rem',
+            gap: '1.5rem'
+        }}>
             {/* Header Card */}
             <div className="glass-card p-6 relative overflow-hidden" style={{ borderRadius: '24px' }}>
                 <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
@@ -59,21 +67,30 @@ const PortfolioIntelligencePanel: React.FC = () => {
                         <Shield size={20} />
                     </div>
                     <div>
-                        <h1 className="m-0 text-2xl font-black tracking-tight">Strategy <span className="text-blue-500">Intelligence</span></h1>
-                        <p className="m-0 text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Multi-Layer Alpha Analytics Engine</p>
+                        {/* Header removed as per request */}
                     </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 mt-6">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1.5rem' }}>
                     {(['correlation', 'stress', 'tax', 'options', 'entry', 'alpha'] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all transform active:scale-95 ${
-                                activeTab === tab 
-                                ? 'bg-blue-600 text-white shadow-[0_8px_20px_rgba(37,99,235,0.4)]' 
-                                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white border border-white/5'
-                            }`}
+                            style={{
+                                padding: '0.75rem 1.5rem',
+                                borderRadius: '12px',
+                                fontSize: '0.75rem',
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                cursor: 'pointer',
+                                background: activeTab === tab ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
+                                color: activeTab === tab ? 'white' : 'var(--color-text-secondary)',
+                                border: '1px solid',
+                                borderColor: activeTab === tab ? 'var(--color-accent)' : 'var(--glass-border)',
+                                boxShadow: activeTab === tab ? '0 8px 24px rgba(99, 102, 241, 0.4)' : 'none'
+                            }}
                         >
                             {tab === 'correlation' ? 'Correlation' : 
                              tab === 'stress' ? 'Stress Test' : 
@@ -94,7 +111,15 @@ const PortfolioIntelligencePanel: React.FC = () => {
 
             {/* Content Area */}
             <div className="animate-in slide-in-from-bottom-4 duration-500">
-                {activeTab === 'correlation' && <CorrelationMatrix />}
+                    <div>
+                        {activeTab === 'correlation' && (
+                            <div className="glass-card p-12 text-center border-dashed border-white/10" style={{ borderRadius: '24px' }}>
+                                <Shield size={48} className="text-slate-600 mb-4 opacity-20 mx-auto" />
+                                <h3 className="text-xl font-bold text-slate-400">Analysis Modules Optimized</h3>
+                                <p className="text-sm text-slate-500 mt-2">Correlation analytics have been migrated to the Alpha Deep Dive engine.</p>
+                            </div>
+                        )}
+                    </div>
                 
                 {activeTab === 'stress' && (
                     <div className="flex flex-column gap-4">

@@ -64,17 +64,17 @@ const AIStrategyIntelliHub: React.FC = () => {
 
     return (
         <div className="ai-strategy-hub" style={{ padding: '0 0.5rem' }}>
-            <div style={{ marginBottom: '2.5rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Zap size={24} color="var(--color-warning)" /> AI Strategy Intelligence Hub
+            <div style={{ marginBottom: '1rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Zap size={20} color="var(--color-warning)" /> AI Strategy Intelligence Hub
                 </h2>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', margin: 0 }}>
                     Advanced market analysis engines for institutional-grade decision making.
                 </p>
             </div>
 
             {/* Institutional Deep Dive Engine */}
-            <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2.5rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%)', border: '1px solid var(--color-accent-light)' }}>
+            <div className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%)', border: '1px solid var(--color-accent-light)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <Shield size={20} className="text-accent" />
@@ -121,70 +121,6 @@ const AIStrategyIntelliHub: React.FC = () => {
                 </p>
             </div>
 
-            {/* Strategy Selection Grid */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                gap: '1rem',
-                marginBottom: '2rem'
-            }}>
-                {Object.entries(STRATEGY_METADATA).map(([id, meta]) => {
-                    const Icon = meta.icon;
-                    const isActive = selectedStrategyId === id;
-                    
-                    return (
-                        <div 
-                            key={id}
-                            onClick={() => handleRunStrategy(id)}
-                            className="glass-card interactive"
-                            style={{
-                                padding: '1.25rem',
-                                borderRadius: '16px',
-                                background: isActive ? `${meta.color}15` : 'var(--glass-bg)',
-                                backdropFilter: 'var(--glass-blur)',
-                                WebkitBackdropFilter: 'var(--glass-blur)',
-                                border: `1px solid ${isActive ? meta.color : 'var(--glass-border)'}`,
-                                boxShadow: 'var(--glass-shadow)',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem',
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }}
-                        >
-                            <div style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '12px',
-                                background: `${meta.color}20`,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0
-                            }}>
-                                <Icon size={24} color={meta.color} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'white' }}>{meta.label}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }}>
-                                    {id === AI_STRATEGIES.PORTFOLIO_HEDGING ? 'Risk Mitigation' : 
-                                     id === AI_STRATEGIES.INSTITUTIONAL_POSITIONING ? '13F Alpha' :
-                                     id === AI_STRATEGIES.DIVIDEND_DANGER ? 'Yield Safety' :
-                                     id === AI_STRATEGIES.CRISIS_CORRELATION ? 'Macro Anomalies' :
-                                     id === AI_STRATEGIES.SENTIMENT_ARBITRAGE ? 'Price-Fund Divergence' :
-                                     id === AI_STRATEGIES.MACRO_ANALYSIS ? 'Fed/GDP Pulse' : 'Momentum Squeeze'}
-                                </div>
-                            </div>
-                            <ChevronRight size={18} color="var(--color-text-tertiary)" />
-                            {isActive && isLoading && (
-                                <div style={{ position: 'absolute', bottom: 0, left: 0, height: '3px', width: '100%', background: meta.color, animation: 'loading-bar 1.5s infinite' }} />
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
 
             {/* Results Section */}
             {selectedStrategyId && (

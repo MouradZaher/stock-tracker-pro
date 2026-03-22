@@ -388,77 +388,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             flexDirection: 'column',
             paddingTop: '0'
         }}>
-            {/* ── Breaking News Ticker (Smooth Marquee) ── */}
-            {breakingNews && breakingNews.length > 0 && (
-                <div
-                    className="pulse-ticker-container"
-                    style={{
-                        background: 'rgba(99, 102, 241, 0.05)',
-                        borderBottom: '1px solid var(--glass-border)',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        padding: '8px 0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '2rem'
-                    }}>
-                    <div style={{
-                        background: 'var(--color-accent)',
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.65rem',
-                        fontWeight: 900,
-                        marginLeft: '1.5rem',
-                        flexShrink: 0,
-                        zIndex: 2
-                    }}>LIVE PULSE</div>
-                    <div style={{
-                        display: 'inline-block',
-                        animation: 'scroll-news 60s linear infinite',
-                        paddingLeft: '100%'
-                    }}>
-                        {breakingNews.map((news, i) => (
-                            <span key={i} style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                marginRight: '4rem',
-                                fontSize: '0.8rem',
-                                color: 'var(--color-text-secondary)',
-                                fontWeight: 500
-                            }}>
-                                <span style={{ color: 'var(--color-accent)', fontWeight: 800 }}>•</span>
-                                {news.headline}
-                                <span style={{ opacity: 0.4, fontSize: '0.7rem' }}>— {news.source}</span>
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {/* Header Area */}
             <div className="pulse-page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '1rem 1.5rem', borderBottom: '1px solid var(--glass-border)', background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)' }}>
                 <div>
                     <h1 style={{ fontSize: '2.75rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '16px', letterSpacing: '-0.03em' }}>
-                        Market Pulse
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '6px 14px',
-                            background: 'rgba(239, 68, 68, 0.1)',
-                            borderRadius: '24px',
-                            border: '1px solid rgba(239, 68, 68, 0.25)',
-                            fontSize: '0.7rem',
-                            color: 'var(--color-error)',
-                            fontWeight: 900,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.08em',
-                            boxShadow: '0 0 20px rgba(239, 68, 68, 0.15)'
-                        }}>
-                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
-                            Pulse Active
-                        </div>
+                        Institutional Hub
                     </h1>
                     <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.95rem', margin: 0, fontWeight: 500 }}>
                         Real-time institutional grade market intelligence and sentiment analysis.
@@ -484,55 +419,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 gap: '1rem',
                 margin: '0 1rem 1.5rem 1rem'
             }}>
-                {/* ═══ TOP ALPHA PICKS (Institutional High Conviction) ═══ */}
-                <div className="glass-card hover-glow" style={{ padding: '1.25rem', gridColumn: '1 / -1', border: '1px solid var(--color-accent-light)', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                        <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-                            <Sparkles size={18} color="var(--color-warning)" /> Institutional Alpha Picks
-                        </h3>
-                        <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)', background: 'var(--color-accent-light)', padding: '3px 10px', borderRadius: '12px' }}>
-                            {effectiveMarket.name.toUpperCase()} MARKET
-                        </div>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                        {MARKET_ALPHA[effectiveMarket.id]?.map((pick) => (
-                            <div 
-                                key={pick.symbol} 
-                                onClick={() => handleAction(pick.symbol)}
-                                style={{ 
-                                    padding: '1rem', 
-                                    background: 'rgba(255,255,255,0.02)', 
-                                    borderRadius: '12px', 
-                                    border: '1px solid var(--glass-border)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                                    e.currentTarget.style.borderColor = 'var(--color-accent)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-                                    e.currentTarget.style.borderColor = 'var(--glass-border)';
-                                }}
-                            >
-                                <CompanyLogo symbol={pick.symbol} size={40} />
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: 900, fontSize: '1rem' }}>{pick.symbol}</span>
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: pick.color }}>{pick.score}%</span>
-                                    </div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700, marginTop: '2px' }}>
-                                        {pick.rec}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
                 {/* Fear & Greed Gauge */}
                 <div className="glass-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', position: 'relative', overflow: 'hidden' }}>
@@ -632,11 +518,11 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     </div>
                 </div>
 
-                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+                <div className="glass-card hover-glow" style={{ padding: '2rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', height: '100%' }}>
                     <EarningsCalendar />
                 </div>
                 
-                <div className="glass-card hover-glow" style={{ padding: '1.25rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+                <div className="glass-card hover-glow" style={{ padding: '2rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', height: '100%' }}>
                     <OptionsFlowSimulator />
                 </div>
 

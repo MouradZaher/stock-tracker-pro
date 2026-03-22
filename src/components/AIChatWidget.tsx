@@ -25,12 +25,29 @@ const AIChatWidget: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { positions, getSummary } = usePortfolioStore();
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [dragPos, setDragPos] = useState({ x: 16, y: 16 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDragging) return;
+            setDragPos({
+                x: window.innerWidth - e.clientX - 28, // Offset half width
+                y: window.innerHeight - e.clientY - 28
+            });
+        };
+        const handleMouseUp = () => setIsDragging(true && false); // Reset trigger
+        
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', () => setIsDragging(false));
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', () => setIsDragging(false));
+        };
+    }, [isDragging]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -107,7 +124,8 @@ const AIChatWidget: React.FC = () => {
                 flexDirection: 'column', 
                 alignItems: 'flex-end', 
                 gap: '10px',
-                right: '16px'
+                right: `${dragPos.x}px`,
+                bottom: `${dragPos.y}px`
             }}
         >
             {isOpen && (
@@ -150,7 +168,6 @@ const AIChatWidget: React.FC = () => {
                                 <Bot size={24} color="white" />
                             </div>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, letterSpacing: '-0.01em', color: 'white' }}>AI Financial Brain</h3>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
                                     <div style={{ 
                                         width: '8px', 
@@ -318,11 +335,11 @@ const AIChatWidget: React.FC = () => {
             )}
 
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onMouseDown={() => setIsDragging(true)}
                 className="ai-chat-widget-trigger shadow-2xl transition-all group active:scale-95"
                 style={{
-                    width: '56px',
-                    height: '56px',
+                    width: '64px', // Slightly bigger for draggable feel
+                    height: '64px',
                     borderRadius: '16px',
                     display: 'flex',
                     alignItems: 'center',
@@ -331,8 +348,9 @@ const AIChatWidget: React.FC = () => {
                     background: 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)',
                     boxShadow: '0 12px 40px rgba(59, 130, 246, 0.4)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
-                    cursor: 'pointer'
+                    cursor: isDragging ? 'grabbing' : 'grab'
                 }}
+                onClick={() => !isDragging && setIsOpen(!isOpen)}
             >
                 {isOpen ? (
                     <X size={24} className="animate-in fade-in duration-300" />

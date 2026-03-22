@@ -137,21 +137,21 @@ const US_RECS = [
 ];
 
 const EGYPT_RECS = [
-    { symbol: 'COMI', name: 'Commercial Intl Bank', sector: 'Banking', score: 91, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'TMGH', name: 'Talaat Moustafa Group', sector: 'Real Estate', score: 87, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'HRHO', name: 'Hermes Holding', sector: 'Financial Services', score: 85, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'EAST', name: 'Eastern Company', sector: 'Consumer Staples', score: 82, recommendation: 'Buy', suggestedAllocation: 4.5 },
-    { symbol: 'EFID', name: 'E-Finance', sector: 'Technology', score: 80, recommendation: 'Buy', suggestedAllocation: 4.5 },
-    { symbol: 'EMFD', name: 'Emaar Misr Development', sector: 'Real Estate', score: 78, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'ADIB', name: 'Abu Dhabi Islamic Bank', sector: 'Banking', score: 76, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'ETEL', name: 'Egyptian Telecom', sector: 'Telecom', score: 74, recommendation: 'Buy', suggestedAllocation: 3.5 },
-    { symbol: 'ABUK', name: 'Abu Qir Fertilizers', sector: 'Materials', score: 72, recommendation: 'Hold', suggestedAllocation: 3.5 },
-    { symbol: 'FWRY', name: 'Fawry', sector: 'Technology', score: 71, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'SWDY', name: 'ElSewedy Electric', sector: 'Industrials', score: 69, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'ORAS', name: 'Orascom Construction', sector: 'Industrials', score: 67, recommendation: 'Hold', suggestedAllocation: 2.5 },
-    { symbol: 'RAYA', name: 'Raya Holding', sector: 'Technology', score: 64, recommendation: 'Hold', suggestedAllocation: 2.5 },
-    { symbol: 'PHDC', name: 'Palm Hills Development', sector: 'Real Estate', score: 61, recommendation: 'Hold', suggestedAllocation: 2.0 },
-    { symbol: 'CLHO', name: 'Cleopatra Hospital', sector: 'Healthcare', score: 58, recommendation: 'Hold', suggestedAllocation: 2.0 },
+    { symbol: 'COMI', name: 'Commercial Intl Bank', sector: 'Banking', score: 91, recommendation: 'Buy', suggestedAllocation: 5.0, price: 92.0 },
+    { symbol: 'TMGH', name: 'Talaat Moustafa Group', sector: 'Real Estate', score: 87, recommendation: 'Buy', suggestedAllocation: 5.0, price: 104.0 },
+    { symbol: 'HRHO', name: 'Hermes Holding', sector: 'Financial Services', score: 85, recommendation: 'Buy', suggestedAllocation: 5.0, price: 32.5 },
+    { symbol: 'EAST', name: 'Eastern Company', sector: 'Consumer Staples', score: 82, recommendation: 'Buy', suggestedAllocation: 4.5, price: 28.0 },
+    { symbol: 'EFID', name: 'E-Finance', sector: 'Technology', score: 80, recommendation: 'Buy', suggestedAllocation: 4.5, price: 31.0 },
+    { symbol: 'EMFD', name: 'Emaar Misr Development', sector: 'Real Estate', score: 78, recommendation: 'Buy', suggestedAllocation: 4.0, price: 6.2 },
+    { symbol: 'ADIB', name: 'Abu Dhabi Islamic Bank', sector: 'Banking', score: 76, recommendation: 'Buy', suggestedAllocation: 4.0, price: 54.0 },
+    { symbol: 'ETEL', name: 'Egyptian Telecom', sector: 'Telecom', score: 74, recommendation: 'Buy', suggestedAllocation: 3.5, price: 38.0 },
+    { symbol: 'ABUK', name: 'Abu Qir Fertilizers', sector: 'Materials', score: 72, recommendation: 'Hold', suggestedAllocation: 3.5, price: 82.0 },
+    { symbol: 'FWRY', name: 'Fawry', sector: 'Technology', score: 71, recommendation: 'Hold', suggestedAllocation: 3.0, price: 7.2 },
+    { symbol: 'SWDY', name: 'ElSewedy Electric', sector: 'Industrials', score: 69, recommendation: 'Hold', suggestedAllocation: 3.0, price: 44.0 },
+    { symbol: 'ORAS', name: 'Orascom Construction', sector: 'Industrials', score: 67, recommendation: 'Hold', suggestedAllocation: 2.5, price: 285.0 },
+    { symbol: 'RAYA', name: 'Raya Holding', sector: 'Technology', score: 64, recommendation: 'Hold', suggestedAllocation: 2.5, price: 4.5 },
+    { symbol: 'PHDC', name: 'Palm Hills Development', sector: 'Real Estate', score: 61, recommendation: 'Hold', suggestedAllocation: 2.0, price: 4.2 },
+    { symbol: 'CLHO', name: 'Cleopatra Hospital', sector: 'Healthcare', score: 58, recommendation: 'Hold', suggestedAllocation: 2.0, price: 8.5 },
 ];
 
 const ABUDHABI_RECS = [
@@ -418,12 +418,13 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     return (
         <div className="tab-content ai-recommendations-wrapper" style={{ 
             height: 'calc(100vh - 120px)', 
-            overflowY: 'auto', 
+            overflow: 'hidden', 
             overflowX: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             paddingTop: '0',
-            gap: '1rem'
+            gap: '1.5rem',
+            padding: '1.5rem'
         }}>
             {!detailSymbol && (
                 <div style={{ 
@@ -442,11 +443,16 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
             )}
 
             {activeSubTab === 'pulse' ? (
-                <>
-                    {/* 1. AI Scan Controller (PRIORITIZED) */}
-                    <div style={{ marginBottom: '0.5rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                            <h3 style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', fontWeight: 800, margin: 0 }}>AI Strategic Scanner</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1, minHeight: 0 }}>
+                    {/* TOP: AI Strategy Intelligence Hub (Moved from Intelligence) */}
+                    <div style={{ minHeight: 0, overflowY: 'auto', flex: '0 0 auto' }}>
+                        <AIStrategyIntelliHub />
+                    </div>
+
+                    {/* MIDDLE: AI Strategic Scanner */}
+                    <div style={{ flex: '0 0 auto' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                            <h3 style={{ fontSize: '1.25rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', letterSpacing: '0.15em', fontWeight: 900, margin: 0 }}>AI Strategic Scanner</h3>
                             <LiveBadge />
                         </div>
                         <button 
@@ -456,21 +462,21 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                             style={{ 
                                 width: '100%', 
                                 padding: '1.25rem',
-                                fontSize: '1rem',
+                                fontSize: '1.1rem',
                                 fontWeight: 900,
                                 background: 'var(--gradient-primary)',
-                                boxShadow: '0 8px 32px rgba(99,102,241,0.3)',
-                                borderRadius: '16px',
-                                border: '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: '0 12px 48px rgba(99,102,241,0.4)',
+                                borderRadius: '20px',
+                                border: '1px solid rgba(255,255,255,0.2)',
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
+                                letterSpacing: '0.1em',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '12px'
                             }}
                         >
-                            <Zap size={20} fill="currentColor" />
+                            <Zap size={28} fill="currentColor" />
                             {isScanning ? 'Processing Market Intelligence...' : 'Initiate Deep AI Scan'}
                         </button>
 
@@ -486,83 +492,63 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                         )}
                     </div>
 
-                    {/* 2. Assets (Recommendation Table) */}
-                    <div className="table-container glass-card" style={{ padding: '0', overflowX: 'auto', border: '1px solid var(--glass-border-bright)' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead>
-                                <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.02)' }}>
-                                    <th style={{ textAlign: 'left', padding: '1rem', fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--color-text-tertiary)' }}>Asset</th>
-                                    <th style={{ textAlign: 'center', padding: '1rem', fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--color-text-tertiary)' }}>Signal</th>
-                                    <th style={{ textAlign: 'center', padding: '1rem', fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--color-text-tertiary)' }}>Conviction</th>
-                                    <th style={{ textAlign: 'right', padding: '1rem', fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--color-text-tertiary)' }}>Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {groupedRecs.map((group) => (
-                                    <React.Fragment key={group.name}>
-                                        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                            <td colSpan={4} style={{ padding: '0.5rem 1rem', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)' }}>{group.name.toUpperCase()}</td>
-                                        </tr>
-                                        {group.recommendations.map((rec) => (
-                                            <tr 
-                                                key={rec.symbol} 
-                                                onClick={() => handleLocalSelect(rec)} 
-                                                style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)', transition: 'background 0.2s' }}
-                                                className="hover-bg-blur"
-                                            >
-                                                <td style={{ padding: '1rem' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <CompanyLogo symbol={rec.symbol} size={24} />
-                                                        <span style={{ fontWeight: 800 }}>{rec.symbol}</span>
-                                                    </div>
-                                                </td>
-                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                    <span style={{ 
-                                                        padding: '4px 8px', 
-                                                        borderRadius: '6px', 
-                                                        fontSize: '0.7rem', 
-                                                        fontWeight: 900,
-                                                        background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                        color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)'
-                                                    }}>
-                                                        {rec.recommendation.toUpperCase()}
-                                                    </span>
-                                                </td>
-                                                <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 800, color: getScoreColor(rec.score) }}>{rec.score}%</td>
-                                                <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 700 }}>{formatCurrency(rec.price || 0)}</td>
+                    {/* BOTTOM: Assets Table (Biggest Box) */}
+                    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                        <div className="table-container glass-card" style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--glass-border-bright)' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'rgba(20,20,30,0.95)', backdropFilter: 'blur(10px)' }}>
+                                    <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.02)' }}>
+                                        <th style={{ textAlign: 'left', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Asset</th>
+                                        <th style={{ textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Signal</th>
+                                        <th style={{ textAlign: 'center', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Conviction</th>
+                                        <th style={{ textAlign: 'right', padding: '1.5rem', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {groupedRecs.map((group) => (
+                                        <React.Fragment key={group.name}>
+                                            <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                                <td colSpan={4} style={{ padding: '0.75rem 1.5rem', fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-accent)' }}>{group.name.toUpperCase()}</td>
                                             </tr>
-                                        ))}
-                                    </React.Fragment>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* 3. Performance & Heatmap (Secondary) */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-                        <AIPerformanceTracker />
-                        <ConfidenceHeatmap items={activeRecs.length > 0 ? activeRecs.flatMap(g => g.recommendations) : INSTANT_RECS} />
-                    </div>
-
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <h3 style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', fontWeight: 800, marginBottom: '0.75rem' }}>Alpha Conviction Gems</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
-                            {undervaluedGems.map((stock, i) => (
-                                <div key={stock.symbol} onClick={() => handleLocalSelect(stock)} className="glass-card hover-glow" style={{ padding: '1.25rem', cursor: 'pointer' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ fontWeight: 900, fontSize: '1rem' }}>{stock.symbol}</div>
-                                        <div style={{ color: 'var(--color-success)', fontSize: '0.65rem', fontWeight: 900, padding: '2px 6px', background: 'rgba(16,185,129,0.1)', borderRadius: '4px' }}>{stock.score}% ALPHA</div>
-                                    </div>
-                                    <div style={{ fontSize: '0.9rem', marginTop: '1rem', fontWeight: 700 }}>{formatCurrency(stock.price)}</div>
-                                </div>
-                            ))}
+                                            {group.recommendations.map((rec) => (
+                                                <tr 
+                                                    key={rec.symbol} 
+                                                    onClick={() => handleLocalSelect(rec)} 
+                                                    style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)', transition: 'background 0.2s' }}
+                                                    className="hover-bg-blur"
+                                                >
+                                                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                            <CompanyLogo symbol={rec.symbol} size={32} />
+                                                            <span style={{ fontWeight: 800, fontSize: '1rem' }}>{rec.symbol}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+                                                        <span style={{ 
+                                                            padding: '6px 12px', 
+                                                            borderRadius: '8px', 
+                                                            fontSize: '0.75rem', 
+                                                            fontWeight: 900,
+                                                            background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                            color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)'
+                                                        }}>
+                                                            {rec.recommendation.toUpperCase()}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center', fontWeight: 900, color: getScoreColor(rec.score), fontSize: '1.1rem' }}>{rec.score}%</td>
+                                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right', fontWeight: 700, fontSize: '1.1rem' }}>{formatCurrency(rec.price || 0)}</td>
+                                                </tr>
+                                            ))}
+                                        </React.Fragment>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </>
+                </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', flex: 1, minHeight: 0, overflowY: 'auto' }}>
                     <AIStrategyIntelliHub />
-                    <PortfolioIntelligencePanel />
                 </div>
             )}
         </div>

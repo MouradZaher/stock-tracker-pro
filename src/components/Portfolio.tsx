@@ -552,74 +552,81 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 marginBottom: '2rem'
             }}>
                 <div className="summary-card glass-card hover-glow" style={{
-                    padding: '1.5rem',
+                    padding: '2.5rem',
                     position: 'relative',
                     overflow: 'hidden',
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
                     border: '1px solid var(--glass-border)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
                 }}>
-                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
-                        <BarChart2 size={120} />
+                    <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.08 }}>
+                        <BarChart2 size={180} />
                     </div>
                     <div className="summary-label" style={{
-                        fontSize: '0.8rem',
-                        color: 'var(--color-text-tertiary)',
+                        fontSize: '1rem',
+                        color: 'var(--color-text-secondary)',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        fontWeight: 800,
-                        marginBottom: '0.75rem',
+                        letterSpacing: '0.15em',
+                        fontWeight: 900,
+                        marginBottom: '1rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '12px'
                     }}>
-                        <BarChart2 size={16} /> Global Assets (USD)
+                        <BarChart2 size={24} /> Global Assets (USD)
                     </div>
                     <div className="summary-value" style={{
-                        fontSize: '2rem',
+                        fontSize: '3.5rem',
                         fontWeight: 900,
-                        letterSpacing: '-0.03em',
+                        letterSpacing: '-0.05em',
                         color: 'white',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+                        textShadow: '0 4px 20px rgba(0,0,0,0.5)'
                     }}>
                         {formatCurrency(summary.normalizedTotalValueUSD)}
                     </div>
                 </div>
 
                 <div className={`summary-card glass-card hover-glow ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`} style={{
-                    padding: '1.5rem',
+                    padding: '2.5rem',
                     position: 'relative',
                     overflow: 'hidden',
                     border: '1px solid var(--glass-border)',
                     background: summary.totalProfitLoss >= 0 ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%)' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.02) 100%)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
                 }}>
-                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
-                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={120} /> : <TrendingDown size={120} />}
+                    <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.08 }}>
+                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={180} /> : <TrendingDown size={180} />}
                     </div>
                     <div className="summary-label" style={{
-                        fontSize: '0.8rem',
-                        color: 'var(--color-text-tertiary)',
+                        fontSize: '1rem',
+                        color: 'var(--color-text-secondary)',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        fontWeight: 800,
-                        marginBottom: '0.75rem',
+                        letterSpacing: '0.15em',
+                        fontWeight: 900,
+                        marginBottom: '1rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '12px'
                     }}>
-                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                        Total Profit / Loss
+                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />} P&L Dynamics
                     </div>
                     <div className="summary-value" style={{
-                        fontSize: '2rem',
+                        fontSize: '3.5rem',
                         fontWeight: 900,
-                        letterSpacing: '-0.03em',
+                        letterSpacing: '-0.05em',
                         color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)',
+                        textShadow: '0 4px 20px rgba(0,0,0,0.5)',
                         display: 'flex',
                         alignItems: 'baseline',
-                        gap: '10px',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+                        gap: '10px'
                     }}>
                         {fmt(summary.totalProfitLoss)}
                         <span style={{ fontSize: '1.1rem', fontWeight: 700, opacity: 0.9 }}>
