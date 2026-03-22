@@ -106,9 +106,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     return (
         <>
             <header className="header" role="banner" style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
+                display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 padding: '0 var(--spacing-xl)',
                 height: 'var(--header-height)',
                 gap: '1rem',
@@ -127,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 {/* ── Logo ─────────────────────────────── */}
                 <div className="header-logo" onClick={() => handleTabClick('home')} style={{ 
                     cursor: 'pointer', 
-                    justifySelf: 'start',
+                    flexShrink: 0,
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px',
@@ -163,7 +163,15 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 </div>
 
                 {/* ── Center Navigation ─────────────────── */}
-                <div className="desktop-only" style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem' }}>
+                <div className="desktop-only" style={{ 
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '2rem' 
+                }}>
                     {tabs.map(tab => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -218,11 +226,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     })}
                 </div>
 
-                <div className="mobile-only" />
+                <div className="mobile-only" style={{ flex: 1 }} />
 
 
                 {/* ── Actions (right-aligned) ───────────── */}
-                <div className="header-actions" style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     {/* Market Countdown Clock */}
                     {!isMobile && <MarketCountdown />}
                     {/* Market Selector */}

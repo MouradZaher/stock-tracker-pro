@@ -93,6 +93,7 @@ const MarketCountdown: React.FC = () => {
                 className={`market-countdown-badge ${status.isOpen ? 'market-open-glow' : ''}`}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
+                onClick={() => setShowTooltip(prev => !prev)}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -108,7 +109,7 @@ const MarketCountdown: React.FC = () => {
                     boxShadow: status.isOpen ? '0 0 20px rgba(16, 185, 129, 0.25)' : 'none',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     fontFamily: 'Inter, sans-serif',
-                    cursor: 'help'
+                    cursor: 'pointer'
                 }}
             >
                 <div style={{
