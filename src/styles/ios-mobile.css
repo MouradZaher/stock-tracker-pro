@@ -12,9 +12,18 @@
     --safe-area-left: env(safe-area-inset-left, 0px);
     --safe-area-right: env(safe-area-inset-right, 0px);
 
-    /* Mobile header reduced to 38px for iPhone 13 Pro compactness */
-    --mobile-header-height: 56px;
-    --mobile-nav-height: 72px;
+    --mobile-header-height: 48px;
+    --mobile-nav-height: 60px;
+    --mobile-topbar-height: 28px;
+    /* Total chrome used: 48 + 28 + 60 = 136px plus safe areas */
+    --mobile-content-height: calc(
+        100dvh
+        - var(--mobile-header-height)
+        - var(--mobile-topbar-height)
+        - var(--mobile-nav-height)
+        - var(--safe-area-top)
+        - var(--safe-area-bottom)
+    );
 }
 
 /* =========================================================
@@ -22,7 +31,7 @@
    ========================================================= */
 @media (max-width: 768px) {
 
-    /* --- Viewport LOCKED on mobile --- */
+    /* ── 1. GLOBAL RESET — nothing scrolls at the page level ── */
     html,
     body {
         height: 100% !important;
@@ -33,7 +42,6 @@
         -webkit-overflow-scrolling: touch;
     }
 
-    /* All major containers stay locked */
     #root,
     .app,
     .main-content {
@@ -42,36 +50,27 @@
         overflow: hidden !important;
     }
 
-    #root {
-        overflow: hidden;
-    }
-
     .app {
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    /* ---------------------------------------------------------
-       HEADER — iPhone 13 Pro optimised (38px, smaller icons)
-       LOCKED: Approved 2026-02-25
-       --------------------------------------------------------- */
+    /* ── 2. HEADER — compact iPhone 13 Pro ── */
     .header {
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
         justify-content: space-between !important;
 
-        /* 38px content + safe-area-top for notch */
         height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
         min-height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
         max-height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
 
-        padding: 0 8px !important;
+        padding: 0 10px !important;
         padding-top: var(--safe-area-top) !important;
-        gap: 4px;
+        gap: 6px;
         overflow: visible;
-
         position: fixed;
         top: 0;
         left: 0;
@@ -79,18 +78,17 @@
         z-index: 1002;
     }
 
-    /* Logo: tighter, smaller text */
     .header-logo {
         flex-shrink: 0;
         margin-bottom: 0;
     }
 
     .logo-text {
-        font-size: 0.75rem !important;
+        font-size: 0.8rem !important;
         letter-spacing: -0.01em;
+        font-weight: 800 !important;
     }
 
-    /* All action icon buttons: 22px tall, 11px icons, 3px gap */
     .header-actions {
         flex-shrink: 0;
         flex-wrap: nowrap;
@@ -100,82 +98,73 @@
     }
 
     .header-actions button {
-        height: 22px !important;
-        min-width: 22px;
-        padding: 2px 4px !important;
-        font-size: 0.6rem !important;
+        height: 28px !important;
+        min-width: 28px;
+        padding: 0 6px !important;
+        font-size: 0.65rem !important;
         border-radius: 8px !important;
         line-height: 1;
         position: relative;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
-    /* Expand touch target to 44x44px for Apple HIG compliance */
+    /* Apple HIG 44px touch target */
     .header-actions button::after {
         content: '';
         position: absolute;
-        top: -11px;
-        bottom: -11px;
-        left: -11px;
-        right: -11px;
+        top: -8px;
+        bottom: -8px;
+        left: -8px;
+        right: -8px;
         z-index: 10;
     }
 
-    /* Force icon sizing inside action buttons */
     .header-actions button svg {
-        width: 11px !important;
-        height: 11px !important;
-    }
-
-    /* Flag image (market selector) */
-    .header-actions button img {
         width: 13px !important;
-        height: 9px !important;
+        height: 13px !important;
     }
 
-    /* Hide all text-labels inside header on mobile */
+    .header-actions button img {
+        width: 14px !important;
+        height: 10px !important;
+    }
+
     .header-actions .desktop-only,
     .header-center {
         display: none !important;
     }
 
-    /* ---------------------------------------------------------
-       MAIN CONTENT AREA — LOCKED
-       --------------------------------------------------------- */
+    /* ── 3. TOP BAR (market time ticker) ── */
+    .topbar,
+    .top-bar,
+    [class*="TopBar"],
+    [class*="topbar"] {
+        height: var(--mobile-topbar-height) !important;
+        min-height: var(--mobile-topbar-height) !important;
+        font-size: 0.6rem !important;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        padding: 0 8px !important;
+    }
+
+    /* ── 4. MAIN CONTENT AREA — precise height ── */
     .main-content {
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        padding-top: calc(32px + var(--mobile-header-height) + var(--safe-area-top) + 4px);
-        padding-left: 4px !important;
-        padding-right: 4px !important;
+        padding-top: calc(var(--mobile-topbar-height) + var(--mobile-header-height) + var(--safe-area-top));
+        padding-left: 0 !important;
+        padding-right: 0 !important;
         padding-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
         overflow: hidden !important;
         position: relative;
         min-height: 0;
     }
 
-    /* ---------------------------------------------------------
-       GRID OVERRIDES for iPhone 13 Pro
-       --------------------------------------------------------- */
-    .portfolio-summary-grid,
-    .admin-stats-grid,
-    .portfolio-risk-audit-grid {
-        display: flex !important;
-        flex-direction: row !important;
-        overflow-x: auto !important;
-        width: 100% !important;
-        gap: 8px !important;
-        flex-wrap: nowrap !important;
-    }
-
-    .pulse-ticker-container {
-        margin: 0 -12px 1rem !important;
-        width: calc(100% + 24px) !important;
-    }
-
-    /* ---------------------------------------------------------
-       TAB CONTENT — STRICT VIEWPORT LOCK
-       --------------------------------------------------------- */
+    /* ── 5. TAB CONTENT — locked, all children must fit ── */
     .tab-content {
         flex: 1 !important;
         display: flex !important;
@@ -186,43 +175,33 @@
         position: relative;
     }
 
-    /* Dashboard viewport on mobile */
     .dashboard-viewport {
         height: 100% !important;
         overflow: hidden !important;
+        padding: 0.5rem !important;
+        gap: 0.5rem !important;
     }
 
-    .landing-scrolling {
-        height: auto !important;
+    .scrollable-panel {
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain;
     }
 
-    /* Home tab content - constrained for single screen */
-    .home-tab-content {
-        height: calc(100dvh - 32px - var(--mobile-header-height) - var(--mobile-nav-height) - var(--safe-area-top) - var(--safe-area-bottom)) !important;
-        overflow: hidden !important;
-        touch-action: none;
-        padding: 0 !important;
-        margin: 0 !important;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* ---------------------------------------------------------
-       MOBILE BOTTOM NAV
-       --------------------------------------------------------- */
+    /* ── 6. MOBILE BOTTOM NAV ── */
     .mobile-nav-container {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         width: 100%;
+        height: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
         padding-bottom: var(--safe-area-bottom);
         z-index: 1001;
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border-top: 1px solid var(--glass-border);
+        background: rgba(5, 5, 8, 0.92);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .mobile-nav-pill {
@@ -233,67 +212,365 @@
         background: transparent;
         border: none;
         box-shadow: none;
+        height: var(--mobile-nav-height);
+        display: flex;
+        align-items: center;
     }
 
-    /* Mobile nav buttons: even spacing across 390px */
     .mobile-nav-btn {
         flex: 1;
         min-width: 0;
-        padding: 6px 2px;
-        font-size: 0.6rem;
+        padding: 6px 4px;
+        font-size: 0.58rem;
+        letter-spacing: 0.02em;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
     }
 
     .mobile-nav-btn svg {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
     }
 
-    /* ---------------------------------------------------------
-       CARDS & CONTENT
-       --------------------------------------------------------- */
+    /* ── 7. WATCHLIST TAB ── */
+    /* Section header: tighter padding on mobile */
+    .dashboard-viewport .section-header {
+        padding: 0.6rem 0.75rem !important;
+        margin-bottom: 0.5rem !important;
+        flex-shrink: 0;
+        gap: 0.5rem !important;
+    }
+
+    /* Title: smaller on mobile */
+    .dashboard-viewport .section-header h2 {
+        font-size: 1rem !important;
+        gap: 6px !important;
+    }
+
+    .dashboard-viewport .section-header h2 svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    /* Search bar: full width */
+    .dashboard-viewport .section-header > div:last-child {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Grid: on mobile, go single-column */
+    .grid-sidebar-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0 0.5rem 0.5rem !important;
+        gap: 0.5rem !important;
+        overflow: hidden;
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* The watchlist asset table card */
+    .glass-card.hover-glow {
+        border-radius: 12px !important;
+    }
+
+    /* Compact table: optimize columns for 390px */
+    .compact-table {
+        font-size: 0.72rem !important;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .compact-table th,
+    .compact-table td {
+        padding: 0.5rem 0.4rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .compact-table th:first-child,
+    .compact-table td:first-child {
+        padding-left: 0.6rem !important;
+        width: 38%;
+    }
+
+    /* Price column */
+    .compact-table th:nth-child(2),
+    .compact-table td:nth-child(2) {
+        width: 20%;
+        text-align: right;
+    }
+
+    /* Change column */
+    .compact-table th:nth-child(3),
+    .compact-table td:nth-child(3) {
+        width: 18%;
+        text-align: right;
+    }
+
+    /* Hide AI Intelligence column on mobile (col 4) */
+    .compact-table th:nth-child(4),
+    .compact-table td:nth-child(4) {
+        display: none !important;
+    }
+
+    /* Hide Trend/Sparkline on mobile (col 5) */
+    .compact-table th:nth-child(5),
+    .compact-table td:nth-child(5) {
+        display: none !important;
+    }
+
+    /* Actions column — compact icon buttons only */
+    .compact-table th:nth-child(6),
+    .compact-table td:nth-child(6) {
+        width: 24%;
+        text-align: center;
+        padding-right: 0.35rem !important;
+    }
+
+    .compact-table td div[style*="gap: 6px"] {
+        gap: 4px !important;
+    }
+
+    .compact-table button {
+        padding: 4px !important;
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Company logo in table */
+    .compact-table .company-logo,
+    .compact-table img[class*="logo"] {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    /* Market benchmark row label */
+    .compact-table .market-benchmark-label {
+        font-size: 0.55rem !important;
+    }
+
+    /* ── 8. PORTFOLIO TAB ── */
+    /* Thin action bar on mobile */
+    .tab-content.dashboard-viewport > div:first-child {
+        padding: 0.4rem 0.75rem !important;
+    }
+
+    /* Summary cards horizontal scroll */
+    .portfolio-summary-grid,
+    .admin-stats-grid,
+    .portfolio-risk-audit-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        padding-bottom: 4px !important; /* space for scrollbar */
+        scrollbar-width: none !important;
+    }
+
+    .portfolio-summary-grid::-webkit-scrollbar,
+    .admin-stats-grid::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .portfolio-summary-grid > *,
+    .admin-stats-grid > * {
+        min-width: 140px !important;
+        flex-shrink: 0 !important;
+        padding: 0.65rem !important;
+    }
+
+    .summary-value,
+    [class*="summary-value"] {
+        font-size: 1.1rem !important;
+    }
+
+    .summary-label,
+    [class*="summary-label"] {
+        font-size: 0.62rem !important;
+    }
+
+    /* Portfolio table: horizontal scroll, compact rows */
+    .portfolio-table-wrapper,
+    .table-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .portfolio-table th,
+    .portfolio-table td {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.72rem !important;
+        white-space: nowrap;
+    }
+
+    .portfolio-table th:first-child,
+    .portfolio-table td:first-child {
+        padding-left: 0.75rem !important;
+    }
+
+    /* ── 9. AI RECOMMENDATIONS TAB ── */
+    /* Assets Table: compact rows */
+    .table-container table th,
+    .table-container table td {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.72rem !important;
+    }
+
+    /* Signal badge: compact */
+    .table-container span[style*="borderRadius"] {
+        padding: 3px 8px !important;
+        font-size: 0.65rem !important;
+    }
+
+    /* Scan button: compact */
+    .dashboard-viewport .btn-primary[style*="width: 100%"] {
+        padding: 0.7rem !important;
+        font-size: 0.85rem !important;
+        border-radius: 12px !important;
+    }
+
+    /* ── 10. PULSE TAB ── */
+    .grid-3col-pulse {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        overflow: hidden;
+        padding: 0.25rem !important;
+    }
+
+    /* Fear & Greed: more compact */
+    .grid-3col-pulse .glass-card:first-child {
+        padding: 0.75rem !important;
+    }
+
+    /* Live stream player: reduced height on mobile */
+    .dashboard-viewport > div:first-child iframe,
+    .dashboard-viewport > div:first-child video {
+        height: 160px !important;
+        min-height: 160px !important;
+    }
+
+    /* ── 11. CARDS ── */
     .glass-card {
+        border-radius: 12px !important;
+        padding: 0.75rem !important;
         word-break: break-word;
         overflow-wrap: break-word;
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
-    /* Prevent iOS input zoom (must be 16px+) */
+    /* ── 12. TYPOGRAPHY SCALE for 390px ── */
+    h1 { font-size: 1.35rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    h3 { font-size: 0.95rem !important; }
+
+    /* ── 13. INPUTS — prevent iOS zoom (must stay ≥ 16px) ── */
     input,
     select,
     textarea {
-        font-size: 16px;
+        font-size: 16px !important;
+        max-height: 44px;
     }
 
-    /* Remove tap highlight */
+    /* Search input: full-width compact */
+    input[type="text"],
+    input[type="search"] {
+        padding: 0.5rem 0.75rem !important;
+        border-radius: 10px !important;
+    }
+
+    /* ── 14. INTERACTION ── */
     button,
     a,
     .mobile-nav-btn {
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* Admin modal — full screen on mobile */
-    .admin-modal {
-        width: 100%;
-        margin: 0;
-        border-radius: 0;
-        height: 100%;
-        max-height: 100%;
+    .btn {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.8rem !important;
+        min-height: 36px;
     }
 
-    /* Portfolio table — horizontal scroll container */
-    .portfolio-table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    /* ── 15. MODALS — full-screen ── */
+    .admin-modal,
+    [class*="Modal"]:not(.mobile-nav-container) {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        border-radius: 16px 16px 0 0 !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        max-height: 90dvh !important;
+        overflow-y: auto !important;
     }
 
-    /* AI signal cards grid: single column on 390px */
-    .ai-signal-card {
-        min-width: 0;
+    /* ── 16. FLOATING BUTTONS — above nav bar ── */
+    .aria-voice-assistant-trigger,
+    .ai-chat-widget-trigger,
+    [class*="VoiceAssistant"],
+    [class*="ChatWidget"] {
+        bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 12px) !important;
+        transform: scale(0.82);
+        z-index: 1005;
     }
 
-    /* Hide keyboard-visible bottom nav */
+    /* ── 17. AI CHAT WIDGET DRAG HANDLE ── */
+    [class*="ai-chat-trigger"] {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    /* ── 18. HOME TAB ── */
+    .home-tab-content {
+        height: var(--mobile-content-height) !important;
+        overflow: hidden !important;
+        touch-action: none;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .home-tab-content h2,
+    .home-tab-content p {
+        display: none;
+    }
+
+    /* ── 19. HEATMAP ── */
+    .landing-scrolling {
+        height: auto !important;
+        overflow-y: auto !important;
+    }
+
+    /* ── 20. SCROLLBARS: hide on mobile (touch devices) ── */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 3px !important;
+        height: 3px !important;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-radius: 2px !important;
+    }
+
+    /* ── 21. KEYBOARD OPEN state ── */
     .keyboard-open .mobile-nav-container {
         display: none;
     }
@@ -302,29 +579,10 @@
         padding-bottom: 0;
     }
 
-    /* Fixed Floating Buttons Overlap - Mega Deep Dive Layout Fix */
-    .aria-voice-assistant-trigger,
-    .ai-chat-widget-trigger {
-        bottom: calc(var(--mobile-nav-height) + 80px + var(--safe-area-bottom)) !important;
-        transform: scale(0.8);
-        z-index: 1005;
-    }
-
-    /* Target specific class names if they exist */
-    [class*="VoiceAssistant"],
-    [class*="ChatWidget"] {
-        bottom: calc(var(--mobile-nav-height) + 40px + var(--safe-area-bottom)) !important;
-    }
-}
-
-/* =========================================================
-   HEATMAP FIXED OVERLAY  (≤ 768px)
-   ========================================================= */
-@media (max-width: 768px) {
-    /* Hide surrounding text while heatmap is full-screen */
-    .home-tab-content h2,
-    .home-tab-content p {
-        display: none;
+    /* ── 22. MISC GRID OVERRIDES ── */
+    .pulse-ticker-container {
+        margin: 0 -8px 0.5rem !important;
+        width: calc(100% + 16px) !important;
     }
 }
 
@@ -333,43 +591,48 @@
    ========================================================= */
 @media (max-width: 375px) {
     :root {
-        --mobile-header-height: 36px;
-        --spacing-xl: 0.8rem;
-        --spacing-lg: 0.6rem;
-        --spacing-md: 0.4rem;
-        --font-size-lg: 0.88rem;
-        --font-size-base: 0.82rem;
-        --font-size-sm: 0.72rem;
-        --font-size-xs: 0.62rem;
+        --mobile-header-height: 42px;
+        --mobile-nav-height: 54px;
     }
 
     .logo-text {
-        font-size: 0.7rem !important;
+        font-size: 0.72rem !important;
     }
 
     .header-actions button {
-        height: 20px !important;
-        padding: 2px 3px !important;
-        font-size: 0.55rem !important;
+        height: 24px !important;
+        padding: 0 4px !important;
     }
 
     .header-actions button svg {
-        width: 10px !important;
-        height: 10px !important;
+        width: 11px !important;
+        height: 11px !important;
     }
 
+    h1 { font-size: 1.2rem !important; }
+    h2 { font-size: 1rem !important; }
+    h3 { font-size: 0.85rem !important; }
+
     .glass-card {
-        padding: 0.6rem;
-        border-radius: var(--radius-lg);
+        padding: 0.6rem !important;
+        border-radius: 10px !important;
     }
 
     .btn {
-        padding: 0.35rem 0.6rem;
-        font-size: 0.7rem;
+        padding: 0.4rem 0.75rem !important;
+        font-size: 0.72rem !important;
     }
 
-    .header-actions {
-        gap: 3px;
+    .compact-table th,
+    .compact-table td {
+        padding: 0.4rem 0.3rem !important;
+        font-size: 0.68rem !important;
+    }
+
+    .portfolio-summary-grid > *,
+    .admin-stats-grid > * {
+        min-width: 120px !important;
+        padding: 0.5rem !important;
     }
 }
 
@@ -381,51 +644,27 @@
         --spacing-xl: 12px;
         --spacing-lg: 10px;
         --spacing-md: 8px;
-        --header-height: 56px;
-        --mobile-header-height: 56px;
-    }
-
-    .main-content {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-        padding-top: calc(var(--mobile-header-height) + var(--safe-area-top) + 12px);
     }
 
     .header {
-        padding: 0 8px 4px !important;
+        padding: 0 10px !important;
     }
 
-    .tab-content {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    /* Force all grid gaps to be tighter */
+    /* Force all grid gaps to be compact */
     .portfolio-summary-grid,
     .admin-stats-grid,
     .pulse-grid,
     .watchlist-grid {
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
-    /* Reduce font size slightly for headers to prevent wrap */
-    h1 {
-        font-size: 1.5rem !important;
+    .summary-card,
+    [class*="summary-card"] {
+        padding: 0.75rem !important;
     }
 
-    h2 {
-        font-size: 1.25rem !important;
-    }
-
-    h3 {
-        font-size: 1.1rem !important;
-    }
-
-    .summary-card {
-        padding: 1rem !important;
-    }
-
-    .summary-value {
-        font-size: 1.25rem !important;
+    .summary-value,
+    [class*="summary-value"] {
+        font-size: 1.15rem !important;
     }
 }

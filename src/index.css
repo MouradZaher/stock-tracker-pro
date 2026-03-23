@@ -349,6 +349,19 @@ html, body, #root {
   .desktop-only {
     display: none !important;
   }
+
+  /* Watchlist section-header: stack title + search vertically on small screens */
+  .section-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.6rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .section-header > div:last-child {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
 }
 
 @media (max-width: 480px) {
