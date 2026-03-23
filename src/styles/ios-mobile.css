@@ -548,13 +548,23 @@
     /* ── 19. HEATMAP ── */
     .heatmap-main-wrapper,
     .heatmap-wrapper {
-        height: 100% !important;
+        height: 45vh !important; /* Reduced height to eliminate black gap and show breadth */
         width: 100% !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
+        position: relative !important; /* Changed to relative to allow stacking */
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        z-index: 10 !important;
+    }
+
+    /* Ensure Market Breadth stays on top and is positioned for mobile */
+    .market-breadth-wrapper {
+        z-index: 60 !important;
+        top: 10px !important;
+        right: 10px !important;
+        transform: scale(0.85);
+        transform-origin: top right;
     }
 
     /* ── 20. SCROLLBARS: hide on mobile (touch devices) ── */

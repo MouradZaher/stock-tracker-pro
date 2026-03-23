@@ -29,7 +29,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
     <div className="dashboard-container" style={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
       
       {/* Floating Overlays */}
-      <div style={{ 
+      <div className="market-breadth-wrapper" style={{ 
         position: 'absolute', 
         top: '20px', 
         right: '25px', 
