@@ -446,99 +446,33 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             padding: 0,
             gap: 0
         }}>
-            {/* ... existing header and summary ... */}
-            <div className="portfolio-header" style={{
-                marginBottom: '1rem',
+            {/* Compact action bar */}
+            <div style={{
                 flexShrink: 0,
                 display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-end',
-                padding: '1rem 1.5rem',
-                borderBottom: '1px solid var(--glass-border)',
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)'
+                justifyContent: 'flex-end',
+                padding: '0.5rem 1.5rem',
+                borderBottom: '1px solid var(--glass-border)'
             }}>
-                <div>
-                    <h2 style={{
-                        margin: 0,
-                        fontSize: '2.75rem',
-                        fontWeight: 900,
-                        letterSpacing: '-0.03em',
+                <button
+                    className="btn btn-primary"
+                    onClick={() => setShowModal(true)}
+                    style={{
+                        background: 'var(--gradient-primary)',
+                        border: 'none',
+                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                        padding: '0.6rem 1.25rem',
+                        borderRadius: '12px',
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '16px'
-                    }}>
-                        Portfolio Assets
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '6px 14px',
-                            background: 'rgba(239, 68, 68, 0.1)',
-                            borderRadius: '24px',
-                            border: '1px solid rgba(239, 68, 68, 0.25)',
-                            fontSize: '0.7rem',
-                            color: 'var(--color-error)',
-                            fontWeight: 900,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.08em',
-                            boxShadow: '0 0 20px rgba(239, 68, 68, 0.15)'
-                        }}>
-                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-error)', animation: 'pulse-glow 1.5s infinite' }} />
-                            Live Pulse
-                        </div>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '4px 10px',
-                            background: isSyncing ? 'rgba(99, 102, 241, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                            borderRadius: '20px',
-                            border: `1px solid ${isSyncing ? 'rgba(99, 102, 241, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
-                            fontSize: '0.65rem',
-                            color: isSyncing ? 'var(--color-accent)' : 'var(--color-success)',
-                            transition: 'all 0.3s ease',
-                            height: 'fit-content'
-                        }}>
-                            {isSyncing ? (
-                                <>
-                                    <RefreshCw size={10} className="animate-spin" />
-                                    <span style={{ fontWeight: 800, textTransform: 'uppercase' }}>Syncing</span>
-                                </>
-                            ) : (
-                                <>
-                                    <CheckCircle size={10} />
-                                    <span style={{ fontWeight: 800, textTransform: 'uppercase' }}>Cloud Secure</span>
-                                </>
-                            )}
-                        </div>
-                    </h2>
-                    <p className="hidden-mobile" style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
-                        Manage your positions and track real-time performance
-                    </p>
-                </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => setShowModal(true)}
-                        style={{
-                            background: 'var(--gradient-primary)',
-                            border: 'none',
-                            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
-                            padding: '0.75rem 1.5rem',
-                            borderRadius: '12px',
-                            fontWeight: 700,
-                            fontSize: '0.9rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            transformOrigin: 'center'
-                        }}
-                    >
-                        <Plus size={18} strokeWidth={3} />
-                        <span>Add position</span>
-                    </button>
-                </div>
+                        gap: '8px'
+                    }}
+                >
+                    <Plus size={16} strokeWidth={3} />
+                    <span>Add Position</span>
+                </button>
             </div>
 
             {/* Summary Cards */}
