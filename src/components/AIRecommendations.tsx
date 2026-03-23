@@ -337,8 +337,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     if (detailSymbol) {
         return (
-            <div className="tab-content ai-detail-view" style={{ paddingTop: '0', animation: 'fadeIn 0.3s ease' }}>
-                <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className="tab-content dashboard-viewport" style={{ animation: 'fadeIn 0.3s ease' }}>
+                <div style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
                     <button onClick={() => { setDetailSymbol(null); setDetailRec(null); }} className="btn btn-icon glass-button">
                         <ArrowRight size={20} style={{ transform: 'rotate(180deg)' }} />
                     </button>
@@ -362,7 +362,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div className="glass-card" style={{ height: '350px', padding: '0.5rem', overflow: 'hidden' }}>
                         <iframe
                             src={`https://s.tradingview.com/widgetembed/?symbol=${detailSymbol}&interval=D&theme=dark&style=1&locale=en`}
@@ -416,13 +416,13 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     }
 
     return (
-        <div className="tab-content dashboard-viewport">
-            <div className="grid-2col-ai">
+        <div className="tab-content dashboard-viewport" style={{ padding: '0.75rem' }}>
+            <div className="grid-2col-ai" style={{ overflow: 'hidden' }}>
                 {/* LEFT COLUMN: Intelligence & Scanner (hidden on mobile) */}
-                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: 0, overflow: 'hidden' }}>
-                    <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingRight: '8px' }}>
+                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+                    <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '8px' }}>
                 {/* TOP: AI Strategy Intelligence Hub */}
-                <div style={{ minHeight: 0, overflowY: 'auto', flex: '0 0 auto' }}>
+                <div style={{ flex: '0 0 auto' }}>
                     <AIStrategyIntelliHub />
                 </div>
 
@@ -437,19 +437,19 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                         disabled={isScanning} 
                         style={{ 
                             width: '100%', 
-                            padding: '1.25rem',
-                            fontSize: '1.1rem',
+                            padding: '0.85rem',
+                            fontSize: '0.95rem',
                             fontWeight: 900,
                             background: 'var(--gradient-primary)',
-                            boxShadow: '0 12px 48px rgba(99,102,241,0.4)',
-                            borderRadius: '20px',
+                            boxShadow: '0 8px 32px rgba(99,102,241,0.4)',
+                            borderRadius: '14px',
                             border: '1px solid rgba(255,255,255,0.2)',
                             textTransform: 'uppercase',
                             letterSpacing: '0.1em',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '12px'
+                            gap: '10px'
                         }}
                     >
                         <Zap size={28} fill="currentColor" />
@@ -471,8 +471,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
 
                 {/* RIGHT COLUMN: Assets Table */}
-                <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div className="table-container glass-card custom-scrollbar" style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--glass-border-bright)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+                    <div className="table-container glass-card scrollable-panel custom-scrollbar" style={{ border: '1px solid var(--glass-border-bright)' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'rgba(20,20,30,0.95)', backdropFilter: 'blur(10px)' }}>
                                 <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.02)' }}>
