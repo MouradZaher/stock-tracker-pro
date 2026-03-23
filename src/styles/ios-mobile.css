@@ -63,16 +63,16 @@
         align-items: center !important;
         justify-content: space-between !important;
 
-        height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
-        min-height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
-        max-height: calc(var(--mobile-header-height) + var(--safe-area-top)) !important;
-
-        padding: 0 10px !important;
-        padding-top: var(--safe-area-top) !important;
+        top: var(--safe-area-top) !important;
+        height: var(--mobile-header-height) !important;
+        background: var(--glass-bg) !important;
+        backdrop-filter: var(--glass-blur) !important;
+        border-bottom: 1px solid var(--glass-border) !important;
+        padding: 0 0.75rem !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
         gap: 6px;
         overflow: visible;
         position: fixed;
-        top: 0;
         left: 0;
         right: 0;
         z-index: 1002;
@@ -549,18 +549,20 @@
     }
 
     .heatmap-main-wrapper {
-        border-radius: 12px !important;
-        overflow: hidden !important;
-        flex: 0 0 45% !important; /* Slightly more room for heatmap */
-        min-height: 220px !important;
+        flex: 1 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
         position: relative !important;
-        background: rgba(0,0,0,0.5) !important;
+        background: transparent !important;
+        border-radius: 0 !important; /* Full bleed on home */
     }
 
     .heatmap-wrapper {
         height: 100% !important;
         width: 100% !important;
         min-height: 100% !important;
+        display: flex !important;
     }
 
     .market-breadth-wrapper {
@@ -576,26 +578,19 @@
         padding: 0.65rem !important;
         border-radius: 10px !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    }
-
-    .dashboard-container .glass-card h3 {
-        font-size: 0.65rem !important;
         margin-bottom: 4px !important;
     }
 
-    /* Ensure Market Insights occupy the rest of the space */
-    .dashboard-container > div:last-child {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 6px !important;
-        min-height: 0 !important;
+    /* Dashboard container on home: full screen, no gap */
+    .dashboard-container.home-tab-content {
+        gap: 0 !important;
+        padding: 0 !important;
+        background: #000 !important; /* Pure black backdrop for heatmap pop */
     }
 
-    /* Ensure Industry Rotation scrolls internally but fits */
-    .dashboard-container .IndustryRotationCard {
-        flex: 1 !important;
-        min-height: 0 !important;
+    /* Market insights removal from home */
+    .dashboard-container.home-tab-content > div:last-child {
+        display: none !important;
     }
 
     /* ── 20. SCROLLBARS: hide on mobile (touch devices) ── */

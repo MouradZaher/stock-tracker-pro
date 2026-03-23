@@ -29,38 +29,38 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
   }, []);
 
   return (
-    <div className="dashboard-container" style={{ 
+    <div className="dashboard-container home-tab-content" style={{ 
       position: 'relative', 
       height: '100%', 
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
-      gap: '8px',
-      padding: '8px'
+      padding: 0,
+      margin: 0
     }}>
       
-      {/* 1. Heatmap Section - Fixed Proportion */}
+      {/* 1. Full-Screen Heatmap Section */}
       <div className="heatmap-main-wrapper" style={{ 
-        flex: '0 0 42%', 
+        flex: 1, 
+        width: '100%',
         position: 'relative', 
-        borderRadius: '12px', 
-        overflow: 'hidden',
-        border: '1px solid var(--glass-border)'
+        overflow: 'hidden'
       }}>
         <div className="market-breadth-wrapper" style={{ 
           position: 'absolute', 
-          top: '10px', 
-          right: '10px', 
+          top: 'env(safe-area-inset-top, 12px)', 
+          right: '12px', 
           zIndex: 60,
           pointerEvents: 'none'
         }}>
           <MarketBreadth value={72} />
         </div>
         
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.01) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
+        {/* Decorative Overlay for Depth */}
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.2) 100%)', pointerEvents: 'none', zIndex: 5 }} />
         
-        {/* Volume Pulses Overlay (Internal to heatmap) */}
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5, overflow: 'hidden' }}>
+        {/* Volume Pulses Overlay */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10, overflow: 'hidden' }}>
           {pulses.map(p => (
             <div 
               key={p.id}
@@ -70,37 +70,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
                 top: `${p.y}%`,
                 width: `${p.size}px`,
                 height: `${p.size}px`,
-                background: 'radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%)',
                 borderRadius: '50%',
                 transform: 'translate(-50%, -50%)',
                 animation: 'pulseOut 2s ease-out forwards',
-                border: '1px solid rgba(79, 70, 229, 0.1)'
+                border: '1px solid rgba(79, 70, 229, 0.05)'
               }}
             />
           ))}
         </div>
 
         <StockHeatmap />
-      </div>
-
-      {/* 2. Market Insights Section - Remaining Space */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: '8px',
-        minHeight: 0 // Crucial for nested flex overflow
-      }}>
-        <FearGreedCard 
-          sentimentScore={sentimentScore}
-          overallSentiment={overallSentiment}
-          sentimentColor={sentimentColor}
-          isCompact={true}
-        />
-        <IndustryRotationCard 
-          sectorData={sectorData}
-          isCompact={true}
-        />
       </div>
 
       <style>{`
