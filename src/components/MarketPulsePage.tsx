@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { soundService } from '../services/soundService';
 import { getStockNews } from '../services/newsService';
 import { useQuery } from '@tanstack/react-query';
-import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, MessageSquare, ShieldCheck, Globe, Play, ExternalLink, Info, Sparkles, Move } from 'lucide-react';
-import type { NewsArticle, SocialPost } from '../types';
-import { socialFeedService } from '../services/SocialFeedService';
+import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, Globe, Play, ExternalLink, Info, Sparkles, Move } from 'lucide-react';
+import type { NewsArticle } from '../types';
 import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 import EarningsCalendar from './EarningsCalendar';
@@ -357,27 +356,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const overallSentiment = sentimentScore >= 60 ? 'Bullish' : sentimentScore <= 40 ? 'Bearish' : 'Neutral';
     const sentimentColor = overallSentiment === 'Bullish' ? '#10B981' : overallSentiment === 'Bearish' ? '#EF4444' : '#F59E0B';
 
-    const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
 
     /** Global Theme Update (Mega Deep Dive Innovation) */
     useEffect(() => {
         setSentimentScore(sentimentScore);
     }, [sentimentScore, setSentimentScore]);
 
-    useEffect(() => {
-        const fetchSocial = async () => {
-            const posts = await socialFeedService.getGlobalFeed();
-            setSocialPosts(posts);
-        };
-        fetchSocial();
-
-        const interval = setInterval(() => {
-            socialFeedService.generateLivePost();
-            fetchSocial();
-        }, 15000); // New post every 15s
-
-        return () => clearInterval(interval);
-    }, []);
 
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
@@ -483,40 +467,10 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
 
                 {/* ── RIGHT COLUMN (hidden on mobile) ── */}
                 <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
-                    {/* Options Flow */}
-                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: '0 0 auto', maxHeight: '45%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    {/* Options Flow — fills entire right column */}
+                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
                             <OptionsFlowSimulator />
-                        </div>
-                    </div>
-
-                    {/* Social Sentiment Feed */}
-                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
-                            <h3 style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
-                                <MessageSquare size={14} color="#1DA1F2" /> Social Feed
-                            </h3>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00FF66', boxShadow: '0 0 8px #00FF66', animation: 'pulse 1.5s infinite' }} />
-                                <span style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>24/7 LIVE</span>
-                            </div>
-                        </div>
-                        <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '4px' }}>
-                            {socialPosts.slice(0, 10).map(post => (
-                                <div key={post.id} style={{ padding: '0.65rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--glass-border)', cursor: 'pointer' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 900, color: 'white', flexShrink: 0 }}>
-                                                {post.author[0]}
-                                            </div>
-                                            <span style={{ fontWeight: 800, fontSize: '0.72rem', color: 'white' }}>{post.author}</span>
-                                            {post.author.includes('Wall St') && <ShieldCheck size={10} color="var(--color-accent)" />}
-                                        </div>
-                                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{new Date(post.timestamp).toLocaleTimeString()}</span>
-                                    </div>
-                                    <p style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: '1.5', fontWeight: 500 }}>{post.content}</p>
-                                </div>
-                            ))}
                         </div>
                     </div>
                 </div>
