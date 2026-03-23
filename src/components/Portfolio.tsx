@@ -442,12 +442,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     }, [positions]);
 
     return (
-        <div className="tab-content portfolio-main-container" style={{ 
-            height: 'calc(100vh - 90px)', 
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            paddingTop: '0'
+        <div className="tab-content dashboard-viewport" style={{ 
+            padding: 0,
+            gap: 0
         }}>
             {/* ... existing header and summary ... */}
             <div className="portfolio-header" style={{
@@ -803,11 +800,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     ) : (
                         <>
                             {/* Desktop Table */}
-                            <div className="table-container glass-card desktop-only custom-scrollbar" style={{
+                            <div className="table-container glass-card desktop-only scrollable-panel custom-scrollbar" style={{
                                 padding: '0',
-                                flex: 1,
-                                minHeight: 0,
-                                overflowY: 'auto',
                                 border: '1px solid var(--glass-border-bright)'
                             }}>
                                 <table className="portfolio-table sticky-header">

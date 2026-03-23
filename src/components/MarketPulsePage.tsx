@@ -382,12 +382,9 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div style={{ 
-            height: 'calc(100vh - 90px)',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
+        <div className="tab-content dashboard-viewport" style={{ 
             gap: 0,
+            padding: 0
         }}>
             {/* Live Stream + Channel Bar — fixed top section */}
             <div style={{ padding: '0.6rem 1rem 0', flexShrink: 0 }}>
@@ -395,15 +392,10 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             </div>
 
             {/* 3-Column Dashboard Grid — fills all remaining height */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1.4fr 1fr',
-                gridTemplateRows: '1fr',
-                gap: '0.75rem',
-                flex: 1,
-                minHeight: 0,
+            <div className="grid-3col-pulse" style={{
+                gap: '0.75rem', /* Compact gap override for Pulse */
                 padding: '0.6rem 1rem 0.6rem',
-                overflow: 'hidden',
+                overflow: 'hidden'
             }}>
 
                 {/* ── LEFT COLUMN ── */}

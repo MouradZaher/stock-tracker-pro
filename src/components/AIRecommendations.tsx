@@ -416,25 +416,11 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     }
 
     return (
-        <div className="tab-content ai-recommendations-wrapper" style={{ 
-            height: 'calc(100vh - 90px)', 
-            overflow: 'hidden', 
-            display: 'flex',
-            flexDirection: 'column',
-            paddingTop: '0',
-            gap: '1.5rem',
-            padding: '1.5rem'
-        }}>
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 1.5fr', 
-                gap: '1.5rem', 
-                flex: 1, 
-                minHeight: 0 
-            }}>
+        <div className="tab-content dashboard-viewport">
+            <div className="grid-2col-ai">
                 {/* LEFT COLUMN: Intelligence & Scanner */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: 0, overflow: 'hidden' }}>
-                    <div className="custom-scrollbar" style={{ minHeight: 0, overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingRight: '8px' }}>
+                    <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingRight: '8px' }}>
                 {/* TOP: AI Strategy Intelligence Hub */}
                 <div style={{ minHeight: 0, overflowY: 'auto', flex: '0 0 auto' }}>
                     <AIStrategyIntelliHub />
@@ -485,7 +471,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
                 </div>
 
                 {/* RIGHT COLUMN: Assets Table */}
-                <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column' }}>
                     <div className="table-container glass-card custom-scrollbar" style={{ flex: 1, overflowY: 'auto', border: '1px solid var(--glass-border-bright)' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'rgba(20,20,30,0.95)', backdropFilter: 'blur(10px)' }}>
