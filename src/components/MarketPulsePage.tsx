@@ -382,210 +382,150 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
-        <div className="tab-content market-pulse-main" style={{ 
-            height: 'calc(100vh - 120px)', 
-            overflowY: 'auto', 
-            overflowX: 'hidden',
+        <div style={{ 
+            height: 'calc(100vh - 90px)',
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            paddingTop: '0'
+            gap: 0,
         }}>
-
-            <div style={{ height: '1.5rem' }}></div>
-            <div style={{ marginBottom: '1.5rem', padding: '0 1rem' }}>
+            {/* Live Stream + Channel Bar — fixed top section */}
+            <div style={{ padding: '0.6rem 1rem 0', flexShrink: 0 }}>
                 <LiveStreamsPlayer streams={MARKET_STREAMS} />
             </div>
 
-            {/* Main Pulse Grid */}
+            {/* 3-Column Dashboard Grid — fills all remaining height */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-                gap: '1rem',
-                margin: '0 1rem 1.5rem 1rem'
+                gridTemplateColumns: '1fr 1.4fr 1fr',
+                gridTemplateRows: '1fr',
+                gap: '0.75rem',
+                flex: 1,
+                minHeight: 0,
+                padding: '0.6rem 1rem 0.6rem',
+                overflow: 'hidden',
             }}>
 
-                {/* Fear & Greed Gauge */}
-                <div className="glass-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', position: 'relative', zIndex: 2 }}>
-                        <div>
-                            <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Zap size={16} color="var(--color-warning)" fill="var(--color-warning)" /> Fear & Greed
+                {/* ── LEFT COLUMN ── */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
+
+                    {/* Fear & Greed */}
+                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flexShrink: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                            <h3 style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                                <Zap size={14} color="var(--color-warning)" fill="var(--color-warning)" /> Fear & Greed
                             </h3>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: sentimentColor, marginTop: '0.5rem', textShadow: `0 0 20px ${sentimentColor}40`, letterSpacing: '-0.02em' }}>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.1em' }}>MARKET MOOD</div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: sentimentColor }}>{overallSentiment.toUpperCase()}</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ fontSize: '2.2rem', fontWeight: 900, color: sentimentColor, textShadow: `0 0 20px ${sentimentColor}40`, letterSpacing: '-0.02em', lineHeight: 1 }}>
                                 {sentimentScore.toFixed(0)}
                             </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.1em' }}>MARKET MOOD</div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: sentimentColor, textShadow: `0 0 10px ${sentimentColor}30` }}>{overallSentiment.toUpperCase()}</div>
-                        </div>
-                    </div>
-
-                    {/* Premium SVG Gauge */}
-                    <div style={{ position: 'relative', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="220" height="120" viewBox="0 0 220 120">
-                            <defs>
-                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stopColor="#EF4444" />
-                                    <stop offset="50%" stopColor="#F59E0B" />
-                                    <stop offset="100%" stopColor="#10B981" />
-                                </linearGradient>
-                                <filter id="glow">
-                                    <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                                    <feMerge>
-                                        <feMergeNode in="coloredBlur" />
-                                        <feMergeNode in="SourceGraphic" />
-                                    </feMerge>
-                                </filter>
-                            </defs>
-                            {/* Track */}
-                            <path 
-                                d="M 30 100 A 80 80 0 0 1 190 100" 
-                                fill="none" 
-                                stroke="rgba(255,255,255,0.05)" 
-                                strokeWidth="12" 
-                                strokeLinecap="round" 
-                            />
-                            {/* Gradient Fill */}
-                            <path 
-                                d="M 30 100 A 80 80 0 0 1 190 100" 
-                                fill="none" 
-                                stroke="url(#gaugeGradient)" 
-                                strokeWidth="12" 
-                                strokeLinecap="round" 
-                                strokeDasharray="251.32" 
-                                strokeDashoffset={251.32 - (251.32 * (sentimentScore / 100))}
-                                style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                                filter="url(#glow)"
-                            />
-                            {/* Needle Pivot */}
-                            <circle cx="110" cy="100" r="6" fill="white" />
-                            {/* Needle */}
-                            <line 
-                                x1="110" y1="100" 
-                                x2={110 + 70 * Math.cos((180 - (sentimentScore * 1.8)) * Math.PI / 180)} 
-                                y2={100 - 70 * Math.sin((180 - (sentimentScore * 1.8)) * Math.PI / 180)} 
-                                stroke="white" 
-                                strokeWidth="3" 
-                                strokeLinecap="round" 
-                                style={{ transition: 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                            />
-                        </svg>
-                        
-                        {/* Status Pulse */}
-                        <div style={{ 
-                            position: 'absolute', 
-                            bottom: '10px', 
-                            left: '50%', 
-                            transform: 'translateX(-50%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            background: `${sentimentColor}15`,
-                            padding: '4px 12px',
-                            borderRadius: '20px',
-                            border: `1px solid ${sentimentColor}30`,
-                            fontSize: '0.65rem',
-                            fontWeight: 800,
-                            color: sentimentColor,
-                            animation: 'pulse 2s infinite'
-                        }}>
-                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: sentimentColor }} />
-                            REAL-TIME PULSE
-                        </div>
-                    </div>
-
-                    {/* Tick Marks */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', marginTop: '-10px' }}>
-                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900 }}>EXTREME FEAR</span>
-                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900 }}>EXTREME GREED</span>
-                    </div>
-                </div>
-
-                <div className="glass-card hover-glow" style={{ padding: '2rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', height: '100%' }}>
-                    <EarningsCalendar />
-                </div>
-                
-                <div className="glass-card hover-glow" style={{ padding: '2rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', height: '100%' }}>
-                    <OptionsFlowSimulator />
-                </div>
-
-                <div className="glass-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Layers size={18} color="var(--color-accent)" /> Industry Rotation
-                        </h3>
-                        {sectorData.length > 0 && (
-                            <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '4px 10px', borderRadius: '20px', border: '1px solid var(--color-success-light)' }}>
-                                {sectorData.filter(s => s.change > 0).length}/{sectorData.length} BULLISH
+                            <div style={{ flex: 1, position: 'relative', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                                <div style={{ background: 'linear-gradient(90deg, #EF4444, #F59E0B, #10B981)', height: '100%', borderRadius: '4px' }} />
+                                <div style={{
+                                    position: 'absolute', top: '-4px',
+                                    left: `${Math.max(4, Math.min(96, sentimentScore))}%`,
+                                    transform: 'translateX(-50%)',
+                                    width: '14px', height: '14px', borderRadius: '50%',
+                                    background: 'white', border: `3px solid ${sentimentColor}`,
+                                    boxShadow: `0 0 10px ${sentimentColor}60`,
+                                    transition: 'left 1s ease'
+                                }} />
                             </div>
-                        )}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
+                            <span style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>FEAR</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.55rem', color: sentimentColor, fontWeight: 800 }}>
+                                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: sentimentColor, animation: 'pulse 1.5s infinite' }} />
+                                REAL-TIME
+                            </div>
+                            <span style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>GREED</span>
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {sectorData.map(sector => (
-                            <div key={sector.name} className="group" style={{ cursor: 'pointer' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '8px' }}>
-                                    <div style={{ 
-                                        width: '32px', height: '32px', borderRadius: '10px', 
-                                        background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem',
-                                        transition: 'all 0.3s ease'
-                                    }}>
-                                        {sector.icon}
+
+                    {/* Industry Rotation */}
+                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
+                            <h3 style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                                <Layers size={14} color="var(--color-accent)" /> Industry Rotation
+                            </h3>
+                            {sectorData.length > 0 && (
+                                <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '3px 8px', borderRadius: '20px' }}>
+                                    {sectorData.filter(s => s.change > 0).length}/{sectorData.length} BULLISH
+                                </div>
+                            )}
+                        </div>
+                        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }} className="custom-scrollbar">
+                            {sectorData.map(sector => (
+                                <div key={sector.name}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ fontSize: '0.9rem' }}>{sector.icon}</span> {sector.name}
+                                        </span>
+                                        <span style={{ fontSize: '0.72rem', fontWeight: 900, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                            {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
+                                        </span>
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sector.name}</span>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 900, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
-                                            </span>
+                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${Math.min(100, Math.abs(sector.change) * 25)}%`, height: '100%', background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', borderRadius: '2px', transition: 'width 1.5s ease' }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── CENTER COLUMN ── */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
+                    {/* Earnings Calendar */}
+                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
+                            <EarningsCalendar />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── RIGHT COLUMN ── */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
+                    {/* Options Flow */}
+                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: '0 0 auto', maxHeight: '45%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
+                            <OptionsFlowSimulator />
+                        </div>
+                    </div>
+
+                    {/* Social Sentiment Feed */}
+                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
+                            <h3 style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                                <MessageSquare size={14} color="#1DA1F2" /> Social Feed
+                            </h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00FF66', boxShadow: '0 0 8px #00FF66', animation: 'pulse 1.5s infinite' }} />
+                                <span style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>24/7 LIVE</span>
+                            </div>
+                        </div>
+                        <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '4px' }}>
+                            {socialPosts.slice(0, 10).map(post => (
+                                <div key={post.id} style={{ padding: '0.65rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--glass-border)', cursor: 'pointer' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 900, color: 'white', flexShrink: 0 }}>
+                                                {post.author[0]}
+                                            </div>
+                                            <span style={{ fontWeight: 800, fontSize: '0.72rem', color: 'white' }}>{post.author}</span>
+                                            {post.author.includes('Wall St') && <ShieldCheck size={10} color="var(--color-accent)" />}
                                         </div>
+                                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{new Date(post.timestamp).toLocaleTimeString()}</span>
                                     </div>
+                                    <p style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: '1.5', fontWeight: 500 }}>{post.content}</p>
                                 </div>
-                                <div style={{ height: '6px', background: 'rgba(255,255,255,0.03)', borderRadius: '3px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.02)' }}>
-                                    <div 
-                                        style={{ 
-                                            width: `${Math.min(100, Math.abs(sector.change) * 25)}%`, 
-                                            height: '100%', 
-                                            background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', 
-                                            borderRadius: '3px',
-                                            boxShadow: sector.change >= 0 ? '0 0 10px rgba(16, 185, 129, 0.3)' : '0 0 10px rgba(239, 68, 68, 0.3)',
-                                            transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                                        }} 
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Social Feed */}
-                <div className="glass-card hover-glow" style={{ padding: '1.5rem', gridColumn: 'span 2', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h3 style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <MessageSquare size={18} color="#1DA1F2" fill="rgba(29, 161, 242, 0.1)" /> Social Sentiment Flow
-                        </h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div className="pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FF66', boxShadow: '0 0 10px #00FF66' }} />
-                            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>24/7 LIVE FEED</span>
+                            ))}
                         </div>
-                    </div>
-                    <div className="custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '8px' }}>
-                        {socialPosts.slice(0, 10).map(post => (
-                            <div key={post.id} className="group" style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--glass-border)', transition: 'all 0.3s ease', cursor: 'pointer' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 900, color: 'white' }}>
-                                            {post.author[0]}
-                                        </div>
-                                        <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'white' }}>{post.author}</span>
-                                        {post.author.includes('Wall St') && <ShieldCheck size={12} color="var(--color-accent)" />}
-                                    </div>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{new Date(post.timestamp).toLocaleTimeString()}</span>
-                                </div>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: '1.6', fontWeight: 500 }}>{post.content}</p>
-                            </div>
-                        ))}
                     </div>
                 </div>
             </div>
@@ -594,3 +534,4 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
 };
 
 export default MarketPulsePage;
+
