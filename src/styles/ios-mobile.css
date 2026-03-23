@@ -175,17 +175,18 @@
         position: relative;
     }
 
-    .mobile-nav-item {
+    .mobile-nav-item, 
+    .mobile-nav-btn {
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 2px !important; /* Tighter gap */
+        gap: 2px !important;
         color: var(--color-text-tertiary) !important;
         background: transparent !important;
         border: none !important;
-        font-size: 0.55rem !important; /* Shrunk font */
+        font-size: 0.55rem !important;
         font-weight: 700 !important;
         position: relative !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
