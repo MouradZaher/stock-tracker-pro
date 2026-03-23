@@ -40,7 +40,7 @@ const StockHeatmap: React.FC = () => {
     }, [retryKey]);
 
     useEffect(() => {
-        if (!containerRef.current || isMobileView) return;
+        if (!containerRef.current) return;
 
         setError(false);
         const container = containerRef.current;
@@ -127,8 +127,6 @@ const StockHeatmap: React.FC = () => {
                         <RefreshCw size={16} /> Retry
                     </button>
                 </div>
-            ) : isMobileView ? (
-                <HeatmapMobileFallback />
             ) : (
                 <>
                     <div
