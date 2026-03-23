@@ -198,9 +198,8 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
 
     return (
         <div className="watchlist-page-wrapper" style={{ 
-            height: 'calc(100vh - 120px)', 
-            overflowY: 'auto', 
-            overflowX: 'hidden',
+            height: 'calc(100vh - 90px)', 
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             paddingTop: '0'
@@ -237,18 +236,21 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                 gridTemplateColumns: 'minmax(0, 1fr) 350px', 
                 gap: '1.5rem', 
                 padding: '0 1.5rem 1.5rem 1.5rem',
-                flex: 1
+                flex: 1,
+                minHeight: 0,
+                overflow: 'hidden'
             }}>
                 {/* Main Content: Personal Watchlist Table */}
-                <div className="dashboard-column">
+                <div className="dashboard-column" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
                     {loading && Object.keys(stockData).length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '3rem' }}>
                             <div className="spinner" style={{ margin: '0 auto 1rem' }} />
                             <p style={{ color: 'var(--color-text-tertiary)' }}>Fetching market data...</p>
                         </div>
                     ) : (
-                        <div className="glass-card hover-glow" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
-                            <table className="compact-table">
+                        <div className="glass-card hover-glow" style={{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: 0, border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
+                            <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto' }}>
+                                <table className="compact-table">
                                 <thead>
                                     <tr>
                                         <th>Asset</th>
@@ -372,13 +374,14 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                     })}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Sidebar Content: Discovery Widgets */}
-                <div className="dashboard-column">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div className="dashboard-column" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+                    <div className="custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', flex: 1, overflowY: 'auto', paddingRight: '8px' }}>
                         <div className="glass-card" style={{ padding: '1.25rem' }}>
                             <IndexComponents onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
                         </div>

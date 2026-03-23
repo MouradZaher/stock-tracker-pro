@@ -443,16 +443,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
     return (
         <div className="tab-content portfolio-main-container" style={{ 
-            height: 'calc(100vh - 120px)', 
-            overflowY: 'auto', 
-            overflowX: 'hidden',
+            height: 'calc(100vh - 90px)', 
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             paddingTop: '0'
         }}>
             {/* ... existing header and summary ... */}
             <div className="portfolio-header" style={{
-                marginBottom: '2.5rem',
+                marginBottom: '1rem',
+                flexShrink: 0,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
@@ -549,7 +549,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: '1.25rem',
-                marginBottom: '2rem'
+                marginBottom: '1rem',
+                flexShrink: 0,
+                padding: '0 1.5rem'
             }}>
                 <div className="summary-card glass-card hover-glow" style={{
                     padding: '2.5rem',
@@ -684,16 +686,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 </div>
             </div>
 
-            {/* Sub-Tabs Navigation */}
+            {/* Sub-Navigation */}
             <div style={{
                 display: 'flex',
-                gap: '8px',
+                gap: '4px',
                 padding: '4px',
-                background: 'rgba(255,255,255,0.03)',
+                background: 'rgba(255,255,255,0.02)',
                 borderRadius: '12px',
-                marginBottom: '1.5rem',
-                border: '1px solid rgba(255,255,255,0.05)',
-                width: 'fit-content'
+                border: '1px solid var(--glass-border)',
+                marginBottom: '1rem',
+                width: 'fit-content',
+                margin: '0 1.5rem 1rem 1.5rem',
+                flexShrink: 0
             }}>
                 <button
                     onClick={() => setActiveSubTab('positions')}
@@ -740,7 +744,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
             {/* Portfolio Content - Main Table and Cards */}
             {activeSubTab === 'positions' ? (
-                <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden', padding: '0 1.5rem 1.5rem 1.5rem' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         📊 My Positions
                     </h3>
@@ -799,10 +803,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     ) : (
                         <>
                             {/* Desktop Table */}
-                            <div className="table-container glass-card desktop-only" style={{
+                            <div className="table-container glass-card desktop-only custom-scrollbar" style={{
                                 padding: '0',
-                                marginBottom: '1.5rem',
-                                maxHeight: '700px',
+                                flex: 1,
+                                minHeight: 0,
                                 overflowY: 'auto',
                                 border: '1px solid var(--glass-border-bright)'
                             }}>
