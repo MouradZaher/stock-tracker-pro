@@ -447,8 +447,8 @@
     /* Live stream player: ultra-compact on mobile */
     .dashboard-viewport > div:first-child iframe,
     .dashboard-viewport > div:first-child video {
-        height: 140px !important;
-        min-height: 140px !important;
+        height: 125px !important;
+        min-height: 125px !important;
     }
 
     /* ── 11. CARDS ── */
