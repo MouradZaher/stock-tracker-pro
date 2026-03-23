@@ -49,13 +49,13 @@ const PortfolioIntelligencePanel: React.FC = () => {
 
     return (
         <div className="portfolio-intelligence-wrapper" style={{ 
-            height: 'calc(100vh - 120px)', 
+            height: '100%', 
             overflowY: 'auto', 
             overflowX: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            padding: '1.5rem',
-            gap: '1.5rem'
+            padding: '0.75rem',
+            gap: '0.75rem'
         }}>
             {/* Header Card */}
             <div className="glass-card p-6 relative overflow-hidden" style={{ borderRadius: '24px' }}>

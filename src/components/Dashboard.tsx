@@ -46,15 +46,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
         position: 'relative', 
         overflow: 'hidden'
       }}>
-        <div className="market-breadth-wrapper" style={{ 
-          position: 'absolute', 
-          top: 'env(safe-area-inset-top, 12px)', 
-          right: '12px', 
-          zIndex: 60,
-          pointerEvents: 'none'
-        }}>
-          <MarketBreadth value={72} />
-        </div>
+        {/* Market Breadth removed as per request */}
         
         {/* Decorative Overlay for Depth */}
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.2) 100%)', pointerEvents: 'none', zIndex: 5 }} />

@@ -205,23 +205,20 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '1.5rem 1.5rem',
+                padding: '0.75rem 1rem',
                 borderBottom: '1px solid var(--glass-border)',
                 background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)',
-                marginBottom: '1rem'
+                marginBottom: '0.5rem'
             }}>
                 <div>
-                    <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>
-                        <Star size={28} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.4))' }} />
-                        {selectedMarket.name} Terminal
+                    <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.2rem', fontWeight: 950 }}>
+                        <Star size={20} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' }} />
+                        {selectedMarket.shortName} Alpha
                     </h2>
-                    <p className="hidden-mobile" style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
-                        Real-time tracking and AI insights for your selected market assets.
-                    </p>
                 </div>
-                <div style={{ width: '100%', maxWidth: '380px' }}>
+                <div style={{ width: '100%', maxWidth: '220px' }}>
                     <SymbolSearchInput
-                        placeholder={`Search ${selectedMarket.shortName} Market Alpha...`}
+                        placeholder="Search Alpha..."
                         marketId={selectedMarket.id}
                         onSelect={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)}
                     />
@@ -247,8 +244,8 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                         <th>Asset</th>
                                         <th>Price</th>
                                         <th>Change</th>
-                                        <th>AI Intelligence</th>
-                                        <th>Trend (24h)</th>
+                                        <th className="hidden-mobile">AI Intelligence</th>
+                                        <th className="hidden-mobile">Trend (24h)</th>
                                         <th style={{ textAlign: 'center' }}>Actions</th>
                                     </tr>
                                 </thead>
@@ -285,12 +282,12 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                             <td className={getChangeClass(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].change)} style={{ fontWeight: 800 }}>
                                                 {formatPercent(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].changePercent)}
                                             </td>
-                                            <td>
+                                            <td className="hidden-mobile">
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>
                                                     <Activity size={12} /> Institutional Alpha Ref
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td className="hidden-mobile">
                                                 <div style={{ opacity: 0.8, transform: 'scale(1.1)' }}>
                                                     <MiniSparkline symbol={selectedMarket.indexSymbol.replace('%5E', '^')} color={selectedMarket.color} />
                                                 </div>
@@ -329,7 +326,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                 <td className={getChangeClass(stock.change)} style={{ fontWeight: 700 }}>
                                                     {formatPercent(stock.changePercent)}
                                                 </td>
-                                                <td>
+                                                <td className="hidden-mobile">
                                                     {aiRecs[symbol] ? (
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                             {getRecIcon(aiRecs[symbol].recommendation)}
@@ -339,7 +336,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                         </div>
                                                     ) : '--'}
                                                 </td>
-                                                <td>
+                                                <td className="hidden-mobile">
                                                     <MiniSparkline symbol={symbol} />
                                                 </td>
                                                 <td style={{ textAlign: 'center', borderRadius: '0 8px 8px 0' }}>
