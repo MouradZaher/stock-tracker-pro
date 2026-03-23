@@ -18,43 +18,38 @@
 }
 
 /* =========================================================
-   BASE MOBILE LAYOUT  (≤ 768px)
+   BASE MOBILE LAYOUT  (≤ 768px) — STRICT VIEWPORT LOCK
    ========================================================= */
 @media (max-width: 768px) {
 
-    /* --- Viewport Scroll enabled --- */
+    /* --- Viewport LOCKED on mobile --- */
     html,
     body {
-        height: auto !important;
-        min-height: 100dvh !important;
+        height: 100% !important;
         width: 100vw;
         max-width: 100vw;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        position: relative;
+        overflow: hidden !important;
+        position: fixed;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: auto;
     }
 
-    /* Force all major containers to be transparent to natural scrolling */
+    /* All major containers stay locked */
     #root,
     .app,
     .main-content {
-        height: auto !important;
-        min-height: 100% !important;
+        height: 100% !important;
         max-width: 100vw !important;
-        overflow-x: hidden !important;
-        overflow-y: visible !important;
+        overflow: hidden !important;
     }
 
     #root {
-        overflow: visible;
+        overflow: hidden;
     }
 
     .app {
         display: flex;
         flex-direction: column;
-        overflow: visible;
+        overflow: hidden;
     }
 
     /* ---------------------------------------------------------
@@ -144,32 +139,33 @@
     }
 
     /* ---------------------------------------------------------
-       MAIN CONTENT AREA
+       MAIN CONTENT AREA — LOCKED
        --------------------------------------------------------- */
     .main-content {
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        /* Accounting for TopBar (32px) + Header (56px) + Safe Area + Padding */
-        padding-top: calc(32px + var(--mobile-header-height) + var(--safe-area-top) + 8px);
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-        padding-bottom: calc(var(--mobile-nav-height) + 12px);
-        overflow: visible;
+        padding-top: calc(32px + var(--mobile-header-height) + var(--safe-area-top) + 4px);
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        padding-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
+        overflow: hidden !important;
         position: relative;
         min-height: 0;
     }
 
     /* ---------------------------------------------------------
-       GRID OVERRIDES for iPhone 13 Pro (Prevent thin squashing)
+       GRID OVERRIDES for iPhone 13 Pro
        --------------------------------------------------------- */
     .portfolio-summary-grid,
     .admin-stats-grid,
     .portfolio-risk-audit-grid {
         display: flex !important;
-        flex-direction: column !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
         width: 100% !important;
-        gap: 12px !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
     }
 
     .pulse-ticker-container {
@@ -178,20 +174,22 @@
     }
 
     /* ---------------------------------------------------------
-       TAB CONTENT — natural scrolling
+       TAB CONTENT — STRICT VIEWPORT LOCK
        --------------------------------------------------------- */
     .tab-content {
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        height: auto !important;
-        min-height: 100% !important;
         width: 100% !important;
-        overflow-y: visible !important;
-        overflow-x: hidden !important;
-        padding-bottom: calc(var(--mobile-nav-height) + 32px + var(--safe-area-bottom)) !important;
-        scroll-behavior: smooth;
+        overflow: hidden !important;
+        min-height: 0 !important;
         position: relative;
+    }
+
+    /* Dashboard viewport on mobile */
+    .dashboard-viewport {
+        height: 100% !important;
+        overflow: hidden !important;
     }
 
     .landing-scrolling {

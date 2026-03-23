@@ -418,8 +418,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
     return (
         <div className="tab-content dashboard-viewport">
             <div className="grid-2col-ai">
-                {/* LEFT COLUMN: Intelligence & Scanner */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: 0, overflow: 'hidden' }}>
+                {/* LEFT COLUMN: Intelligence & Scanner (hidden on mobile) */}
+                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: 0, overflow: 'hidden' }}>
                     <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingRight: '8px' }}>
                 {/* TOP: AI Strategy Intelligence Hub */}
                 <div style={{ minHeight: 0, overflowY: 'auto', flex: '0 0 auto' }}>

@@ -215,7 +215,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                         <Star size={28} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.4))' }} />
                         {selectedMarket.name} Terminal
                     </h2>
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
+                    <p className="hidden-mobile" style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
                         Real-time tracking and AI insights for your selected market assets.
                     </p>
                 </div>
@@ -370,8 +370,8 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                     )}
                 </div>
 
-                {/* Sidebar Content: Discovery Widgets */}
-                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+                {/* Sidebar Content: Discovery Widgets (hidden on mobile) */}
+                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
                     <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', paddingRight: '8px' }}>
                         <div className="glass-card" style={{ padding: '1.25rem' }}>
                             <IndexComponents onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />

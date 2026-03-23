@@ -512,7 +512,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                             )}
                         </div>
                     </h2>
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
+                    <p className="hidden-mobile" style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 500 }}>
                         Manage your positions and track real-time performance
                     </p>
                 </div>

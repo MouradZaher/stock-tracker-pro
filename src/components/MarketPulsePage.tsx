@@ -471,8 +471,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     </div>
                 </div>
 
-                {/* ── CENTER COLUMN ── */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
+                {/* ── CENTER COLUMN (hidden on mobile) ── */}
+                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
                     {/* Earnings Calendar */}
                     <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
@@ -481,8 +481,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                     </div>
                 </div>
 
-                {/* ── RIGHT COLUMN ── */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
+                {/* ── RIGHT COLUMN (hidden on mobile) ── */}
+                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
                     {/* Options Flow */}
                     <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: '0 0 auto', maxHeight: '45%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
