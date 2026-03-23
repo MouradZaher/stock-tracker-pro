@@ -586,6 +586,12 @@
         gap: 0 !important;
         padding: 0 !important;
         background: #000 !important; /* Pure black backdrop for heatmap pop */
+        height: var(--mobile-content-height) !important;
+    }
+
+    .dashboard-container.home-tab-content .heatmap-main-wrapper {
+        height: 100% !important;
+        flex: 1 !important;
     }
 
     /* Market insights removal from home */
