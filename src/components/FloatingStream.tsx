@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, CSSProperties } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
 import { X, Maximize2, Volume2, VolumeX, GripHorizontal, ChevronRight, Activity } from 'lucide-react';
 import { usePiPStore } from '../services/usePiPStore';
 import { useNavigate } from 'react-router-dom';
