@@ -594,6 +594,13 @@
         flex: 1 !important;
     }
 
+    /* Prevent TradingView widget default 350px height collapse */
+    .dashboard-container.home-tab-content .tradingview-widget-container,
+    .dashboard-container.home-tab-content .tradingview-widget-container iframe {
+        height: 100% !important;
+        min-height: 100% !important;
+    }
+
     /* Market insights removal from home */
     .dashboard-container.home-tab-content > div:last-child {
         display: none !important;
