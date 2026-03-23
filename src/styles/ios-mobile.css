@@ -236,29 +236,34 @@
     }
 
     /* ── 7. WATCHLIST TAB ── */
-    /* Section header: tighter padding on mobile */
+    /* Section header: ultra-compact on mobile */
     .dashboard-viewport .section-header {
-        padding: 0.6rem 0.75rem !important;
-        margin-bottom: 0.5rem !important;
+        padding: 0.5rem 0.75rem !important;
+        margin-bottom: 0.4rem !important;
         flex-shrink: 0;
-        gap: 0.5rem !important;
+        gap: 0.4rem !important;
     }
 
     /* Title: smaller on mobile */
     .dashboard-viewport .section-header h2 {
-        font-size: 1rem !important;
-        gap: 6px !important;
+        font-size: 0.9rem !important;
+        gap: 5px !important;
+        font-weight: 900 !important;
     }
 
     .dashboard-viewport .section-header h2 svg {
-        width: 18px !important;
-        height: 18px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
-    /* Search bar: full width */
+    /* Search bar: compact */
     .dashboard-viewport .section-header > div:last-child {
         max-width: 100% !important;
         width: 100% !important;
+    }
+
+    .dashboard-viewport .section-header p {
+        display: none !important;
     }
 
     /* Grid: on mobile, go single-column */
@@ -312,15 +317,16 @@
         text-align: right;
     }
 
-    /* Hide AI Intelligence column on mobile (col 4) */
+    /* Hide AI Intelligence and Trend on mobile to save space */
     .compact-table th:nth-child(4),
-    .compact-table td:nth-child(4) {
+    .compact-table td:nth-child(4),
+    .compact-table th:nth-child(5),
+    .compact-table td:nth-child(5) {
         display: none !important;
     }
 
-    /* Hide Trend/Sparkline on mobile (col 5) */
-    .compact-table th:nth-child(5),
-    .compact-table td:nth-child(5) {
+    /* PRUNE: Only show top 8 assets to fit viewport */
+    .compact-table tr:nth-child(n+10) {
         display: none !important;
     }
 
@@ -358,9 +364,9 @@
     /* Thin action bar on mobile */
     .tab-content.dashboard-viewport > div:first-child {
         padding: 0.4rem 0.75rem !important;
+        margin-bottom: 4px !important;
     }
 
-    /* Summary cards horizontal scroll */
     .portfolio-summary-grid,
     .admin-stats-grid,
     .portfolio-risk-audit-grid {
@@ -371,70 +377,57 @@
         width: 100% !important;
         gap: 6px !important;
         flex-wrap: nowrap !important;
-        padding-bottom: 4px !important; /* space for scrollbar */
+        padding-bottom: 2px !important;
         scrollbar-width: none !important;
-    }
-
-    .portfolio-summary-grid::-webkit-scrollbar,
-    .admin-stats-grid::-webkit-scrollbar {
-        display: none !important;
     }
 
     .portfolio-summary-grid > *,
     .admin-stats-grid > * {
-        min-width: 140px !important;
+        min-width: 130px !important;
         flex-shrink: 0 !important;
-        padding: 0.65rem !important;
+        padding: 0.5rem !important;
     }
 
     .summary-value,
     [class*="summary-value"] {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
     }
 
-    .summary-label,
-    [class*="summary-label"] {
-        font-size: 0.62rem !important;
-    }
-
-    /* Portfolio table: horizontal scroll, compact rows */
-    .portfolio-table-wrapper,
-    .table-container {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-
-    .portfolio-table th,
-    .portfolio-table td {
-        padding: 0.65rem 0.75rem !important;
-        font-size: 0.72rem !important;
-        white-space: nowrap;
-    }
-
-    .portfolio-table th:first-child,
-    .portfolio-table td:first-child {
-        padding-left: 0.75rem !important;
+    /* Prune portfolio table visually */
+    .portfolio-table tr:nth-child(n+12) {
+        display: none !important;
     }
 
     /* ── 9. AI RECOMMENDATIONS TAB ── */
     /* Assets Table: compact rows */
     .table-container table th,
     .table-container table td {
-        padding: 0.65rem 0.75rem !important;
-        font-size: 0.72rem !important;
+        padding: 0.5rem 0.6rem !important;
+        font-size: 0.68rem !important;
+    }
+
+    .table-container tr:nth-child(n+10) {
+        display: none !important; /* Prune to top 10 assets to fit viewport */
+    }
+
+    .table-container {
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow: hidden !important; /* No scroll! */
     }
 
     /* Signal badge: compact */
     .table-container span[style*="borderRadius"] {
-        padding: 3px 8px !important;
-        font-size: 0.65rem !important;
+        padding: 2px 6px !important;
+        font-size: 0.6rem !important;
     }
 
-    /* Scan button: compact */
+    /* Scan button: ultra-compact */
     .dashboard-viewport .btn-primary[style*="width: 100%"] {
-        padding: 0.7rem !important;
-        font-size: 0.85rem !important;
-        border-radius: 12px !important;
+        padding: 0.5rem !important;
+        font-size: 0.75rem !important;
+        border-radius: 10px !important;
+        margin-bottom: 0.5rem !important;
     }
 
     /* ── 10. PULSE TAB ── */
@@ -451,11 +444,11 @@
         padding: 0.75rem !important;
     }
 
-    /* Live stream player: reduced height on mobile */
+    /* Live stream player: ultra-compact on mobile */
     .dashboard-viewport > div:first-child iframe,
     .dashboard-viewport > div:first-child video {
-        height: 160px !important;
-        min-height: 160px !important;
+        height: 140px !important;
+        min-height: 140px !important;
     }
 
     /* ── 11. CARDS ── */
@@ -545,26 +538,64 @@
         position: relative;
     }
 
-    /* ── 19. HEATMAP ── */
-    .heatmap-main-wrapper,
-    .heatmap-wrapper {
-        height: 45vh !important; /* Reduced height to eliminate black gap and show breadth */
-        width: 100% !important;
-        position: relative !important; /* Changed to relative to allow stacking */
-        top: auto !important;
-        left: auto !important;
-        right: auto !important;
-        bottom: auto !important;
-        z-index: 10 !important;
+    /* ── 19. HOME TAB COMMAND CENTER ── */
+    .dashboard-container {
+        padding: 8px !important;
+        gap: 8px !important;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
     }
 
-    /* Ensure Market Breadth stays on top and is positioned for mobile */
+    .heatmap-main-wrapper {
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        flex: 0 0 45% !important; /* Slightly more room for heatmap */
+        min-height: 220px !important;
+        position: relative !important;
+        background: rgba(0,0,0,0.5) !important;
+    }
+
+    .heatmap-wrapper {
+        height: 100% !important;
+        width: 100% !important;
+        min-height: 100% !important;
+    }
+
     .market-breadth-wrapper {
         z-index: 60 !important;
-        top: 10px !important;
-        right: 10px !important;
-        transform: scale(0.85);
+        top: 8px !important;
+        right: 8px !important;
+        transform: scale(0.8) !important;
         transform-origin: top right;
+    }
+
+    /* Compact Cards for Command Center */
+    .dashboard-container .glass-card {
+        padding: 0.65rem !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dashboard-container .glass-card h3 {
+        font-size: 0.65rem !important;
+        margin-bottom: 4px !important;
+    }
+
+    /* Ensure Market Insights occupy the rest of the space */
+    .dashboard-container > div:last-child {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        min-height: 0 !important;
+    }
+
+    /* Ensure Industry Rotation scrolls internally but fits */
+    .dashboard-container .IndustryRotationCard {
+        flex: 1 !important;
+        min-height: 0 !important;
     }
 
     /* ── 20. SCROLLBARS: hide on mobile (touch devices) ── */

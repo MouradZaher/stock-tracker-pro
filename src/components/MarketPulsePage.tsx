@@ -12,6 +12,8 @@ import CompanyLogo from './CompanyLogo';
 
 import { CHANNELS } from './LiveIntelligenceStreams';
 import { usePiPStore } from '../services/usePiPStore';
+import { FearGreedCard, IndustryRotationCard } from './MarketInsights';
+import { useMarketInsights } from '../hooks/useMarketInsights';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -197,8 +199,9 @@ const MARKET_ALPHA: Record<string, any[]> = {
 };
 
 const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
-    const { effectiveMarket, setSentimentScore } = useMarket();
+    const { effectiveMarket } = useMarket();
     const { activeStream, setPiPActive } = usePiPStore();
+    const { sectorData, sentimentScore, overallSentiment, sentimentColor } = useMarketInsights();
 
     // Reset PiP when on this page
     useEffect(() => {
@@ -220,7 +223,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     }, [onSelectStock]);
 
     const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number }>({ hours: 0, minutes: 0, seconds: 0 });
-    const [sectorData, setSectorData] = useState<any[]>([]);
     const [volumeAnomalies, setVolumeAnomalies] = useState<any[]>([]);
     const [macroData, setMacroData] = useState<any[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
@@ -236,16 +238,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         staleTime: 15000,
     });
 
-    // Fetch Sector and Volume data - Market Aware
+    // Fetch Volume data and Macro Data - Market Aware
     useEffect(() => {
         const fetchData = async () => {
             setIsLoadingData(true);
             try {
-                const [sectors, volumes] = await Promise.all([
-                    getSectorPerformance(effectiveMarket.id),
-                    getVolumeAnomalies(effectiveMarket.id)
-                ]);
-                setSectorData(sectors);
+                const volumes = await getVolumeAnomalies(effectiveMarket.id);
                 setVolumeAnomalies(volumes);
 
                 // Live Macro Data
@@ -296,7 +294,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 3000); // 3s refresh for live pulse (accelerated from 8s)
+        const interval = setInterval(fetchData, 8000); 
         return () => clearInterval(interval);
     }, [effectiveMarket.id]);
 
@@ -350,19 +348,6 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         return () => clearInterval(interval);
     }, [nextEventData.time]);
 
-    // Sentiment Calculation (from real data)
-    const bullishCount = sectorData.filter(s => s.change > 0).length;
-    const sentimentScore = sectorData.length > 0 ? (bullishCount / sectorData.length) * 100 : 50;
-    const overallSentiment = sentimentScore >= 60 ? 'Bullish' : sentimentScore <= 40 ? 'Bearish' : 'Neutral';
-    const sentimentColor = overallSentiment === 'Bullish' ? '#10B981' : overallSentiment === 'Bearish' ? '#EF4444' : '#F59E0B';
-
-
-    /** Global Theme Update (Mega Deep Dive Innovation) */
-    useEffect(() => {
-        setSentimentScore(sentimentScore);
-    }, [sentimentScore, setSentimentScore]);
-
-
     const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
 
     return (
@@ -386,73 +371,16 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
 
                     {/* Fear & Greed */}
-                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flexShrink: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
-                            <h3 style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
-                                <Zap size={14} color="var(--color-warning)" fill="var(--color-warning)" /> Fear & Greed
-                            </h3>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.1em' }}>MARKET MOOD</div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: sentimentColor }}>{overallSentiment.toUpperCase()}</div>
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ fontSize: '2.2rem', fontWeight: 900, color: sentimentColor, textShadow: `0 0 20px ${sentimentColor}40`, letterSpacing: '-0.02em', lineHeight: 1 }}>
-                                {sentimentScore.toFixed(0)}
-                            </div>
-                            <div style={{ flex: 1, position: 'relative', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                                <div style={{ background: 'linear-gradient(90deg, #EF4444, #F59E0B, #10B981)', height: '100%', borderRadius: '4px' }} />
-                                <div style={{
-                                    position: 'absolute', top: '-4px',
-                                    left: `${Math.max(4, Math.min(96, sentimentScore))}%`,
-                                    transform: 'translateX(-50%)',
-                                    width: '14px', height: '14px', borderRadius: '50%',
-                                    background: 'white', border: `3px solid ${sentimentColor}`,
-                                    boxShadow: `0 0 10px ${sentimentColor}60`,
-                                    transition: 'left 1s ease'
-                                }} />
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-                            <span style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>FEAR</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.55rem', color: sentimentColor, fontWeight: 800 }}>
-                                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: sentimentColor, animation: 'pulse 1.5s infinite' }} />
-                                REAL-TIME
-                            </div>
-                            <span style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>GREED</span>
-                        </div>
-                    </div>
+                    <FearGreedCard 
+                        sentimentScore={sentimentScore}
+                        overallSentiment={overallSentiment}
+                        sentimentColor={sentimentColor}
+                    />
 
                     {/* Industry Rotation */}
-                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
-                            <h3 style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
-                                <Layers size={14} color="var(--color-accent)" /> Industry Rotation
-                            </h3>
-                            {sectorData.length > 0 && (
-                                <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--color-success)', background: 'var(--color-success-light)', padding: '3px 8px', borderRadius: '20px' }}>
-                                    {sectorData.filter(s => s.change > 0).length}/{sectorData.length} BULLISH
-                                </div>
-                            )}
-                        </div>
-                        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }} className="custom-scrollbar">
-                            {sectorData.map(sector => (
-                                <div key={sector.name}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ fontSize: '0.9rem' }}>{sector.icon}</span> {sector.name}
-                                        </span>
-                                        <span style={{ fontSize: '0.72rem', fontWeight: 900, color: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            {sector.change > 0 ? '+' : ''}{sector.change.toFixed(2)}%
-                                        </span>
-                                    </div>
-                                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${Math.min(100, Math.abs(sector.change) * 25)}%`, height: '100%', background: sector.change >= 0 ? 'var(--color-success)' : 'var(--color-error)', borderRadius: '2px', transition: 'width 1.5s ease' }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <IndustryRotationCard 
+                        sectorData={sectorData}
+                    />
                 </div>
 
                 {/* ── CENTER COLUMN (hidden on mobile) ── */}
