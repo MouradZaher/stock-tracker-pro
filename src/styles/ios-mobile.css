@@ -594,21 +594,11 @@
         padding: 0 !important;
         margin: 0 !important;
         background: #000 !important;
-        /* Fill exactly: viewport minus TopBar, Header, MobileNav, safe areas. Flush with mobile tabs. */
-        height: calc(
-            100dvh
-            - var(--mobile-topbar-height)
-            - var(--mobile-header-height)
-            - var(--mobile-nav-height)
-            - var(--safe-area-top)
-        ) !important;
-        max-height: calc(
-            100dvh
-            - var(--mobile-topbar-height)
-            - var(--mobile-header-height)
-            - var(--mobile-nav-height)
-            - var(--safe-area-top)
-        ) !important;
+        /* Let the main-content padding organically bound the height */
+        flex: 1 !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        min-height: 0 !important;
     }
 
     .heatmap-main-wrapper {
