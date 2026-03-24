@@ -642,6 +642,13 @@ body:has(.home-tab-content) {
     padding-left: 2rem;
     padding-right: 2rem;
   }
+  
+  /* Make home tab absolutely flush to bottom on desktop */
+  .tab-content.home-tab-content {
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
 
 @keyframes tab-entry {

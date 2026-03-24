@@ -161,7 +161,7 @@
         padding-left: 0 !important;
         padding-right: 0 !important;
         /* Reserve exact space for bottom nav — heatmap won't go past it */
-        padding-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom)) !important;
+        padding-bottom: var(--mobile-nav-height) !important;
         overflow: hidden !important;
         position: relative;
         min-height: 0;
