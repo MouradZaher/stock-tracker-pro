@@ -457,8 +457,8 @@ body:has(.home-tab-content) {
 }
 
 .main-content:has(.home-tab-content) {
-  padding-top: var(--total-header-height) !important;
-  padding-bottom: 0 !important;
+  padding-top: var(--total-header-height);
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
   flex: 1;
