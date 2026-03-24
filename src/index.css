@@ -253,12 +253,19 @@ html, body, #root {
 
 /* ── Viewport Dashboard Framework ── */
 .dashboard-viewport {
-  height: calc(100vh - 90px);
+  /* Remove 90px gap previously set to let heatmap touch the bottom of the screen on desktop */
+  height: calc(100vh - var(--total-header-height));
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
+  /* Remove bottom padding specifically for flush heatmap if it's the home tab */
   gap: 1.5rem;
+}
+
+/* Make home tab completely flush on desktop */
+.home-tab-content.dashboard-container {
+  padding-bottom: 0 !important;
 }
 
 .scrollable-panel {
@@ -462,7 +469,8 @@ body:has(.home-tab-content) {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
+  /* Remove any min-height to allow exact height filling */
+  height: calc(100vh - var(--total-header-height));
 }
 
 .home-tab-content,

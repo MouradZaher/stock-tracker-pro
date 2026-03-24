@@ -216,8 +216,9 @@
         left: 0;
         right: 0;
         width: 100%;
-        height: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
-        padding-bottom: var(--safe-area-bottom);
+        /* Nav bar height matches content precisely, sits absolute bottom */
+        height: var(--mobile-nav-height);
+        /* padding-bottom: var(--safe-area-bottom); removed so they sit completely at end */
         z-index: 1001;
         background: rgba(5, 5, 8, 0.92);
         backdrop-filter: blur(24px);
@@ -593,14 +594,15 @@
         padding: 0 !important;
         margin: 0 !important;
         background: #000 !important;
-        /* Fill exactly: viewport minus TopBar, Header, MobileNav, safe areas */
+        /* Fill exactly: viewport minus TopBar, Header, MobileNav, safe areas, AND exactly 5vh cut */
         height: calc(
             100dvh
             - var(--mobile-topbar-height)
             - var(--mobile-header-height)
             - var(--mobile-nav-height)
             - var(--safe-area-top)
-            - var(--safe-area-bottom)
+            /* No longer subtracting safe-area-bottom since it's removed from nav container */
+            - 5vh 
         ) !important;
         max-height: calc(
             100dvh
@@ -608,7 +610,7 @@
             - var(--mobile-header-height)
             - var(--mobile-nav-height)
             - var(--safe-area-top)
-            - var(--safe-area-bottom)
+            - 5vh 
         ) !important;
     }
 
