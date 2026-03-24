@@ -464,26 +464,31 @@ body:has(.home-tab-content) {
 }
 
 .main-content:has(.home-tab-content) {
-  padding-top: var(--total-header-height) !important;
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-  border: none !important;
   display: flex;
   flex-direction: column;
   flex: 1;
-  /* Fix gap: border-box means padding-top subtracts from height. 100vh makes it end exactly at bottom of screen. */
-  height: 100vh !important;
-  max-height: 100vh !important;
-  box-sizing: border-box !important;
 }
 
-/* Force absolute bottom flush on the heatmap elements */
-.dashboard-container.home-tab-content,
-.heatmap-main-wrapper,
-.heatmap-wrapper {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-  box-sizing: border-box !important;
+@media (min-width: 769px) {
+  .main-content:has(.home-tab-content) {
+    padding-top: var(--total-header-height) !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    border: none !important;
+    /* Fix gap: border-box means padding-top subtracts from height. 100vh makes it end exactly at bottom of screen. */
+    height: 100vh !important;
+    max-height: 100vh !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force absolute bottom flush on the heatmap elements */
+  .dashboard-container.home-tab-content,
+  .heatmap-main-wrapper,
+  .heatmap-wrapper {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box !important;
+  }
 }
 
 .home-tab-content,
