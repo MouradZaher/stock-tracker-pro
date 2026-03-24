@@ -505,12 +505,7 @@ body:has(.home-tab-content) {
   touch-action: pan-x pan-y;
 }
 
-/* Ensure mobile nav clearance */
-@media (max-width: 768px) {
-  .home-tab-content {
-    padding-bottom: 85px; /* Offset for mobile bottom nav */
-  }
-}
+/* Mobile nav clearance is handled via .main-content padding-bottom in ios-mobile.css */
 /* END LOCKED: Desktop Home Tab Layout */
 
 .ai-signal-card {
@@ -624,11 +619,12 @@ body:has(.home-tab-content) {
 
 /* Layout handled in Core Layout Chain */
 
+/* Mobile tab padding: handled by ios-mobile.css via .main-content padding-bottom */
 @media (max-width: 768px) {
   .tab-content {
-    padding-bottom: 80px; /* Clear mobile nav footer */
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
   }
 }
 
