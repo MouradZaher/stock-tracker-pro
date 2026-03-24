@@ -594,15 +594,13 @@
         padding: 0 !important;
         margin: 0 !important;
         background: #000 !important;
-        /* Fill exactly: viewport minus TopBar, Header, MobileNav, safe areas, AND exactly 5vh cut */
+        /* Fill exactly: viewport minus TopBar, Header, MobileNav, safe areas. Flush with mobile tabs. */
         height: calc(
             100dvh
             - var(--mobile-topbar-height)
             - var(--mobile-header-height)
             - var(--mobile-nav-height)
             - var(--safe-area-top)
-            /* No longer subtracting safe-area-bottom since it's removed from nav container */
-            - 5vh 
         ) !important;
         max-height: calc(
             100dvh
@@ -610,7 +608,6 @@
             - var(--mobile-header-height)
             - var(--mobile-nav-height)
             - var(--safe-area-top)
-            - 5vh 
         ) !important;
     }
 
