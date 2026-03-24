@@ -469,8 +469,8 @@ body:has(.home-tab-content) {
   display: flex;
   flex-direction: column;
   flex: 1;
-  /* Remove any min-height to allow exact height filling */
-  height: calc(100vh - var(--total-header-height));
+  /* Fix gap: border-box means padding-top subtracts from height. 100vh makes it end exactly at bottom of screen. */
+  height: 100vh;
 }
 
 .home-tab-content,
