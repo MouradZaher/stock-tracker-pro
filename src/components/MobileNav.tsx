@@ -44,18 +44,18 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
             aria-label="Main navigation"
             style={{
                 position: 'fixed',
-                bottom: 20, // Floating look
-                left: '5%',
-                right: '5%',
-                width: '90%',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                width: '100%',
                 zIndex: 1001,
-                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-                background: 'rgba(15, 15, 25, 0.85)',
-                backdropFilter: 'blur(20px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02)',
-                borderRadius: '24px',
+                paddingBottom: 0, /* Removed safe-area so it touches the absolute bottom */
+                background: 'rgba(15, 15, 25, 0.95)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 -4px 24px rgba(0,0,0,0.8)',
+                borderRadius: 0,
             }}
         >
             <div style={{
