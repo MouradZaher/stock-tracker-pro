@@ -570,6 +570,13 @@
         position: relative;
     }
 
+    /* Force tab-content wrappers to be flush when on home */
+    .main-content > .tab-content.home-tab-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+
     /* ── 19. HOME TAB COMMAND CENTER ── */
     .dashboard-container {
         padding: 0 !important;
@@ -584,6 +591,7 @@
     .dashboard-container.home-tab-content {
         gap: 0 !important;
         padding: 0 !important;
+        margin: 0 !important;
         background: #000 !important;
         /* Fill exactly: viewport minus TopBar, Header, MobileNav, safe areas */
         height: calc(
