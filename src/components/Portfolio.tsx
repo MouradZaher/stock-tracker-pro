@@ -912,7 +912,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
                                                     <div style={{ fontWeight: 900, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{position.symbol}</div>
-                                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{position.name.split(' ')[0]}</div>
+                                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{(position.name || position.symbol).split(' ')[0]}</div>
                                                 </div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'right' }}>
                                                     <div>

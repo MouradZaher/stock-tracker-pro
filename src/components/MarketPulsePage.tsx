@@ -356,14 +356,14 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
             padding: 0
         }}>
             {/* Live Stream + Channel Bar — fixed top section */}
-            <div style={{ padding: '0.6rem 1rem 0', flexShrink: 0 }}>
+            <div style={{ padding: '0.4rem 0.75rem 0', flexShrink: 0 }}>
                 <LiveStreamsPlayer streams={MARKET_STREAMS} />
             </div>
 
             {/* 3-Column Dashboard Grid — fills all remaining height */}
             <div className="grid-3col-pulse" style={{
-                gap: '0.75rem', /* Compact gap override for Pulse */
-                padding: '0.6rem 1rem 0.6rem',
+                gap: '0.5rem', /* Highly compact gap for Pulse */
+                padding: '0.4rem 0.75rem 0.4rem',
                 overflow: 'hidden'
             }}>
 

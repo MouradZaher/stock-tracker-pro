@@ -66,9 +66,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .from('profiles')
                 .select('role, is_approved')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
 
-            if (error) throw error;
+            if (error && error.code !== 'PGRST116') throw error;
 
             if (data) {
                 setRole(data.role as 'admin' | 'user');
