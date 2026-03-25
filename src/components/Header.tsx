@@ -28,6 +28,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
     // Detect mobile viewport to pass smaller icon sizes directly to Lucide
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     useEffect(() => {
         const onResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', onResize);
@@ -231,7 +237,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
                 {/* ── Actions (right-aligned) ───────────── */}
                 <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: isMobile ? '0.2rem' : '0.4rem' }}>
-                    {/* Market Selector - Priority 1 */}
+                    {/* 1. Market Selector */}
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
@@ -321,52 +327,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         document.body
                     )}
 
-                    {/* FAQ / Help with Integrated Support - Priority 2 */}
-                    <button
-                        style={{ ...iconBtn }}
-                        onClick={() => { soundService.playTap(); onOpenTutorial?.(); }}
-                        aria-label="Help & Support"
-                        title="Help & Support"
-                    >
-                        <HelpCircle size={iconSize} strokeWidth={2.0} />
-                    </button>
-
-                    {/* Support Contact Link (shown inside Help/Tutorial modal usually, but keeping here icon-only for mobile if requested) */}
-                    {!isMobile && (
-                        <a
-                            href="mailto:support@stocktrackerpro.com"
-                            style={{ ...iconBtn, textDecoration: 'none' }}
-                            onClick={() => soundService.playTap()}
-                            aria-label="Contact Support"
-                            title="Contact Support"
-                        >
-                            <MessageSquare size={iconSize} strokeWidth={2.0} />
-                        </a>
-                    )}
-
-                    {/* Settings - Priority 3 */}
-                    <button
-                        style={{ ...iconBtn }}
-                        onClick={() => { soundService.playTap(); onOpenSettings?.(); }}
-                        aria-label="Settings"
-                        title="Settings"
-                    >
-                        <SettingsIcon size={iconSize} strokeWidth={2.0} />
-                    </button>
-
-                    {/* Admin Panel - Priority 4 */}
-                    {showAdmin && (
-                        <button
-                            style={{ ...iconBtn, color: 'var(--color-accent)', borderColor: 'var(--color-accent-light)' }}
-                            onClick={() => { soundService.playTap(); onAdminClick?.(); }}
-                            aria-label="Open Admin Panel"
-                            title="Admin Dashboard"
-                        >
-                            <Shield size={iconSize} strokeWidth={2.0} />
-                        </button>
-                    )}
-
-                    {/* Notifications */}
+                    {/* 2. Notifications (Bell) */}
                     <button
                         style={{ ...iconBtn, position: 'relative' }}
                         onClick={() => { soundService.playTap(); setIsNotifyOpen(true); markAllAsRead(); }}
@@ -396,7 +357,52 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         )}
                     </button>
 
-                    {/* Logout - Priority 5 */}
+                    {/* 3. FAQ / Help */}
+                    <button
+                        style={{ ...iconBtn }}
+                        onClick={() => { soundService.playTap(); onOpenTutorial?.(); }}
+                        aria-label="Help & Support"
+                        title="Help & Support"
+                    >
+                        <HelpCircle size={iconSize} strokeWidth={2.0} />
+                    </button>
+
+                    {/* Support Contact Link (Desktop only) */}
+                    {!isMobile && (
+                        <a
+                            href="mailto:support@stocktrackerpro.com"
+                            style={{ ...iconBtn, textDecoration: 'none' }}
+                            onClick={() => soundService.playTap()}
+                            aria-label="Contact Support"
+                            title="Contact Support"
+                        >
+                            <MessageSquare size={iconSize} strokeWidth={2.0} />
+                        </a>
+                    )}
+
+                    {/* 4. Settings */}
+                    <button
+                        style={{ ...iconBtn }}
+                        onClick={() => { soundService.playTap(); onOpenSettings?.(); }}
+                        aria-label="Settings"
+                        title="Settings"
+                    >
+                        <SettingsIcon size={iconSize} strokeWidth={2.0} />
+                    </button>
+
+                    {/* 5. Admin Panel */}
+                    {showAdmin && (
+                        <button
+                            style={{ ...iconBtn, color: 'var(--color-accent)', borderColor: 'var(--color-accent-light)' }}
+                            onClick={() => { soundService.playTap(); onAdminClick?.(); }}
+                            aria-label="Open Admin Panel"
+                            title="Admin Dashboard"
+                        >
+                            <Shield size={iconSize} strokeWidth={2.0} />
+                        </button>
+                    )}
+
+                    {/* 6. Logout */}
                     <button
                         style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)' }}
                         onClick={() => { soundService.playTap(); onLogout(); }}

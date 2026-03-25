@@ -99,8 +99,8 @@
     }
 
     .header-actions button {
-        height: 24px !important; /* Shortened */
-        min-width: 24px;
+        height: 21px !important; /* Vertically shorter */
+        min-width: 21px;
         padding: 0 4px !important;
         font-size: 0.6rem !important;
         border-radius: 6px !important;
@@ -115,21 +115,21 @@
     .header-actions button::after {
         content: '';
         position: absolute;
-        top: -10px;
-        bottom: -10px;
+        top: -11px;
+        bottom: -11px;
         left: -8px;
         right: -8px;
         z-index: 10;
     }
 
     .header-actions button svg {
-        width: 12px !important;
-        height: 12px !important;
+        width: 14px !important; /* Larger icons */
+        height: 14px !important;
     }
 
     .header-actions button img {
-        width: 12px !important;
-        height: 8px !important;
+        width: 14px !important;
+        height: 9px !important;
     }
 
     .header-actions .desktop-only,
