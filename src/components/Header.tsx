@@ -250,6 +250,77 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         </button>
                     </div>
 
+                    {/* Market Dropdown Portal — rendered outside header stacking context */}
+                    {isMarketOpen && dropdownPos && ReactDOM.createPortal(
+                        <>
+                            {/* Transparent backdrop to close dropdown on outside click */}
+                            <div
+                                onClick={() => setIsMarketOpen(false)}
+                                style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+                            />
+                            <div style={{
+                                position: 'fixed',
+                                top: dropdownPos.top,
+                                right: isMobile ? '10px' : dropdownPos.right,
+                                zIndex: 9999,
+                                background: 'rgba(10,10,18,0.97)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                borderRadius: 'var(--radius-lg)',
+                                padding: '0.5rem',
+                                minWidth: isMobile ? '160px' : '200px',
+                                backdropFilter: 'blur(30px)',
+                                boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '4px',
+                            }}
+                                onMouseLeave={() => !isMobile && setHoverMarket(null)}
+                            >
+                                <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
+                                    Select Market
+                                </div>
+                                {MARKETS.map(m => (
+                                    <button
+                                        key={m.id}
+                                        onMouseEnter={() => !isMobile && setHoverMarket(m.id as MarketId)}
+                                        onClick={() => { setMarket(m.id as MarketId); setIsMarketOpen(false); soundService.playTap(); }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '0.65rem 0.75rem',
+                                            borderRadius: 'var(--radius-md)',
+                                            background: selectedMarket.id === m.id ? `${m.color}18` : 'transparent',
+                                            border: selectedMarket.id === m.id ? `1px solid ${m.color}44` : '1px solid transparent',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            transition: 'all 0.15s',
+                                            width: '100%',
+                                            color: 'inherit',
+                                            font: 'inherit',
+                                        }}
+                                    >
+                                        <img src={m.flagUrl} alt={m.shortName} style={{ width: isMobile ? '20px' : '28px', height: isMobile ? '14px' : '20px', borderRadius: '3px', objectFit: 'cover' }} />
+                                        <div>
+                                            <div style={{ fontWeight: 700, fontSize: isMobile ? '0.75rem' : '0.85rem', color: selectedMarket.id === m.id ? m.color : 'var(--color-text-primary)' }}>
+                                                {m.name}
+                                            </div>
+                                            {!isMobile && (
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '1px' }}>
+                                                    {m.indexName}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {selectedMarket.id === m.id && (
+                                            <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: m.color, boxShadow: `0 0 8px ${m.color}` }} />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </>,
+                        document.body
+                    )}
+
                     {/* FAQ / Help with Integrated Support - Priority 2 */}
                     <button
                         style={{ ...iconBtn }}
@@ -295,37 +366,35 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         </button>
                     )}
 
-                    {/* Notifications (Desktop only to save space) */}
-                    {!isMobile && (
-                        <button
-                            style={{ ...iconBtn, position: 'relative' }}
-                            onClick={() => { soundService.playTap(); setIsNotifyOpen(true); markAllAsRead(); }}
-                            aria-label="Notifications"
-                            title="Notifications"
-                        >
-                            <Bell size={iconSize} strokeWidth={2.0} />
-                            {unreadCount > 0 && (
-                                <span style={{
-                                    position: 'absolute',
-                                    top: '-4px',
-                                    right: '-4px',
-                                    background: 'var(--color-error)',
-                                    color: 'white',
-                                    borderRadius: 'var(--radius-full)',
-                                    width: isMobile ? '12px' : '16px',
-                                    height: isMobile ? '12px' : '16px',
-                                    fontSize: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '2px solid var(--color-bg-primary)',
-                                    fontWeight: 800,
-                                }}>
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </button>
-                    )}
+                    {/* Notifications */}
+                    <button
+                        style={{ ...iconBtn, position: 'relative' }}
+                        onClick={() => { soundService.playTap(); setIsNotifyOpen(true); markAllAsRead(); }}
+                        aria-label="Notifications"
+                        title="Notifications"
+                    >
+                        <Bell size={iconSize} strokeWidth={2.0} />
+                        {unreadCount > 0 && (
+                            <span style={{
+                                position: 'absolute',
+                                top: '-4px',
+                                right: '-4px',
+                                background: 'var(--color-error)',
+                                color: 'white',
+                                borderRadius: 'var(--radius-full)',
+                                width: isMobile ? '12px' : '16px',
+                                height: isMobile ? '12px' : '16px',
+                                fontSize: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: '2px solid var(--color-bg-primary)',
+                                fontWeight: 800,
+                            }}>
+                                {unreadCount}
+                            </span>
+                        )}
+                    </button>
 
                     {/* Logout - Priority 5 */}
                     <button
