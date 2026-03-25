@@ -281,7 +281,7 @@ function MainLayout({
         </div>
       </ErrorBoundary>
       <div className="noise-overlay" />
-      <AIChatWidget />
+      {activeTab !== 'home' && <AIChatWidget />}
       <ARIAVoiceAssistant
         onNavigate={handleTabChange}
         onSelectSymbol={handleSelectSymbol}
