@@ -282,10 +282,12 @@ function MainLayout({
       </ErrorBoundary>
       <div className="noise-overlay" />
       {activeTab !== 'home' && <AIChatWidget />}
-      <ARIAVoiceAssistant
-        onNavigate={handleTabChange}
-        onSelectSymbol={handleSelectSymbol}
-      />
+      {activeTab !== 'home' && (
+        <ARIAVoiceAssistant
+          onNavigate={handleTabChange}
+          onSelectSymbol={handleSelectSymbol}
+        />
+      )}
       <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
       {activeTab !== 'pulse' && <FloatingStream />}
     </div>
