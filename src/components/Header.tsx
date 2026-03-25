@@ -130,8 +130,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                     flexShrink: 0,
                     display: 'flex', 
                     alignItems: 'center', 
-                    gap: '8px',
-                    padding: '6px 12px',
+                    gap: isMobile ? '4px' : '8px',
+                    padding: isMobile ? '4px 8px' : '6px 12px',
                     borderRadius: '12px',
                     background: 'rgba(255,255,255,0.03)',
                     border: '1px solid var(--glass-border)',
@@ -141,17 +141,17 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                 onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
                 >
                     <div className="logo-icon" style={{ 
-                        padding: '4px', 
+                        padding: isMobile ? '2px' : '4px', 
                         borderRadius: '6px',
                         background: 'var(--gradient-primary)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}>
-                        <Zap size={16} color="white" fill="white" />
+                        <Zap size={isMobile ? 12 : 16} color="white" fill="white" />
                     </div>
                     <span className="logo-text" style={{ 
-                        fontSize: '0.9rem', 
+                        fontSize: isMobile ? '0.75rem' : '0.9rem', 
                         fontWeight: 900, 
                         letterSpacing: '-0.02em',
                         background: 'linear-gradient(to right, #fff, rgba(255,255,255,0.7))',
@@ -230,114 +230,50 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
 
                 {/* ── Actions (right-aligned) ───────────── */}
-                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {/* Market Countdown Clock */}
-                    {!isMobile && <MarketCountdown />}
-                    {/* Market Selector */}
+                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: isMobile ? '0.2rem' : '0.4rem' }}>
+                    {/* Market Selector - Priority 1 */}
                     <div style={{ position: 'relative' }}>
                         <button
                             ref={marketBtnRef}
-                            style={{ ...iconBtn, borderColor: `${selectedMarket.color}55`, padding: isMobile ? '2px 3px' : '2px 4px' }}
+                            style={{ 
+                                ...iconBtn, 
+                                borderColor: `${selectedMarket.color}55`, 
+                                padding: isMobile ? '2px' : '2px 4px',
+                                minWidth: isMobile ? '20px' : '28px'
+                            }}
                             onClick={openMarketDropdown}
                             title="Select Market"
                             aria-label="Select market"
                         >
                             <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: isMobile ? '12px' : '14px', height: isMobile ? '8px' : '10px', borderRadius: '1px', objectFit: 'cover' }} />
-                            <ChevronDown size={isMobile ? 7 : 8} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />
+                            {!isMobile && <ChevronDown size={8} strokeWidth={2.0} style={{ opacity: 0.5, transform: isMarketOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--color-text-tertiary)' }} />}
                         </button>
                     </div>
 
-                    {/* Market Dropdown Portal — rendered outside header stacking context */}
-                    {isMarketOpen && dropdownPos && ReactDOM.createPortal(
-                        <>
-                            {/* Transparent backdrop to close dropdown on outside click */}
-                            <div
-                                onClick={() => setIsMarketOpen(false)}
-                                style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
-                            />
-                            <div style={{
-                                position: 'fixed',
-                                top: dropdownPos.top,
-                                right: dropdownPos.right,
-                                zIndex: 9999,
-                                background: 'rgba(10,10,18,0.97)',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                borderRadius: 'var(--radius-lg)',
-                                padding: '0.5rem',
-                                minWidth: '200px',
-                                backdropFilter: 'blur(30px)',
-                                boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '4px',
-                            }}
-                                onMouseLeave={() => setHoverMarket(null)}
-                            >
-                                <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
-                                    Select Market
-                                </div>
-                                {MARKETS.map(m => (
-                                    <button
-                                        key={m.id}
-                                        onMouseEnter={() => setHoverMarket(m.id as MarketId)}
-                                        onClick={() => { setMarket(m.id as MarketId); setIsMarketOpen(false); soundService.playTap(); }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            padding: '0.65rem 0.75rem',
-                                            borderRadius: 'var(--radius-md)',
-                                            background: selectedMarket.id === m.id ? `${m.color}18` : 'transparent',
-                                            border: selectedMarket.id === m.id ? `1px solid ${m.color}44` : '1px solid transparent',
-                                            cursor: 'pointer',
-                                            textAlign: 'left',
-                                            transition: 'all 0.15s',
-                                            width: '100%',
-                                            color: 'inherit',
-                                            font: 'inherit',
-                                        }}
-                                    >
-                                        <img src={m.flagUrl} alt={m.shortName} style={{ width: '28px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} />
-                                        <div>
-                                            <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedMarket.id === m.id ? m.color : 'var(--color-text-primary)' }}>
-                                                {m.name}
-                                            </div>
-                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', marginTop: '1px' }}>
-                                                {m.indexName}
-                                            </div>
-                                        </div>
-                                        {selectedMarket.id === m.id && (
-                                            <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: m.color, boxShadow: `0 0 8px ${m.color}` }} />
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                        </>,
-                        document.body
-                    )}
-
-                    {/* Help / Tutorial */}
+                    {/* FAQ / Help with Integrated Support - Priority 2 */}
                     <button
                         style={{ ...iconBtn }}
                         onClick={() => { soundService.playTap(); onOpenTutorial?.(); }}
-                        aria-label="Help & Tutorial"
-                        title="Help & Tutorial"
+                        aria-label="Help & Support"
+                        title="Help & Support"
                     >
                         <HelpCircle size={iconSize} strokeWidth={2.0} />
                     </button>
 
-                    {/* Support Email */}
-                    <a
-                        href="mailto:support@stocktrackerpro.com"
-                        style={{ ...iconBtn, textDecoration: 'none' }}
-                        onClick={() => soundService.playTap()}
-                        aria-label="Contact Support"
-                        title="Contact Support"
-                    >
-                        <MessageSquare size={iconSize} strokeWidth={2.0} />
-                    </a>
+                    {/* Support Contact Link (shown inside Help/Tutorial modal usually, but keeping here icon-only for mobile if requested) */}
+                    {!isMobile && (
+                        <a
+                            href="mailto:support@stocktrackerpro.com"
+                            style={{ ...iconBtn, textDecoration: 'none' }}
+                            onClick={() => soundService.playTap()}
+                            aria-label="Contact Support"
+                            title="Contact Support"
+                        >
+                            <MessageSquare size={iconSize} strokeWidth={2.0} />
+                        </a>
+                    )}
 
-                    {/* Settings */}
+                    {/* Settings - Priority 3 */}
                     <button
                         style={{ ...iconBtn }}
                         onClick={() => { soundService.playTap(); onOpenSettings?.(); }}
@@ -347,7 +283,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         <SettingsIcon size={iconSize} strokeWidth={2.0} />
                     </button>
 
-                    {/* Admin icon */}
+                    {/* Admin Panel - Priority 4 */}
                     {showAdmin && (
                         <button
                             style={{ ...iconBtn, color: 'var(--color-accent)', borderColor: 'var(--color-accent-light)' }}
@@ -359,37 +295,39 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         </button>
                     )}
 
-                    {/* Bell / Notifications */}
-                    <button
-                        style={{ ...iconBtn, position: 'relative' }}
-                        onClick={() => { soundService.playTap(); setIsNotifyOpen(true); markAllAsRead(); }}
-                        aria-label="Notifications"
-                        title="Notifications"
-                    >
-                        <Bell size={iconSize} strokeWidth={2.0} />
-                        {unreadCount > 0 && (
-                            <span style={{
-                                position: 'absolute',
-                                top: '-4px',
-                                right: '-4px',
-                                background: 'var(--color-error)',
-                                color: 'white',
-                                borderRadius: 'var(--radius-full)',
-                                width: isMobile ? '12px' : '16px',
-                                height: isMobile ? '12px' : '16px',
-                                fontSize: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '2px solid var(--color-bg-primary)',
-                                fontWeight: 800,
-                            }}>
-                                {unreadCount}
-                            </span>
-                        )}
-                    </button>
+                    {/* Notifications (Desktop only to save space) */}
+                    {!isMobile && (
+                        <button
+                            style={{ ...iconBtn, position: 'relative' }}
+                            onClick={() => { soundService.playTap(); setIsNotifyOpen(true); markAllAsRead(); }}
+                            aria-label="Notifications"
+                            title="Notifications"
+                        >
+                            <Bell size={iconSize} strokeWidth={2.0} />
+                            {unreadCount > 0 && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '-4px',
+                                    right: '-4px',
+                                    background: 'var(--color-error)',
+                                    color: 'white',
+                                    borderRadius: 'var(--radius-full)',
+                                    width: isMobile ? '12px' : '16px',
+                                    height: isMobile ? '12px' : '16px',
+                                    fontSize: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px solid var(--color-bg-primary)',
+                                    fontWeight: 800,
+                                }}>
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+                    )}
 
-                    {/* Logout */}
+                    {/* Logout - Priority 5 */}
                     <button
                         style={{ ...iconBtn, color: 'var(--color-error)', borderColor: 'rgba(239,68,68,0.2)' }}
                         onClick={() => { soundService.playTap(); onLogout(); }}

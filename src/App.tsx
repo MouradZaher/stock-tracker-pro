@@ -128,6 +128,14 @@ function AppContent() {
       {isSettingsOpen && (
         <SettingsModal 
           onClose={() => setIsSettingsOpen(false)}
+          onClearData={() => {
+            localStorage.clear();
+            window.location.reload();
+          }}
+          onDeleteAccount={() => {
+            localStorage.clear();
+            handleLogout();
+          }}
         />
       )}
       <MainLayout
