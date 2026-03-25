@@ -86,8 +86,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     };
 
     const iconBtn: React.CSSProperties = {
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid var(--glass-border)',
         borderRadius: '6px',
         color: 'var(--color-text-secondary)',
         cursor: 'pointer',
@@ -102,7 +100,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         whiteSpace: 'nowrap' as const,
         height: isMobile ? '28px' : '28px', // Back to 28px for better touch area without visual border
         minWidth: isMobile ? '28px' : '28px',
-        background: isMobile ? 'transparent' : 'rgba(255,255,255,0.03)',
+        background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.03)',
         border: isMobile ? 'none' : '1px solid var(--glass-border)',
     };
 
