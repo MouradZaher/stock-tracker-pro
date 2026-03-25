@@ -34,8 +34,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    const iconSize = isMobile ? 15 : 12;
-    const btnH = isMobile ? '20px' : '22px';
+    const iconSize = isMobile ? 18 : 12;
+    const btnH = isMobile ? '28px' : '22px';
 
     const tabs: { id: TabType; label: string; icon: React.ElementType; isCustomIcon?: boolean }[] = [
         { id: 'home', label: 'Home', icon: Home },
@@ -100,8 +100,10 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         fontSize: '0.6rem',
         fontWeight: 700,
         whiteSpace: 'nowrap' as const,
-        height: isMobile ? '20px' : '28px',
-        minWidth: isMobile ? '20px' : '28px',
+        height: isMobile ? '28px' : '28px', // Back to 28px for better touch area without visual border
+        minWidth: isMobile ? '28px' : '28px',
+        background: isMobile ? 'transparent' : 'rgba(255,255,255,0.03)',
+        border: isMobile ? 'none' : '1px solid var(--glass-border)',
     };
 
     return (
