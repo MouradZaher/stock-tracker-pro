@@ -231,7 +231,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
 
                 {/* ── Actions (right-aligned) ───────────── */}
-                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '0.4rem' }}>
+                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: isMobile ? '12px' : '0.4rem' }}>
                     {/* 1. Market Selector */}
                     <div style={{ position: 'relative' }}>
                         <button

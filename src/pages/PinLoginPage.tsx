@@ -210,22 +210,21 @@ const PinLoginPage: React.FC = () => {
                 </div>
             </nav>
 
-            <div className="hero-section" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1rem', width: '100%', maxWidth: 'none' }}>
-                <div className="hero-form-container" style={{ maxWidth: '440px', width: '100%' }}>
-                    <div className="login-form-wrapper glass-card" style={{ padding: '2.5rem', borderRadius: '24px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                            <div style={{ background: 'var(--gradient-primary)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                                <Shield size={24} color="white" />
+            <div className="hero-section" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                <div className="hero-form-container" style={{ maxWidth: '400px', width: '100%', animation: 'fadeIn 0.6s ease-out' }}>
+                    <div className="login-form-wrapper glass-card" style={{ padding: '2.5rem', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 100px rgba(0,0,0,0.8)' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                            <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
+                                <Shield size={28} color="white" />
                             </div>
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>Terminal <span className="gradient-text">Access</span></h2>
-                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Secure portal for authenticated traders.</p>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.4rem', color: 'white', letterSpacing: '-0.02em' }}>Terminal <span className="gradient-text">Pro</span></h2>
+                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', opacity: 0.7 }}>Institutional Access Only</p>
                         </div>
                         
                         <div className="login-form">
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (
                                 <div className="form-step-container">
-                                    <label className="form-label">Enter Username</label>
                                     <div className="input-group">
                                         <div className="input-with-icon">
                                             <User size={18} className="input-icon" />
@@ -233,7 +232,7 @@ const PinLoginPage: React.FC = () => {
                                                 ref={usernameRef}
                                                 type="text"
                                                 className="form-input landing-input"
-                                                placeholder="Your username..."
+                                                placeholder="Username"
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
@@ -249,13 +248,9 @@ const PinLoginPage: React.FC = () => {
                                             onClick={handleUsernameSubmit}
                                             disabled={isLoading || !username.trim()}
                                             className="btn btn-primary next-button"
+                                            style={{ borderRadius: '12px' }}
                                         >
-                                            {isLoading ? '...' : (
-                                                <>
-                                                    Next
-                                                    <ArrowRight size={18} />
-                                                </>
-                                            )}
+                                            {isLoading ? '...' : <ArrowRight size={20} />}
                                         </button>
                                     </div>
                                 </div>
@@ -265,25 +260,13 @@ const PinLoginPage: React.FC = () => {
                             {(mode === 'login' || mode === 'signup') && (
                                 <div className="form-step-container">
                                     <div className="form-back-selector">
-                                        <button onClick={goBack} className="glass-button back-btn">← Back</button>
+                                        <button onClick={goBack} className="glass-button back-btn">←</button>
                                         <span className="user-indicator">
-                                            {mode === 'signup' ? (
-                                                <>
-                                                    <UserPlus size={14} color="var(--color-success)" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                                                    <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    User: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                                </>
-                                            )}
+                                            <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
                                         </span>
                                     </div>
 
-                                    <label className="form-label">
-                                        {mode === 'signup' ? 'Create a 4-Digit PIN' : 'Enter Your PIN'}
-                                    </label>
-                                    <div className="pin-input-group">
+                                    <div className="pin-input-group" style={{ marginTop: '1rem' }}>
                                         {pin.map((digit, index) => (
                                             <input
                                                 key={index}
@@ -302,38 +285,22 @@ const PinLoginPage: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-
-                            <p className="form-note">
-                                <Shield size={12} color="var(--color-success)" />
-                                Institutional Grade Security
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <footer className="landing-footer" style={{ borderTop: 'none', background: 'transparent', padding: '1rem' }}>
-                <div className="footer-links" style={{ gap: '1rem', flexWrap: 'wrap' }}>
-                    <span className="footer-link" onClick={() => setActiveModal('privacy')}>Privacy</span>
-                    <span className="footer-link" onClick={() => setActiveModal('terms')}>Terms</span>
-                    <span className="footer-link" onClick={() => setActiveModal('support')}>Support</span>
-                </div>
-                <p style={{ opacity: 0.4, fontSize: '0.75rem', marginTop: '0.5rem' }}>&copy; {new Date().getFullYear()} StockTracker Pro</p>
-            </footer>
-
             {activeModal && (
                 <div className="modal-overlay glass-blur" onClick={() => setActiveModal(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 'clamp(320px, 90vw, 500px)', width: '90%', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)', padding: '0', overflow: 'hidden', boxShadow: 'var(--shadow-xl)' }}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 'clamp(320px, 90vw, 500px)', width: '90%', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)', padding: '0', overflow: 'hidden' }}>
                         <div className="modal-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 className="modal-title" style={{ margin: 0, fontSize: '1.25rem', color: 'var(--color-text-primary)' }}>{FOOTER_CONTENT[activeModal].title}</h3>
-                            <button className="btn btn-icon glass-button" onClick={() => setActiveModal(null)} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-tertiary)', cursor: 'pointer' }}>
-                                <X size={20} />
-                            </button>
+                            <h3 className="modal-title" style={{ margin: 0 }}>{FOOTER_CONTENT[activeModal].title}</h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setActiveModal(null)}><X size={20} /></button>
                         </div>
                         <div className="modal-body" style={{ padding: '1.5rem', fontSize: '1rem', lineHeight: '1.6', color: 'var(--color-text-secondary)' }}>
                             {FOOTER_CONTENT[activeModal].content}
                         </div>
-                        <div className="modal-footer" style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.2)' }}>
+                        <div className="modal-footer" style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'flex-end' }}>
                             <button className="btn btn-primary" onClick={() => setActiveModal(null)}>Close</button>
                         </div>
                     </div>

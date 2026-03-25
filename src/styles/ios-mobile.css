@@ -110,15 +110,9 @@
         justify-content: center !important;
     }
 
-    /* Apple HIG 44px touch target */
+    /* Remove absolute hit area extension on mobile to prevent overlaps */
     .header-actions button::after {
-        content: '';
-        position: absolute;
-        top: -8px;
-        bottom: -8px;
-        left: -2px;
-        right: -2px;
-        z-index: 10;
+        display: none !important;
     }
 
     .header-actions button svg {
