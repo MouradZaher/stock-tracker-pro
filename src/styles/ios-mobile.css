@@ -629,7 +629,7 @@
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        bottom: 50px !important; /* Explicitly guarantees 50px clearance for the raised Command button */
+        bottom: 5vh !important; /* Explicitly guarantees 5vh clearance for the raised Command button */
         height: auto !important;
         max-height: none !important;
         flex: none !important;
