@@ -370,7 +370,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         if (jitterEnabled && price > 0) {
             // More visible jitter: +/- 0.05% (e.g., 10 cents on a $200 stock)
             // This provides a "living" feel to the UI even during slow market periods
-            const jitterFactor = 1 + (Math.random() * 0.001 - 0.0005);
+            const jitterFactor = 1 + (Math.random() * 0.0006 - 0.0003);
             finalPrice = price * jitterFactor;
         }
 
@@ -730,10 +730,14 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
             const originalSymbol = symbols.find(s => s === sym || s === quote.symbol) || sym;
 
             if (quote.price > 0) {
+                // ADD REAL-TIME JITTER for "living" feel in batch mode
+                const jitterFactor = 1 + (Math.random() * 0.0006 - 0.0003);
+                const finalPrice = quote.price * jitterFactor;
+
                 const stock: Stock = {
                     symbol: originalSymbol,
                     name: quote.name || originalSymbol,
-                    price: quote.price,
+                    price: finalPrice,
                     change: quote.change || 0,
                     changePercent: quote.changePercent || 0,
                     previousClose: quote.previousClose || 0,

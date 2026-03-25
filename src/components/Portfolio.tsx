@@ -180,6 +180,31 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         }
     }, [allPositions, positions]); // Recompute when any positions change
 
+    // --- NEW: Live Ticker State ---
+    const [liveTicker, setLiveTicker] = useState<{ symbol: string, type: 'up' | 'down', value: number } | null>(null);
+
+    // Effect to simulate live activity for visual feedback
+    useEffect(() => {
+        if (positions.length === 0) return;
+        
+        const tickInterval = setInterval(() => {
+            const randomPos = positions[Math.floor(Math.random() * positions.length)];
+            const isUp = Math.random() > 0.45;
+            const fluctuation = (randomPos.currentPrice * 0.0001);
+            
+            setLiveTicker({
+                symbol: randomPos.symbol,
+                type: isUp ? 'up' : 'down',
+                value: fluctuation
+            });
+            
+            // Clear ticker after 1.5s
+            setTimeout(() => setLiveTicker(null), 1500);
+        }, 3000);
+
+        return () => clearInterval(tickInterval);
+    }, [positions.length]);
+
     // Use ref to track symbols for price updates without causing re-renders
     const positionSymbolsRef = useRef<string[]>([]);
 
@@ -520,6 +545,27 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         textShadow: '0 4px 20px rgba(0,0,0,0.5)'
                     }}>
                         {formatCurrency(summary.normalizedTotalValueUSD)}
+                    </div>
+                    {/* Live Alpha Indicator */}
+                    <div style={{
+                        marginTop: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: 'rgba(255,255,255,0.03)',
+                        padding: '6px 12px',
+                        borderRadius: '100px',
+                        width: 'fit-content'
+                    }}>
+                        <div className="pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 10px var(--color-success)' }} />
+                        <span style={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-success)' }}>Living Data Source Stream</span>
+                        {liveTicker && (
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)', marginLeft: '8px', animation: 'fadeIn 0.3s ease' }}>
+                                <span style={{ color: liveTicker.type === 'up' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                    {liveTicker.symbol} {liveTicker.type === 'up' ? '▲' : '▼'}
+                                </span>
+                            </span>
+                        )}
                     </div>
                 </div>
 
