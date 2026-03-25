@@ -1,33 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { soundService } from '../services/soundService';
-import { getStockNews } from '../services/newsService';
-import { useQuery } from '@tanstack/react-query';
-import { Timer, TrendingUp, TrendingDown, Activity, BarChart2, RefreshCw, Zap, AlertTriangle, Layers, Globe, Play, ExternalLink, Info, Sparkles, Move } from 'lucide-react';
-import type { NewsArticle } from '../types';
-import { getSectorPerformance, getVolumeAnomalies, getMultipleQuotes } from '../services/stockDataService';
+import React, { useEffect, useRef } from 'react';
+import { Layers, Activity, FileText, Calendar as CalendarIcon, Move, RefreshCw, ExternalLink } from 'lucide-react';
 import { useMarket } from '../contexts/MarketContext';
-import EarningsCalendar from './EarningsCalendar';
-import OptionsFlowSimulator from './OptionsFlowSimulator';
-import CompanyLogo from './CompanyLogo';
-
-import { CHANNELS } from './LiveIntelligenceStreams';
 import { usePiPStore } from '../services/usePiPStore';
-import { FearGreedCard, IndustryRotationCard } from './MarketInsights';
-import { useMarketInsights } from '../hooks/useMarketInsights';
+import { CHANNELS } from './LiveIntelligenceStreams';
+import { soundService } from '../services/soundService';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
 }
 
-// Use centralized channels for consistent experience
 const MARKET_STREAMS = CHANNELS;
 
-// Inline stream player component — shows a single active stream with channel selector strip
 const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ streams }) => {
     const { activeStream, setActiveStream, isMuted, setMuted, setPiPActive } = usePiPStore();
     const active = activeStream || streams[0];
     
-    // Sync local selection to global store on first load if none active
     useEffect(() => {
         if (!activeStream) {
             setActiveStream(streams[0]);
@@ -38,10 +25,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
 
     return (
         <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)', position: 'relative' }}>
-            {/* Stream Status Overlays removed as per request */}
-
-            {/* Video Player */}
-            <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', minHeight: '200px' }}>
+            <div style={{ position: 'relative', paddingBottom: '38%', background: '#000', minHeight: '200px' }}>
                 <iframe
                     key={`${active.id}-${isMuted}`}
                     src={active.videoId 
@@ -52,11 +36,9 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     title={active.name}
-                    onLoad={() => console.log(`Stream loaded: ${active.name}`)}
                 />
             </div>
 
-            {/* Channel Info + Controls */}
             <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
                 <div>
                     <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -66,11 +48,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                             justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
                             padding: '2px', border: '1px solid rgba(0,0,0,0.1)'
                         }}>
-                            <img 
-                                src={active.logo} 
-                                alt={active.shortName}
-                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                            />
+                            <img src={active.logo} alt={active.shortName} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                         </div>
                         {active.name}
                     </div>
@@ -80,13 +58,13 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                     <button
                         onClick={() => {
                             const current = active;
-                            setActiveStream({...streams[0]}); // Jiggle state
+                            setActiveStream({...streams[0]});
                             setTimeout(() => setActiveStream(current), 50);
                             soundService.playTap();
                         }}
                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}
                     >
-                        <RefreshCw size={12} /> Force Sync
+                        <RefreshCw size={12} /> Sync
                     </button>
                     <button
                         onClick={() => setMuted(!isMuted)}
@@ -102,37 +80,11 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '5px 8px', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '0.7rem' }}
                         title="Minimize to Picture-in-Picture"
                     >
-                        <Move size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Minimize
+                        <Move size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Min
                     </button>
-                    <a
-                        href={`https://www.youtube.com/channel/${active.youtubeId}/live`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ 
-                            background: '#FF0000', 
-                            border: 'none', 
-                            borderRadius: '8px', 
-                            padding: '6px 10px', 
-                            cursor: 'pointer', 
-                            color: 'white', 
-                            fontSize: '0.7rem', 
-                            fontWeight: 800,
-                            textDecoration: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                            boxShadow: '0 0 15px rgba(255,0,0,0.3)',
-                            transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                    >
-                        <ExternalLink size={12} /> YouTube
-                    </a>
                 </div>
             </div>
 
-            {/* Channel Selector Strip */}
             <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none', flexWrap: 'nowrap', msOverflowStyle: 'none' }}>
                 {streams.map((ch) => {
                     const isActive = ch.id === active.id;
@@ -158,11 +110,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                                 justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
                                 padding: '1px', border: '1px solid rgba(0,0,0,0.1)'
                             }}>
-                                <img 
-                                    src={ch.logo} 
-                                    alt={ch.shortName}
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
+                                <img src={ch.logo} alt={ch.shortName} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                             </div>
                             {ch.shortName}
                             {isActive && <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: ch.color, display: 'inline-block', animation: 'pulse 1.5s infinite' }} />}
@@ -174,41 +122,18 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
     );
 };
 
-const MARKET_ALPHA: Record<string, any[]> = {
-    us: [
-        { symbol: 'NVDA', score: 94, rec: 'Strong Buy', color: '#10B981' },
-        { symbol: 'MSFT', score: 88, rec: 'Buy', color: '#10B981' },
-        { symbol: 'AAPL', score: 85, rec: 'Buy', color: '#10B981' },
-        { symbol: 'TSLA', score: 72, rec: 'Hold', color: '#F59E0B' },
-        { symbol: 'META', score: 89, rec: 'Buy', color: '#10B981' }
-    ],
-    egypt: [
-        { symbol: 'COMI', score: 92, rec: 'Strong Buy', color: '#10B981' },
-        { symbol: 'TMGH', score: 87, rec: 'Buy', color: '#10B981' },
-        { symbol: 'FWRY', score: 84, rec: 'Buy', color: '#10B981' },
-        { symbol: 'SWDY', score: 79, rec: 'Buy', color: '#10B981' },
-        { symbol: 'ABUK', score: 75, rec: 'Hold', color: '#F59E0B' }
-    ],
-    abudhabi: [
-        { symbol: 'IHC', score: 95, rec: 'Strong Buy', color: '#10B981' },
-        { symbol: 'FAB', score: 89, rec: 'Buy', color: '#10B981' },
-        { symbol: 'ETISALAT', score: 86, rec: 'Buy', color: '#10B981' },
-        { symbol: 'ALDAR', score: 82, rec: 'Buy', color: '#10B981' },
-        { symbol: 'ADNOCDIST', score: 78, rec: 'Hold', color: '#F59E0B' }
-    ]
-};
-
-const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
+const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
+    const { setPiPActive, activeStream } = usePiPStore();
     const { effectiveMarket } = useMarket();
-    const { activeStream, setPiPActive } = usePiPStore();
-    const { sectorData, sentimentScore, overallSentiment, sentimentColor } = useMarketInsights();
+    const newsContainerRef = useRef<HTMLDivElement>(null);
+    const eventsContainerRef = useRef<HTMLDivElement>(null);
 
-    // Reset PiP when on this page
+    // Reset PiP when directly viewing this page
     useEffect(() => {
         setPiPActive(false);
     }, [setPiPActive]);
 
-    // Enable PiP when leaving if a stream is active
+    // Go to PiP when leaving if stream is playing
     useEffect(() => {
         return () => {
             if (activeStream) {
@@ -217,189 +142,121 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
         };
     }, [activeStream, setPiPActive]);
 
-    const handleAction = useCallback((symbol: string) => {
-        soundService.playTap();
-        onSelectStock?.(symbol);
-    }, [onSelectStock]);
-
-    const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number }>({ hours: 0, minutes: 0, seconds: 0 });
-    const [volumeAnomalies, setVolumeAnomalies] = useState<any[]>([]);
-    const [macroData, setMacroData] = useState<any[]>([]);
-    const [isLoadingData, setIsLoadingData] = useState(true);
-
-    // Fetch real breaking news - Sync to market
-    const { data: breakingNews, refetch: refetchNews } = useQuery<NewsArticle[]>({
-        queryKey: ['breakingNews', effectiveMarket.id],
-        queryFn: async () => {
-            const ticker = effectiveMarket.indexSymbol.replace('%5E', '^');
-            return await getStockNews(ticker, 5);
-        },
-        refetchInterval: 30000,
-        staleTime: 15000,
-    });
-
-    // Fetch Volume data and Macro Data - Market Aware
+    // Load TradingView Timeline Widget (News)
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoadingData(true);
-            try {
-                const volumes = await getVolumeAnomalies(effectiveMarket.id);
-                setVolumeAnomalies(volumes);
+        if (!newsContainerRef.current) return;
+        newsContainerRef.current.innerHTML = '';
+        const widgetContainer = document.createElement('div');
+        widgetContainer.className = 'tradingview-widget-container__widget';
+        widgetContainer.style.height = '100%';
+        widgetContainer.style.width = '100%';
+        newsContainerRef.current.appendChild(widgetContainer);
 
-                // Live Macro Data
-                const goldSymbol = effectiveMarket.id === 'us' ? 'GC=F' : effectiveMarket.id === 'egypt' ? 'XAUUSD=X' : 'CL=F';
-                const volSymbol = effectiveMarket.id === 'us' ? '^VIX' : effectiveMarket.indexSymbol.replace('%5E', '^');
-                const flowSymbol = effectiveMarket.id === 'us' ? 'SPY' : effectiveMarket.indexSymbol.replace('%5E', '^');
-
-                const macroQuotes = await getMultipleQuotes([goldSymbol, volSymbol, flowSymbol]);
-
-                const goldQuote = macroQuotes.get(goldSymbol);
-                const volQuote = macroQuotes.get(volSymbol);
-                const flowQuote = macroQuotes.get(flowSymbol);
-
-                const isGoldUp = goldQuote ? goldQuote.change > 0 : true;
-                const isVolUp = volQuote ? volQuote.change > 0 : false;
-                const isFlowUp = flowQuote ? flowQuote.change > 0 : true;
-
-                const newMacroData = [
-                    {
-                        label: `${effectiveMarket.id === 'us' ? 'Gold (GC=F)' : effectiveMarket.id === 'egypt' ? 'Gold (XAU/USD)' : 'WTI Crude'} Intelligence`,
-                        status: isGoldUp ? 'Hedge Bias' : 'Risk On',
-                        color: isGoldUp ? '#10B981' : '#F59E0B',
-                        desc: `Cross-asset analysis confirms liquidity flows in ${effectiveMarket.name} are moving toward ${isGoldUp ? 'defensive structures' : 'risk-on positions'}. Institutional conviction is high for mid-term stability.`,
-                        action: isGoldUp ? 'Strategic Long' : 'Reduce Hedges'
-                    },
-                    {
-                        label: `${effectiveMarket.indexName} Volatility`,
-                        status: isVolUp ? 'Elevated' : 'Order Flow',
-                        color: isVolUp ? '#EF4444' : '#F59E0B',
-                        desc: `Real-time monitoring of ${effectiveMarket.indexName} components suggests ${isVolUp ? 'increasing hedging activity' : 'pending rotation'}. Liquidity clusters identified at key structural supports.`,
-                        action: isVolUp ? 'Hedge Portfolio' : 'Defensive Bias'
-                    },
-                    {
-                        label: 'Institutional Flow',
-                        status: isFlowUp ? 'Smart Money' : 'Distribution',
-                        color: isFlowUp ? '#3b82f6' : '#EF4444',
-                        desc: `Aggregated order book data reveals significant block trade activity in ${effectiveMarket.shortName} top constituents. Tracking ${isFlowUp ? 'sovereign wealth accumulation' : 'systematic distribution'}.`,
-                        action: isFlowUp ? 'Accumulate' : 'Wait & See'
-                    }
-                ];
-                setMacroData(newMacroData);
-
-            } catch (error) {
-                console.error('Failed to fetch pulse data:', error);
-            } finally {
-                setIsLoadingData(false);
-            }
-        };
-
-        fetchData();
-        const interval = setInterval(fetchData, 8000); 
-        return () => clearInterval(interval);
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
+        script.type = 'text/javascript';
+        script.async = true;
+        
+        script.innerHTML = JSON.stringify({
+            "feedMode": "market",
+            "market": effectiveMarket.id === 'us' ? "stock" : "crypto", // fallback to crypto/forex for global if needed
+            "isTransparent": true,
+            "displayMode": "regular",
+            "width": "100%",
+            "height": "100%",
+            "colorTheme": "dark",
+            "locale": "en"
+        });
+        newsContainerRef.current.appendChild(script);
     }, [effectiveMarket.id]);
 
-    // Calculate next market event
-    const nextEventData = React.useMemo(() => {
-        const now = new Date();
-        const events = [
-            { name: 'Market Open', hour: 9, minute: 30 },
-            { name: 'Market Close', hour: 16, minute: 0 },
-            { name: 'Pre-Market', hour: 4, minute: 0 },
-            { name: 'After Hours End', hour: 20, minute: 0 },
-        ];
-
-        let nextEventTime: Date | null = null;
-        let nextEventName = 'Market Event';
-
-        for (const event of events) {
-            const eventTime = new Date();
-            eventTime.setHours(event.hour, event.minute, 0, 0);
-            if (eventTime > now && (!nextEventTime || eventTime < nextEventTime)) {
-                nextEventTime = eventTime;
-                nextEventName = event.name;
-            }
-        }
-
-        if (!nextEventTime) {
-            nextEventTime = new Date();
-            nextEventTime.setDate(nextEventTime.getDate() + 1);
-            nextEventTime.setHours(4, 0, 0, 0);
-            nextEventName = 'Pre-Market';
-        }
-
-        return { name: nextEventName, time: nextEventTime };
-    }, []);
-
+    // Load TradingView Events Calendar Widget (Economic & Earnings impact)
     useEffect(() => {
-        const targetTime = nextEventData.time.getTime();
-        const interval = setInterval(() => {
-            const now = Date.now();
-            const diff = targetTime - now;
+        if (!eventsContainerRef.current) return;
+        eventsContainerRef.current.innerHTML = '';
+        const widgetContainer = document.createElement('div');
+        widgetContainer.className = 'tradingview-widget-container__widget';
+        widgetContainer.style.height = '100%';
+        widgetContainer.style.width = '100%';
+        eventsContainerRef.current.appendChild(widgetContainer);
 
-            if (diff <= 0) {
-                setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
-            } else {
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                setTimeLeft({ hours, minutes, seconds });
-            }
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [nextEventData.time]);
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+        script.type = 'text/javascript';
+        script.async = true;
 
-    const newsTickerText = breakingNews?.map(n => n.headline).join(' • ') || 'Monitoring global markets for breaking news...';
+        const curFilter = effectiveMarket.id === 'us' ? "USD" : effectiveMarket.id === 'egypt' ? "USD,EUR" : "AED,USD";
+        
+        script.innerHTML = JSON.stringify({
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "width": "100%",
+            "height": "100%",
+            "locale": "en",
+            "importanceFilter": "-1,0,1",
+            "currencyFilter": curFilter
+        });
+        eventsContainerRef.current.appendChild(script);
+    }, [effectiveMarket.id]);
 
     return (
         <div className="tab-content dashboard-viewport" style={{ 
-            gap: 0,
-            padding: 0
+            gap: '1rem',
+            padding: '1rem',
+            overflowY: 'auto', // Allow scrolling on this massive page
+            display: 'flex',
+            flexDirection: 'column'
         }}>
-            {/* Live Stream + Channel Bar — fixed top section */}
-            <div style={{ padding: '0.4rem 0.75rem 0', flexShrink: 0 }}>
+            {/* Live Stream Section */}
+            <div style={{ flexShrink: 0 }}>
                 <LiveStreamsPlayer streams={MARKET_STREAMS} />
             </div>
 
-            {/* 3-Column Dashboard Grid — fills all remaining height */}
-            <div className="grid-3col-pulse" style={{
-                gap: '0.5rem', /* Highly compact gap for Pulse */
-                padding: '0.4rem 0.75rem 0.4rem',
-                overflow: 'hidden'
+            {/* Real Reports & Events Grid */}
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+                gap: '1rem',
+                flex: 1,
+                minHeight: '600px' // Ensure widgets have room to breathe
             }}>
-
-                {/* ── LEFT COLUMN ── */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
-
-                    {/* Fear & Greed */}
-                    <FearGreedCard 
-                        sentimentScore={sentimentScore}
-                        overallSentiment={overallSentiment}
-                        sentimentColor={sentimentColor}
-                    />
-
-                    {/* Industry Rotation */}
-                    <IndustryRotationCard 
-                        sectorData={sectorData}
-                    />
-                </div>
-
-                {/* ── CENTER COLUMN (hidden on mobile) ── */}
-                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
-                    {/* Earnings Calendar */}
-                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
-                            <EarningsCalendar />
-                        </div>
+                {/* Real Time News Reports */}
+                <div className="glass-card" style={{ 
+                    border: '1px solid var(--glass-border)', 
+                    borderRadius: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    background: 'var(--glass-bg)'
+                }}>
+                    <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
+                        <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                            <FileText size={16} color="var(--color-accent)" /> 
+                            Real-Time Market Reports
+                        </h3>
+                    </div>
+                    <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
+                        <div className="tradingview-widget-container" ref={newsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
                     </div>
                 </div>
 
-                {/* ── RIGHT COLUMN (hidden on mobile) ── */}
-                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', minHeight: 0, overflow: 'hidden' }}>
-                    {/* Options Flow — fills entire right column */}
-                    <div className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
-                            <OptionsFlowSimulator />
-                        </div>
+                {/* Real Events & Earnings Indicators */}
+                <div className="glass-card" style={{ 
+                    border: '1px solid var(--glass-border)', 
+                    borderRadius: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    background: 'var(--glass-bg)'
+                }}>
+                    <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
+                        <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                            <CalendarIcon size={16} color="var(--color-warning)" /> 
+                            Company Reports & Events
+                        </h3>
+                    </div>
+                    <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
+                        <div className="tradingview-widget-container" ref={eventsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
                     </div>
                 </div>
             </div>
@@ -408,4 +265,3 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
 };
 
 export default MarketPulsePage;
-
