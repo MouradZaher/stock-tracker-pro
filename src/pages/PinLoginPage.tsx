@@ -210,18 +210,17 @@ const PinLoginPage: React.FC = () => {
                 </div>
             </nav>
 
-            <div className="hero-section" style={{ animation: 'fadeIn 0.8s ease-out both' }}>
-                <div className="hero-content">
-                    <h1 className="hero-title" style={{ animation: 'slideUp 0.8s ease-out 0.2s both' }}>
-                        Master the Market <span className="gradient-text">with Precision.</span>
-                    </h1>
-                    <p className="hero-subtitle" style={{ animation: 'slideUp 0.8s ease-out 0.4s both' }}>
-                        The ultimate dashboard for S&P 500 investors. Real-time insights, automated portfolio tracking, and institutional-grade analytics.
-                    </p>
-                </div>
-
-                <div className="hero-form-container">
-                    <div className="login-form-wrapper glass-card">
+            <div className="hero-section" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1rem', width: '100%', maxWidth: 'none' }}>
+                <div className="hero-form-container" style={{ maxWidth: '440px', width: '100%' }}>
+                    <div className="login-form-wrapper glass-card" style={{ padding: '2.5rem', borderRadius: '24px' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                            <div style={{ background: 'var(--gradient-primary)', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+                                <Shield size={24} color="white" />
+                            </div>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>Terminal <span className="gradient-text">Access</span></h2>
+                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Secure portal for authenticated traders.</p>
+                        </div>
+                        
                         <div className="login-form">
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (
@@ -271,7 +270,7 @@ const PinLoginPage: React.FC = () => {
                                             {mode === 'signup' ? (
                                                 <>
                                                     <UserPlus size={14} color="var(--color-success)" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                                                    New: <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
+                                                    <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
                                                 </>
                                             ) : (
                                                 <>
@@ -306,32 +305,20 @@ const PinLoginPage: React.FC = () => {
 
                             <p className="form-note">
                                 <Shield size={12} color="var(--color-success)" />
-                                Enterprise-grade security
+                                Institutional Grade Security
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="landing-section benefits-section">
-                <div className="section-container">
-                    <BenefitsGrid />
+            <footer className="landing-footer" style={{ borderTop: 'none', background: 'transparent', padding: '1rem' }}>
+                <div className="footer-links" style={{ gap: '1rem', flexWrap: 'wrap' }}>
+                    <span className="footer-link" onClick={() => setActiveModal('privacy')}>Privacy</span>
+                    <span className="footer-link" onClick={() => setActiveModal('terms')}>Terms</span>
+                    <span className="footer-link" onClick={() => setActiveModal('support')}>Support</span>
                 </div>
-            </div>
-
-            <div className="landing-section performance-section">
-                <div className="section-container">
-                    <AIPerformanceTracker />
-                </div>
-            </div>
-
-            <footer className="landing-footer">
-                <div className="footer-links" style={{ marginBottom: '1rem' }}>
-                    <span className="footer-link" onClick={() => setActiveModal('privacy')} style={{ cursor: 'pointer' }}>Privacy Policy</span>
-                    <span className="footer-link" onClick={() => setActiveModal('terms')} style={{ cursor: 'pointer' }}>Terms of Service</span>
-                    <span className="footer-link" onClick={() => setActiveModal('support')} style={{ cursor: 'pointer' }}>Support</span>
-                </div>
-                <p>&copy; {new Date().getFullYear()} StockTracker Pro</p>
+                <p style={{ opacity: 0.4, fontSize: '0.75rem', marginTop: '0.5rem' }}>&copy; {new Date().getFullYear()} StockTracker Pro</p>
             </footer>
 
             {activeModal && (
