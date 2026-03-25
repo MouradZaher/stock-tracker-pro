@@ -34,8 +34,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    const iconSize = isMobile ? 10 : 12;
-    const btnH = isMobile ? '18px' : '22px';
+    const iconSize = isMobile ? 15 : 12;
+    const btnH = isMobile ? '20px' : '22px';
 
     const tabs: { id: TabType; label: string; icon: React.ElementType; isCustomIcon?: boolean }[] = [
         { id: 'home', label: 'Home', icon: Home },
@@ -97,11 +97,11 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         padding: isMobile ? '3px' : '5px',
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         gap: '3px',
-        fontSize: '0.65rem',
+        fontSize: '0.6rem',
         fontWeight: 700,
         whiteSpace: 'nowrap' as const,
-        height: isMobile ? '24px' : '28px',
-        minWidth: isMobile ? '24px' : '28px',
+        height: isMobile ? '20px' : '28px',
+        minWidth: isMobile ? '20px' : '28px',
     };
 
     return (
@@ -231,7 +231,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
 
                 {/* ── Actions (right-aligned) ───────────── */}
-                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: isMobile ? '0.2rem' : '0.4rem' }}>
+                <div className="header-actions" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: isMobile ? '2px' : '0.4rem' }}>
                     {/* 1. Market Selector */}
                     <div style={{ position: 'relative' }}>
                         <button
