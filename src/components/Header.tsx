@@ -34,11 +34,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    useEffect(() => {
-        const onResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
-    }, []);
     const iconSize = isMobile ? 10 : 12;
     const btnH = isMobile ? '18px' : '22px';
 
