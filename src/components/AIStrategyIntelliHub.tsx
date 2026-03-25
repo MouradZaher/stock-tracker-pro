@@ -113,8 +113,63 @@ const AIStrategyIntelliHub: React.FC = () => {
                 </p>
             </div>
 
-
-            {/* Results Section */}
+            {/* Strategic Intelligence Modules Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                {Object.entries(STRATEGY_METADATA).map(([id, meta]) => (
+                    <button
+                        key={id}
+                        onClick={() => handleRunStrategy(id)}
+                        disabled={isLoading}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '1.25rem',
+                            borderRadius: '16px',
+                            background: selectedStrategyId === id ? `${meta.color}15` : 'rgba(255,255,255,0.02)',
+                            border: `1px solid ${selectedStrategyId === id ? meta.color : 'rgba(255,255,255,0.05)'}`,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            textAlign: 'center',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (selectedStrategyId !== id) {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (selectedStrategyId !== id) {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                            }
+                        }}
+                    >
+                        <div style={{ 
+                            width: '40px', 
+                            height: '40px', 
+                            borderRadius: '12px', 
+                            background: `${meta.color}20`, 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            color: meta.color,
+                            boxShadow: selectedStrategyId === id ? `0 0 20px ${meta.color}40` : 'none'
+                        }}>
+                            <meta.icon size={24} />
+                        </div>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                            {meta.label}
+                        </span>
+                        {selectedStrategyId === id && (
+                            <div style={{ position: 'absolute', bottom: 0, left: 0, height: '2px', width: '100%', background: meta.color }} />
+                        )}
+                    </button>
+                ))}
+            </div>
             {selectedStrategyId && (
                 <div 
                     className="strategy-results-panel animate-fade-in" 

@@ -172,25 +172,6 @@ const AIPerformanceTracker: React.FC = () => {
 
     return (
         <div className="ai-performance-tracker" style={{ marginBottom: '2.5rem' }}>
-            {/* ═══ LIVE SYNC HEADER ═══ */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', padding: '0 0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className="pulse-dot" style={{
-                        width: '8px',
-                        height: '8px',
-                        background: 'var(--color-success)',
-                        borderRadius: '50%',
-                        boxShadow: '0 0 15px var(--color-success)',
-                        animation: 'pulse-high 1s infinite alternate'
-                    }}></div>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--color-success)', textShadow: '0 0 8px rgba(16,185,129,0.4)' }}>ALPHA CORE ACTIVE</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontWeight: 600 }}>
-                    <Clock size={12} />
-                    {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </div>
-            </div>
-
             {/* ═══ MAIN GLASS CONTAINER ═══ */}
             <div className="glass-card" style={{
                 padding: '2rem',
