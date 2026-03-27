@@ -6,7 +6,6 @@ import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 import BenefitsGrid from '../components/BenefitsGrid';
 import AIPerformanceTracker from '../components/AIPerformanceTracker';
-import TopBar from '../components/TopBar';
 import './LandingPage.css';
 
 const PinLoginPage: React.FC = () => {
@@ -167,7 +166,6 @@ const PinLoginPage: React.FC = () => {
 
     return (
         <div className="landing-page">
-            <TopBar />
             <nav className="landing-nav" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-lg)', fontWeight: 700 }}>
                     <div style={{ background: 'var(--gradient-primary)', width: 'var(--spacing-xl)', height: 'var(--spacing-xl)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
