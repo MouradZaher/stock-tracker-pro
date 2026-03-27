@@ -9,7 +9,6 @@ import { formatCurrency } from '../utils/formatters';
 import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
 import { soundService } from '../services/soundService';
-import { LiveBadge } from './LiveBadge';
 import { getGroupedRecommendations } from '../services/aiRecommendationService';
 import { getStockData } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
