@@ -266,7 +266,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             {/* === 3. COCKPIT MODE SELECTOR === */}
             <div style={{ padding: '0.5rem 1.5rem', display: 'flex', gap: '1.5rem', zIndex: 10, flexShrink: 0 }}>
                 {[
-                    { id: 'alpha', label: 'ALGO ALPHA', icon: Layers }
+                    { id: 'alpha', label: 'AI PICKS', icon: Layers }
                 ].map((tab) => (
                     <button 
                         key={tab.id}
