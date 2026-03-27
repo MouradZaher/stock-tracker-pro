@@ -14,8 +14,6 @@ import { getGroupedRecommendations } from '../services/aiRecommendationService';
 import { getStockData } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
-import AIPerformanceTracker from './AIPerformanceTracker';
-import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 import CompanyLogo from './CompanyLogo';
 import AIIntelligenceStream from './AIIntelligenceStream';
 
