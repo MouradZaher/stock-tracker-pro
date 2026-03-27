@@ -68,13 +68,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete, onDecline
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '12px', borderRadius: '12px', height: 'fit-content' }}><DollarSign color="#10b981" /></div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 4px 0' }}>Tax-Smart Tracking</h4>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Automatic wash sale detection, Schedule D reports, and quarterly tax estimates to keep you compliant.</p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '1rem' }}>
               <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '12px', borderRadius: '12px', height: 'fit-content' }}><TrendingUp color="#3b82f6" /></div>
               <div>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 4px 0' }}>Real-Time Analytics</h4>

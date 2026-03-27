@@ -90,8 +90,7 @@ function AppContent() {
   const role = user?.role || 'user';
 
   const handleLogout = () => {
-    localStorage.removeItem('hasAcceptedTerms');
-    setHasAcceptedTerms(false);
+    // Keep terms acceptance persistent across logout sessions
     logout();
   };
 
