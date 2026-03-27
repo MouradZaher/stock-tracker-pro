@@ -215,8 +215,8 @@ const PinLoginPage: React.FC = () => {
                             <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
                                 <Shield size={28} color="white" />
                             </div>
-                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.4rem', color: 'white', letterSpacing: '-0.02em' }}>Terminal <span className="gradient-text">Pro</span></h2>
-                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', opacity: 0.7 }}>Institutional Access Only</p>
+                            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: 'white', letterSpacing: '-0.01em' }}>StockTracker <span className="gradient-text">Pro</span> Login</h2>
+                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', opacity: 0.8 }}>Secure access for authorized users</p>
                         </div>
                         
                         <div className="login-form">
