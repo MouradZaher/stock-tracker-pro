@@ -263,94 +263,55 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                 </form>
             </div>
 
-            {/* === 3. COCKPIT MODE SELECTOR === */}
-            <div style={{ padding: '0.5rem 1.5rem', display: 'flex', gap: '1.5rem', zIndex: 10, flexShrink: 0 }}>
-                {[
-                    { id: 'alpha', label: 'AI PICKS', icon: Layers }
-                ].map((tab) => (
-                    <button 
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        style={{ 
-                            padding: '12px 4px', 
-                            fontSize: '0.8rem', 
-                            fontWeight: 900, 
-                            color: activeTab === tab.id ? 'white' : 'var(--color-text-tertiary)',
-                            border: 'none',
-                            background: 'transparent',
-                            borderBottom: `2.5px solid ${activeTab === tab.id ? 'var(--color-accent)' : 'transparent'}`,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            letterSpacing: '0.08em',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            opacity: activeTab === tab.id ? 1 : 0.6
-                        }}
-                    >
-                        <tab.icon size={16} color={activeTab === tab.id ? 'var(--color-accent)' : 'currentColor'} />
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* === 4. SYSTEM INTELLIGENCE FEED (FIXED TICKER) === */}
-            <div style={{ padding: '0 1rem', flexShrink: 0, zIndex: 10 }}>
-                <AIIntelligenceStream />
-            </div>
-
-            {/* === 5. CONTENT CONSOLE (LOCK VERTICAL SCROLL ON CONTAINER) === */}
-            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', zIndex: 5 }}>
+            {/* === 3. AI PICKS CONTENT === */}
+            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', zIndex: 10 }}>
                 <div className="scrollable-panel custom-scrollbar" style={{ height: '100%', padding: '1rem 1.5rem 2rem' }}>
-                    
-                    {activeTab === 'alpha' && (
-                        <div className="animate-fade-in">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <div>
-                                    <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em' }}>
-                                        TOP ALPHA CONVICTIONS
-                                    </h3>
-                                    <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>AI identified high-probability breakout candidates for the next 48h</p>
-                                </div>
-                                <button 
-                                    onClick={runScanner} 
-                                    disabled={isScanning}
-                                    style={{ 
-                                        padding: '10px 18px', 
-                                        fontSize: '0.75rem', 
-                                        fontWeight: 900, 
-                                        borderRadius: '10px', 
-                                        background: isScanning ? 'rgba(255,255,255,0.03)' : 'rgba(99, 102, 241, 0.1)',
-                                        color: isScanning ? 'var(--color-text-tertiary)' : 'var(--color-accent)',
-                                        border: '1px solid var(--color-accent-light)',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '10px',
-                                        transition: 'all 0.2s',
-                                        letterSpacing: '0.05em'
-                                    }}
-                                >
-                                    {isScanning ? <RefreshCw size={14} className="spin" /> : <RefreshCw size={14} />}
-                                    {isScanning ? `SYSTEM SCANNING ${Math.round(scanProgress)}%` : 'INITIATE DEEP SCAN'}
-                                </button>
+                    <div className="animate-fade-in">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <div>
+                                <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em' }}>
+                                    TOP LIVERATED AI PICKS
+                                </h3>
+                                <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>AI identified high-probability breakout candidates for the next 48h</p>
                             </div>
-
-                            <div style={{ 
-                                display: 'grid', 
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-                                gap: '1.25rem' 
-                            }}>
-                                {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec, i) => (
-                                    <AlphaPickCard 
-                                        key={rec.symbol + i} 
-                                        rec={rec} 
-                                        onClick={() => onSelectStock && onSelectStock(rec.symbol)} 
-                                    />
-                                ))}
-                            </div>
+                            <button 
+                                onClick={runScanner} 
+                                disabled={isScanning}
+                                style={{ 
+                                    padding: '10px 18px', 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 900, 
+                                    borderRadius: '10px', 
+                                    background: isScanning ? 'rgba(255,255,255,0.03)' : 'rgba(99, 102, 241, 0.1)',
+                                    color: isScanning ? 'var(--color-text-tertiary)' : 'var(--color-accent)',
+                                    border: '1px solid var(--color-accent-light)',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    transition: 'all 0.2s',
+                                    letterSpacing: '0.05em'
+                                }}
+                            >
+                                {isScanning ? <RefreshCw size={14} className="spin" /> : <RefreshCw size={14} />}
+                                {isScanning ? `SYSTEM SCANNING ${Math.round(scanProgress)}%` : 'INITIATE DEEP SCAN'}
+                            </button>
                         </div>
-                    )}
+
+                        <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+                            gap: '1.25rem' 
+                        }}>
+                            {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec, i) => (
+                                <AlphaPickCard 
+                                    key={rec.symbol + i} 
+                                    rec={rec} 
+                                    onClick={() => onSelectStock && onSelectStock(rec.symbol)} 
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 
