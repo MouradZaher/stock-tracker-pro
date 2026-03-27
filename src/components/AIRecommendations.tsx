@@ -115,7 +115,7 @@ const RECS_MAP: Record<MarketId, typeof US_RECS> = { us: US_RECS, egypt: EGYPT_R
 const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> = ({ onSelectStock }) => {
     const { addNotification } = useNotifications();
     const { selectedMarket } = useMarket();
-    const [activeTab, setActiveTab] = useState<'alpha' | 'strategies' | 'analysis'>('alpha');
+    const [activeTab, setActiveTab] = useState<'alpha'>('alpha');
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
@@ -266,9 +266,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             {/* === 3. COCKPIT MODE SELECTOR === */}
             <div style={{ padding: '0.5rem 1.5rem', display: 'flex', gap: '1.5rem', zIndex: 10, flexShrink: 0 }}>
                 {[
-                    { id: 'alpha', label: 'ALGO ALPHA', icon: Layers },
-                    { id: 'strategies', label: 'QUANT STRATEGIES', icon: CommandIcon },
-                    { id: 'analysis', label: 'MARKET AUDIT', icon: BarChart2 }
+                    { id: 'alpha', label: 'ALGO ALPHA', icon: Layers }
                 ].map((tab) => (
                     <button 
                         key={tab.id}
@@ -351,29 +349,6 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                                     />
                                 ))}
                             </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'strategies' && (
-                        <div className="animate-fade-in">
-                            <div className="glass-card" style={{ padding: '1.25rem', border: '1px solid var(--color-accent-light)', marginBottom: '1.5rem', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '18px' }}>
-                                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Shield size={24} className="text-accent" />
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: '1rem', fontWeight: 900, color: 'white' }}>ELITE STRATEGY DEPLOYMENT</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginTop: '2px' }}>Access proprietary AI models for hedging, institutional tracking, and arbitrage.</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <AIStrategyIntelliHub />
-                        </div>
-                    )}
-
-                    {activeTab === 'analysis' && (
-                        <div className="animate-fade-in">
-                            <AIPerformanceTracker />
                         </div>
                     )}
                 </div>

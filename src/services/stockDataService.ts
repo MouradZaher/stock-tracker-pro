@@ -315,7 +315,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
     const symbol = sanitizeSymbol(rawSymbol);
     if (!symbol) {
         console.warn(`⚠️ Invalid/polluted symbol rejected: "${rawSymbol}"`);
-        return { symbol: rawSymbol, name: 'Invalid Symbol', price: 0, change: 0, changePercent: 0, previousClose: 0, open: 0, high: 0, low: 0, volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0, dividendYield: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0, totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date() };
+        return { symbol: rawSymbol, name: 'Invalid Symbol', price: 0, change: 0, changePercent: 0, previousClose: 0, open: 0, high: 0, low: 0, volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0, dividendYield: 0, pegRatio: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0, totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date() };
     }
     
     // Check if we have a fresh 1-second cache BEFORE joining the pool
@@ -390,9 +390,10 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             peRatio: quote.peRatio || 0,
             eps: quote.eps || 0,
             dividendYield: quote.dividendYield || 0,
+            pegRatio: quote.pegRatio || 0,
             fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
             fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
-            totalValue: 0,
+            totalValue: (finalPrice || 0) * (quote.volume || 0),
             totalBuy: 0,
             totalSell: 0,
             lastUpdated: new Date(),
@@ -413,7 +414,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
             changePercent: parseFloat((Math.random() * 2 - 1).toFixed(2)),
             previousClose: p, open: p, high: p * 1.005, low: p * 0.995,
             volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0,
-            dividendYield: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0,
+            dividendYield: 0, pegRatio: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0,
             totalValue: 0, totalBuy: 0, totalSell: 0, lastUpdated: new Date(),
             isFallback: true,
         };
@@ -439,6 +440,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         peRatio: 0,
         eps: 0,
         dividendYield: 0,
+        pegRatio: 0,
         fiftyTwoWeekHigh: 0,
         fiftyTwoWeekLow: 0,
         totalValue: 0,
@@ -750,6 +752,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
                     peRatio: quote.peRatio || 0,
                     eps: quote.eps || 0,
                     dividendYield: quote.dividendYield || 0,
+                    pegRatio: quote.pegRatio || 0,
                     fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
                     fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
                     totalValue: quote.price * (quote.volume || 0),
@@ -797,6 +800,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
                 peRatio: 0,
                 eps: 0,
                 dividendYield: 0,
+                pegRatio: 0,
                 fiftyTwoWeekHigh: 0,
                 fiftyTwoWeekLow: 0,
                 totalValue: 0,

@@ -17,6 +17,7 @@ export interface StockQuote {
     peRatio: number;
     eps: number;
     dividendYield: number;
+    pegRatio: number | null;
     fiftyTwoWeekHigh: number;
     fiftyTwoWeekLow: number;
     provider?: string;
@@ -175,6 +176,7 @@ export const parsers = {
             peRatio: quote.trailingPE || 0,
             eps: quote.epsTrailingTwelveMonths || 0,
             dividendYield: quote.dividendYield ? quote.dividendYield * 100 : 0,
+            pegRatio: quote.pegRatio || null,
             fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
             fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
         };
@@ -198,6 +200,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: 0,
             fiftyTwoWeekLow: 0,
         };
@@ -222,6 +225,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: 0,
             fiftyTwoWeekLow: 0,
         };
@@ -250,6 +254,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: parseFloat(data.fifty_two_week?.high) || 0,
             fiftyTwoWeekLow: parseFloat(data.fifty_two_week?.low) || 0,
         };
@@ -276,6 +281,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: 0,
             fiftyTwoWeekLow: 0,
         };
@@ -300,6 +306,7 @@ export const parsers = {
             peRatio: quote.pe || 0,
             eps: quote.eps || 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: quote.yearHigh || 0,
             fiftyTwoWeekLow: quote.yearLow || 0,
         };
@@ -324,6 +331,7 @@ export const parsers = {
             peRatio: quote.peRatio || 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: quote.week52High || 0,
             fiftyTwoWeekLow: quote.week52Low || 0,
         };
@@ -348,6 +356,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: 0,
             fiftyTwoWeekLow: 0,
         };
@@ -378,6 +387,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: 0,
             fiftyTwoWeekLow: 0,
         };
@@ -410,6 +420,7 @@ export const parsers = {
             peRatio: 0,
             eps: 0,
             dividendYield: 0,
+            pegRatio: null,
             fiftyTwoWeekHigh: 0,
             fiftyTwoWeekLow: 0,
         };

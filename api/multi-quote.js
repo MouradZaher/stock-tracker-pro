@@ -233,6 +233,13 @@ async function fetchYahooBatch(yahooSymbols, endpoint = 'query1') {
             high: Number(q.regularMarketDayHigh) || 0,
             low: Number(q.regularMarketDayLow) || 0,
             volume: Number(q.regularMarketVolume) || 0,
+            avgVolume: Number(q.averageDailyVolume3Month) || 0,
+            marketCap: Number(q.marketCap) || 0,
+            peRatio: Number(q.trailingPE) || 0,
+            eps: Number(q.epsTrailingTwelveMonths) || 0,
+            pegRatio: Number(q.pegRatio) || null,
+            fiftyTwoWeekHigh: Number(q.fiftyTwoWeekHigh) || 0,
+            fiftyTwoWeekLow: Number(q.fiftyTwoWeekLow) || 0,
             provider: `yahoo_${endpoint}`,
         });
     }

@@ -15,6 +15,7 @@ export interface Stock {
   peRatio: number | null;
   eps: number | null;
   dividendYield: number | null;
+  pegRatio: number | null;
   fiftyTwoWeekHigh: number | null;
   fiftyTwoWeekLow: number | null;
   totalValue: number | null;

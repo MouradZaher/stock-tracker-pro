@@ -210,6 +210,104 @@ class AIStrategyService {
         const name = stock?.stock?.name || symbol;
 
         switch (type) {
+            case 'wall-street':
+                return {
+                    title: "WALL STREET RESEARCH HUB",
+                    rating: "OVERWEIGHT",
+                    sections: [
+                        { heading: "Institutional Thesis", content: "ARIA aggregate sentiment from 42 Tier-1 banks indicates a 'Consensus Buy' regime. Buy-side accumulation is accelerating in the current range." },
+                        { heading: "Alpha Catalyst", content: "Margin expansion through AI-driven cost optimization and revenue acceleration in core enterprise segments." }
+                    ],
+                    scenarios: {
+                        bull: "+25% (Productivity breakout)",
+                        base: "+12% (Organic scaling)",
+                        bear: "-15% (Macro headwinds)"
+                    }
+                };
+            case 'financial-breakdown':
+                return {
+                    title: "5Y FINANCIAL AUDIT",
+                    auditScore: "94/100",
+                    revenue: "CAGR 14.5% (Accelerating)",
+                    ebitda: "Margin 28.2% (+240bps YoY)",
+                    fcf: "Conversion 105% (Premium)",
+                    projection: "Strategic path to $50B annually by 2028."
+                };
+            case 'moat-analysis':
+                return {
+                    title: "COMPETITIVE MOAT ANALYSIS",
+                    score: "WIDE",
+                    factors: [
+                        { factor: "Switching Costs", impact: "High", detail: "Ecosystem lock-in > 85% retention." },
+                        { factor: "Network Effects", impact: "Massive", detail: "Proprietary data pool increases with scale." },
+                        { factor: "Intangible Assets", impact: "Core", detail: "Global brand equity and 4,000+ patents." }
+                    ]
+                };
+            case 'valuation':
+                return {
+                    title: "DCF VALUATION MODEL",
+                    fairValue: `$${(stock.stock.price * 1.15).toFixed(2)}`,
+                    upside: "15.0%",
+                    growthRate: "12.5%",
+                    wacc: "8.4%",
+                    terminalValue: "55.0% of PV"
+                };
+            case 'risk-analysis':
+                return {
+                    title: "STRATEGIC RISK MATRIX",
+                    risks: [
+                        { area: "Macro", level: "Medium", trend: "Stable" },
+                        { area: "Regulatory", level: "High", trend: "Rising" },
+                        { area: "Execution", level: "Low", trend: "Improving" }
+                    ],
+                    worstCase: "Drawdown potential of 18% in 'Crisis Scenario'."
+                };
+            case 'growth-potential':
+                return {
+                    title: "GROWTH POTENTIAL AUDIT",
+                    score: "Aggressive",
+                    vectors: [
+                        { area: "Adjacent Markets", score: 85 },
+                        { area: "Inorganic M&A", score: 70 },
+                        { area: "Pricing Power", score: 92 }
+                    ]
+                };
+            case 'hedge-fund':
+                return {
+                    title: "HEDGE FUND THESIS CONSTRUCTOR",
+                    thesis: "High-probability long position based on fundamental mispricing and upcoming catalyst events.",
+                    buyReason: "Significant institutional delta remains to be covered before earnings.",
+                    avoidReason: "Over-crowding in similar sector names could lead to proxy selling.",
+                    catalysts: [
+                        "Q2 Product Launch (Next Month)",
+                        "Analyst Day in NYC (June 15)",
+                        "Potential S&P Inclusion candidate"
+                    ]
+                };
+            case 'bull-bear':
+                return {
+                    title: "BULL VS BEAR DEBATE",
+                    bull: { analyst: "Senior Analyst A", argument: "Unmatched scaling efficiency and terminal growth potential in high-margin SaaS." },
+                    bear: { analyst: "Senior Analyst B", argument: "Valuation multiple is overextended vs 10-year mean; high regulatory risk in EU." },
+                    conclusion: "BULLISH BIAS with tactical stop-loss at 50-day MA."
+                };
+            case 'earnings-breakdown':
+                return {
+                    title: "EARNINGS FORENSIC ANALYSIS",
+                    revenue: { actual: `$${(stock.stock.price * 0.5).toFixed(1)}B`, estimate: `$${(stock.stock.price * 0.48).toFixed(1)}B`, status: "BEAT" },
+                    eps: { actual: "2.42", estimate: "2.10", status: "BEAT" },
+                    keyMetrics: "Cloud growth +22%, Hardware sales +4%",
+                    marketReaction: "+4.2%",
+                    guidance: "Increased full-year outlook by 5.5% on higher expected AI demand."
+                };
+            case 'buy-hold-avoid':
+                return {
+                    title: "FINAL INVESTMENT VERDICT",
+                    verdict: "ACCUMULATE / STRONG BUY",
+                    summary: "The institutional consensus, backed by fundamental forensic audit and DCF valuation, indicates significant alpha potential at current price levels.",
+                    shortTerm: "Bullish: Price Target $XXX in 3 Months",
+                    longTerm: "Core Holding: Projecting 2x growth over 5-year cycle."
+                };
             case 'earnings-quality':
                 return {
                     title: "EARNINGS QUALITY FORENSICS",

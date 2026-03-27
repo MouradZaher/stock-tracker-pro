@@ -531,38 +531,38 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         <Shield size={24} className="text-accent" />
                         Institutional Alpha Intelligence
                     </h3>
-                    <div style={{
-                        fontSize: '0.7rem',
-                        background: 'var(--color-accent-light)',
-                        color: 'var(--color-accent)',
-                        padding: '4px 12px',
-                        borderRadius: '20px',
-                        fontWeight: 800,
-                        letterSpacing: '0.05em'
-                    }}>
-                        SENIOR ANALYST ACCESS
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', fontSize: '0.6rem', fontWeight: 900, padding: '4px 10px', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>📡 ACTIVE_SYNC</div>
+                        <div style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--color-accent)', fontSize: '0.6rem', fontWeight: 900, padding: '4px 10px', borderRadius: '4px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>🔐 SECURE_NODE</div>
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="alpha-grid" style={{ gridColumn: 'span 1' }}>
-                        <div className="alpha-card">
-                            <div className="alpha-label">GLOBAL_RANK</div>
-                            <div className="alpha-value">#12 / Institutional</div>
-                        </div>
-                        <LiveMomentum symbol={symbol} />
+                {/* Alpha Pulse Bar */}
+                <div className="glass-card" style={{ padding: '0', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '2rem', border: '1px solid rgba(99, 102, 241, 0.3)', background: 'rgba(10, 10, 20, 0.4)' }}>
+                    <div style={{ padding: '1rem 1.5rem', borderRight: '1px solid var(--glass-border)' }}>
+                        <div className="alpha-label">GLOBAL_RANK</div>
+                        <div className="alpha-value" style={{ color: 'var(--color-accent)', fontSize: '1rem' }}>#12 / Institutional</div>
                     </div>
-                    <div className="alpha-card" style={{ gridColumn: 'span 1', background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.2)' }}>
-                        <div className="alpha-label" style={{ color: 'var(--color-accent)' }}>INSTITUTIONAL_TERMINAL_ACCESS</div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '8px 0' }}>
-                            Encrypted connection established with ARIA Global Research Hub. Real-time synthesis of cross-asset data units in progress. All stats are live-synchronized with regional market centers.
-                        </p>
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                            <div className="badge-live">📡 ACTIVE_SYNC</div>
-                            <div className="badge-live" style={{ color: 'var(--color-accent)', background: 'rgba(99,102,241,0.1)', borderColor: 'rgba(99,102,241,0.2)' }}>🔐 SECURE_NODE</div>
+                    <div style={{ padding: '1rem 1.5rem', borderRight: '1px solid var(--glass-border)' }}>
+                        <div className="alpha-label">LIVE MOMENTUM FLOW</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className="alpha-value" style={{ fontSize: '1rem' }}>51.1%</div>
+                            <LiveMomentum value={51.1} />
                         </div>
+                    </div>
+                    <div style={{ padding: '1rem 1.5rem', borderRight: '1px solid var(--glass-border)' }}>
+                        <div className="alpha-label">SENTIMENT_FLOW</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-success)' }}>
+                            <div className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-success)' }} />
+                            <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>ACCUMULATING</span>
+                        </div>
+                    </div>
+                    <div style={{ padding: '1rem 1.5rem' }}>
+                        <div className="alpha-label">SECURE_NODE</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>ARIA_CORE_v4.2</div>
                     </div>
                 </div>
+
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 3fr', gap: '2rem' }}>
                     {/* Module Selection Sidebar */}
