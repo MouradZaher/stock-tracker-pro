@@ -167,31 +167,6 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             {/* Animated Mesh Background Elements */}
             <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '60%', height: '40%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%)', pointerEvents: 'none', filter: 'blur(60px)', zIndex: 0 }} />
             
-            {/* === 1. COCKPIT TOP BAR === */}
-            <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10, flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)' }}>
-                        <Brain size={22} color="white" />
-                    </div>
-                    <div>
-                        <h1 style={{ fontSize: '1.1rem', fontWeight: 900, margin: 0, letterSpacing: '0.05em', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            ALPHA COMMAND
-                            <span style={{ fontSize: '0.6rem', padding: '2px 6px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', borderRadius: '4px', fontWeight: 900 }}>v4.2 PRO</span>
-                        </h1>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginTop: '2px' }}>
-                            <Activity size={10} color="var(--color-success)" style={{ marginRight: '4px' }} /> 
-                            {selectedMarket.name.toUpperCase()} ENGINE | SYSTEM_OPTIMIZED
-                        </div>
-                    </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <div className="hidden-mobile" style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900, textTransform: 'uppercase' }}>Core Load</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white' }}>12.4% <span style={{ color: 'var(--color-success)' }}>STABLE</span></div>
-                    </div>
-                    <LiveBadge />
-                </div>
-            </div>
 
             {/* === 2. UNIVERSAL SEARCH CONSOLE === */}
             <div style={{ padding: '1.5rem 1.5rem 1rem', zIndex: 10, flexShrink: 0 }}>
