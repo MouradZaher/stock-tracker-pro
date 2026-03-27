@@ -50,7 +50,7 @@ const PRICE_FLOORS = {
     'XLI': 140.00,  'XLY': 90.00,  'XLP': 70.00,  'XLB': 40.00,
     'XLU': 40.00,   'XLE': 50.00,  'XLRE': 38.00, 'XLF': 44.00,
     // S&P500 ETFs
-    'VOO': 540.00,  // floor: $540 — current $597.94
+    'VOO': 540.00,  // floor: $540 — current $603.00
     'SPY': 530.00,
     'QQQ': 520.00,  // floor: $520 — current $582.06
     // Index ETFs
@@ -385,7 +385,7 @@ export default async function handler(req, res) {
             // REAL ESTATE
             'AMT': 185.00, 'PLD': 105.00, 'SPG': 160.00,
             // ETFs
-            'VOO': 598.00, 'SPY': 598.00, 'QQQ': 582.00, 'VTI': 273.00, 'IWM': 200.00,
+            'VOO': 603.00, 'SPY': 603.00, 'QQQ': 582.00, 'VTI': 273.00, 'IWM': 200.00,
             'DIA': 425.00, 'VGT': 530.00, 'VHT': 235.00, 'VFH': 97.00,
             'XLK': 235.00, 'XLV': 145.00, 'XLF': 49.00, 'XLE': 59.00,
             'XLI': 162.00, 'XLY': 108.00, 'XLP': 81.00, 'XLB': 47.00, 'XLU': 45.00, 'XLRE': 42.00,

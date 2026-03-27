@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
@@ -167,6 +167,23 @@ interface MainLayoutProps {
   onOpenSettings: () => void;
 }
 
+/**
+ * Stock Detail Wrapper that reads symbol from Route params 
+ * for persistence across page refreshes.
+ */
+function StockDetailRoute({ onBack }: { onBack: () => void }) {
+  const { symbol } = useParams<{ symbol: string }>();
+  if (!symbol) return <Navigate to="/home" replace />;
+  return (
+    <div className="tab-content">
+      <StockDetail
+        symbol={symbol}
+        onBack={onBack}
+      />
+    </div>
+  );
+}
+
 function MainLayout({
   role,
   logout,
@@ -183,7 +200,12 @@ function MainLayout({
   const navigate = useNavigate();
 
   const currentPath = location.pathname.substring(1) || 'home';
-  const activeTab = (['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing'].includes(currentPath) ? currentPath : 'home') as TabType;
+  // Treat '/stock' as part of the 'home' tab for UI highlighting
+  const activeTab = (
+    currentPath.startsWith('stock/') 
+      ? 'home' 
+      : (['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing'].includes(currentPath) ? currentPath : 'home')
+  ) as TabType;
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/${tab}`);
@@ -192,19 +214,18 @@ function MainLayout({
 
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
-    navigate('/home');
+    navigate(`/stock/${symbol}`);
   };
 
-  // Listen for symbol query parameters (from heatmap deep-linking)
+  // Listen for symbol query parameters (from legacy heatmap deep-linking)
+  // Now redirects to the new persistent /stock/ route
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const symbolFromUrl = params.get('symbol');
-    if (symbolFromUrl && symbolFromUrl !== selectedSymbol) {
-      setSelectedSymbol(symbolFromUrl);
-      // Clear the query param to keep URL clean after processing
-      navigate(location.pathname, { replace: true });
+    if (symbolFromUrl) {
+      navigate(`/stock/${symbolFromUrl}`, { replace: true });
     }
-  }, [location.search, navigate, selectedSymbol, setSelectedSymbol]);
+  }, [location.search, navigate]);
 
   return (
     <div className="app">
@@ -235,16 +256,12 @@ function MainLayout({
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
-                <div className={`tab-content ${!selectedSymbol ? 'home-tab-content' : ''}`}>
-                  {!selectedSymbol ? (
-                    <Dashboard onSelectSymbol={handleSelectSymbol} />
-                  ) : (
-                    <StockDetail
-                      symbol={selectedSymbol}
-                      onBack={() => setSelectedSymbol(null)}
-                    />
-                  )}
+                <div className="tab-content home-tab-content">
+                  <Dashboard onSelectSymbol={handleSelectSymbol} />
                 </div>
+              } />
+              <Route path="/stock/:symbol" element={
+                <StockDetailRoute onBack={() => navigate('/home')} />
               } />
               <Route path="/watchlist" element={
                 <div className="tab-content" style={{ padding: '1rem', paddingBottom: '80px' }}>
@@ -261,7 +278,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/recommendations" element={
-                <div className="tab-content" style={{ paddingTop: '1rem' }}>
+                <div className="tab-content" style={{ padding: 0 }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <AIRecommendations onSelectStock={handleSelectSymbol} />

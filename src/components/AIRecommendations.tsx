@@ -1,253 +1,125 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, X, Zap, ArrowRight, Check, TrendingUp, MessageSquare, BarChart2, Sparkles, LayoutGrid, Shield } from 'lucide-react';
+import { 
+    RefreshCw, X, Zap, ArrowRight, Check, TrendingUp, 
+    MessageSquare, BarChart2, Sparkles, LayoutGrid, 
+    Shield, Search, Activity, Globe, ZapOff, Fingerprint,
+    Cpu, Target, Command as CommandIcon, Brain, Layers
+} from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import toast from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
 import { soundService } from '../services/soundService';
 import { LiveBadge } from './LiveBadge';
-import { getGroupedRecommendations, getAllRecommendations } from '../services/aiRecommendationService';
+import { getGroupedRecommendations } from '../services/aiRecommendationService';
 import { getStockData } from '../services/stockDataService';
 import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
 import AIPerformanceTracker from './AIPerformanceTracker';
-import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 import CompanyLogo from './CompanyLogo';
 import AIIntelligenceStream from './AIIntelligenceStream';
 
-// --- NEW: Reasoning Path Component ---
-const ReasoningPath: React.FC<{ tech: number; fund: number; score: number }> = ({ tech, fund, score }) => {
-    return (
-        <div style={{ position: 'relative', height: '100px', width: '100%', margin: '1rem 0', opacity: 0.9 }}>
-            <svg viewBox="0 0 400 100" style={{ width: '100%', height: '100%' }}>
-                {/* Connection Paths */}
-                <path 
-                    d="M 50 50 Q 125 10, 200 50 T 350 50" 
-                    fill="none" 
-                    stroke="rgba(255,255,255,0.05)" 
-                    strokeWidth="2" 
-                />
-                <path 
-                    className="path-animate"
-                    d="M 50 50 Q 125 10, 200 50 T 350 50" 
-                    fill="none" 
-                    stroke="var(--color-accent)" 
-                    strokeWidth="2"
-                    strokeDasharray="10, 5"
-                    style={{ filter: 'drop-shadow(0 0 5px var(--color-accent))' }}
-                />
+// --- NEW COMPONENT: Alpha Card ---
+const AlphaPickCard: React.FC<{ rec: any; onClick: () => void }> = ({ rec, onClick }) => {
+    const getScoreColor = (score: number) => {
+        if (score >= 90) return 'var(--color-success)';
+        if (score >= 70) return 'var(--color-warning)';
+        return 'var(--color-error)';
+    };
 
-                {/* Nodes */}
-                <circle cx="50" cy="50" r="4" fill="var(--color-accent)" />
-                <circle cx="200" cy="50" r="4" fill="var(--color-success)" />
-                <circle cx="350" cy="50" r="6" fill={score >= 75 ? 'var(--color-success)' : 'var(--color-warning)'} />
-                
-                {/* Labels */}
-                <text x="50" y="75" textAnchor="middle" fontSize="10" fill="var(--color-text-tertiary)" fontWeight="700">TECHNICAL</text>
-                <text x="200" y="75" textAnchor="middle" fontSize="10" fill="var(--color-text-tertiary)" fontWeight="700">FUNDAMENTAL</text>
-                <text x="350" y="75" textAnchor="middle" fontSize="10" fill="var(--color-text-tertiary)" fontWeight="700">CONVICTION</text>
-                <text x="350" y="40" textAnchor="middle" fontSize="12" fill="white" fontWeight="900">{score}%</text>
-            </svg>
-            <style>{`
-                .path-animate {
-                    stroke-dashoffset: 100;
-                    animation: dash 10s linear infinite;
-                }
-                @keyframes dash {
-                    to { stroke-dashoffset: 0; }
-                }
-            `}</style>
-        </div>
-    );
-};
-
-// --- NEW: Confidence Heatmap Component ---
-const ConfidenceHeatmap: React.FC<{ items: any[] }> = ({ items }) => {
     return (
-        <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <LayoutGrid size={14} color="var(--color-accent)" /> Strategy Confidence Matrix
-            </h3>
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', 
-                gap: '4px' 
-            }}>
-                {items.slice(0, 48).map((item, i) => {
-                    const opacity = (item.score - 50) / 50; 
-                    return (
-                        <div 
-                            key={i}
-                            title={`${item.symbol}: ${item.score}% Confidence`}
-                            style={{ 
-                                height: '30px', 
-                                background: item.score >= 80 ? `rgba(16, 185, 129, ${0.1 + opacity * 0.5})` : 
-                                            item.score >= 70 ? `rgba(245, 158, 11, ${0.1 + opacity * 0.5})` : 
-                                            `rgba(239, 68, 68, ${0.1 + opacity * 0.5})`,
-                                borderRadius: '4px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '0.6rem',
-                                fontWeight: 900,
-                                color: 'rgba(255,255,255,0.7)',
-                                border: '1px solid rgba(255,255,255,0.05)',
-                                transition: 'all 0.2s',
-                                cursor: 'help'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'scale(1.2) z-index: 10';
-                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                            }}
-                        >
-                            {item.symbol.substring(0, 3)}
-                        </div>
-                    );
-                })}
+        <div 
+            onClick={onClick}
+            className="glass-card hover-lift"
+            style={{ 
+                padding: '1.25rem', 
+                cursor: 'pointer', 
+                border: '1px solid var(--glass-border)',
+                background: 'rgba(255,255,255,0.02)',
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: '16px'
+            }}
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ position: 'relative' }}>
+                        <CompanyLogo symbol={rec.symbol} size={40} />
+                        <div style={{ position: 'absolute', bottom: -2, right: -2, width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-success)', border: '2px solid var(--color-bg-primary)' }} />
+                    </div>
+                    <div>
+                        <div style={{ fontWeight: 900, fontSize: '1rem', color: 'white' }}>{rec.symbol}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{rec.sector}</div>
+                    </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 900, color: getScoreColor(rec.score), textShadow: `0 0 10px ${getScoreColor(rec.score)}55` }}>{rec.score}%</div>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900, letterSpacing: '0.1em' }}>ALPHA PROB</div>
+                </div>
             </div>
-            <div style={{ display: 'flex', gap: '12px', marginTop: '1rem', fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--color-success)' }} /> High Conviction</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--color-warning)' }} /> Moderate</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--color-error)' }} /> Watchlist</div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '1.25rem' }}>
+                <div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white' }}>{formatCurrency(rec.price || 0)}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <TrendingUp size={12} /> +{Math.floor(Math.random() * 8 + 5)}% ESTIMATED
+                    </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <span style={{ 
+                        padding: '4px 10px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.65rem', 
+                        fontWeight: 900,
+                        background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                        color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)',
+                        border: `1px solid ${rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`,
+                        letterSpacing: '0.05em'
+                    }}>
+                        {rec.recommendation.toUpperCase()}
+                    </span>
+                </div>
+            </div>
+            
+            <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.05)', marginTop: '1rem', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${rec.score}%`, height: '100%', background: getScoreColor(rec.score), borderRadius: '2px', boxShadow: `0 0 8px ${getScoreColor(rec.score)}` }} />
             </div>
         </div>
     );
 };
 
-// --- Market-Specific Curated Recommendations ---
 const US_RECS = [
-    { symbol: 'NVDA', name: 'NVIDIA Corp.', sector: 'Technology', score: 88, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'MSFT', name: 'Microsoft Corp.', sector: 'Technology', score: 85, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology', score: 82, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'LLY', name: 'Eli Lilly & Co.', sector: 'Healthcare', score: 80, recommendation: 'Buy', suggestedAllocation: 4.5 },
-    { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', score: 79, recommendation: 'Buy', suggestedAllocation: 4.5 },
-    { symbol: 'AVGO', name: 'Broadcom Inc.', sector: 'Technology', score: 77, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'AMZN', name: 'Amazon.com Inc.', sector: 'Consumer Cyclical', score: 76, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'META', name: 'Meta Platforms', sector: 'Technology', score: 74, recommendation: 'Buy', suggestedAllocation: 3.5 },
-    { symbol: 'JPM', name: 'JPMorgan Chase', sector: 'Financial', score: 72, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'UNH', name: 'UnitedHealth Group', sector: 'Healthcare', score: 70, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'WMT', name: 'Walmart Inc.', sector: 'Consumer Staples', score: 69, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'V', name: 'Visa Inc.', sector: 'Financial', score: 68, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'XOM', name: 'Exxon Mobil Corp.', sector: 'Energy', score: 65, recommendation: 'Hold', suggestedAllocation: 2.5 },
-    { symbol: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', score: 62, recommendation: 'Hold', suggestedAllocation: 2.5 },
-    { symbol: 'TSLA', name: 'Tesla Inc.', sector: 'Consumer Cyclical', score: 58, recommendation: 'Hold', suggestedAllocation: 2.0 },
+    { symbol: 'NVDA', name: 'NVIDIA Corp.', sector: 'Technology', score: 94, recommendation: 'Buy', suggestedAllocation: 5.0, price: 172.70 },
+    { symbol: 'MSFT', name: 'Microsoft Corp.', sector: 'Technology', score: 89, recommendation: 'Buy', suggestedAllocation: 5.0, price: 381.87 },
+    { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology', score: 86, recommendation: 'Buy', suggestedAllocation: 5.0, price: 248.28 },
+    { symbol: 'LLY', name: 'Eli Lilly & Co.', sector: 'Healthcare', score: 84, recommendation: 'Buy', suggestedAllocation: 4.5, price: 810.00 },
+    { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', score: 81, recommendation: 'Buy', suggestedAllocation: 4.5, price: 301.00 },
+    { symbol: 'AVGO', name: 'Broadcom Inc.', sector: 'Technology', score: 79, recommendation: 'Buy', suggestedAllocation: 4.0, price: 310.51 },
 ];
 
 const EGYPT_RECS = [
     { symbol: 'COMI', name: 'Commercial Intl Bank', sector: 'Banking', score: 91, recommendation: 'Buy', suggestedAllocation: 5.0, price: 92.0 },
     { symbol: 'TMGH', name: 'Talaat Moustafa Group', sector: 'Real Estate', score: 87, recommendation: 'Buy', suggestedAllocation: 5.0, price: 104.0 },
     { symbol: 'HRHO', name: 'Hermes Holding', sector: 'Financial Services', score: 85, recommendation: 'Buy', suggestedAllocation: 5.0, price: 32.5 },
-    { symbol: 'EAST', name: 'Eastern Company', sector: 'Consumer Staples', score: 82, recommendation: 'Buy', suggestedAllocation: 4.5, price: 28.0 },
-    { symbol: 'EFID', name: 'E-Finance', sector: 'Technology', score: 80, recommendation: 'Buy', suggestedAllocation: 4.5, price: 31.0 },
-    { symbol: 'EMFD', name: 'Emaar Misr Development', sector: 'Real Estate', score: 78, recommendation: 'Buy', suggestedAllocation: 4.0, price: 6.2 },
-    { symbol: 'ADIB', name: 'Abu Dhabi Islamic Bank', sector: 'Banking', score: 76, recommendation: 'Buy', suggestedAllocation: 4.0, price: 54.0 },
-    { symbol: 'ETEL', name: 'Egyptian Telecom', sector: 'Telecom', score: 74, recommendation: 'Buy', suggestedAllocation: 3.5, price: 38.0 },
-    { symbol: 'ABUK', name: 'Abu Qir Fertilizers', sector: 'Materials', score: 72, recommendation: 'Hold', suggestedAllocation: 3.5, price: 82.0 },
-    { symbol: 'FWRY', name: 'Fawry', sector: 'Technology', score: 71, recommendation: 'Hold', suggestedAllocation: 3.0, price: 7.2 },
-    { symbol: 'SWDY', name: 'ElSewedy Electric', sector: 'Industrials', score: 69, recommendation: 'Hold', suggestedAllocation: 3.0, price: 44.0 },
-    { symbol: 'ORAS', name: 'Orascom Construction', sector: 'Industrials', score: 67, recommendation: 'Hold', suggestedAllocation: 2.5, price: 285.0 },
-    { symbol: 'RAYA', name: 'Raya Holding', sector: 'Technology', score: 64, recommendation: 'Hold', suggestedAllocation: 2.5, price: 4.5 },
-    { symbol: 'PHDC', name: 'Palm Hills Development', sector: 'Real Estate', score: 61, recommendation: 'Hold', suggestedAllocation: 2.0, price: 4.2 },
-    { symbol: 'CLHO', name: 'Cleopatra Hospital', sector: 'Healthcare', score: 58, recommendation: 'Hold', suggestedAllocation: 2.0, price: 8.5 },
+    { symbol: 'EFID', name: 'E-Finance', sector: 'Technology', score: 82, recommendation: 'Buy', suggestedAllocation: 4.5, price: 31.0 },
 ];
 
 const ABUDHABI_RECS = [
-    { symbol: 'IHC', name: 'International Holding Co.', sector: 'Conglomerate', score: 90, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'FAB', name: 'First Abu Dhabi Bank', sector: 'Banking', score: 87, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'ETISALAT', name: 'Emirates Telecom Group', sector: 'Telecom', score: 84, recommendation: 'Buy', suggestedAllocation: 5.0 },
-    { symbol: 'ADNOCDIST', name: 'ADNOC Distribution', sector: 'Energy', score: 82, recommendation: 'Buy', suggestedAllocation: 4.5 },
-    { symbol: 'ALDAR', name: 'Aldar Properties', sector: 'Real Estate', score: 80, recommendation: 'Buy', suggestedAllocation: 4.5 },
-    { symbol: 'ADCB', name: 'Abu Dhabi Comm. Bank', sector: 'Banking', score: 78, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'MULTIPLY', name: 'Multiply Group', sector: 'Conglomerate', score: 76, recommendation: 'Buy', suggestedAllocation: 4.0 },
-    { symbol: 'ADNOC', name: 'ADNOC Drilling', sector: 'Energy', score: 74, recommendation: 'Buy', suggestedAllocation: 3.5 },
-    { symbol: 'PRESIGHT', name: 'Presight AI', sector: 'Technology', score: 73, recommendation: 'Hold', suggestedAllocation: 3.5 },
-    { symbol: 'FERTIGLBE', name: 'Fertiglobe', sector: 'Materials', score: 70, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'DANA', name: 'Dana Gas', sector: 'Energy', score: 68, recommendation: 'Hold', suggestedAllocation: 3.0 },
-    { symbol: 'AGTHIA', name: 'Agthia Group', sector: 'Consumer Staples', score: 66, recommendation: 'Hold', suggestedAllocation: 2.5 },
-    { symbol: 'YAHSAT', name: 'Al Yah Satellite', sector: 'Telecom', score: 63, recommendation: 'Hold', suggestedAllocation: 2.5 },
-    { symbol: 'ALPAGO', name: 'Alpha Dhabi Holding', sector: 'Conglomerate', score: 60, recommendation: 'Hold', suggestedAllocation: 2.0 },
-    { symbol: 'RAK', name: 'RAK Properties', sector: 'Real Estate', score: 56, recommendation: 'Hold', suggestedAllocation: 2.0 },
+    { symbol: 'IHC', name: 'International Holding Co.', sector: 'Conglomerate', score: 90, recommendation: 'Buy', suggestedAllocation: 5.0, price: 390.0 },
+    { symbol: 'FAB', name: 'First Abu Dhabi Bank', sector: 'Banking', score: 87, recommendation: 'Buy', suggestedAllocation: 5.0, price: 17.5 },
+    { symbol: 'ALDAR', name: 'Aldar Properties', sector: 'Real Estate', score: 84, recommendation: 'Buy', suggestedAllocation: 4.5, price: 9.27 },
 ];
 
 const RECS_MAP: Record<MarketId, typeof US_RECS> = { us: US_RECS, egypt: EGYPT_RECS, abudhabi: ABUDHABI_RECS };
 
-const SCAN_LOGS: Record<MarketId, string[]> = {
-    us: [
-        'Analyzing multi-timeframe technical signatures (RSI, SMA, EMA)...',
-        'Parsing NLP sentiment from X (Twitter) Pro and WallStreetBets Pulse...',
-        'Computing Alpha Conviction scores (0.0 - 1.0) via ML model v5.2...',
-        'Auditing SEC 13F institutional accumulation patterns...',
-        'Detecting HFT volume anomalies and liquidity sweep signatures...',
-        'Synthesizing tactical strategy setups for session deployment...',
-    ],
-    egypt: [
-        'Analyzing sector rotation and currency-indexed arbitrage...',
-        'Processing local sentiment from regional financial intelligence...',
-        'Calculating Alpha Conviction metrics for high-cap listings...',
-        'Evaluating foreign vs. local institutional capital flow divergence...',
-        'Scanning for retail volume spikes and accumulation sweeps...',
-        'Finalizing tactical setups for Cairo session optimization...',
-    ],
-    abudhabi: [
-        'Analyzing oil-equity correlation lags and energy sector dividend yield...',
-        'Processing UAE strategic investment news and Gulf capital sentiment...',
-        'Calculating Alpha Conviction scores for ADX institutional majors...',
-        'Auditing sovereign flow patterns and corporate buy-back signatures...',
-        'Detecting low-float liquidity traps and institutional support walls...',
-        'Synthesizing tactical setups for Abu Dhabi capital markets...',
-    ],
-};
-
-const generateDynamicReasoning = (symbol: string, name: string, sector: string, score: number) => {
-    const hash = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const volumeMultiplier = (1.2 + (hash % 15) * 0.1).toFixed(1);
-    const techBase = 40 + (hash % 40);
-    const fundBase = 100 - techBase;
-
-    if (score >= 80) {
-        const templates = [
-            `Strong institutional accumulation detected in ${symbol}. Volume profile suggests a breakout with a ${score}% probability.`,
-            `Recent earnings whisper numbers for ${name} indicate significant upside. High conviction score of ${score}%.`,
-            `Hedge fund flow analysis shows aggressive buying in the ${sector} sector for ${symbol}.`,
-            `Algorithmic dark pool sweeps indicate smart money accumulation in ${symbol}.`
-        ];
-        return { text: templates[hash % templates.length], vol: volumeMultiplier, sent: 'Very Bullish', tech: techBase, fund: fundBase };
-    } else if (score >= 70) {
-        const templates = [
-            `Favorable risk/reward setup for ${symbol}. Matches ${score}% of our Alpha criteria.`,
-            `Moderate options flow suggests bullish sentiment building around ${name}.`,
-            `Technical consolidation phase nearing completion for ${symbol}.`
-        ];
-        return { text: templates[hash % templates.length], vol: volumeMultiplier, sent: 'Bullish', tech: techBase, fund: fundBase };
-    } else {
-        const templates = [
-            `Neutral momentum. Alpha probability for ${symbol} is ${score}%.`,
-            `${sector} sector headwinds are affecting ${name}.`,
-            `Mixed signals on the daily timeframe for ${symbol}.`
-        ];
-        return { text: templates[hash % templates.length], vol: volumeMultiplier, sent: 'Neutral', tech: techBase, fund: fundBase };
-    }
-};
-
-interface AIRecommendationsProps {
-    onSelectStock?: (symbol: string) => void;
-}
-
-const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) => {
+const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> = ({ onSelectStock }) => {
     const { addNotification } = useNotifications();
     const { selectedMarket } = useMarket();
-    const [detailSymbol, setDetailSymbol] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'picks' | 'intelligence' | 'performance'>('picks');
-    const [detailRec, setDetailRec] = useState<any>(null);
+    const [activeTab, setActiveTab] = useState<'alpha' | 'strategies' | 'analysis'>('alpha');
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
-    const [scanLog, setScanLog] = useState<string[]>([]);
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
-    const [detailStockData, setDetailStockData] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const INSTANT_RECS = useMemo(() => {
         return [...(RECS_MAP[selectedMarket.id] || US_RECS)].sort((a, b) => b.score - a.score);
@@ -255,407 +127,284 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onSelectStock }) 
 
     useEffect(() => {
         setActiveRecs([]);
-        setDetailSymbol(null);
-        setDetailRec(null);
     }, [selectedMarket.id]);
 
-    const groupedRecs = useMemo(() => {
-        if (activeRecs.length > 0) return activeRecs;
-        const groups: Record<string, any[]> = {};
-        INSTANT_RECS.forEach((rec) => {
-            const sector = rec.sector || 'Uncategorized';
-            if (!groups[sector]) groups[sector] = [];
-            groups[sector].push(rec);
-        });
-        return Object.entries(groups)
-            .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([name, recommendations]) => ({ name, recommendations }));
-    }, [activeRecs, INSTANT_RECS]);
-
-    const [checklist, setChecklist] = useState({
-        positiveBreadth: true, volumeHigh: true, rsiValid: true,
-        macdConfirm: false, candleClose: false, volumeEntry: false, fakeBreakout: true,
-    });
-
-    const handleLocalSelect = (rec: any) => {
-        soundService.playTap();
-        setDetailSymbol(rec.symbol);
-        setDetailRec(rec);
-        setChecklist({
-            positiveBreadth: Math.random() > 0.3, volumeHigh: Math.random() > 0.4,
-            rsiValid: Math.random() > 0.2, macdConfirm: Math.random() > 0.5,
-            candleClose: Math.random() > 0.5, volumeEntry: Math.random() > 0.5,
-            fakeBreakout: Math.random() > 0.2,
-        });
-        if (onSelectStock) onSelectStock(rec.symbol);
-    };
-
     const runScanner = async () => {
-        const logs = SCAN_LOGS[selectedMarket.id] || SCAN_LOGS.us;
         setIsScanning(true);
         setScanProgress(0);
-        setScanLog(['Initializing Engine...', 'Auditing Metrics...', 'Filtering Sectors...']);
         soundService.playTap();
-
-        for (let i = 0; i < logs.length; i++) {
-            await new Promise(r => setTimeout(r, 600));
-            setScanLog(prev => [...prev, logs[i]]);
-            setScanProgress(((i + 1) / logs.length) * 100);
+        
+        for (let i = 0; i <= 100; i += 5) {
+            await new Promise(r => setTimeout(r, 80));
+            setScanProgress(i);
             soundService.playWorking();
         }
 
-        try {
-            const freshGroupedRecs = await getGroupedRecommendations(selectedMarket.indexName);
-            setActiveRecs(freshGroupedRecs);
-            setIsScanning(false);
-            soundService.playSuccess();
-            addNotification({ title: 'Scan Complete', message: `Found picks in ${freshGroupedRecs.length} sectors.`, type: 'ai' });
-        } catch (error) {
-            setIsScanning(false);
-            toast.error('Scan failed.');
-        }
+        const freshData = await getGroupedRecommendations(selectedMarket.indexName);
+        const flattened = freshData.flatMap(g => g.recommendations.map(r => ({ ...r, group: g.name })));
+        setActiveRecs(flattened.sort((a, b) => b.score - a.score));
+        setIsScanning(false);
+        soundService.playSuccess();
+        addNotification({ title: 'System Calibrated', message: `Alpha Engine synced with ${selectedMarket.name}.`, type: 'ai' });
     };
 
-    const getScoreColor = (score: number) => {
-        if (score >= 90) return 'var(--color-success)';
-        if (score >= 70) return 'var(--color-warning)';
-        return 'var(--color-error)';
-    };
-
-    useEffect(() => {
-        if (detailSymbol) {
-            getStockData(detailSymbol).then(data => {
-                if (data?.stock) setDetailStockData({ ...data.stock, price: Number(data.stock.price) || 0, changePercent: Number(data.stock.changePercent) || 0 });
-            });
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery && onSelectStock) {
+            onSelectStock(searchQuery.toUpperCase());
+            toast.success(`Alpha Engine: Initializing deep audit for ${searchQuery.toUpperCase()}`);
+            setSearchQuery('');
         }
-    }, [detailSymbol]);
-
-    if (detailSymbol) {
-        return (
-            <div className="tab-content dashboard-viewport" style={{ animation: 'fadeIn 0.3s ease' }}>
-                <div style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
-                    <button onClick={() => { setDetailSymbol(null); setDetailRec(null); }} className="btn btn-icon glass-button">
-                        <ArrowRight size={20} style={{ transform: 'rotate(180deg)' }} />
-                    </button>
-                    <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Trade Analysis</h2>
-                </div>
-
-                <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <CompanyLogo symbol={detailSymbol} size={48} />
-                            <div>
-                                <div style={{ fontSize: '1.75rem', fontWeight: 800 }}>{detailSymbol}</div>
-                                <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{detailStockData ? formatCurrency(detailStockData.price) : '...'}</div>
-                            </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ color: (detailStockData?.changePercent || 0) >= 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 700 }}>
-                                {(detailStockData?.changePercent || 0).toFixed(2)}%
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div className="glass-card" style={{ height: '350px', padding: '0.5rem', overflow: 'hidden' }}>
-                        <iframe
-                            src={`https://s.tradingview.com/widgetembed/?symbol=${detailSymbol}&interval=D&theme=dark&style=1&locale=en`}
-                            style={{ width: '100%', height: '100%', border: 'none' }}
-                            title="TradingView Chart"
-                        />
-                    </div>
-
-                    <div className="glass-card" style={{ padding: '1.25rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <h3 style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>Intelligence Breakdown</h3>
-                            <div style={{ fontWeight: 700 }}>Conviction: <span style={{ color: getScoreColor(detailRec?.score || 50) }}>{detailRec?.score || '--'}%</span></div>
-                        </div>
-
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', marginBottom: '8px' }}>
-                                <span>Technical Analysis</span>
-                                <span>Fundamental Growth</span>
-                            </div>
-                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
-                                <div style={{ width: `${detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).tech : 50}%`, background: 'var(--color-accent)' }} />
-                                <div style={{ width: `${detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).fund : 50}%`, background: 'var(--color-success)' }} />
-                            </div>
-                        </div>
-
-                        <ReasoningPath 
-                            tech={detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).tech : 50}
-                            fund={detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).fund : 50}
-                            score={detailRec?.score || 50}
-                        />
-
-                        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
-                            {detailRec ? generateDynamicReasoning(detailRec.symbol, detailRec.name, detailRec.sector, detailRec.score).text : 'Analyzing...'}
-                        </p>
-                    </div>
-
-                    <div className="glass-card" style={{ padding: '1.25rem' }}>
-                        <h3 style={{ textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '1rem' }}>Automated Checklist</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                            {Object.entries(checklist).map(([key, val]) => (
-                                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
-                                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: val ? 'var(--color-success)' : 'rgba(255,255,255,0.1)' }} />
-                                    {key.replace(/([A-Z])/g, ' $1').toUpperCase()}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    };
 
     return (
-        <div className="tab-content dashboard-viewport" style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column' }}>
-            {/* AI COMMAND CENTER HEADER */}
-            <div className="ai-command-header" style={{ marginBottom: '1.5rem', flexShrink: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+        <div className="ai-cockpit-container" style={{ 
+            height: '100%', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            overflow: 'hidden',
+            background: 'var(--color-bg-primary)',
+            position: 'relative'
+        }}>
+            {/* Animated Mesh Background Elements */}
+            <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '60%', height: '40%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%)', pointerEvents: 'none', filter: 'blur(60px)', zIndex: 0 }} />
+            
+            {/* === 1. COCKPIT TOP BAR === */}
+            <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10, flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(99, 102, 241, 0.4)' }}>
+                        <Brain size={22} color="white" />
+                    </div>
                     <div>
-                        <h1 style={{ fontSize: '1.75rem', fontWeight: 900, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Sparkles className="text-accent" size={28} />
+                        <h1 style={{ fontSize: '1.1rem', fontWeight: 900, margin: 0, letterSpacing: '0.05em', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             ALPHA COMMAND
+                            <span style={{ fontSize: '0.6rem', padding: '2px 6px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', borderRadius: '4px', fontWeight: 900 }}>v4.2 PRO</span>
                         </h1>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', fontWeight: 600, marginTop: '4px' }}>
-                            Institutional-Grade Artificial Intelligence & Strategic Analysis
-                        </p>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginTop: '2px' }}>
+                            <Activity size={10} color="var(--color-success)" style={{ marginRight: '4px' }} /> 
+                            {selectedMarket.name.toUpperCase()} ENGINE | SYSTEM_OPTIMIZED
+                        </div>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <div className="hidden-mobile" style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900, textTransform: 'uppercase' }}>Core Load</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white' }}>12.4% <span style={{ color: 'var(--color-success)' }}>STABLE</span></div>
                     </div>
                     <LiveBadge />
                 </div>
-
-                {/* TAB NAVIGATION */}
-                <div className="ai-tabs-nav glass-card" style={{ 
-                    display: 'flex', 
-                    padding: '4px', 
-                    borderRadius: '14px', 
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid var(--glass-border)',
-                    marginBottom: '1rem'
-                }}>
-                    <button 
-                        onClick={() => setActiveTab('picks')}
-                        className={`ai-tab-btn ${activeTab === 'picks' ? 'active' : ''}`}
-                        style={{
-                            flex: 1,
-                            padding: '10px',
-                            borderRadius: '12px',
-                            fontSize: '0.85rem',
-                            fontWeight: 800,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            background: activeTab === 'picks' ? 'var(--gradient-primary)' : 'transparent',
-                            color: activeTab === 'picks' ? 'white' : 'var(--color-text-secondary)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            border: 'none',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <LayoutGrid size={16} /> PICKS
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('intelligence')}
-                        className={`ai-tab-btn ${activeTab === 'intelligence' ? 'active' : ''}`}
-                        style={{
-                            flex: 1,
-                            padding: '10px',
-                            borderRadius: '12px',
-                            fontSize: '0.85rem',
-                            fontWeight: 800,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            background: activeTab === 'intelligence' ? 'var(--gradient-primary)' : 'transparent',
-                            color: activeTab === 'intelligence' ? 'white' : 'var(--color-text-secondary)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            border: 'none',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <Zap size={16} /> INTELLIGENCE
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('performance')}
-                        className={`ai-tab-btn ${activeTab === 'performance' ? 'active' : ''}`}
-                        style={{
-                            flex: 1,
-                            padding: '10px',
-                            borderRadius: '12px',
-                            fontSize: '0.85rem',
-                            fontWeight: 800,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            background: activeTab === 'performance' ? 'var(--gradient-primary)' : 'transparent',
-                            color: activeTab === 'performance' ? 'white' : 'var(--color-text-secondary)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            border: 'none',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <TrendingUp size={16} /> AUDIT
-                    </button>
-                </div>
             </div>
 
-            {/* TAB CONTENT AREAS */}
-            <div className="ai-tab-content-wrapper scrollable-panel custom-scrollbar" style={{ flex: 1, minHeight: 0 }}>
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <AIIntelligenceStream />
-                </div>
-                {activeTab === 'picks' && (
-                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        {/* DEEP SCAN BUTTON INTEGRATED */}
-                        <div className="glass-card noise-texture" style={{ padding: '1.5rem', border: '1px solid var(--color-accent-light)', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                <div>
-                                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900 }}>AI Strategic Scanner</h3>
-                                    <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Analyze the entire {selectedMarket.name} for high-conviction trades</p>
-                                </div>
-                                <Zap size={24} className="text-accent animate-pulse" />
-                            </div>
-                            
-                            <button 
-                                className="btn btn-primary" 
-                                onClick={runScanner} 
-                                disabled={isScanning} 
+            {/* === 2. UNIVERSAL SEARCH CONSOLE === */}
+            <div style={{ padding: '1.5rem 1.5rem 1rem', zIndex: 10, flexShrink: 0 }}>
+                <form onSubmit={handleSearch} style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
+                    <div className="glass-card noise-texture" style={{ 
+                        padding: '1px', 
+                        borderRadius: '20px', 
+                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(236, 72, 153, 0.2), transparent, rgba(99, 102, 241, 0.4))',
+                        boxShadow: '0 20px 50px -15px rgba(0,0,0,0.6)'
+                    }}>
+                        <div style={{ 
+                            background: '#0a0a0f', 
+                            borderRadius: '19px', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            padding: '0.5rem 1rem' 
+                        }}>
+                            <Search className="text-accent" size={24} style={{ opacity: 0.8 }} />
+                            <input 
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Universal Asset Analysis: Enter Ticker (AAPL, COMI, IHC)..."
                                 style={{ 
-                                    width: '100%', 
-                                    padding: '1rem',
-                                    fontSize: '0.95rem',
-                                    fontWeight: 900,
+                                    flex: 1, 
+                                    background: 'transparent', 
+                                    border: 'none', 
+                                    color: 'white', 
+                                    fontSize: '1.1rem', 
+                                    padding: '14px 20px', 
+                                    fontWeight: 600,
+                                    outline: 'none',
+                                    letterSpacing: '0.02em'
+                                }}
+                            />
+                            <button 
+                                type="submit"
+                                className="btn btn-primary" 
+                                style={{ 
+                                    borderRadius: '14px', 
+                                    padding: '12px 30px', 
+                                    fontWeight: 900, 
+                                    fontSize: '0.9rem',
                                     background: 'var(--gradient-primary)',
-                                    boxShadow: '0 8px 32px rgba(99,102,241,0.4)',
-                                    borderRadius: '14px',
-                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
                                     textTransform: 'uppercase',
-                                    letterSpacing: '0.1em',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '10px'
+                                    letterSpacing: '0.05em'
                                 }}
                             >
-                                {isScanning ? <RefreshCw className="spin" size={20} /> : <Zap size={20} fill="currentColor" />}
-                                {isScanning ? 'Processing Market Intelligence...' : 'Initiate Deep AI Scan'}
+                                Run Audit
                             </button>
+                        </div>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginTop: '1.25rem' }}>
+                        {[
+                            { icon: Target, text: 'DCF VALUATION' },
+                            { icon: Fingerprint, text: 'HEDGE FLOWS' },
+                            { icon: Globe, text: 'MACRO SIGNAL' },
+                            { icon: Shield, text: 'RISK AUDIT' }
+                        ].map((item, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, transition: 'color 0.2s', cursor: 'default' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-tertiary)'}>
+                                <item.icon size={14} /> {item.text}
+                            </div>
+                        ))}
+                    </div>
+                </form>
+            </div>
 
-                            {isScanning && (
-                                <div style={{ marginTop: '1.25rem', animation: 'fadeIn 0.3s ease' }}>
-                                    <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${scanProgress}%`, height: '100%', background: 'var(--color-success)', transition: 'width 0.3s ease', boxShadow: '0 0 10px var(--color-success)' }} />
+            {/* === 3. COCKPIT MODE SELECTOR === */}
+            <div style={{ padding: '0.5rem 1.5rem', display: 'flex', gap: '1.5rem', zIndex: 10, flexShrink: 0 }}>
+                {[
+                    { id: 'alpha', label: 'ALGO ALPHA', icon: Layers },
+                    { id: 'strategies', label: 'QUANT STRATEGIES', icon: CommandIcon },
+                    { id: 'analysis', label: 'MARKET AUDIT', icon: BarChart2 }
+                ].map((tab) => (
+                    <button 
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as any)}
+                        style={{ 
+                            padding: '12px 4px', 
+                            fontSize: '0.8rem', 
+                            fontWeight: 900, 
+                            color: activeTab === tab.id ? 'white' : 'var(--color-text-tertiary)',
+                            border: 'none',
+                            background: 'transparent',
+                            borderBottom: `2.5px solid ${activeTab === tab.id ? 'var(--color-accent)' : 'transparent'}`,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            letterSpacing: '0.08em',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            opacity: activeTab === tab.id ? 1 : 0.6
+                        }}
+                    >
+                        <tab.icon size={16} color={activeTab === tab.id ? 'var(--color-accent)' : 'currentColor'} />
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* === 4. SYSTEM INTELLIGENCE FEED (FIXED TICKER) === */}
+            <div style={{ padding: '0 1rem', flexShrink: 0, zIndex: 10 }}>
+                <AIIntelligenceStream />
+            </div>
+
+            {/* === 5. CONTENT CONSOLE (LOCK VERTICAL SCROLL ON CONTAINER) === */}
+            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', zIndex: 5 }}>
+                <div className="scrollable-panel custom-scrollbar" style={{ height: '100%', padding: '1rem 1.5rem 2rem' }}>
+                    
+                    {activeTab === 'alpha' && (
+                        <div className="animate-fade-in">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em' }}>
+                                        TOP ALPHA CONVICTIONS
+                                    </h3>
+                                    <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>AI identified high-probability breakout candidates for the next 48h</p>
+                                </div>
+                                <button 
+                                    onClick={runScanner} 
+                                    disabled={isScanning}
+                                    style={{ 
+                                        padding: '10px 18px', 
+                                        fontSize: '0.75rem', 
+                                        fontWeight: 900, 
+                                        borderRadius: '10px', 
+                                        background: isScanning ? 'rgba(255,255,255,0.03)' : 'rgba(99, 102, 241, 0.1)',
+                                        color: isScanning ? 'var(--color-text-tertiary)' : 'var(--color-accent)',
+                                        border: '1px solid var(--color-accent-light)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px',
+                                        transition: 'all 0.2s',
+                                        letterSpacing: '0.05em'
+                                    }}
+                                >
+                                    {isScanning ? <RefreshCw size={14} className="spin" /> : <RefreshCw size={14} />}
+                                    {isScanning ? `SYSTEM SCANNING ${Math.round(scanProgress)}%` : 'INITIATE DEEP SCAN'}
+                                </button>
+                            </div>
+
+                            <div style={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+                                gap: '1.25rem' 
+                            }}>
+                                {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec, i) => (
+                                    <AlphaPickCard 
+                                        key={rec.symbol + i} 
+                                        rec={rec} 
+                                        onClick={() => onSelectStock && onSelectStock(rec.symbol)} 
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'strategies' && (
+                        <div className="animate-fade-in">
+                            <div className="glass-card" style={{ padding: '1.25rem', border: '1px solid var(--color-accent-light)', marginBottom: '1.5rem', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '18px' }}>
+                                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Shield size={24} className="text-accent" />
                                     </div>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '8px', fontFamily: 'monospace', display: 'flex', justifyContent: 'space-between' }}>
-                                        <span>{scanLog[scanLog.length - 1]}</span>
-                                        <span>{Math.round(scanProgress)}%</span>
+                                    <div>
+                                        <div style={{ fontSize: '1rem', fontWeight: 900, color: 'white' }}>ELITE STRATEGY DEPLOYMENT</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginTop: '2px' }}>Access proprietary AI models for hedging, institutional tracking, and arbitrage.</div>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-
-                        {/* PICK TABLE */}
-                        <div className="table-container glass-card" style={{ border: '1px solid var(--glass-border-bright)', padding: 0, overflow: 'hidden' }}>
-                            <div style={{ padding: '1rem 1.5rem', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Strategic Opportunities</h3>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{INSTANT_RECS.length} ASSETS EVALUATED</div>
                             </div>
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                    <thead>
-                                        <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
-                                            <th style={{ textAlign: 'left', padding: '1.25rem 1.5rem', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Asset</th>
-                                            <th style={{ textAlign: 'center', padding: '1.25rem 1.5rem', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Signal</th>
-                                            <th style={{ textAlign: 'center', padding: '1.25rem 1.5rem', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Conviction</th>
-                                            <th style={{ textAlign: 'right', padding: '1.25rem 1.5rem', fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 900 }}>Potential</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {groupedRecs.map((group) => (
-                                            <React.Fragment key={group.name}>
-                                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                                    <td colSpan={4} style={{ padding: '0.6rem 1.5rem', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{group.name}</td>
-                                                </tr>
-                                                {group.recommendations.map((rec) => (
-                                                    <tr 
-                                                        key={rec.symbol} 
-                                                        onClick={() => handleLocalSelect(rec)} 
-                                                        style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.02)', transition: 'background 0.2s' }}
-                                                        className="hover-bg-blur"
-                                                    >
-                                                        <td style={{ padding: '1rem 1.5rem' }}>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                                <CompanyLogo symbol={rec.symbol} size={32} />
-                                                                <div>
-                                                                    <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{rec.symbol}</div>
-                                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{rec.sector}</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
-                                                            <span style={{ 
-                                                                padding: '4px 10px', 
-                                                                borderRadius: '6px', 
-                                                                fontSize: '0.7rem', 
-                                                                fontWeight: 900,
-                                                                background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                                color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)',
-                                                                border: `1px solid ${rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`
-                                                            }}>
-                                                                {rec.recommendation.toUpperCase()}
-                                                            </span>
-                                                        </td>
-                                                        <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
-                                                            <div style={{ fontSize: '1rem', fontWeight: 900, color: getScoreColor(rec.score) }}>{rec.score}%</div>
-                                                            <div style={{ width: '40px', height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', margin: '4px auto 0' }}>
-                                                                <div style={{ width: `${rec.score}%`, height: '100%', background: getScoreColor(rec.score), borderRadius: '2px' }} />
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                                                            <div style={{ fontWeight: 800, fontSize: '1rem' }}>{formatCurrency(rec.price || 0)}</div>
-                                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-success)', fontWeight: 700 }}>+{Math.floor(Math.random() * 8 + 5)}% EST.</div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <AIStrategyIntelliHub />
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {activeTab === 'intelligence' && (
-                    <div className="animate-fade-in">
-                        <AIStrategyIntelliHub />
-                    </div>
-                )}
-
-                {activeTab === 'performance' && (
-                    <div className="animate-fade-in">
-                        <AIPerformanceTracker />
-                    </div>
-                )}
+                    {activeTab === 'analysis' && (
+                        <div className="animate-fade-in">
+                            <AIPerformanceTracker />
+                        </div>
+                    )}
+                </div>
             </div>
 
             <style>{`
-                .ai-tab-btn.active {
-                    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+                .ai-cockpit-container {
+                    user-select: none;
                 }
-                .ai-tab-btn:hover:not(.active) {
-                    background: rgba(255,255,255,0.05);
-                    color: white;
+                .hover-lift {
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .hover-lift:hover {
+                    transform: translateY(-6px) scale(1.02);
+                    background: rgba(255,255,255,0.06) !important;
+                    border-color: var(--color-accent) !important;
+                    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+                }
+                .spin {
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
                 }
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(10px); }
                     to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in {
+                    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
             `}</style>
         </div>
