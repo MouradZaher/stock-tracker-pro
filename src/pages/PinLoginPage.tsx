@@ -6,6 +6,7 @@ import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 import BenefitsGrid from '../components/BenefitsGrid';
 import AIPerformanceTracker from '../components/AIPerformanceTracker';
+import TopBar from '../components/TopBar';
 import './LandingPage.css';
 
 const PinLoginPage: React.FC = () => {
@@ -166,6 +167,7 @@ const PinLoginPage: React.FC = () => {
 
     return (
         <div className="landing-page">
+            <TopBar />
             <nav className="landing-nav" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-lg)', fontWeight: 700 }}>
                     <div style={{ background: 'var(--gradient-primary)', width: 'var(--spacing-xl)', height: 'var(--spacing-xl)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -215,7 +217,7 @@ const PinLoginPage: React.FC = () => {
                             <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
                                 <Shield size={28} color="white" />
                             </div>
-                            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: 'white', letterSpacing: '-0.01em' }}>StockTracker <span className="gradient-text">Pro</span> Login</h2>
+                            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: 'white', letterSpacing: '-0.01em' }}>Login</h2>
                             <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', opacity: 0.8 }}>Secure access for authorized users</p>
                         </div>
                         
@@ -224,8 +226,8 @@ const PinLoginPage: React.FC = () => {
                             {mode === 'username' && (
                                 <div className="form-step-container">
                                     <div className="input-group">
-                                        <div className="input-with-icon">
-                                            <User size={18} className="input-icon" />
+                                        <div className="input-with-icon" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <User size={18} className="input-icon" style={{ color: 'var(--color-text-secondary)', marginLeft: '-8px' }} />
                                             <input
                                                 ref={usernameRef}
                                                 type="text"

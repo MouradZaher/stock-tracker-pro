@@ -11,6 +11,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden; /* No vertical scroll */
+  padding-top: 28px; /* reserve space for TopBar */
 }
 
 /* Landing Nav */
