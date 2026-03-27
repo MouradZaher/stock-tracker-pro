@@ -92,49 +92,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete, onDecline
     );
   }
 
-  // STEP 3: Broker Connect
-  if (step === 3) {
-    return (
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 'var(--spacing-md)' }}>
-        <div className="glass-card animate-fade-in" style={{ maxWidth: '600px', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', borderRadius: 'var(--radius-xl)', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border-bright)' }}>
-          <div style={{ textAlign: 'center' }}>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>Connect Your Broker</h2>
-            <p style={{ color: 'var(--color-text-secondary)' }}>Auto-sync your trades from 20+ brokerages — no manual entry needed.</p>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '12px', borderRadius: '12px', height: 'fit-content' }}><LinkIcon color="var(--color-accent)" /></div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 4px 0' }}>Automatic Trade Sync</h4>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Connect to Schwab, Fidelity, Robinhood, TD Ameritrade, Interactive Brokers, Webull, and 15+ more via SnapTrade. Your trades import automatically.</p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '12px', borderRadius: '12px', height: 'fit-content' }}><Lock color="#10b981" /></div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 4px 0' }}>Read-Only & Secure</h4>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Broker connections are read-only — Stock Tracker Pro can never place trades or move funds. Your credentials are handled securely by SnapTrade.</p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '12px', borderRadius: '12px', height: 'fit-content' }}><Star color="#f59e0b" /></div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 4px 0' }}>Add-On Feature</h4>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Broker connections are available as an add-on for Standard and Premium subscribers — starting at $2.99/mo per connected broker. Connect anytime from ⚙ Settings → Integrations.</p>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-            <button onClick={nextStep} style={{ padding: '12px 24px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--color-text-secondary)', borderRadius: '8px', cursor: 'pointer' }}>Skip for now</button>
-            <button onClick={nextStep} style={{ padding: '12px 32px', background: 'var(--color-accent)', border: 'none', color: '#fff', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>Continue</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // STEP 4: Get Started
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: 'var(--spacing-md)' }}>
