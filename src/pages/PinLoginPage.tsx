@@ -290,7 +290,7 @@ const PinLoginPage: React.FC = () => {
                                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                                 disabled={isLoading}
                                                 className="landing-input pin-field"
-                                                style={{ width: '56px', height: '56px', textAlign: 'center', fontSize: '1.4rem', fontWeight: 700, padding: '0', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}
+                                                style={{ width: '56px', height: '56px', textAlign: 'center', fontSize: '1.4rem', fontWeight: 700, padding: '0', borderRadius: '12px', border: '1px solid var(--color-border-light)', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}
                                                 onFocus={(e) => e.target.select()}
                                             />
                                         ))}
