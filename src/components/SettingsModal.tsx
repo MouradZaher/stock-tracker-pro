@@ -10,7 +10,7 @@ interface SettingsModalProps {
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onDeleteAccount }) => {
   const { theme, toggleTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<'preferences' | 'notifications' | 'subscription' | 'danger'>('preferences');
+  const [activeTab, setActiveTab] = useState<'notifications' | 'subscription' | 'danger'>('notifications');
   
   // Persistent local states for toggles
   const [emailNotif, setEmailNotif] = useState(() => localStorage.getItem('settings_emailNotif') !== 'false');
@@ -34,7 +34,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
   }, [emailNotif, pushNotif, divEmail, divPush, newsEmail, newsPush, currency]);
 
   const tabs = [
-    { id: 'preferences', label: 'Preferences', icon: SettingsIcon },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'subscription', label: 'Subscription', icon: CreditCard },
     { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
@@ -116,56 +115,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
               {tabs.find(t => t.id === activeTab)?.label}
             </h2>
 
-            {/* PREFERENCES TAB */}
-            {activeTab === 'preferences' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                
-                {/* Theme Section */}
-                <div>
-                  <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 1rem 0', color: 'var(--color-text-primary)' }}>Appearance</h4>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {theme === 'dark' ? <Moon color="var(--color-text-secondary)" size={20} /> : <Sun color="var(--color-text-secondary)" size={20} />}
-                      <div>
-                        <div style={{ fontWeight: 600 }}>Theme Mode</div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>Toggle between light and dark mode</div>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={toggleTheme}
-                      style={{ 
-                        padding: '8px 16px', background: 'var(--color-bg-elevated)', border: '1px solid var(--glass-border)', 
-                        color: 'var(--color-text-primary)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600
-                      }}
-                    >
-                      {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
-                    </button>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Base Currency</label>
-                  <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
-                    <select 
-                      value={currency} 
-                      onChange={e => setCurrency(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', background: 'var(--color-bg-elevated)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: '8px', appearance: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="USD">USD - US Dollar</option>
-                      <option value="EUR">EUR - Euro</option>
-                      <option value="GBP">GBP - British Pound</option>
-                    </select>
-                    <ChevronDown size={16} color="var(--color-text-tertiary)" style={{ position: 'absolute', right: '16px', top: '14px', pointerEvents: 'none' }} />
-                  </div>
-                </div>
-
-                {/* Tax lot method and benchmark settings removed per request */}
-                </div>
-              </div>
-            )}
-
-            {/* NOTIFICATIONS TAB */}
+            {/* NOTIFICATIONS TAB */
             {activeTab === 'notifications' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
                 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Shield, Lock, Sun, Moon, User, ArrowRight, UserPlus, X } from 'lucide-react';
+import { Shield, Lock, Sun, Moon, User, ArrowRight, UserPlus, X, BarChart3, TrendingUp, Zap, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinAuth } from '../contexts/PinAuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
@@ -20,6 +20,46 @@ const PinLoginPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [userExists, setUserExists] = useState(false);
     const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'support' | 'compliance' | null>(null);
+    const [activeOverviewTab, setActiveOverviewTab] = useState(0);
+
+    const OVERVIEW_TABS = [
+        {
+            id: 'ai-insights',
+            title: 'AI-Powered Insights',
+            icon: Zap,
+            description: 'Advanced algorithms analyze market sentiment, predict trends, and provide actionable recommendations.',
+            features: [
+                'Sentiment analysis from news & social media',
+                'Predictive modeling for price movements',
+                'Automated trading signals',
+                'Risk assessment reports'
+            ]
+        },
+        {
+            id: 'portfolio-tracking',
+            title: 'Live Portfolio Tracking',
+            icon: BarChart3,
+            description: 'Real-time monitoring of your investments with comprehensive performance analytics.',
+            features: [
+                'Real-time P&L calculations',
+                'Custom performance charts',
+                'Dividend tracking & alerts',
+                'Tax lot management'
+            ]
+        },
+        {
+            id: 'market-intelligence',
+            title: 'Market Intelligence',
+            icon: TrendingUp,
+            description: 'Comprehensive market data visualization and correlation analysis tools.',
+            features: [
+                'Interactive heatmaps',
+                'Correlation matrix analysis',
+                'Real-time news aggregation',
+                'Sector performance tracking'
+            ]
+        }
+    ];
 
     const FOOTER_CONTENT = {
         privacy: {
@@ -48,10 +88,10 @@ const PinLoginPage: React.FC = () => {
         // Focus username input on mount
         usernameRef.current?.focus();
 
-        // Enable scrolling for landing page
-        document.body.classList.add('landing-scrolling');
+        // Disable scrolling for login page to ensure no vertical scroll
+        document.body.style.overflow = 'hidden';
         return () => {
-            document.body.classList.remove('landing-scrolling');
+            document.body.style.overflow = '';
         };
     }, []);
 
@@ -210,93 +250,246 @@ const PinLoginPage: React.FC = () => {
                 </div>
             </nav>
 
-            <div className="hero-section" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-                <div className="hero-form-container" style={{ maxWidth: '400px', width: '100%', animation: 'fadeIn 0.6s ease-out' }}>
-                    <div className="login-form-wrapper glass-card" style={{ padding: '2.5rem', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 100px rgba(0,0,0,0.8)' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                            <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
-                                <Shield size={28} color="white" />
+            <div className="hero-section" style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', height: '100%', overflow: 'hidden' }}>
+                {/* Left Column: Login Form */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+                    <div className="hero-form-container" style={{ maxWidth: '400px', width: '100%', animation: 'fadeIn 0.6s ease-out' }}>
+                        <div className="login-form-wrapper glass-card" style={{ padding: '2.5rem', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 100px rgba(0,0,0,0.8)' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                                <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
+                                    <Shield size={28} color="white" />
+                                </div>
+                                <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', letterSpacing: '-0.01em' }}>Login</h2>
+                                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', opacity: 0.8 }}>Secure access for authorized users</p>
                             </div>
-                            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', letterSpacing: '-0.01em' }}>Login</h2>
-                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', opacity: 0.8 }}>Secure access for authorized users</p>
-                        </div>
-                        
-                        <div className="login-form">
-                            {/* Step 1: Username Input */}
-                            {mode === 'username' && (
-                                <div className="form-step-container">
-                                    <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                        <div className="input-with-icon" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <User size={18} className="input-icon" style={{ color: 'var(--color-text-secondary)', marginLeft: '-8px' }} />
-                                            <input
-                                                ref={usernameRef}
-                                                type="text"
-                                                className="form-input landing-input"
-                                                placeholder="Username"
-                                                value={username}
-                                                onChange={(e) => setUsername(e.target.value)}
-                                                style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', height: '44px' }}
-                                                onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
-                                                disabled={isLoading}
-                                                autoCapitalize="none"
-                                                autoCorrect="off"
-                                                spellCheck={false}
-                                                autoComplete="username"
-                                                autoFocus
-                                            />
+                            
+                            <div className="login-form">
+                                {/* Step 1: Username Input */}
+                                {mode === 'username' && (
+                                    <div className="form-step-container">
+                                        <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <div className="input-with-icon" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <User size={18} className="input-icon" style={{ color: 'var(--color-text-secondary)', marginLeft: '-8px' }} />
+                                                <input
+                                                    ref={usernameRef}
+                                                    type="text"
+                                                    className="form-input landing-input"
+                                                    placeholder="Username"
+                                                    value={username}
+                                                    onChange={(e) => setUsername(e.target.value)}
+                                                    style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', height: '44px' }}
+                                                    onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
+                                                    disabled={isLoading}
+                                                    autoCapitalize="none"
+                                                    autoCorrect="off"
+                                                    spellCheck={false}
+                                                    autoComplete="username"
+                                                    autoFocus
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleUsernameSubmit}
+                                                disabled={isLoading || !username.trim()}
+                                                className="btn btn-primary next-button"
+                                                style={{
+                                                    borderRadius: '12px',
+                                                    width: '44px',
+                                                    height: '44px',
+                                                    minWidth: '44px',
+                                                    padding: '0',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    lineHeight: 1,
+                                                    backgroundColor: 'var(--color-surface)',
+                                                    border: '1px solid var(--color-border-light)'
+                                                }}
+                                            >
+                                                {isLoading ? '...' : <ArrowRight size={20} color="var(--color-accent)" />}
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={handleUsernameSubmit}
-                                            disabled={isLoading || !username.trim()}
-                                            className="btn btn-primary next-button"
-                                            style={{
-                                                borderRadius: '12px',
-                                                width: '44px',
-                                                height: '44px',
-                                                minWidth: '44px',
-                                                padding: '0',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                lineHeight: 1,
-                                                backgroundColor: 'var(--color-surface)',
-                                                border: '1px solid var(--color-border-light)'
-                                            }}
-                                        >
-                                            {isLoading ? '...' : <ArrowRight size={20} color="var(--color-accent)" />}
-                                        </button>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Step 2: PIN Input (Login or Signup) */}
-                            {(mode === 'login' || mode === 'signup') && (
-                                <div className="form-step-container">
-                                    <div className="form-back-selector" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '0.75rem', width: '100%', marginBottom: '0.8rem' }}>
-                                        <button onClick={goBack} className="glass-button back-btn" style={{ minWidth: '40px', minHeight: '40px', display: 'grid', placeItems: 'center', padding: 0 }}>←</button>
-                                        <span className="user-indicator" style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', fontWeight: 700, fontSize: '0.95rem' }}>{username || 'User'}</span>
-                                    </div>
+                                {/* Step 2: PIN Input (Login or Signup) */}
+                                {(mode === 'login' || mode === 'signup') && (
+                                    <div className="form-step-container">
+                                        <div className="form-back-selector" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '0.75rem', width: '100%', marginBottom: '0.8rem' }}>
+                                            <button onClick={goBack} className="glass-button back-btn" style={{ minWidth: '40px', minHeight: '40px', display: 'grid', placeItems: 'center', padding: 0 }}>←</button>
+                                            <span className="user-indicator" style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', fontWeight: 700, fontSize: '0.95rem' }}>{username || 'User'}</span>
+                                        </div>
 
-                                    <div className="pin-input-group" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
-                                        {pin.map((digit, index) => (
-                                            <input
-                                                key={index}
-                                                ref={inputRefs[index]}
-                                                type="text"
-                                                inputMode="numeric"
-                                                maxLength={1}
-                                                value={digit}
-                                                onChange={(e) => handlePinChange(index, e.target.value)}
-                                                onKeyDown={(e) => handleKeyDown(index, e)}
-                                                disabled={isLoading}
-                                                className="landing-input pin-field"
-                                                style={{ width: '56px', height: '56px', textAlign: 'center', fontSize: '1.4rem', fontWeight: 700, padding: '0', borderRadius: '12px', border: '1px solid var(--color-border-light)', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}
-                                                onFocus={(e) => e.target.select()}
-                                            />
-                                        ))}
+                                        <div className="pin-input-group" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
+                                            {pin.map((digit, index) => (
+                                                <input
+                                                    key={index}
+                                                    ref={inputRefs[index]}
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    maxLength={1}
+                                                    value={digit}
+                                                    onChange={(e) => handlePinChange(index, e.target.value)}
+                                                    onKeyDown={(e) => handleKeyDown(index, e)}
+                                                    disabled={isLoading}
+                                                    className="landing-input pin-field"
+                                                    style={{ width: '56px', height: '56px', textAlign: 'center', fontSize: '1.4rem', fontWeight: 700, padding: '0', borderRadius: '12px', border: '1px solid var(--color-border-light)', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}
+                                                    onFocus={(e) => e.target.select()}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Website Overview */}
+                <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+                    {/* Mock Dashboard Overlay (Peek-Behind Effect) */}
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%)',
+                        zIndex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0.3
+                    }}>
+                        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                            <Eye size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                            <div>Live Dashboard Preview</div>
+                            <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Real-time charts & analytics</div>
+                        </div>
+                    </div>
+
+                    {/* Tabbed Overview Carousel */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '2rem', zIndex: 2, position: 'relative' }}>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--color-text-primary)', textAlign: 'center' }}>
+                            Discover StockTracker Pro
+                        </h3>
+
+                        {/* Tab Navigation */}
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            {OVERVIEW_TABS.map((tab, index) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveOverviewTab(index)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        padding: '0.5rem 1rem',
+                                        background: activeOverviewTab === index ? 'var(--color-accent-light)' : 'rgba(255,255,255,0.05)',
+                                        border: `1px solid ${activeOverviewTab === index ? 'var(--glass-border-bright)' : 'var(--glass-border)'}`,
+                                        borderRadius: '12px',
+                                        color: activeOverviewTab === index ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.9rem',
+                                        fontWeight: activeOverviewTab === index ? 600 : 500,
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    <tab.icon size={16} />
+                                    {tab.title}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Tab Content */}
+                        <div style={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            textAlign: 'center',
+                            padding: '1rem',
+                            background: 'rgba(255,255,255,0.02)',
+                            borderRadius: '16px',
+                            border: '1px solid var(--glass-border)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <OVERVIEW_TABS[activeOverviewTab].icon size={48} color="var(--color-accent)" />
+                            </div>
+                            <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
+                                {OVERVIEW_TABS[activeOverviewTab].title}
+                            </h4>
+                            <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                                {OVERVIEW_TABS[activeOverviewTab].description}
+                            </p>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'left', width: '100%', maxWidth: '300px' }}>
+                                {OVERVIEW_TABS[activeOverviewTab].features.map((feature, idx) => (
+                                    <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                                        <div style={{ width: '6px', height: '6px', background: 'var(--color-accent)', borderRadius: '50%' }}></div>
+                                        {feature}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Navigation Arrows */}
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+                            <button
+                                onClick={() => setActiveOverviewTab((activeOverviewTab - 1 + OVERVIEW_TABS.length) % OVERVIEW_TABS.length)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid var(--glass-border)',
+                                    borderRadius: '50%',
+                                    width: '40px',
+                                    height: '40px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    color: 'var(--color-text-secondary)'
+                                }}
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                {OVERVIEW_TABS.map((_, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '50%',
+                                            background: activeOverviewTab === index ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => setActiveOverviewTab(index)}
+                                    />
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => setActiveOverviewTab((activeOverviewTab + 1) % OVERVIEW_TABS.length)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid var(--glass-border)',
+                                    borderRadius: '50%',
+                                    width: '40px',
+                                    height: '40px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    color: 'var(--color-text-secondary)'
+                                }}
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Integrated Feature Grid (Compact Showcase) */}
+                    <div style={{ flex: 1, padding: '1rem', zIndex: 2, position: 'relative', maxHeight: '50vh', overflow: 'hidden' }}>
+                        <BenefitsGrid style={{ height: '100%', overflow: 'hidden' }} />
+                        <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                            Explore more features after login
                         </div>
                     </div>
                 </div>
