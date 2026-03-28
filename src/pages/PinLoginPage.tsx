@@ -235,6 +235,7 @@ const PinLoginPage: React.FC = () => {
                                                 placeholder="Username"
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value)}
+                                                style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}
                                                 style={{ height: '44px' }}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                                 disabled={isLoading}
@@ -259,9 +260,11 @@ const PinLoginPage: React.FC = () => {
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 lineHeight: 1,
+                                                backgroundColor: 'var(--color-surface)',
+                                                border: '1px solid var(--color-border-light)'
                                             }}
                                         >
-                                            {isLoading ? '...' : <ArrowRight size={20} />}
+                                            {isLoading ? '...' : <ArrowRight size={20} color="var(--color-accent)" />}
                                         </button>
                                     </div>
                                 </div>
