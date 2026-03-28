@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { soundService } from './services/soundService';
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { TabType } from './types';
@@ -81,6 +82,23 @@ function AppContent() {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, syncPrices]);
+
+  // Global click sound for all interactive clicks (playTap everywhere)
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      // In addition to buttons, trigger on all elements with role=button, <a>, input clickables
+      const clickable = target.closest('button, [role="button"], a, input[type="button"], input[type="submit"], .btn, .glass-button');
+      if (clickable) {
+        soundService.playTap();
+      }
+    };
+
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
 
   // If not authenticated, show PIN login
   if (!isAuthenticated) {
