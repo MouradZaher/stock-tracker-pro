@@ -272,14 +272,12 @@ const PinLoginPage: React.FC = () => {
                             {/* Step 2: PIN Input (Login or Signup) */}
                             {(mode === 'login' || mode === 'signup') && (
                                 <div className="form-step-container">
-                                    <div className="form-back-selector">
-                                        <button onClick={goBack} className="glass-button back-btn">←</button>
-                                        <span className="user-indicator">
-                                            <strong style={{ color: 'var(--color-accent)' }}>{username}</strong>
-                                        </span>
+                                    <div className="form-back-selector" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '0.75rem', width: '100%', marginBottom: '0.8rem' }}>
+                                        <button onClick={goBack} className="glass-button back-btn" style={{ minWidth: '40px', minHeight: '40px', display: 'grid', placeItems: 'center', padding: 0 }}>←</button>
+                                        <span className="user-indicator" style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', fontWeight: 700, fontSize: '0.95rem' }}>{username || 'User'}</span>
                                     </div>
 
-                                    <div className="pin-input-group" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                    <div className="pin-input-group" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
                                         {pin.map((digit, index) => (
                                             <input
                                                 key={index}
@@ -292,6 +290,7 @@ const PinLoginPage: React.FC = () => {
                                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                                 disabled={isLoading}
                                                 className="landing-input pin-field"
+                                                style={{ width: '56px', height: '56px', textAlign: 'center', fontSize: '1.4rem', fontWeight: 700, padding: '0', borderRadius: '12px', border: '1px solid var(--color-border-light)' }}
                                                 onFocus={(e) => e.target.select()}
                                             />
                                         ))}
