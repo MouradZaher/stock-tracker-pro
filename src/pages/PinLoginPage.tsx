@@ -175,7 +175,7 @@ const PinLoginPage: React.FC = () => {
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
                         </svg>
                     </div>
-                    <span>StockTracker <span className="gradient-text">Pro</span></span>
+                    <span style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}>StockTracker <span className="gradient-text">Pro</span></span>
                 </div>
                 <div className="landing-nav-actions" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', background: 'rgba(255,255,255,0.05)', padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -217,7 +217,7 @@ const PinLoginPage: React.FC = () => {
                             <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
                                 <Shield size={28} color="white" />
                             </div>
-                            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: 'white', letterSpacing: '-0.01em' }}>Login</h2>
+                            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', letterSpacing: '-0.01em' }}>Login</h2>
                             <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', opacity: 0.8 }}>Secure access for authorized users</p>
                         </div>
                         
