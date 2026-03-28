@@ -280,7 +280,7 @@ const PinLoginPage: React.FC = () => {
                                         </span>
                                     </div>
 
-                                    <div className="pin-input-group" style={{ marginTop: '1rem' }}>
+                                    <div className="pin-input-group" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                                         {pin.map((digit, index) => (
                                             <input
                                                 key={index}
