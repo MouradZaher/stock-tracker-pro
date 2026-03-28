@@ -69,6 +69,8 @@ export const MARKETS: Market[] = [
 interface MarketContextType {
     selectedMarket: Market;
     setMarket: (id: MarketId) => void;
+    favoriteMarketId: MarketId;
+    setFavoriteMarket: (id: MarketId) => void;
     /** Market currently being hovered in the selector (preview only — resets when dropdown closes) */
     hoverMarketId: MarketId | null;
     setHoverMarket: (id: MarketId | null) => void;
@@ -82,20 +84,42 @@ interface MarketContextType {
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
 
 export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [selectedMarketId, setSelectedMarketId] = useState<MarketId>('us');
+    const [favoriteMarketId, setFavoriteMarketId] = useState<MarketId>(() => {
+        const stored = localStorage.getItem('favorite_market');
+        return (stored === 'us' || stored === 'egypt' || stored === 'abudhabi') ? stored : 'us';
+    });
+
+    const [selectedMarketId, setSelectedMarketId] = useState<MarketId>(() => {
+        const preferred = localStorage.getItem('preferred_market');
+        const stored = (preferred === 'us' || preferred === 'egypt' || preferred === 'abudhabi') ? preferred : null;
+        return stored ? stored : favoriteMarketId;
+    });
     const [hoverMarketId, setHoverMarketId] = useState<MarketId | null>(null);
     const [sentimentScore, setSentimentScore] = useState<number>(50);
 
     const selectedMarket = MARKETS.find(m => m.id === selectedMarketId) ?? MARKETS[0];
     const effectiveMarket = (hoverMarketId ? MARKETS.find(m => m.id === hoverMarketId) : null) ?? selectedMarket;
 
-    const setMarket = (id: MarketId) => setSelectedMarketId(id);
+    const setMarket = (id: MarketId) => {
+        setSelectedMarketId(id);
+        localStorage.setItem('preferred_market', id);
+    };
+
+    const setFavoriteMarket = (id: MarketId) => {
+        setFavoriteMarketId(id);
+        localStorage.setItem('favorite_market', id);
+        setSelectedMarketId(id);
+        localStorage.setItem('preferred_market', id);
+    };
+
     const setHoverMarket = (id: MarketId | null) => setHoverMarketId(id);
 
     return (
         <MarketContext.Provider value={{ 
             selectedMarket, 
-            setMarket, 
+            setMarket,
+            favoriteMarketId,
+            setFavoriteMarket,
             hoverMarketId, 
             setHoverMarket, 
             effectiveMarket,

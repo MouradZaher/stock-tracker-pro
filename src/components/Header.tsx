@@ -21,7 +21,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick, onOpenTutorial, onOpenSettings }) => {
     const { theme, toggleTheme } = useTheme();
     const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
-    const { selectedMarket, setMarket, setHoverMarket } = useMarket();
+    const { selectedMarket, setMarket, favoriteMarketId, setFavoriteMarket, setHoverMarket } = useMarket();
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [isMarketOpen, setIsMarketOpen] = useState(false);
     const marketBtnRef = useRef<HTMLButtonElement>(null);
@@ -312,9 +312,25 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                                 </div>
                                             )}
                                         </div>
-                                        {selectedMarket.id === m.id && (
-                                            <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: m.color, boxShadow: `0 0 8px ${m.color}` }} />
-                                        )}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setFavoriteMarket(m.id as MarketId);
+                                                setMarket(m.id as MarketId);
+                                                setIsMarketOpen(false);
+                                                soundService.playTap();
+                                            }}
+                                            style={{
+                                                marginLeft: 'auto',
+                                                border: 'none',
+                                                background: 'transparent',
+                                                cursor: 'pointer',
+                                                padding: '4px',
+                                            }}
+                                            title={favoriteMarketId === m.id ? 'Favorite market' : 'Set as favorite'}
+                                        >
+                                            <Star size={16} color={favoriteMarketId === m.id ? '#facc15' : 'var(--color-text-tertiary)'} fill={favoriteMarketId === m.id ? '#facc15' : 'none'} />
+                                        </button>
                                     </button>
                                 ))}
                             </div>
