@@ -225,7 +225,7 @@ const PinLoginPage: React.FC = () => {
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (
                                 <div className="form-step-container">
-                                    <div className="input-group">
+                                    <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                         <div className="input-with-icon" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                             <User size={18} className="input-icon" style={{ color: 'var(--color-text-secondary)', marginLeft: '-8px' }} />
                                             <input
@@ -235,6 +235,7 @@ const PinLoginPage: React.FC = () => {
                                                 placeholder="Username"
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value)}
+                                                style={{ height: '44px' }}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                                 disabled={isLoading}
                                                 autoCapitalize="none"
@@ -248,9 +249,17 @@ const PinLoginPage: React.FC = () => {
                                             onClick={handleUsernameSubmit}
                                             disabled={isLoading || !username.trim()}
                                             className="btn btn-primary next-button"
-                                            style={{ borderRadius: '12px' }}
+                                            style={{
+                                                borderRadius: '12px',
+                                                minWidth: '44px',
+                                                height: '44px',
+                                                padding: '0 12px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
                                         >
-                                            {isLoading ? '...' : <ArrowRight size={20} />}
+                                            {isLoading ? '...' : <ArrowRight size={18} />}
                                         </button>
                                     </div>
                                 </div>
