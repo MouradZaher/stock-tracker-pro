@@ -96,7 +96,7 @@ const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
             alignItems: 'center',
             padding: '0 0.75rem',
             fontSize: '0.68rem',
-            background: 'rgba(0,0,0,0.85)',
+            background: 'var(--topbar-bg)',
             zIndex: 1100, // Above header
             position: 'fixed',
             top: 0,

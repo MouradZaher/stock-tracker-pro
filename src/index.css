@@ -68,6 +68,11 @@
   --topbar-height: 28px;
   --total-header-height: calc(var(--header-height) + var(--topbar-height));
 
+  /* Themed headers */
+  --topbar-bg: rgba(0,0,0,0.85);
+  --landing-nav-bg: linear-gradient(90deg, rgba(8, 13, 40, 0.95), rgba(15, 18, 50, 0.94));
+
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%);
   --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -437,6 +442,10 @@ html[data-theme='light'] {
   --glass-border: rgba(0, 0, 0, 0.1);
   --glass-border-bright: rgba(0, 0, 0, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+
+  --topbar-bg: rgba(255,255,255,0.95);
+  --landing-nav-bg: #ffffff;
+  --topbar-border: rgba(148,163,184,0.4);
 
   /* Override shadow variables for light mode */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
