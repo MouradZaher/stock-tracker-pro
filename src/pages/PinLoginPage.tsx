@@ -235,8 +235,7 @@ const PinLoginPage: React.FC = () => {
                                                 placeholder="Username"
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value)}
-                                                style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}
-                                                style={{ height: '44px' }}
+                                                style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', height: '44px' }}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                                 disabled={isLoading}
                                                 autoCapitalize="none"
