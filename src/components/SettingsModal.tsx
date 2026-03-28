@@ -21,8 +21,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
   const [newsPush, setNewsPush] = useState(() => localStorage.getItem('settings_newsPush') !== 'false');
 
   const [currency, setCurrency] = useState(() => localStorage.getItem('settings_currency') || 'USD');
-  const [taxMethod, setTaxMethod] = useState(() => localStorage.getItem('settings_taxMethod') || 'FIFO');
-  const [benchmark, setBenchmark] = useState(() => localStorage.getItem('settings_benchmark') || 'SPY');
 
   // Persistence effects
   React.useEffect(() => {
@@ -33,9 +31,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
     localStorage.setItem('settings_newsEmail', String(newsEmail));
     localStorage.setItem('settings_newsPush', String(newsPush));
     localStorage.setItem('settings_currency', currency);
-    localStorage.setItem('settings_taxMethod', taxMethod);
-    localStorage.setItem('settings_benchmark', benchmark);
-  }, [emailNotif, pushNotif, divEmail, divPush, newsEmail, newsPush, currency, taxMethod, benchmark]);
+  }, [emailNotif, pushNotif, divEmail, divPush, newsEmail, newsPush, currency]);
 
   const tabs = [
     { id: 'preferences', label: 'Preferences', icon: SettingsIcon },
@@ -164,40 +160,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Tax Lot Method</label>
-                  <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
-                    <select 
-                      value={taxMethod} 
-                      onChange={e => setTaxMethod(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', background: 'var(--color-bg-elevated)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: '8px', appearance: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="FIFO">First In, First Out (FIFO)</option>
-                      <option value="LIFO">Last In, First Out (LIFO)</option>
-                      <option value="HIFO">Highest In, First Out (HIFO)</option>
-                    </select>
-                    <ChevronDown size={16} color="var(--color-text-tertiary)" style={{ position: 'absolute', right: '16px', top: '14px', pointerEvents: 'none' }} />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Benchmark Index</label>
-                  <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
-                    <select 
-                      value={benchmark} 
-                      onChange={e => setBenchmark(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', background: 'var(--color-bg-elevated)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: '8px', appearance: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="SPY">S&P 500 ETF (SPY)</option>
-                      <option value="QQQ">NASDAQ 100 ETF (QQQ)</option>
-                      <option value="DIA">Dow Jones ETF (DIA)</option>
-                    </select>
-                    <ChevronDown size={16} color="var(--color-text-tertiary)" style={{ position: 'absolute', right: '16px', top: '14px', pointerEvents: 'none' }} />
-                  </div>
-                  <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem', margin: 0, marginTop: '4px' }}>
-                    Used for performance comparison, alpha, beta, and risk metrics calculations
-                  </p>
-                </div>
+                {/* Tax lot method and benchmark settings removed per request */}
                 </div>
               </div>
             )}
