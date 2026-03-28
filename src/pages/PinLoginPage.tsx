@@ -168,7 +168,7 @@ const PinLoginPage: React.FC = () => {
     return (
         <div className="landing-page">
             <TopBar />
-            <nav className="landing-nav" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+            <nav className="landing-nav" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '100%', margin: 0, background: 'linear-gradient(90deg, rgba(8, 13, 40, 0.95), rgba(15, 18, 50, 0.94))', position: 'relative', left: 0, right: 0 }}>
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-lg)', fontWeight: 700 }}>
                     <div style={{ background: 'var(--gradient-primary)', width: 'var(--spacing-xl)', height: 'var(--spacing-xl)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
