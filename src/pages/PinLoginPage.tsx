@@ -251,15 +251,17 @@ const PinLoginPage: React.FC = () => {
                                             className="btn btn-primary next-button"
                                             style={{
                                                 borderRadius: '12px',
-                                                minWidth: '44px',
+                                                width: '44px',
                                                 height: '44px',
-                                                padding: '0 12px',
+                                                minWidth: '44px',
+                                                padding: '0',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center'
+                                                justifyContent: 'center',
+                                                lineHeight: 1,
                                             }}
                                         >
-                                            {isLoading ? '...' : <ArrowRight size={18} />}
+                                            {isLoading ? '...' : <ArrowRight size={20} />}
                                         </button>
                                     </div>
                                 </div>
