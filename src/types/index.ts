@@ -131,7 +131,7 @@ export interface SearchResult {
 }
 
 // Tab types
-export type TabType = 'home' | 'portfolio' | 'recommendations' | 'watchlist' | 'pulse' | 'pricing' | 'notifications';
+export type TabType = 'home' | 'portfolio' | 'recommendations' | 'watchlist' | 'pulse' | 'pricing' | 'notifications' | 'admin';
 
 // Social & Notifications
 export interface SocialPost {

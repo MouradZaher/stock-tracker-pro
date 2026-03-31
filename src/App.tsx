@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense, useEffect } from 'react';
+import { useState, lazy, Suspense, useEffect, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { soundService } from './services/soundService';
 import { Toaster } from 'react-hot-toast';
@@ -217,15 +217,18 @@ function MainLayout({
   const navigate = useNavigate();
 
   const currentPath = location.pathname.substring(1) || 'home';
-  const queryParams = new URLSearchParams(location.search);
-  const fromTab = queryParams.get('from');
   
-  // Use 'from' parameter if on stock detail, else default to 'home' or current path
-  const activeTab = (
-    currentPath.startsWith('stock/') 
-      ? (fromTab || 'home') 
-      : (['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing', 'admin'].includes(currentPath) ? currentPath : 'home')
-  ) as TabType;
+  const activeTab = useMemo(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const fromTab = queryParams.get('from');
+    
+    if (currentPath.startsWith('stock/')) {
+      return (fromTab || 'home') as TabType;
+    }
+    
+    const validTabs: TabType[] = ['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing', 'admin'];
+    return (validTabs.includes(currentPath as TabType) ? currentPath : 'home') as TabType;
+  }, [location.pathname, location.search]);
 
   const handleTabChange = (tab: TabType) => {
     navigate(`/${tab}`);
