@@ -111,6 +111,11 @@ const ABUDHABI_RECS = [
 
 const RECS_MAP: Record<MarketId, typeof US_RECS> = { us: US_RECS, egypt: EGYPT_RECS, abudhabi: ABUDHABI_RECS };
 
+import AIInstitutionalHub from './AIInstitutionalHub';
+
+// Define mobile tab types
+type MobileTab = 'alpha' | 'intel' | 'strategy';
+
 const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> = ({ onSelectStock }) => {
     const { addNotification } = useNotifications();
     const { selectedMarket } = useMarket();
@@ -118,6 +123,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
     const [scanProgress, setScanProgress] = useState(0);
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [mobileTab, setMobileTab] = useState<MobileTab>('alpha');
     
     // Swipe state for mobile
     const [swipeIndex, setSwipeIndex] = useState(0);
@@ -181,88 +187,77 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             overflow: 'hidden',
             background: 'var(--color-bg-primary)',
             position: 'relative',
-            padding: '1rem'
+            padding: '1rem',
+            boxSizing: 'border-box'
         }}>
-            {/* 1. TOP STREAM (Universal) */}
+            {/* 1. TOP STREAM (Zero-Scroll Friendly) */}
             <div style={{ marginBottom: '1rem', flexShrink: 0 }}>
                 <AIIntelligenceStream />
             </div>
 
-            {/* DESKTOP BENTO LAYOUT */}
-            <div className="desktop-only" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: '1.25rem' }}>
+            {/* ─── DESKTOP COMMAND CENTER (3-COLUMN BENTO) ─── */}
+            <div className="desktop-only" style={{ display: 'grid', gridTemplateColumns: '320px 1fr 340px', gap: '1rem', flex: 1, minHeight: 0 }}>
                 
-                {/* Row 2: Search & Performance */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.25rem', height: '120px', flexShrink: 0 }}>
-                    {/* Search */}
-                    <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px' }}>
-                            <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '0 1rem' }}>
-                                <Search size={18} className="text-accent" />
+                {/* Column 1: Alpha Entry & Picks */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
+                    {/* Search / Audit Trigger */}
+                    <div className="glass-card" style={{ padding: '0.75rem', flexShrink: 0 }}>
+                        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '10px', border: '1px solid var(--glass-border)', padding: '0 0.75rem' }}>
+                                <Search size={14} className="text-accent" />
                                 <input 
                                     type="text" 
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
-                                    placeholder="Run Audit: Enter Ticker..."
-                                    style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '10px', fontSize: '0.9rem', outline: 'none' }}
+                                    placeholder="Universal Asset Analysis..."
+                                    style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '8px', fontSize: '0.75rem', outline: 'none' }}
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary" style={{ padding: '0 20px', borderRadius: '12px', fontWeight: 900, fontSize: '0.8rem' }}>RUN</button>
+                            <button type="submit" className="btn btn-primary" style={{ padding: '0 12px', borderRadius: '10px', fontWeight: 900, fontSize: '0.7rem', height: '36px' }}>RUN AUDIT</button>
                         </form>
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '10px' }}>
-                            {['DCF VALUATION', 'HEDGE FLOWS', 'MACRO SIGNAL'].map(t => (
-                                <span key={t} style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800 }}>• {t}</span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '10px' }}>
+                            {['DCF VALUATION', 'HEDGE FLOWS', 'MACRO', 'RISK'].map(t => (
+                                <span key={t} style={{ fontSize: '0.5rem', color: 'var(--color-text-tertiary)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                    <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} /> {t}
+                                </span>
                             ))}
                         </div>
                     </div>
 
-                    {/* Performance (Condensed) */}
-                    <AIPerformanceTracker condensed={true} />
-                </div>
-
-                {/* Row 3: Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '1.25rem', flex: 1, minHeight: 0 }}>
-                    
-                    {/* Alpha Picks column */}
-                    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', minHeight: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexShrink: 0 }}>
-                            <div>
-                                <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <Sparkles size={16} className="text-accent" /> TOP AI ALPHA PICKS
-                                </h3>
-                            </div>
-                            <button 
-                                onClick={runScanner} 
-                                disabled={isScanning}
-                                className="glass-button"
-                                style={{ padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderRadius: '8px' }}
-                            >
-                                {isScanning ? <RefreshCw size={12} className="spin" /> : <RefreshCw size={12} />}
-                                {isScanning ? ` SCANNING...` : ' SYNC ENGINE'}
+                    {/* Alpha Picks List */}
+                    <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', minHeight: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexShrink: 0 }}>
+                            <h3 style={{ margin: 0, fontSize: '0.75rem', fontWeight: 900, color: 'white', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Sparkles size={14} className="text-accent" /> TOP LIVERATED AI PICKS
+                            </h3>
+                            <button onClick={runScanner} disabled={isScanning} className="glass-button" style={{ padding: '4px 8px', fontSize: '0.6rem', borderRadius: '6px' }}>
+                                {isScanning ? <RefreshCw size={10} className="spin" /> : <RefreshCw size={10} />}
                             </button>
                         </div>
-
-                        <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(2, 1fr)', 
-                            gridTemplateRows: 'repeat(3, 1fr)',
-                            gap: '0.75rem', 
-                            flex: 1,
-                            minHeight: 0
-                        }}>
-                            {displayedRecs.slice(0, 6).map((rec, i) => (
-                                <AlphaPickCard 
-                                    key={rec.symbol + i} 
-                                    rec={rec} 
-                                    onClick={() => onSelectStock && onSelectStock(rec.symbol)} 
-                                />
+                        <div className="custom-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingRight: '4px' }}>
+                            {displayedRecs.map((rec, i) => (
+                                <AlphaPickCard key={rec.symbol + i} rec={rec} onClick={() => onSelectStock && onSelectStock(rec.symbol)} />
                             ))}
                         </div>
                     </div>
+                </div>
 
-                    {/* Strategies column */}
-                    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', minHeight: 0 }}>
-                        <h3 style={{ margin: '0 0 1.25rem 0', fontSize: '0.9rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Cpu size={16} className="text-accent" /> STRATEGIC COMMAND
+                {/* Column 2: The ARIA Intelligence Hub */}
+                <div style={{ minHeight: 0 }}>
+                    <AIInstitutionalHub />
+                </div>
+
+                {/* Column 3: Control & Strategy */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
+                    {/* Performance Metrics */}
+                    <div style={{ height: '140px', flexShrink: 0 }}>
+                        <AIPerformanceTracker condensed={true} />
+                    </div>
+
+                    {/* Strategic Command */}
+                    <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', minHeight: 0 }}>
+                        <h3 style={{ margin: '0 0 1rem 0', fontSize: '0.75rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Cpu size={14} className="text-accent" /> STRATEGIC RESULT FLOW
                         </h3>
                         <div style={{ flex: 1, minHeight: 0 }}>
                             <AIStrategyIntelliHub condensed={true} />
@@ -271,73 +266,89 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                 </div>
             </div>
 
-            {/* MOBILE VIEW */}
-            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minHeight: 0 }}>
-                {/* Search */}
-                <form onSubmit={handleSearch} style={{ position: 'relative' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', padding: '0 1rem' }}>
-                        <Search size={18} className="text-accent" />
-                        <input 
-                            type="text" 
-                            className="mobile-input"
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            placeholder="Universal Audit..."
-                            style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '12px', fontSize: '1rem' }}
-                        />
-                    </div>
-                </form>
+            {/* ─── MOBILE COMMAND CENTER (TABBED INTERFACE) ─── */}
+            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: '1rem' }}>
+                
+                {/* Mobile Tab Switcher */}
+                <div style={{ display: 'flex', gap: '8px', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', flexShrink: 0 }}>
+                    {[
+                        { id: 'alpha', icon: Sparkles, color: 'var(--color-accent)' },
+                        { id: 'intel', icon: Target, color: '#38bdf8' },
+                        { id: 'strategy', icon: Cpu, color: 'var(--color-warning)' }
+                    ].map(t => (
+                        <button
+                            key={t.id}
+                            onClick={() => setMobileTab(t.id as MobileTab)}
+                            style={{
+                                flex: 1,
+                                height: '48px',
+                                borderRadius: '10px',
+                                border: 'none',
+                                background: mobileTab === t.id ? t.color : 'transparent',
+                                color: mobileTab === t.id ? 'white' : 'var(--color-text-tertiary)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.3s'
+                            }}
+                        >
+                            <t.icon size={20} />
+                        </button>
+                    ))}
+                </div>
 
-                {/* Swipeable Picks */}
-                <div style={{ position: 'relative', height: '200px' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-                    <div style={{ textAlign: 'center', marginBottom: '8px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>
-                        ALPHA DECK ({swipeIndex + 1}/{displayedRecs.length})
-                    </div>
-                    {displayedRecs[swipeIndex] && (
-                        <div className="animate-fade-in" style={{ height: '140px' }}>
-                            <AlphaPickCard rec={displayedRecs[swipeIndex]} onClick={() => onSelectStock && onSelectStock(displayedRecs[swipeIndex].symbol)} />
+                {/* Tab Views */}
+                <div className="animate-fade-in" style={{ flex: 1, minHeight: 0 }}>
+                    {mobileTab === 'alpha' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', overflowY: 'auto' }}>
+                            {displayedRecs.map((rec, i) => (
+                                <AlphaPickCard key={i} rec={rec} onClick={() => onSelectStock && onSelectStock(rec.symbol)} />
+                            ))}
                         </div>
                     )}
-                    {/* Dots */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginTop: '12px' }}>
-                        {displayedRecs.slice(0, 5).map((_, i) => (
-                            <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: i === swipeIndex ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)' }} />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Performance Strip */}
-                <div onClick={() => soundService.playTap()} style={{ padding: '1rem', background: 'var(--gradient-primary)', borderRadius: '12px', color: 'white', fontWeight: 900, textAlign: 'center', fontSize: '0.8rem' }}>
-                    OPEN PERFORMANCE AUDIT
-                </div>
-
-                {/* Strategy List (Scrollable) */}
-                <div style={{ flex: 1, overflowY: 'auto' }}>
-                    <AIStrategyIntelliHub condensed={true} />
+                    {mobileTab === 'intel' && (
+                        <div style={{ height: '100%', overflowY: 'auto' }}>
+                            <AIInstitutionalHub />
+                        </div>
+                    )}
+                    {mobileTab === 'strategy' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', overflowY: 'auto' }}>
+                            <AIPerformanceTracker condensed={true} />
+                            <AIStrategyIntelliHub condensed={true} />
+                        </div>
+                    )}
                 </div>
             </div>
 
             <style>{`
-                .dashboard-viewport {
-                    height: calc(100vh - var(--total-header-height));
-                    overflow: hidden;
+                .ai-cockpit-container {
+                  height: calc(100vh - var(--total-header-height));
+                  overflow: hidden;
                 }
+                .custom-scroll {
+                  scrollbar-width: thin;
+                  scrollbar-color: var(--color-accent-light) transparent;
+                }
+                .custom-scroll::-webkit-scrollbar { width: 4px; }
+                .custom-scroll::-webkit-scrollbar-thumb { background: var(--color-accent-light); border-radius: 4px; }
+                
                 .spin { animation: spin 1s linear infinite; }
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-                @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+                @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
                 
                 @media (max-width: 768px) {
                     .desktop-only { display: none !important; }
                     .mobile-only { display: flex !important; }
                 }
                 @media (min-width: 769px) {
-                    .desktop-only { display: flex !important; }
+                    .desktop-only { display: grid !important; }
                     .mobile-only { display: none !important; }
                 }
             `}</style>
         </div>
     );
 };
+
 
 export default AIRecommendations;
