@@ -12,12 +12,12 @@ interface MobileNavProps {
 const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const { triggerLight } = useHaptics();
 
-    const navItems: { id: TabType; label: string; icon: React.ElementType }[] = [
+    const navItems: { id: TabType; label: string; icon: React.ElementType; color?: string }[] = [
         { id: 'home', label: 'Home', icon: LayoutDashboard },
-        { id: 'watchlist', label: 'Watch', icon: List },
-        { id: 'recommendations', label: 'Command', icon: Brain }, // This will be the central button
-        { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
-        { id: 'pulse', label: 'Pulse', icon: Activity },
+        { id: 'watchlist', label: 'Watch', icon: List, color: '#3b82f6' },
+        { id: 'recommendations', label: 'Command', icon: Brain, color: '#a855f7' }, // Central button
+        { id: 'portfolio', label: 'Portfolio', icon: Briefcase, color: '#10b981' },
+        { id: 'pulse', label: 'Pulse', icon: Activity, color: '#f97316' },
     ];
 
     const handleTabClick = (tabId: TabType) => {
@@ -116,12 +116,12 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                                 border: 'none',
                                 cursor: 'pointer',
                                 WebkitTapHighlightColor: 'transparent',
-                                color: isActive ? 'var(--color-accent)' : 'rgba(255,255,255,0.4)',
+                                color: isActive ? (item.color || 'var(--color-accent)') : 'rgba(255,255,255,0.4)',
                                 transition: 'all 0.2s ease',
                             }}
                         >
                              <IconComponent size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-                             <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500 }}>{item.label}</span>
+                             <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500, color: isActive ? (item.color || 'var(--color-accent)') : 'inherit' }}>{item.label}</span>
                         </button>
                     );
                 })}

@@ -37,13 +37,13 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const iconSize = isMobile ? 18 : 12;
     const btnH = isMobile ? '28px' : '22px';
 
-    const tabs: { id: TabType; label: string; icon: React.ElementType; isCustomIcon?: boolean }[] = [
+    const tabs: { id: TabType; label: string; icon: React.ElementType; color?: string; isCustomIcon?: boolean }[] = [
         { id: 'home', label: 'Home', icon: Home },
-        { id: 'recommendations', label: 'AI', icon: Brain },
-        { id: 'watchlist', label: 'Watch', icon: Eye },
-        { id: 'portfolio', label: 'Portfolio', icon: PieChart },
-        { id: 'pulse', label: 'Pulse', icon: Activity },
-        { id: 'pricing', label: 'Pro', icon: Star },
+        { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' }, // Purple AI
+        { id: 'watchlist', label: 'Watch', icon: Eye, color: '#3b82f6' }, // Blue Watchlist
+        { id: 'portfolio', label: 'Portfolio', icon: PieChart, color: '#10b981' }, // Green Portfolio
+        { id: 'pulse', label: 'Pulse', icon: Activity, color: '#f97316' }, // Orange Pulse
+        { id: 'pricing', label: 'Pro', icon: Star, color: '#facc15' }, // Gold Pro
     ];
 
     const handleTabClick = (tabId: TabType) => {
@@ -188,17 +188,17 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                     background: 'none',
                                     border: 'none',
                                     cursor: 'pointer',
-                                    color: isActive ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+                                    color: isActive ? (tab.color || 'var(--color-accent)') : 'var(--color-text-tertiary)',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                                     padding: '4px',
-                                    borderBottom: isActive ? '2px solid var(--color-accent)' : '2px solid transparent',
+                                    borderBottom: isActive ? `2px solid ${tab.color || 'var(--color-accent)'}` : '2px solid transparent',
                                     position: 'relative'
                                 }}
                                 onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
                                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
                             >
                                 <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ 
-                                    filter: isActive ? 'drop-shadow(0 0 8px var(--color-accent-light))' : 'none',
+                                    filter: isActive ? `drop-shadow(0 0 8px ${tab.color}55)` : 'none',
                                     transition: 'all 0.3s ease'
                                 }} />
                                 <span style={{ 
@@ -217,8 +217,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                         left: '15%',
                                         right: '15%',
                                         height: '2px',
-                                        background: 'var(--color-accent)',
-                                        boxShadow: '0 0 12px var(--color-accent)',
+                                        background: tab.color || 'var(--color-accent)',
+                                        boxShadow: `0 0 12px ${tab.color || 'var(--color-accent)'}`,
                                         borderRadius: '2px'
                                     }} />
                                 )}

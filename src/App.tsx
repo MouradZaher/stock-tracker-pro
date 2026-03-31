@@ -217,11 +217,14 @@ function MainLayout({
   const navigate = useNavigate();
 
   const currentPath = location.pathname.substring(1) || 'home';
-  // Treat '/stock' as part of the 'home' tab for UI highlighting
+  const queryParams = new URLSearchParams(location.search);
+  const fromTab = queryParams.get('from');
+  
+  // Use 'from' parameter if on stock detail, else default to 'home' or current path
   const activeTab = (
     currentPath.startsWith('stock/') 
-      ? 'home' 
-      : (['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing'].includes(currentPath) ? currentPath : 'home')
+      ? (fromTab || 'home') 
+      : (['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing', 'admin'].includes(currentPath) ? currentPath : 'home')
   ) as TabType;
 
   const handleTabChange = (tab: TabType) => {
@@ -231,7 +234,7 @@ function MainLayout({
 
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
-    navigate(`/stock/${symbol}`);
+    navigate(`/stock/${symbol}${activeTab ? `?from=${activeTab}` : ''}`);
   };
 
   // Listen for symbol query parameters (from legacy heatmap deep-linking)
