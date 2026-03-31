@@ -219,15 +219,17 @@ function MainLayout({
   const currentPath = location.pathname.substring(1) || 'home';
   
   const activeTab = useMemo(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const fromTab = queryParams.get('from');
+    const searchParams = new URLSearchParams(location.search);
+    const fromTab = searchParams.get('from');
+    const path = location.pathname;
     
-    if (currentPath.startsWith('stock/')) {
+    if (path.startsWith('/stock/')) {
       return (fromTab || 'home') as TabType;
     }
     
+    const tabName = path.substring(1) || 'home';
     const validTabs: TabType[] = ['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing', 'admin'];
-    return (validTabs.includes(currentPath as TabType) ? currentPath : 'home') as TabType;
+    return (validTabs.includes(tabName as TabType) ? tabName : 'home') as TabType;
   }, [location.pathname, location.search]);
 
   const handleTabChange = (tab: TabType) => {
@@ -237,16 +239,20 @@ function MainLayout({
 
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
-    navigate(`/stock/${symbol}${activeTab ? `?from=${activeTab}` : ''}`);
+    // Explicitly pass current tab as 'from' context
+    const currentTab = activeTab || 'home';
+    navigate(`/stock/${symbol}?from=${currentTab}`);
   };
 
   // Listen for symbol query parameters (from legacy heatmap deep-linking)
-  // Now redirects to the new persistent /stock/ route
+  // Now redirects to the new persistent /stock/ route while preserving other params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const symbolFromUrl = params.get('symbol');
     if (symbolFromUrl) {
-      navigate(`/stock/${symbolFromUrl}`, { replace: true });
+      params.delete('symbol');
+      const search = params.toString();
+      navigate(`/stock/${symbolFromUrl}${search ? `?${search}` : ''}`, { replace: true });
     }
   }, [location.search, navigate]);
 
