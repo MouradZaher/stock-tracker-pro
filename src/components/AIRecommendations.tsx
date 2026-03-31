@@ -15,6 +15,8 @@ import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
 import CompanyLogo from './CompanyLogo';
 import AIIntelligenceStream from './AIIntelligenceStream';
+import AIPerformanceTracker from './AIPerformanceTracker';
+import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 
 // --- NEW COMPONENT: Alpha Card ---
 const AlphaPickCard: React.FC<{ rec: any; onClick: () => void }> = ({ rec, onClick }) => {
@@ -112,18 +114,24 @@ const RECS_MAP: Record<MarketId, typeof US_RECS> = { us: US_RECS, egypt: EGYPT_R
 const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> = ({ onSelectStock }) => {
     const { addNotification } = useNotifications();
     const { selectedMarket } = useMarket();
-    const [activeTab, setActiveTab] = useState<'alpha'>('alpha');
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    
+    // Swipe state for mobile
+    const [swipeIndex, setSwipeIndex] = useState(0);
+    const [touchStart, setTouchStart] = useState<number | null>(null);
 
     const INSTANT_RECS = useMemo(() => {
         return [...(RECS_MAP[selectedMarket.id] || US_RECS)].sort((a, b) => b.score - a.score);
     }, [selectedMarket.id]);
 
+    const displayedRecs = activeRecs.length > 0 ? activeRecs : INSTANT_RECS;
+
     useEffect(() => {
         setActiveRecs([]);
+        setSwipeIndex(0);
     }, [selectedMarket.id]);
 
     const runScanner = async () => {
@@ -149,133 +157,99 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
         e.preventDefault();
         if (searchQuery && onSelectStock) {
             onSelectStock(searchQuery.toUpperCase());
-            toast.success(`Alpha Engine: Initializing deep audit for ${searchQuery.toUpperCase()}`);
+            toast.success(`Alpha Engine: Deep audit for ${searchQuery.toUpperCase()}`);
             setSearchQuery('');
         }
     };
 
+    // Mobile Swipe Logic
+    const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (touchStart === null) return;
+        const touchEnd = e.changedTouches[0].clientX;
+        const diff = touchStart - touchEnd;
+        if (diff > 50 && swipeIndex < displayedRecs.length - 1) setSwipeIndex(prev => prev + 1);
+        if (diff < -50 && swipeIndex > 0) setSwipeIndex(prev => prev - 1);
+        setTouchStart(null);
+    };
+
     return (
-        <div className="ai-cockpit-container" style={{ 
+        <div className="ai-cockpit-container dashboard-viewport" style={{ 
             height: '100%', 
             display: 'flex', 
             flexDirection: 'column', 
             overflow: 'hidden',
             background: 'var(--color-bg-primary)',
-            position: 'relative'
+            position: 'relative',
+            padding: '1rem'
         }}>
-            {/* Animated Mesh Background Elements */}
-            <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '60%', height: '40%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%)', pointerEvents: 'none', filter: 'blur(60px)', zIndex: 0 }} />
-            
-
-            {/* === 2. UNIVERSAL SEARCH CONSOLE === */}
-            <div style={{ padding: '1.5rem 1.5rem 1rem', zIndex: 10, flexShrink: 0 }}>
-                <form onSubmit={handleSearch} style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
-                    <div className="glass-card noise-texture" style={{ 
-                        padding: '1px', 
-                        borderRadius: '20px', 
-                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(236, 72, 153, 0.2), transparent, rgba(99, 102, 241, 0.4))',
-                        boxShadow: '0 20px 50px -15px rgba(0,0,0,0.6)'
-                    }}>
-                        <div style={{ 
-                            background: '#0a0a0f', 
-                            borderRadius: '19px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            padding: '0.5rem 1rem' 
-                        }}>
-                            <Search className="text-accent" size={24} style={{ opacity: 0.8 }} />
-                            <input 
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Universal Asset Analysis: Enter Ticker (AAPL, COMI, IHC)..."
-                                style={{ 
-                                    flex: 1, 
-                                    background: 'transparent', 
-                                    border: 'none', 
-                                    color: 'white', 
-                                    fontSize: '1.1rem', 
-                                    padding: '14px 20px', 
-                                    fontWeight: 600,
-                                    outline: 'none',
-                                    letterSpacing: '0.02em'
-                                }}
-                            />
-                            <button 
-                                type="submit"
-                                className="btn btn-primary" 
-                                style={{ 
-                                    borderRadius: '14px', 
-                                    padding: '12px 30px', 
-                                    fontWeight: 900, 
-                                    fontSize: '0.9rem',
-                                    background: 'var(--gradient-primary)',
-                                    boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}
-                            >
-                                Run Audit
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginTop: '1.25rem' }}>
-                        {[
-                            { icon: Target, text: 'DCF VALUATION' },
-                            { icon: Fingerprint, text: 'HEDGE FLOWS' },
-                            { icon: Globe, text: 'MACRO SIGNAL' },
-                            { icon: Shield, text: 'RISK AUDIT' }
-                        ].map((item, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, transition: 'color 0.2s', cursor: 'default' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-tertiary)'}>
-                                <item.icon size={14} /> {item.text}
-                            </div>
-                        ))}
-                    </div>
-                </form>
+            {/* 1. TOP STREAM (Universal) */}
+            <div style={{ marginBottom: '1rem', flexShrink: 0 }}>
+                <AIIntelligenceStream />
             </div>
 
-            {/* === 3. AI PICKS CONTENT === */}
-            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', zIndex: 10 }}>
-                <div className="scrollable-panel custom-scrollbar" style={{ height: '100%', padding: '1rem 1.5rem 2rem' }}>
-                    <div className="animate-fade-in">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            {/* DESKTOP BENTO LAYOUT */}
+            <div className="desktop-only" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: '1.25rem' }}>
+                
+                {/* Row 2: Search & Performance */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.25rem', height: '120px', flexShrink: 0 }}>
+                    {/* Search */}
+                    <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px' }}>
+                            <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '1px solid var(--glass-border)', padding: '0 1rem' }}>
+                                <Search size={18} className="text-accent" />
+                                <input 
+                                    type="text" 
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    placeholder="Run Audit: Enter Ticker..."
+                                    style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '10px', fontSize: '0.9rem', outline: 'none' }}
+                                />
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ padding: '0 20px', borderRadius: '12px', fontWeight: 900, fontSize: '0.8rem' }}>RUN</button>
+                        </form>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '10px' }}>
+                            {['DCF VALUATION', 'HEDGE FLOWS', 'MACRO SIGNAL'].map(t => (
+                                <span key={t} style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800 }}>• {t}</span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Performance (Condensed) */}
+                    <AIPerformanceTracker condensed={true} />
+                </div>
+
+                {/* Row 3: Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '1.25rem', flex: 1, minHeight: 0 }}>
+                    
+                    {/* Alpha Picks column */}
+                    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', minHeight: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexShrink: 0 }}>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em' }}>
-                                    TOP LIVERATED AI PICKS
+                                <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Sparkles size={16} className="text-accent" /> TOP AI ALPHA PICKS
                                 </h3>
-                                <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>AI identified high-probability breakout candidates for the next 48h</p>
                             </div>
                             <button 
                                 onClick={runScanner} 
                                 disabled={isScanning}
-                                style={{ 
-                                    padding: '10px 18px', 
-                                    fontSize: '0.75rem', 
-                                    fontWeight: 900, 
-                                    borderRadius: '10px', 
-                                    background: isScanning ? 'rgba(255,255,255,0.03)' : 'rgba(99, 102, 241, 0.1)',
-                                    color: isScanning ? 'var(--color-text-tertiary)' : 'var(--color-accent)',
-                                    border: '1px solid var(--color-accent-light)',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    transition: 'all 0.2s',
-                                    letterSpacing: '0.05em'
-                                }}
+                                className="glass-button"
+                                style={{ padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderRadius: '8px' }}
                             >
-                                {isScanning ? <RefreshCw size={14} className="spin" /> : <RefreshCw size={14} />}
-                                {isScanning ? `SYSTEM SCANNING ${Math.round(scanProgress)}%` : 'INITIATE DEEP SCAN'}
+                                {isScanning ? <RefreshCw size={12} className="spin" /> : <RefreshCw size={12} />}
+                                {isScanning ? ` SCANNING...` : ' SYNC ENGINE'}
                             </button>
                         </div>
 
                         <div style={{ 
                             display: 'grid', 
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-                            gap: '1.25rem' 
+                            gridTemplateColumns: 'repeat(2, 1fr)', 
+                            gridTemplateRows: 'repeat(3, 1fr)',
+                            gap: '0.75rem', 
+                            flex: 1,
+                            minHeight: 0
                         }}>
-                            {(activeRecs.length > 0 ? activeRecs : INSTANT_RECS).map((rec, i) => (
+                            {displayedRecs.slice(0, 6).map((rec, i) => (
                                 <AlphaPickCard 
                                     key={rec.symbol + i} 
                                     rec={rec} 
@@ -284,35 +258,82 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                             ))}
                         </div>
                     </div>
+
+                    {/* Strategies column */}
+                    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', minHeight: 0 }}>
+                        <h3 style={{ margin: '0 0 1.25rem 0', fontSize: '0.9rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Cpu size={16} className="text-accent" /> STRATEGIC COMMAND
+                        </h3>
+                        <div style={{ flex: 1, minHeight: 0 }}>
+                            <AIStrategyIntelliHub condensed={true} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* MOBILE VIEW */}
+            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minHeight: 0 }}>
+                {/* Search */}
+                <form onSubmit={handleSearch} style={{ position: 'relative' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', padding: '0 1rem' }}>
+                        <Search size={18} className="text-accent" />
+                        <input 
+                            type="text" 
+                            className="mobile-input"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            placeholder="Universal Audit..."
+                            style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '12px', fontSize: '1rem' }}
+                        />
+                    </div>
+                </form>
+
+                {/* Swipeable Picks */}
+                <div style={{ position: 'relative', height: '200px' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                    <div style={{ textAlign: 'center', marginBottom: '8px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>
+                        ALPHA DECK ({swipeIndex + 1}/{displayedRecs.length})
+                    </div>
+                    {displayedRecs[swipeIndex] && (
+                        <div className="animate-fade-in" style={{ height: '140px' }}>
+                            <AlphaPickCard rec={displayedRecs[swipeIndex]} onClick={() => onSelectStock && onSelectStock(displayedRecs[swipeIndex].symbol)} />
+                        </div>
+                    )}
+                    {/* Dots */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginTop: '12px' }}>
+                        {displayedRecs.slice(0, 5).map((_, i) => (
+                            <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: i === swipeIndex ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)' }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Performance Strip */}
+                <div onClick={() => soundService.playTap()} style={{ padding: '1rem', background: 'var(--gradient-primary)', borderRadius: '12px', color: 'white', fontWeight: 900, textAlign: 'center', fontSize: '0.8rem' }}>
+                    OPEN PERFORMANCE AUDIT
+                </div>
+
+                {/* Strategy List (Scrollable) */}
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                    <AIStrategyIntelliHub condensed={true} />
                 </div>
             </div>
 
             <style>{`
-                .ai-cockpit-container {
-                    user-select: none;
+                .dashboard-viewport {
+                    height: calc(100vh - var(--total-header-height));
+                    overflow: hidden;
                 }
-                .hover-lift {
-                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                .spin { animation: spin 1s linear infinite; }
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+                @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+                
+                @media (max-width: 768px) {
+                    .desktop-only { display: none !important; }
+                    .mobile-only { display: flex !important; }
                 }
-                .hover-lift:hover {
-                    transform: translateY(-6px) scale(1.02);
-                    background: rgba(255,255,255,0.06) !important;
-                    border-color: var(--color-accent) !important;
-                    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-                }
-                .spin {
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-fade-in {
-                    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                @media (min-width: 769px) {
+                    .desktop-only { display: flex !important; }
+                    .mobile-only { display: none !important; }
                 }
             `}</style>
         </div>

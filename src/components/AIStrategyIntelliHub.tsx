@@ -3,7 +3,7 @@ import {
     Zap, Shield, TrendingUp, AlertTriangle, 
     BarChart2, Globe, Search, ArrowRight, 
     ChevronRight, Info, ExternalLink, RefreshCw,
-    Briefcase, FileText, Activity, Sparkles
+    Briefcase, FileText, Activity, Sparkles, Cpu
 } from 'lucide-react';
 import { aiStrategyService, AI_STRATEGIES } from '../services/aiStrategyService';
 import type { StrategyResult } from '../services/aiStrategyService';
@@ -27,7 +27,11 @@ const STRATEGY_METADATA: Record<string, { icon: any, color: string, label: strin
     [AI_STRATEGIES.SHORT_SQUEEZE]: { icon: TrendingUp, color: '#ec4899', label: 'Short Squeeze' },
 };
 
-const AIStrategyIntelliHub: React.FC = () => {
+interface AIStrategyIntelliHubProps {
+    condensed?: boolean;
+}
+
+const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed = false }) => {
     const navigate = useNavigate();
     const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
     const [strategyResult, setStrategyResult] = useState<StrategyResult | null>(null);
@@ -63,18 +67,25 @@ const AIStrategyIntelliHub: React.FC = () => {
     };
 
     return (
-        <div className="ai-strategy-hub" style={{ padding: '0 0.5rem' }}>
+        <div className="ai-strategy-hub" style={{ padding: condensed ? '0' : '0 0.5rem', height: condensed ? '100%' : 'auto', display: condensed ? 'flex' : 'block', flexDirection: 'column' }}>
             {/* Headers removed */}
 
-            {/* 10 MODULES Badge */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-accent)', background: 'var(--color-accent-light)', padding: '2px 10px', borderRadius: '20px' }}>
-                    10 STRATEGIC MODULES ACTIVE
+            {!condensed && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-accent)', background: 'var(--color-accent-light)', padding: '2px 10px', borderRadius: '20px' }}>
+                        10 STRATEGIC MODULES ACTIVE
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Strategic Intelligence Modules Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: condensed ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(160px, 1fr))', 
+                gap: condensed ? '0.5rem' : '0.75rem', 
+                marginBottom: condensed ? '1rem' : '1.5rem',
+                flexShrink: 0
+            }}>
                 {Object.entries(STRATEGY_METADATA).map(([id, meta]) => (
                     <button
                         key={id}
@@ -82,181 +93,138 @@ const AIStrategyIntelliHub: React.FC = () => {
                         disabled={isLoading}
                         style={{
                             display: 'flex',
-                            flexDirection: 'column',
+                            flexDirection: condensed ? 'row' : 'column',
                             alignItems: 'center',
-                            gap: '12px',
-                            padding: '1.25rem',
+                            gap: condensed ? '8px' : '12px',
+                            padding: condensed ? '0.75rem' : '1.25rem',
                             borderRadius: '16px',
                             background: selectedStrategyId === id ? `${meta.color}15` : 'rgba(255,255,255,0.02)',
                             border: `1px solid ${selectedStrategyId === id ? meta.color : 'rgba(255,255,255,0.05)'}`,
                             cursor: 'pointer',
                             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            textAlign: 'center',
+                            textAlign: condensed ? 'left' : 'center',
                             position: 'relative',
-                            overflow: 'hidden'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (selectedStrategyId !== id) {
-                                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (selectedStrategyId !== id) {
-                                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                            }
+                            overflow: 'hidden',
+                            width: '100%'
                         }}
                     >
                         <div style={{ 
-                            width: '40px', 
-                            height: '40px', 
-                            borderRadius: '12px', 
+                            width: condensed ? '24px' : '40px', 
+                            height: condensed ? '24px' : '40px', 
+                            borderRadius: condensed ? '8px' : '12px', 
                             background: `${meta.color}20`, 
                             display: 'flex', 
                             alignItems: 'center', 
                             justifyContent: 'center',
                             color: meta.color,
-                            boxShadow: selectedStrategyId === id ? `0 0 20px ${meta.color}40` : 'none'
+                            flexShrink: 0
                         }}>
-                            <meta.icon size={24} />
+                            <meta.icon size={condensed ? 14 : 24} />
                         </div>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {meta.label}
                         </span>
-                        {selectedStrategyId === id && (
-                            <div style={{ position: 'absolute', bottom: 0, left: 0, height: '2px', width: '100%', background: meta.color }} />
-                        )}
                     </button>
                 ))}
             </div>
-            {selectedStrategyId && (
-                <div 
-                    className="strategy-results-panel animate-fade-in" 
-                    style={{ 
-                        animation: 'fadeInUp 0.5s ease forwards',
-                        opacity: 0,
-                        transform: 'translateY(20px)'
-                    }}
-                >
-                    {isLoading ? (
-                        <div className="glass-card" style={{ padding: '3rem', textAlign: 'center' }}>
-                            <RefreshCw size={32} className="spin" color={STRATEGY_METADATA[selectedStrategyId].color} />
-                            <p style={{ marginTop: '1rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-                                Executing {STRATEGY_METADATA[selectedStrategyId].label} Analysis...
-                            </p>
-                        </div>
-                    ) : strategyResult ? (
-                        <div className="glass-card" style={{ padding: '0', overflow: 'hidden', border: `1px solid ${STRATEGY_METADATA[selectedStrategyId].color}30` }}>
-                            {/* Header */}
-                            <div style={{ 
-                                padding: '1.5rem', 
-                                background: `linear-gradient(135deg, ${STRATEGY_METADATA[selectedStrategyId].color}15 0%, transparent 100%)`,
-                                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: getRiskColor(strategyResult.riskLevel) }} />
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: getRiskColor(strategyResult.riskLevel), textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                            {strategyResult.riskLevel} RISK PROFILE
-                                        </span>
-                                    </div>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900, margin: 0 }}>{strategyResult.recommendation}</h3>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>STRATEGY_ID</div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: STRATEGY_METADATA[selectedStrategyId].color }}>{strategyResult.id.toUpperCase()}</div>
-                                </div>
+
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '4px' }}>
+                {selectedStrategyId && (
+                    <div 
+                        className="strategy-results-panel animate-fade-in" 
+                        style={{ 
+                            animation: 'fadeInUp 0.5s ease forwards',
+                            opacity: 0,
+                            transform: 'translateY(20px)'
+                        }}
+                    >
+                        {isLoading ? (
+                            <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
+                                <RefreshCw size={24} className="spin" color={STRATEGY_METADATA[selectedStrategyId].color} />
+                                <p style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+                                    Analyzing {STRATEGY_METADATA[selectedStrategyId].label}...
+                                </p>
                             </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1px', background: 'rgba(255,255,255,0.05)' }}>
-                                {/* Main Reasoning */}
-                                <div style={{ padding: '1.5rem', background: 'var(--color-bg-secondary)' }}>
-                                    <h4 style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <FileText size={14} /> Strategic Insights
-                                    </h4>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                        {strategyResult.reasoning.map((text, i) => (
-                                            <div key={i} style={{ display: 'flex', gap: '12px' }}>
-                                                <div style={{ marginTop: '4px', width: '16px', height: '16px', borderRadius: '50%', background: `${STRATEGY_METADATA[selectedStrategyId!].color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: STRATEGY_METADATA[selectedStrategyId!].color }} />
-                                                </div>
-                                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>{text}</p>
-                                            </div>
-                                        ))}
+                        ) : strategyResult ? (
+                            <div className="glass-card" style={{ padding: '0', overflow: 'hidden', border: `1px solid ${STRATEGY_METADATA[selectedStrategyId].color}30` }}>
+                                {/* Header */}
+                                <div style={{ 
+                                    padding: '1rem', 
+                                    background: `linear-gradient(135deg, ${STRATEGY_METADATA[selectedStrategyId].color}15 0%, transparent 100%)`,
+                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: getRiskColor(strategyResult.riskLevel) }} />
+                                            <span style={{ fontSize: '0.6rem', fontWeight: 900, color: getRiskColor(strategyResult.riskLevel), textTransform: 'uppercase' }}>
+                                                {strategyResult.riskLevel} RISK
+                                            </span>
+                                        </div>
+                                        <h3 style={{ fontSize: '1rem', fontWeight: 900, margin: 0 }}>{strategyResult.recommendation}</h3>
                                     </div>
                                 </div>
 
-                                {/* Metrics & Actionable */}
-                                <div style={{ background: 'var(--color-bg-secondary)', display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                    {/* Metrics Grid */}
-                                    <div style={{ padding: '1.5rem', flex: 1 }}>
-                                        <h4 style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <BarChart2 size={14} /> Key Performance Metrics
+                                <div style={{ padding: '1rem' }}>
+                                    {/* Reasoning */}
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <h4 style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <FileText size={12} /> Strategic Insights
                                         </h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                            {Object.entries(strategyResult.metrics).map(([label, value]) => (
-                                                <div key={label} style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
-                                                    <div style={{ fontSize: '1rem', fontWeight: 900, color: 'white' }}>{String(value)}</div>
-                                                </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            {strategyResult.reasoning.slice(0, 3).map((text, i) => (
+                                                <p key={i} style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, margin: 0 }}>• {text}</p>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Actionable Items */}
-                                    <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.2)', flex: 1 }}>
-                                        <h4 style={{ fontSize: '0.8rem', color: 'var(--color-success)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <ArrowRight size={14} /> Actionable Execution
+                                    {/* Actions */}
+                                    <div>
+                                        <h4 style={{ fontSize: '0.65rem', color: 'var(--color-success)', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <ArrowRight size={12} /> execution
                                         </h4>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                            {strategyResult.actionableItems.map((item, i) => (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            {strategyResult.actionableItems.slice(0, 2).map((item, i) => (
                                                 <button 
                                                     key={i} 
                                                     className="btn btn-secondary glass-button"
-                                                    style={{ justifyContent: 'space-between', padding: '0.75rem 1rem', fontSize: '0.85rem', width: '100%', textAlign: 'left' }}
+                                                    style={{ justifyContent: 'space-between', padding: '0.5rem 0.75rem', fontSize: '0.75rem', width: '100%', textAlign: 'left' }}
                                                     onClick={() => toast.success(`Executing: ${item}`)}
                                                 >
                                                     {item}
-                                                    <ChevronRight size={16} />
+                                                    <ChevronRight size={14} />
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Footer / Sources */}
-                            <div style={{ padding: '1rem 1.5rem', background: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>SOURCES:</span>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                        {strategyResult.sources.map(s => (
-                                            <span key={s} style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>{s}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <button className="btn btn-icon" onClick={() => handleRunStrategy(selectedStrategyId!)}>
-                                    <RefreshCw size={16} color="var(--color-text-tertiary)" />
-                                </button>
-                            </div>
+                        ) : null}
+                    </div>
+                )}
+                {!selectedStrategyId && (
+                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', opacity: 0.5 }}>
+                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            <Cpu size={32} style={{ color: 'var(--color-text-tertiary)', marginBottom: '1rem' }} />
+                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>SELECT STRATEGY MODULE</p>
                         </div>
-                    ) : null}
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
 
             <style>{`
                 @keyframes fadeInUp {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-                @keyframes loading-bar {
-                    0% { left: -100%; width: 30%; }
-                    50% { left: 40%; width: 40%; }
-                    100% { left: 100%; width: 30%; }
+                .spin {
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
                 }
             `}</style>
         </div>

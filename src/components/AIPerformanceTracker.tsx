@@ -148,7 +148,11 @@ const getMarketSessionStatus = (marketId: MarketId): { code: string; name: strin
 // COMPONENT
 // ══════════════════════════════════════════════════════════════════════════════
 
-const AIPerformanceTracker: React.FC = () => {
+interface AIPerformanceTrackerProps {
+    condensed?: boolean;
+}
+
+const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed = false }) => {
     const { selectedMarket } = useMarket();
     const [showBacktestModal, setShowBacktestModal] = useState(false);
     const [showExplainerModal, setShowExplainerModal] = useState(false);
@@ -169,6 +173,166 @@ const AIPerformanceTracker: React.FC = () => {
         setShowBacktestModal(true);
         toast.success('Stress test launched');
     };
+
+    if (condensed) {
+        return (
+            <div className="ai-performance-tracker-condensed" style={{ height: '100%' }}>
+                <div className="glass-card" style={{
+                    padding: '1rem',
+                    height: '100%',
+                    border: '1px solid var(--glass-border-bright)',
+                    background: 'linear-gradient(180deg, rgba(20, 20, 30, 0.6) 0%, rgba(10, 10, 15, 0.9) 100%)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1.5rem'
+                }}>
+                    <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '200px', height: '100px', background: `${selectedMarket.color}22`, filter: 'blur(60px)', pointerEvents: 'none' }}></div>
+                    
+                    {/* Hero Section */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', zIndex: 1 }}>
+                        <div style={{ fontSize: '0.65rem', fontWeight: 800, color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>OUTPERFORMANCE</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'white', lineHeight: 1 }}>{statsRaw.outperformance}</div>
+                            <button 
+                                onClick={() => setShowExplainerModal(true)}
+                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', padding: '4px', borderRadius: '50%', cursor: 'pointer', color: selectedMarket.color }}
+                            >
+                                <HelpCircle size={14} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div style={{ display: 'flex', gap: '1rem', zIndex: 1 }}>
+                        <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '12px', minWidth: '100px' }}>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>ACCURACY</div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 900 }}>{ps.accuracy}%</div>
+                        </div>
+                        <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '12px', minWidth: '80px' }}>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>SHARPE</div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 900 }}>{statsRaw.sharpe}</div>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={() => setShowBacktestModal(true)}
+                        className="btn btn-secondary glass-button"
+                        style={{ padding: '8px 16px', fontSize: '0.75rem', fontWeight: 800, zIndex: 1 }}
+                    >
+                        SIMULATOR
+                    </button>
+                </div>
+                {/* Modals remain the same */}
+                {showExplainerModal && (
+                    <div className="modal-overlay glass-blur" onClick={() => setShowExplainerModal(false)} style={{ zIndex: 1000 }}>
+                         <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '95%', padding: '2rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{ padding: '8px', borderRadius: '10px', background: `${selectedMarket.color}22` }}>
+                                        <HelpCircle size={22} color={selectedMarket.color} />
+                                    </div>
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 900 }}>Real-Asset Alpha Audit</h3>
+                                </div>
+                                <button onClick={() => setShowExplainerModal(false)} className="btn-icon glass-button"><X size={20} /></button>
+                            </div>
+
+                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>
+                                Our AI Engine consistently beats the S&P 500 by strategically selecting high-alpha real assets and executing entries with institutional precision.
+                            </p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                {[
+                                    { title: 'High-Conviction Alpha Equities', contribution: '48%', desc: 'AI-selected mega-caps (NVDA, MSFT, AAPL) identified during accumulation phases before S&P benchmark inclusion.' },
+                                    { title: 'Global Macro Proxy Strategy', contribution: '32%', desc: 'Strategic allocation to Gold (GLD) and Oil (XLE) during geopolitical volatility, hedging S&P drawdown.' },
+                                    { title: 'Institutional Flow Capture', contribution: '20%', desc: 'Exploiting S&P 500 order imbalance and liquidity sweeps using 500ms execution advantage over retail.' }
+                                ].map((source, i) => (
+                                    <div key={i} style={{ display: 'flex', gap: '15px' }}>
+                                        <div style={{ fontSize: '1.25rem', fontWeight: 900, color: selectedMarket.color, width: '45px', textAlign: 'right' }}>{source.contribution}</div>
+                                        <div>
+                                            <div style={{ fontSize: '0.9rem', fontWeight: 800, marginBottom: '4px' }}>{source.title}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', lineHeight: 1.5 }}>{source.desc}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div style={{ marginTop: '2.5rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 800 }}>Model Confidence</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px' }}>
+                                        <div style={{ width: '88%', height: '100%', background: selectedMarket.color, borderRadius: '3px' }}></div>
+                                    </div>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: 900 }}>88%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {showBacktestModal && (
+                    <div className="modal-overlay glass-blur" onClick={() => setShowBacktestModal(false)} style={{ zIndex: 1000 }}>
+                        <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '95%' }}>
+                            <div className="modal-header">
+                                <h3 className="modal-title">AI Performance vs {selectedMarket.indexName}</h3>
+                                <button className="btn btn-icon glass-button" onClick={() => setShowBacktestModal(false)}><X size={20} /></button>
+                            </div>
+                            <div className="modal-body" style={{ padding: '1.25rem' }}>
+                                <div style={{
+                                    background: `linear-gradient(180deg, ${selectedMarket.color}0d 0%, rgba(16,185,129,0.1) 100%)`,
+                                    borderRadius: 'var(--radius-lg)', padding: '1.5rem', marginBottom: '1.5rem',
+                                    border: '1px solid var(--glass-borderShadow)', position: 'relative', overflow: 'hidden',
+                                }}>
+                                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60px', opacity: 0.3 }}>
+                                        <svg viewBox="0 0 500 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+                                            <path d="M0,80 Q50,70 100,75 T200,50 T300,60 T400,30 T500,10 L500,100 L0,100 Z" fill="var(--color-success)" />
+                                            <path d="M0,90 Q50,85 100,88 T200,80 T300,82 T400,75 T500,70 L500,100 L0,100 Z" fill="rgba(255,255,255,0.1)" />
+                                        </svg>
+                                    </div>
+                                    <div style={{ position: 'relative', zIndex: 1 }}>
+                                        <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-success)', marginBottom: '0.25rem' }}>+27.42%</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Historical Alpha Yield</div>
+                                    </div>
+                                </div>
+                                <div style={{ padding: '1.25rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>AI Strategy Return</span>
+                                            <span style={{ fontWeight: 800, color: 'var(--color-success)' }}>+38.1%</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{selectedMarket.indexName} (Benchmark)</span>
+                                            <span style={{ fontWeight: 600 }}>+10.68%</span>
+                                        </div>
+                                        <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }} />
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Outperformance</span>
+                                            <span style={{ fontWeight: 900, color: selectedMarket.color }}>+27.42%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                    <div className="glass-card" style={{ padding: '0.75rem', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>MAX DRAWDOWN</div>
+                                        <div style={{ fontWeight: 700 }}>-7.2%</div>
+                                    </div>
+                                    <div className="glass-card" style={{ padding: '0.75rem', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '4px' }}>WIN RATE</div>
+                                        <div style={{ fontWeight: 700, color: 'var(--color-success)' }}>{ps.winRate}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button className="btn btn-primary" onClick={() => setShowBacktestModal(false)}>Close Simulator</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="ai-performance-tracker" style={{ marginBottom: '2.5rem' }}>
