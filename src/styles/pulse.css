@@ -1,0 +1,36 @@
+/* 
+   ============================================================
+   MARKET PULSE DASHBOARD STYLES
+   ============================================================ 
+*/
+
+.grid-3col-pulse {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+@keyframes scroll-news {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.pulse-ticker-container {
+  margin: 0 -1.5rem 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .grid-3col-pulse {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-3col-pulse {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,83 @@
+/* 
+   ============================================================
+   LANDING & AUTH PAGE STYLES
+   ============================================================ 
+*/
+
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at top right, #1e1b4b 0%, #0a0a0f 40%);
+  overflow-y: auto;
+}
+
+.hero-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-2xl);
+  gap: var(--spacing-2xl);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-lg);
+  letter-spacing: -0.02em;
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-form {
+  background: var(--color-bg-elevated);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.landing-input {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 1rem;
+}
+
+.visual-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-md);
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 1024px) {
+  .hero-section { flex-direction: column; text-align: center; }
+  .hero-title { font-size: 2.5rem; }
+}
+
+/* Authentication PIN Login Specifics */
+.login-card {
+  background: var(--color-bg-elevated);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-xl);
+}

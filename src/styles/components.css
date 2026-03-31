@@ -1,0 +1,106 @@
+/* 
+   ============================================================
+   UNIVERSAL UI COMPONENTS & SHARED ANIMATIONS
+   ============================================================ 
+*/
+
+/* --- Glassmorphism UI --- */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  transition: all var(--transition-spring);
+  position: relative;
+  overflow: hidden;
+  padding: var(--spacing-md);
+  transform: translateZ(0);
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-bright);
+  box-shadow: var(--shadow-xl), 0 0 20px rgba(255,255,255,0.03);
+  background: var(--glass-bg-hover);
+  transform: translateY(-4px) scale(1.01);
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.glass-card:hover::before {
+  left: 150%;
+}
+
+.glass-glow {
+  box-shadow: var(--accent-glow), 0 0 40px rgba(0,0,0,0.5);
+  border-color: var(--color-accent-light) !important;
+}
+
+/* --- Glass Buttons --- */
+.glass-button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+}
+
+.glass-button:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-bright);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+/* --- Real-Time Market Animations --- */
+@keyframes price-flash-up {
+  0% { background-color: transparent; text-shadow: none; }
+  10% { background-color: rgba(16, 185, 129, 0.2); text-shadow: 0 0 12px rgba(16, 185, 129, 0.8); }
+  100% { background-color: transparent; text-shadow: none; }
+}
+
+@keyframes price-flash-down {
+  0% { background-color: transparent; text-shadow: none; }
+  10% { background-color: rgba(239, 68, 68, 0.2); text-shadow: 0 0 12px rgba(239, 68, 68, 0.8); }
+  100% { background-color: transparent; text-shadow: none; }
+}
+
+.flash-up { animation: price-flash-up 2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.flash-down { animation: price-flash-down 2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+/* --- Mood Pulse --- */
+@keyframes mood-pulse {
+  0% { box-shadow: 0 0 10px var(--color-accent-light); }
+  50% { box-shadow: 0 0 25px var(--color-accent-light); }
+  100% { box-shadow: 0 0 10px var(--color-accent-light); }
+}
+
+.animate-mood-pulse {
+  animation: mood-pulse 3s infinite ease-in-out;
+}

@@ -1,0 +1,54 @@
+/* 
+   ============================================================
+   AI RECOMMENDATIONS TAB - BENTO GRID & SCAN ANIMATIONS
+   ============================================================ 
+*/
+
+.grid-2col-ai {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.ai-signal-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  transform: translateZ(0);
+}
+
+.ai-signal-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--glass-border-bright);
+  background: var(--glass-bg-hover);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.6);
+}
+
+.ai-pulse-button {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.ai-pulse-button:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 15px 30px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* Scanner Animation */
+@keyframes aiPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); opacity: 0.8; }
+  50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.5); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .grid-2col-ai {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,85 @@
+/* 
+   ============================================================
+   STOCK DETAIL & CHART STYLES
+   ============================================================ 
+*/
+
+.stock-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  gap: var(--spacing-xl);
+}
+
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.stock-price {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.stock-change {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-top: var(--spacing-sm);
+}
+
+.stock-change.positive { background: var(--color-success-light); color: var(--color-success); }
+.stock-change.negative { background: var(--color-error-light); color: var(--color-error); }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stat-card {
+  padding: var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.stat-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+
+.stat-label {
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-value { font-size: 1.25rem; font-weight: 600; color: var(--color-text-primary); }
+
+.chart-container {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-height: 450px;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .stock-detail { padding: var(--spacing-md); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stock-price { font-size: 1.75rem; }
+}

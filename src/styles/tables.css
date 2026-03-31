@@ -1,0 +1,63 @@
+/* 
+   ============================================================
+   DYNAMIC TABLES & PORTFOLIO ROWS
+   ============================================================ 
+*/
+
+.compact-table, .portfolio-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px; /* Vertical gap between rows for card feel */
+}
+
+.compact-table th, .portfolio-table th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-tertiary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.compact-table tbody tr, .portfolio-table tbody tr {
+  background: rgba(255, 255, 255, 0.012);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.compact-table tbody tr:hover, .portfolio-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+  transform: scale(1.002);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.compact-table td, .portfolio-table td {
+  padding: 0.85rem 1.25rem;
+  vertical-align: middle;
+  border: 1px solid transparent;
+}
+
+.compact-table td:first-child, .portfolio-table td:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.compact-table td:last-child, .portfolio-table td:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.sticky-header th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 2px solid var(--color-accent-light);
+}
+
+.table-container {
+  flex: 1;
+  overflow: auto;
+  min-height: 300px;
+}
