@@ -559,6 +559,35 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
             {/* Detailed ARIA Research Hub */}
             <div className="section" style={{ marginTop: '2.5rem' }}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.5rem',
+                    padding: '0.75rem 1.25rem',
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: '12px',
+                    marginBottom: '1.5rem',
+                    overflowX: 'auto'
+                }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '120px' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.05em' }}>GLOBAL_RANK</div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 900, color: 'var(--color-accent)' }}>#12 / Institutional</div>
+                    </div>
+                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '180px' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.05em' }}>LIVE MOMENTUM FLOW</div>
+                        <LiveMomentum symbol={symbol} compact={true} />
+                    </div>
+                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: '120px' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.05em' }}>SENTIMENT_FLOW</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-success)' }}>
+                            <div className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-success)' }} />
+                            <span style={{ fontSize: '0.8rem', fontWeight: 900 }}>ACCUMULATING</span>
+                        </div>
+                    </div>
+                </div>
 
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 3fr', gap: '2rem' }}>

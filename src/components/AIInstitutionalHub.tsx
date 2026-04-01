@@ -106,14 +106,18 @@ const AIInstitutionalHub: React.FC = () => {
                   Consensus Tier-1 accumulation detected. Margin expansion expected via AI optimization. Institutional flow remains "ACCUMULATING".
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-accent)' }}>
+                  <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>GLOBAL_RANK</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>#12 / Institutional</div>
+                </div>
                 <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-success)' }}>
                   <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>SENTIMENT FLOW</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>BULLISH_AGGREGATE</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>ACCUMULATING</div>
                 </div>
-                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-accent)' }}>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-warning)' }}>
                   <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>MOMENTUM FLOW</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>46.4% RETRACING</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>51.8% STABLE</div>
                 </div>
               </div>
             </div>
