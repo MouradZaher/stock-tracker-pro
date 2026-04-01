@@ -208,41 +208,46 @@ const PinLoginPage: React.FC = () => {
     return (
         <div className="landing-page">
             <TopBar />
-            <nav className="landing-nav" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '100%', margin: 0, background: 'var(--landing-nav-bg)', position: 'relative', left: 0, right: 0 }}>
-                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: 'var(--font-size-lg)', fontWeight: 700 }}>
-                    <div style={{ background: 'var(--gradient-primary)', width: 'var(--spacing-xl)', height: 'var(--spacing-xl)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
-                        </svg>
+            
+            {/* Background elements */}
+            <div className="landing-bg-elements">
+                <div className="bg-blob blob-1"></div>
+                <div className="bg-blob blob-2"></div>
+                <div className="bg-blob blob-3"></div>
+            </div>
+
+            <nav className="landing-nav">
+                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: '1.25rem', fontWeight: 700 }}>
+                    <div style={{ background: 'var(--gradient-primary)', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Shield size={18} color="white" />
                     </div>
-                    <span style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}>StockTracker <span className="gradient-text">Pro</span></span>
+                    <span>StockTracker <span className="gradient-text">Pro</span></span>
                 </div>
-                <div className="landing-nav-actions" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', background: 'rgba(255,255,255,0.05)', padding: 'var(--spacing-xs) var(--spacing-sm)', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Lock size={10} color="var(--color-warning)" />
-                        <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
-                            Private Access
+                <div className="landing-nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <Lock size={12} color="var(--color-warning)" />
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            Secure Channel
                         </span>
                     </div>
 
                     <button
-                        className="glass-button icon-btn"
+                        className="glass-button"
                         onClick={() => {
                             soundService.playTap();
                             toggleTheme();
                         }}
-                        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                         style={{
                             background: 'rgba(255, 255, 255, 0.05)',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
                             borderRadius: '50%',
-                            width: 'var(--spacing-xl)',
-                            height: 'var(--spacing-xl)',
+                            width: '40px',
+                            height: '40px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
-                            color: 'var(--color-text-primary)'
+                            color: 'white'
                         }}
                     >
                         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -250,262 +255,179 @@ const PinLoginPage: React.FC = () => {
                 </div>
             </nav>
 
-            <div className="hero-section" style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', height: '100%', overflow: 'hidden' }}>
-                {/* Left Column: Login Form */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-                    <div className="hero-form-container" style={{ maxWidth: '400px', width: '100%', animation: 'fadeIn 0.6s ease-out' }}>
-                        <div className="login-form-wrapper glass-card" style={{ padding: '2.5rem', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 100px rgba(0,0,0,0.8)' }}>
-                            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                                <div style={{ background: 'var(--gradient-primary)', width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', boxShadow: '0 10px 20px rgba(99,102,241,0.3)' }}>
-                                    <Shield size={28} color="white" />
+            <div className="hero-section">
+                {/* Left: Login Sidebar */}
+                <div className="login-sidebar">
+                    <div className="login-form-wrapper">
+                        <div style={{ marginBottom: '2.5rem' }}>
+                            <div style={{ display: 'inline-flex', background: 'rgba(99,102,241,0.1)', padding: '8px', borderRadius: '12px', marginBottom: '1.25rem' }}>
+                                <Shield size={24} color="var(--color-accent)" />
+                            </div>
+                            <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white', letterSpacing: '-0.02em' }}>
+                                {mode === 'username' ? 'Access Terminal' : 'Verify Identity'}
+                            </h2>
+                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '1rem' }}>
+                                {mode === 'username' ? 'Enter your institutional credentials' : `Confirming access for ${username}`}
+                            </p>
+                        </div>
+                        
+                        <div className="login-form">
+                            {/* Step 1: Username Input */}
+                            {mode === 'username' && (
+                                <div className="form-step-container">
+                                    <div className="input-group" style={{ position: 'relative' }}>
+                                        <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', pointerEvents: 'none' }}>
+                                            <User size={20} />
+                                        </div>
+                                        <input
+                                            ref={usernameRef}
+                                            type="text"
+                                            className="landing-input"
+                                            placeholder="Standard ID"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            style={{ height: '60px', paddingLeft: '52px', fontSize: '1rem', color: 'white' }}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
+                                            disabled={isLoading}
+                                            autoCapitalize="none"
+                                            autoComplete="username"
+                                        />
+                                        <button
+                                            onClick={handleUsernameSubmit}
+                                            disabled={isLoading || !username.trim()}
+                                            className="btn btn-primary"
+                                            style={{
+                                                position: 'absolute',
+                                                right: '8px',
+                                                top: '8px',
+                                                bottom: '8px',
+                                                borderRadius: '10px',
+                                                padding: '0 16px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
+                                                fontWeight: 600,
+                                                fontSize: '0.9rem'
+                                            }}
+                                        >
+                                            {isLoading ? '...' : <><ArrowRight size={18} /></>}
+                                        </button>
+                                    </div>
+                                    <div style={{ marginTop: '1.5rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Zap size={14} />
+                                        <span>Authorized access points only</span>
+                                    </div>
                                 </div>
-                                <h2 style={{ fontSize: '1.9rem', fontWeight: 800, marginBottom: '0.3rem', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', letterSpacing: '-0.01em' }}>Login</h2>
-                                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', opacity: 0.8 }}>Secure access for authorized users</p>
-                            </div>
-                            
-                            <div className="login-form">
-                                {/* Step 1: Username Input */}
-                                {mode === 'username' && (
-                                    <div className="form-step-container">
-                                        <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                            <div className="input-with-icon" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                <User size={18} className="input-icon" style={{ color: 'var(--color-text-secondary)', marginLeft: '-8px' }} />
-                                                <input
-                                                    ref={usernameRef}
-                                                    type="text"
-                                                    className="form-input landing-input"
-                                                    placeholder="Username"
-                                                    value={username}
-                                                    onChange={(e) => setUsername(e.target.value)}
-                                                    style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', height: '44px' }}
-                                                    onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
-                                                    disabled={isLoading}
-                                                    autoCapitalize="none"
-                                                    autoCorrect="off"
-                                                    spellCheck={false}
-                                                    autoComplete="username"
-                                                    autoFocus
-                                                />
-                                            </div>
-                                            <button
-                                                onClick={handleUsernameSubmit}
-                                                disabled={isLoading || !username.trim()}
-                                                className="btn btn-primary next-button"
-                                                style={{
-                                                    borderRadius: '12px',
-                                                    width: '44px',
-                                                    height: '44px',
-                                                    minWidth: '44px',
-                                                    padding: '0',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    lineHeight: 1,
-                                                    backgroundColor: 'var(--color-surface)',
-                                                    border: '1px solid var(--color-border-light)'
-                                                }}
-                                            >
-                                                {isLoading ? '...' : <ArrowRight size={20} color="var(--color-accent)" />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                            )}
 
-                                {/* Step 2: PIN Input (Login or Signup) */}
-                                {(mode === 'login' || mode === 'signup') && (
-                                    <div className="form-step-container">
-                                        <div className="form-back-selector" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '0.75rem', width: '100%', marginBottom: '0.8rem' }}>
-                                            <button onClick={goBack} className="glass-button back-btn" style={{ minWidth: '40px', minHeight: '40px', display: 'grid', placeItems: 'center', padding: 0 }}>←</button>
-                                            <span className="user-indicator" style={{ color: theme === 'light' ? 'var(--color-text-secondary)' : 'white', fontWeight: 700, fontSize: '0.95rem' }}>{username || 'User'}</span>
-                                        </div>
-
-                                        <div className="pin-input-group" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
-                                            {pin.map((digit, index) => (
-                                                <input
-                                                    key={index}
-                                                    ref={inputRefs[index]}
-                                                    type="text"
-                                                    inputMode="numeric"
-                                                    maxLength={1}
-                                                    value={digit}
-                                                    onChange={(e) => handlePinChange(index, e.target.value)}
-                                                    onKeyDown={(e) => handleKeyDown(index, e)}
-                                                    disabled={isLoading}
-                                                    className="landing-input pin-field"
-                                                    style={{ width: '56px', height: '56px', textAlign: 'center', fontSize: '1.4rem', fontWeight: 700, padding: '0', borderRadius: '12px', border: '1px solid var(--color-border-light)', color: theme === 'light' ? 'var(--color-text-secondary)' : 'white' }}
-                                                    onFocus={(e) => e.target.select()}
-                                                />
-                                            ))}
-                                        </div>
+                            {/* Step 2: PIN Input */}
+                            {(mode === 'login' || mode === 'signup') && (
+                                <div className="form-step-container" style={{ animation: 'slideInUp 0.4s ease-out' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                                        <button onClick={goBack} className="glass-button" style={{ width: '36px', height: '36px', borderRadius: '10px', padding: 0 }}>←</button>
+                                        <span style={{ color: 'white', fontWeight: 600 }}>{username}</span>
                                     </div>
-                                )}
-                            </div>
+
+                                    <div className="pin-input-group" style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+                                        {pin.map((digit, index) => (
+                                            <input
+                                                key={index}
+                                                ref={inputRefs[index]}
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength={1}
+                                                value={digit}
+                                                onChange={(e) => handlePinChange(index, e.target.value)}
+                                                onKeyDown={(e) => handleKeyDown(index, e)}
+                                                disabled={isLoading}
+                                                className="landing-input"
+                                                style={{ width: '100%', height: '70px', textAlign: 'center', fontSize: '1.75rem', fontWeight: 800, padding: 0, color: 'white' }}
+                                                onFocus={(e) => e.target.select()}
+                                            />
+                                        ))}
+                                    </div>
+                                    <p style={{ marginTop: '1.5rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', textAlign: 'center' }}>
+                                        {mode === 'signup' ? 'Create a secure 4-digit PIN' : 'Enter your 4-digit security PIN'}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* Right Column: Website Overview */}
-                <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-                    {/* Mock Dashboard Overlay (Peek-Behind Effect) */}
-                    <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%)',
-                        zIndex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        opacity: 0.3
+                {/* Right: Content Showcase */}
+                <div className="content-showcase">
+                    <div className="showcase-header">
+                        <div className="access-badge" style={{ display: 'inline-flex', marginBottom: '1.5rem' }}>
+                            <span className="gradient-text" style={{ fontWeight: 800, letterSpacing: '0.1em', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                                The Future of Trading
+                            </span>
+                        </div>
+                        <h1 className="showcase-title">
+                            Institutional Grade <br />
+                            <span className="gradient-text">Intelligence.</span>
+                        </h1>
+                        <p className="showcase-subtitle">
+                            Supercharge your portfolio with AI-driven sentiment analysis, real-time market breadth, and institutional-grade risk management tools.
+                        </p>
+                    </div>
+
+                    <div className="features-compact-grid">
+                        <div className="feature-item-card">
+                            <div className="feature-icon-box">
+                                <Zap size={22} />
+                            </div>
+                            <h3 className="feature-card-title">Smart Momentum</h3>
+                            <p className="feature-card-desc">AI-detected trend shifts before they manifest in price action.</p>
+                        </div>
+                        <div className="feature-item-card">
+                            <div className="feature-icon-box">
+                                <BarChart3 size={22} />
+                            </div>
+                            <h3 className="feature-card-title">Market Breadth</h3>
+                            <p className="feature-card-desc">Deep sector rotation analysis and institutional positioning data.</p>
+                        </div>
+                        <div className="feature-item-card">
+                            <div className="feature-icon-box">
+                                <Shield size={22} />
+                            </div>
+                            <h3 className="feature-card-title">Risk Engine</h3>
+                            <p className="feature-card-desc">Advanced correlation matrix and volatility clustering models.</p>
+                        </div>
+                        <div className="feature-item-card">
+                            <div className="feature-icon-box">
+                                <TrendingUp size={22} />
+                            </div>
+                            <h3 className="feature-card-title">Global Sentiment</h3>
+                            <p className="feature-card-desc">Multi-channel NLP processing for real-time market psychology.</p>
+                        </div>
+                    </div>
+
+                    {/* Integrated mini-tracker peeking from bottom */}
+                    <div style={{ 
+                        position: 'absolute', 
+                        bottom: '-50px', 
+                        right: '4rem', 
+                        width: '400px', 
+                        opacity: 0.4,
+                        pointerEvents: 'none' 
                     }}>
-                        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-                            <Eye size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-                            <div>Live Dashboard Preview</div>
-                            <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Real-time charts & analytics</div>
-                        </div>
-                    </div>
-
-                    {/* Tabbed Overview Carousel */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '2rem', zIndex: 2, position: 'relative' }}>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--color-text-primary)', textAlign: 'center' }}>
-                            Discover StockTracker Pro
-                        </h3>
-
-                        {/* Tab Navigation */}
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            {OVERVIEW_TABS.map((tab, index) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveOverviewTab(index)}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        padding: '0.5rem 1rem',
-                                        background: activeOverviewTab === index ? 'var(--color-accent-light)' : 'rgba(255,255,255,0.05)',
-                                        border: `1px solid ${activeOverviewTab === index ? 'var(--glass-border-bright)' : 'var(--glass-border)'}`,
-                                        borderRadius: '12px',
-                                        color: activeOverviewTab === index ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                                        cursor: 'pointer',
-                                        fontSize: '0.9rem',
-                                        fontWeight: activeOverviewTab === index ? 600 : 500,
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    <tab.icon size={16} />
-                                    {tab.title}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Tab Content */}
-                        <div style={{
-                            flex: 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            textAlign: 'center',
-                            padding: '1rem',
-                            background: 'rgba(255,255,255,0.02)',
-                            borderRadius: '16px',
-                            border: '1px solid var(--glass-border)',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <OVERVIEW_TABS[activeOverviewTab].icon size={48} color="var(--color-accent)" />
-                            </div>
-                            <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>
-                                {OVERVIEW_TABS[activeOverviewTab].title}
-                            </h4>
-                            <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                                {OVERVIEW_TABS[activeOverviewTab].description}
-                            </p>
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'left', width: '100%', maxWidth: '300px' }}>
-                                {OVERVIEW_TABS[activeOverviewTab].features.map((feature, idx) => (
-                                    <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-                                        <div style={{ width: '6px', height: '6px', background: 'var(--color-accent)', borderRadius: '50%' }}></div>
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Navigation Arrows */}
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-                            <button
-                                onClick={() => setActiveOverviewTab((activeOverviewTab - 1 + OVERVIEW_TABS.length) % OVERVIEW_TABS.length)}
-                                style={{
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: '1px solid var(--glass-border)',
-                                    borderRadius: '50%',
-                                    width: '40px',
-                                    height: '40px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    color: 'var(--color-text-secondary)'
-                                }}
-                            >
-                                <ChevronLeft size={20} />
-                            </button>
-                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                {OVERVIEW_TABS.map((_, index) => (
-                                    <div
-                                        key={index}
-                                        style={{
-                                            width: '8px',
-                                            height: '8px',
-                                            borderRadius: '50%',
-                                            background: activeOverviewTab === index ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={() => setActiveOverviewTab(index)}
-                                    />
-                                ))}
-                            </div>
-                            <button
-                                onClick={() => setActiveOverviewTab((activeOverviewTab + 1) % OVERVIEW_TABS.length)}
-                                style={{
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: '1px solid var(--glass-border)',
-                                    borderRadius: '50%',
-                                    width: '40px',
-                                    height: '40px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    color: 'var(--color-text-secondary)'
-                                }}
-                            >
-                                <ChevronRight size={20} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Integrated Feature Grid (Compact Showcase) */}
-                    <div style={{ flex: 1, padding: '1rem', zIndex: 2, position: 'relative', maxHeight: '50vh', overflow: 'hidden' }}>
-                        <BenefitsGrid style={{ height: '100%', overflow: 'hidden' }} />
-                        <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-                            Explore more features after login
-                        </div>
+                        <AIPerformanceTracker />
                     </div>
                 </div>
             </div>
 
             {activeModal && (
-                <div className="modal-overlay glass-blur" onClick={() => setActiveModal(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 'clamp(320px, 90vw, 500px)', width: '90%', background: 'var(--color-bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-lg)', padding: '0', overflow: 'hidden' }}>
-                        <div className="modal-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 className="modal-title" style={{ margin: 0 }}>{FOOTER_CONTENT[activeModal].title}</h3>
-                            <button className="btn btn-icon glass-button" onClick={() => setActiveModal(null)}><X size={20} /></button>
+                <div className="modal-overlay glass-blur" onClick={() => setActiveModal(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 'clamp(320px, 90vw, 500px)', width: '90%', background: 'rgb(10, 11, 20)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', padding: '0', overflow: 'hidden' }}>
+                        <div className="modal-header" style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 className="modal-title" style={{ margin: 0, color: 'white' }}>{FOOTER_CONTENT[activeModal].title}</h3>
+                            <button className="btn btn-icon glass-button" onClick={() => setActiveModal(null)} style={{ color: 'white' }}><X size={20} /></button>
                         </div>
-                        <div className="modal-body" style={{ padding: '1.5rem', fontSize: '1rem', lineHeight: '1.6', color: 'var(--color-text-secondary)' }}>
+                        <div className="modal-body" style={{ padding: '1.5rem', fontSize: '1rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.6)' }}>
                             {FOOTER_CONTENT[activeModal].content}
                         </div>
-                        <div className="modal-footer" style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'flex-end' }}>
+                        <div className="modal-footer" style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'flex-end' }}>
                             <button className="btn btn-primary" onClick={() => setActiveModal(null)}>Close</button>
                         </div>
                     </div>
@@ -516,3 +438,4 @@ const PinLoginPage: React.FC = () => {
 };
 
 export default PinLoginPage;
+

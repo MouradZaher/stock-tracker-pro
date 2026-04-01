@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-    RefreshCw, X, Zap, ArrowRight, Check, TrendingUp, 
-    MessageSquare, BarChart2, Sparkles, LayoutGrid, 
+import {
+    RefreshCw, X, Zap, ArrowRight, Check, TrendingUp,
+    MessageSquare, BarChart2, Sparkles, LayoutGrid,
     Shield, Search, Activity, Globe, ZapOff, Fingerprint,
     Cpu, Target, Command as CommandIcon, Brain, Layers
 } from 'lucide-react';
@@ -27,12 +27,12 @@ const AlphaPickCard: React.FC<{ rec: any; onClick: () => void }> = ({ rec, onCli
     };
 
     return (
-        <div 
+        <div
             onClick={onClick}
             className="glass-card hover-lift"
-            style={{ 
-                padding: '1.25rem', 
-                cursor: 'pointer', 
+            style={{
+                padding: '1.25rem',
+                cursor: 'pointer',
                 border: '1px solid var(--glass-border)',
                 background: 'rgba(255,255,255,0.02)',
                 position: 'relative',
@@ -65,10 +65,10 @@ const AlphaPickCard: React.FC<{ rec: any; onClick: () => void }> = ({ rec, onCli
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <span style={{ 
-                        padding: '4px 10px', 
-                        borderRadius: '6px', 
-                        fontSize: '0.65rem', 
+                    <span style={{
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.65rem',
                         fontWeight: 900,
                         background: rec.recommendation === 'Buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
                         color: rec.recommendation === 'Buy' ? 'var(--color-success)' : 'var(--color-warning)',
@@ -79,7 +79,7 @@ const AlphaPickCard: React.FC<{ rec: any; onClick: () => void }> = ({ rec, onCli
                     </span>
                 </div>
             </div>
-            
+
             <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.05)', marginTop: '1rem', borderRadius: '2px', overflow: 'hidden' }}>
                 <div style={{ width: `${rec.score}%`, height: '100%', background: getScoreColor(rec.score), borderRadius: '2px', boxShadow: `0 0 8px ${getScoreColor(rec.score)}` }} />
             </div>
@@ -124,7 +124,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
     const [activeRecs, setActiveRecs] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileTab, setMobileTab] = useState<MobileTab>('alpha');
-    
+
     // Swipe state for mobile
     const [swipeIndex, setSwipeIndex] = useState(0);
     const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -141,8 +141,8 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
 
     const suggestions = useMemo(() => {
         if (!searchQuery) return [];
-        return allSearchable.filter(s => 
-            s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        return allSearchable.filter(s =>
+            s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
             s.name.toLowerCase().includes(searchQuery.toLowerCase())
         ).slice(0, 5);
     }, [searchQuery, allSearchable]);
@@ -162,7 +162,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
         setIsScanning(true);
         setScanProgress(0);
         soundService.playTap();
-        
+
         for (let i = 0; i <= 100; i += 5) {
             await new Promise(r => setTimeout(r, 80));
             setScanProgress(i);
@@ -200,10 +200,10 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
     };
 
     return (
-        <div className="ai-cockpit-container dashboard-viewport" style={{ 
-            height: '100%', 
-            display: 'flex', 
-            flexDirection: 'column', 
+        <div className="ai-cockpit-container dashboard-viewport" style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
             overflow: 'hidden',
             background: 'var(--color-bg-primary)',
             position: 'relative',
@@ -215,13 +215,13 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <AIIntelligenceStream />
                 </div>
-                
+
                 {/* Horizontal Navigation Sub-Bar */}
-                <div className="desktop-only" style={{ 
-                    display: 'flex', 
-                    background: 'rgba(255,255,255,0.03)', 
-                    padding: '4px', 
-                    borderRadius: '12px', 
+                <div className="desktop-only" style={{
+                    display: 'flex',
+                    background: 'rgba(255,255,255,0.03)',
+                    padding: '4px',
+                    borderRadius: '12px',
                     border: '1px solid var(--glass-border)',
                     height: '42px',
                     alignItems: 'center'
@@ -259,14 +259,14 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             </div>
 
             {/* ─── DESKTOP COMMAND CENTER (VARIABLE GRID) ─── */}
-            <div className="desktop-only" style={{ 
-                display: 'grid', 
-                gridTemplateColumns: viewMode === 'terminal' ? '320px 1fr 340px' : (viewMode === 'intel' ? '320px 1fr' : '1fr 340px'), 
-                gap: '1rem', 
-                flex: 1, 
-                minHeight: 0 
+            <div className="desktop-only" style={{
+                display: 'grid',
+                gridTemplateColumns: viewMode === 'terminal' ? '320px 1fr 340px' : (viewMode === 'intel' ? '320px 1fr' : '1fr 340px'),
+                gap: '1rem',
+                flex: 1,
+                minHeight: 0
             }}>
-                
+
                 {/* Column 1: Alpha Entry & Picks (Hidden in Strategy Focus) */}
                 {viewMode !== 'strategy' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
@@ -275,8 +275,8 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                             <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
                                 <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '10px', border: '1px solid var(--glass-border)', padding: '0 0.75rem' }}>
                                     <Search size={14} className="text-accent" />
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={searchQuery}
                                         onChange={e => {
                                             setSearchQuery(e.target.value);
@@ -292,17 +292,17 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
 
                             {/* Autocomplete Suggestions */}
                             {showSuggestions && suggestions.length > 0 && (
-                                <div style={{ 
-                                    position: 'absolute', top: '100%', left: '0.75rem', right: '0.75rem', 
-                                    background: 'rgba(15,15,25,0.98)', border: '1px solid var(--glass-border)', 
+                                <div style={{
+                                    position: 'absolute', top: '100%', left: '0.75rem', right: '0.75rem',
+                                    background: 'rgba(15,15,25,0.98)', border: '1px solid var(--glass-border)',
                                     borderRadius: '10px', marginTop: '4px', zIndex: 1000, overflow: 'hidden',
                                     boxShadow: '0 10px 30px rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)'
                                 }}>
                                     {suggestions.map((s, idx) => (
-                                        <div 
+                                        <div
                                             key={s.symbol + idx}
                                             onClick={() => handleSearch(s.symbol)}
-                                            style={{ 
+                                            style={{
                                                 padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)',
                                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                                             }}
@@ -368,7 +368,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
 
             {/* ─── MOBILE COMMAND CENTER (TABBED INTERFACE) ─── */}
             <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: '1rem' }}>
-                
+
                 {/* Mobile Tab Switcher */}
                 <div style={{ display: 'flex', gap: '8px', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', flexShrink: 0 }}>
                     {[
