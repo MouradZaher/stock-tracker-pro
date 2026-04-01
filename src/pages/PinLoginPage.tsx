@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Shield, Lock, Sun, Moon, User, ArrowRight, UserPlus, X, BarChart3, TrendingUp, Zap, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Shield, Lock, Sun, Moon, User, ArrowRight, X, BarChart3, TrendingUp, Zap } from 'lucide-react';
 import { usePinAuth } from '../contexts/PinAuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
-import BenefitsGrid from '../components/BenefitsGrid';
+
 import AIPerformanceTracker from '../components/AIPerformanceTracker';
 import TopBar from '../components/TopBar';
 import './LandingPage.css';
@@ -18,48 +18,8 @@ const PinLoginPage: React.FC = () => {
     const [pin, setPin] = useState(['', '', '', '']);
     const [mode, setMode] = useState<'username' | 'login' | 'signup'>('username');
     const [isLoading, setIsLoading] = useState(false);
-    const [userExists, setUserExists] = useState(false);
     const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'support' | 'compliance' | null>(null);
-    const [activeOverviewTab, setActiveOverviewTab] = useState(0);
 
-    const OVERVIEW_TABS = [
-        {
-            id: 'ai-insights',
-            title: 'AI-Powered Insights',
-            icon: Zap,
-            description: 'Advanced algorithms analyze market sentiment, predict trends, and provide actionable recommendations.',
-            features: [
-                'Sentiment analysis from news & social media',
-                'Predictive modeling for price movements',
-                'Automated trading signals',
-                'Risk assessment reports'
-            ]
-        },
-        {
-            id: 'portfolio-tracking',
-            title: 'Live Portfolio Tracking',
-            icon: BarChart3,
-            description: 'Real-time monitoring of your investments with comprehensive performance analytics.',
-            features: [
-                'Real-time P&L calculations',
-                'Custom performance charts',
-                'Dividend tracking & alerts',
-                'Tax lot management'
-            ]
-        },
-        {
-            id: 'market-intelligence',
-            title: 'Market Intelligence',
-            icon: TrendingUp,
-            description: 'Comprehensive market data visualization and correlation analysis tools.',
-            features: [
-                'Interactive heatmaps',
-                'Correlation matrix analysis',
-                'Real-time news aggregation',
-                'Sector performance tracking'
-            ]
-        }
-    ];
 
     const FOOTER_CONTENT = {
         privacy: {
@@ -107,7 +67,7 @@ const PinLoginPage: React.FC = () => {
 
         try {
             const result = await checkUser(username.trim());
-            setUserExists(result.exists);
+
 
             if (result.exists) {
                 setMode('login');
