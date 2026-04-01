@@ -129,6 +129,24 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
     const [swipeIndex, setSwipeIndex] = useState(0);
     const [touchStart, setTouchStart] = useState<number | null>(null);
 
+
+    // View mode state for horizontal nav
+    const [viewMode, setViewMode] = useState<'terminal' | 'intel' | 'strategy'>('terminal');
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Merge all recs for searchable suggestions
+    const allSearchable = useMemo(() => {
+        return [...US_RECS, ...EGYPT_RECS, ...ABUDHABI_RECS];
+    }, []);
+
+    const suggestions = useMemo(() => {
+        if (!searchQuery) return [];
+        return allSearchable.filter(s => 
+            s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            s.name.toLowerCase().includes(searchQuery.toLowerCase())
+        ).slice(0, 5);
+    }, [searchQuery, allSearchable]);
+
     const INSTANT_RECS = useMemo(() => {
         return [...(RECS_MAP[selectedMarket.id] || US_RECS)].sort((a, b) => b.score - a.score);
     }, [selectedMarket.id]);
@@ -159,12 +177,14 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
         addNotification({ title: 'System Calibrated', message: `Alpha Engine synced with ${selectedMarket.name}.`, type: 'ai' });
     };
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery && onSelectStock) {
-            onSelectStock(searchQuery.toUpperCase());
-            toast.success(`Alpha Engine: Deep audit for ${searchQuery.toUpperCase()}`);
+    const handleSearch = (e: React.FormEvent | string) => {
+        if (typeof e !== 'string') e.preventDefault();
+        const symbol = typeof e === 'string' ? e : searchQuery;
+        if (symbol && onSelectStock) {
+            onSelectStock(symbol.toUpperCase());
+            toast.success(`Alpha Engine: Deep audit for ${symbol.toUpperCase()}`);
             setSearchQuery('');
+            setShowSuggestions(false);
         }
     };
 
@@ -190,80 +210,160 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             padding: '1rem',
             boxSizing: 'border-box'
         }}>
-            {/* 1. TOP STREAM (Zero-Scroll Friendly) */}
-            <div style={{ marginBottom: '1rem', flexShrink: 0 }}>
-                <AIIntelligenceStream />
+            {/* 1. TOP HEADER ROW */}
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem', flexShrink: 0, alignItems: 'center' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <AIIntelligenceStream />
+                </div>
+                
+                {/* Horizontal Navigation Sub-Bar */}
+                <div className="desktop-only" style={{ 
+                    display: 'flex', 
+                    background: 'rgba(255,255,255,0.03)', 
+                    padding: '4px', 
+                    borderRadius: '12px', 
+                    border: '1px solid var(--glass-border)',
+                    height: '42px',
+                    alignItems: 'center'
+                }}>
+                    {[
+                        { id: 'terminal', label: 'TERMINAL', icon: LayoutGrid },
+                        { id: 'intel', label: 'ALPHA INTEL', icon: Target },
+                        { id: 'strategy', label: 'STRATEGY', icon: Cpu }
+                    ].map(btn => (
+                        <button
+                            key={btn.id}
+                            onClick={() => setViewMode(btn.id as any)}
+                            style={{
+                                padding: '0 1.25rem',
+                                height: '34px',
+                                border: 'none',
+                                background: viewMode === btn.id ? 'var(--color-accent)' : 'transparent',
+                                color: viewMode === btn.id ? 'white' : 'var(--color-text-tertiary)',
+                                fontSize: '0.65rem',
+                                fontWeight: 900,
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                transition: 'all 0.2s',
+                                letterSpacing: '0.05em'
+                            }}
+                        >
+                            <btn.icon size={14} />
+                            {btn.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {/* ─── DESKTOP COMMAND CENTER (3-COLUMN BENTO) ─── */}
-            <div className="desktop-only" style={{ display: 'grid', gridTemplateColumns: '320px 1fr 340px', gap: '1rem', flex: 1, minHeight: 0 }}>
+            {/* ─── DESKTOP COMMAND CENTER (VARIABLE GRID) ─── */}
+            <div className="desktop-only" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: viewMode === 'terminal' ? '320px 1fr 340px' : (viewMode === 'intel' ? '320px 1fr' : '1fr 340px'), 
+                gap: '1rem', 
+                flex: 1, 
+                minHeight: 0 
+            }}>
                 
-                {/* Column 1: Alpha Entry & Picks */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
-                    {/* Search / Audit Trigger */}
-                    <div className="glass-card" style={{ padding: '0.75rem', flexShrink: 0 }}>
-                        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
-                            <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '10px', border: '1px solid var(--glass-border)', padding: '0 0.75rem' }}>
-                                <Search size={14} className="text-accent" />
-                                <input 
-                                    type="text" 
-                                    value={searchQuery}
-                                    onChange={e => setSearchQuery(e.target.value)}
-                                    placeholder="Universal Asset Analysis..."
-                                    style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '8px', fontSize: '0.75rem', outline: 'none' }}
-                                />
+                {/* Column 1: Alpha Entry & Picks (Hidden in Strategy Focus) */}
+                {viewMode !== 'strategy' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
+                        {/* Search / Audit Trigger with Autocomplete */}
+                        <div className="glass-card" style={{ padding: '0.75rem', flexShrink: 0, position: 'relative', zIndex: 100 }}>
+                            <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
+                                <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: '10px', border: '1px solid var(--glass-border)', padding: '0 0.75rem' }}>
+                                    <Search size={14} className="text-accent" />
+                                    <input 
+                                        type="text" 
+                                        value={searchQuery}
+                                        onChange={e => {
+                                            setSearchQuery(e.target.value);
+                                            setShowSuggestions(true);
+                                        }}
+                                        onFocus={() => setShowSuggestions(true)}
+                                        placeholder="Scan Ticker..."
+                                        style={{ flex: 1, background: 'transparent', border: 'none', color: 'white', padding: '8px', fontSize: '0.75rem', outline: 'none' }}
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary" style={{ padding: '0 12px', borderRadius: '10px', fontWeight: 900, fontSize: '0.7rem', height: '36px' }}>SCAN</button>
+                            </form>
+
+                            {/* Autocomplete Suggestions */}
+                            {showSuggestions && suggestions.length > 0 && (
+                                <div style={{ 
+                                    position: 'absolute', top: '100%', left: '0.75rem', right: '0.75rem', 
+                                    background: 'rgba(15,15,25,0.98)', border: '1px solid var(--glass-border)', 
+                                    borderRadius: '10px', marginTop: '4px', zIndex: 1000, overflow: 'hidden',
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)'
+                                }}>
+                                    {suggestions.map((s, idx) => (
+                                        <div 
+                                            key={s.symbol + idx}
+                                            onClick={() => handleSearch(s.symbol)}
+                                            style={{ 
+                                                padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                                            }}
+                                            className="hover-bg-accent"
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <CompanyLogo symbol={s.symbol} size={24} />
+                                                <span style={{ fontWeight: 800, fontSize: '0.8rem' }}>{s.symbol}</span>
+                                            </div>
+                                            <span style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{s.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Alpha Picks List */}
+                        <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', minHeight: 0 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexShrink: 0 }}>
+                                <h3 style={{ margin: 0, fontSize: '0.75rem', fontWeight: 900, color: 'white', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Sparkles size={14} className="text-accent" /> ALPHA DECK
+                                </h3>
+                                <button onClick={runScanner} disabled={isScanning} className="glass-button" style={{ padding: '4px 8px', fontSize: '0.6rem', borderRadius: '6px' }}>
+                                    {isScanning ? <RefreshCw size={10} className="spin" /> : <RefreshCw size={10} />}
+                                </button>
                             </div>
-                            <button type="submit" className="btn btn-primary" style={{ padding: '0 12px', borderRadius: '10px', fontWeight: 900, fontSize: '0.7rem', height: '36px' }}>RUN AUDIT</button>
-                        </form>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '10px' }}>
-                            {['DCF VALUATION', 'HEDGE FLOWS', 'MACRO', 'RISK'].map(t => (
-                                <span key={t} style={{ fontSize: '0.5rem', color: 'var(--color-text-tertiary)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                    <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} /> {t}
-                                </span>
-                            ))}
+                            <div className="custom-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingRight: '4px' }}>
+                                {displayedRecs.map((rec, i) => (
+                                    <AlphaPickCard key={rec.symbol + i} rec={rec} onClick={() => onSelectStock && onSelectStock(rec.symbol)} />
+                                ))}
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    {/* Alpha Picks List */}
-                    <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', minHeight: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexShrink: 0 }}>
-                            <h3 style={{ margin: 0, fontSize: '0.75rem', fontWeight: 900, color: 'white', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <Sparkles size={14} className="text-accent" /> TOP LIVERATED AI PICKS
+                {/* Column 2: The ARIA Intelligence Hub (Expanded in Intel Focus) */}
+                {viewMode !== 'strategy' && (
+                    <div style={{ minHeight: 0 }}>
+                        <AIInstitutionalHub />
+                    </div>
+                )}
+
+                {/* Column 3: Control & Strategy (Expanded in Strategy Focus) */}
+                {viewMode !== 'intel' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
+                        {/* Performance Metrics */}
+                        <div style={{ height: viewMode === 'strategy' ? '200px' : '140px', flexShrink: 0 }}>
+                            <AIPerformanceTracker condensed={true} />
+                        </div>
+
+                        {/* Strategic Command */}
+                        <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', minHeight: 0 }}>
+                            <h3 style={{ margin: '0 0 1rem 0', fontSize: '0.75rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Cpu size={14} className="text-accent" /> STRATEGIC COMMAND
                             </h3>
-                            <button onClick={runScanner} disabled={isScanning} className="glass-button" style={{ padding: '4px 8px', fontSize: '0.6rem', borderRadius: '6px' }}>
-                                {isScanning ? <RefreshCw size={10} className="spin" /> : <RefreshCw size={10} />}
-                            </button>
-                        </div>
-                        <div className="custom-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingRight: '4px' }}>
-                            {displayedRecs.map((rec, i) => (
-                                <AlphaPickCard key={rec.symbol + i} rec={rec} onClick={() => onSelectStock && onSelectStock(rec.symbol)} />
-                            ))}
+                            <div style={{ flex: 1, minHeight: 0 }}>
+                                <AIStrategyIntelliHub condensed={true} />
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Column 2: The ARIA Intelligence Hub */}
-                <div style={{ minHeight: 0 }}>
-                    <AIInstitutionalHub />
-                </div>
-
-                {/* Column 3: Control & Strategy */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: 0 }}>
-                    {/* Performance Metrics */}
-                    <div style={{ height: '140px', flexShrink: 0 }}>
-                        <AIPerformanceTracker condensed={true} />
-                    </div>
-
-                    {/* Strategic Command */}
-                    <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', minHeight: 0 }}>
-                        <h3 style={{ margin: '0 0 1rem 0', fontSize: '0.75rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Cpu size={14} className="text-accent" /> STRATEGIC RESULT FLOW
-                        </h3>
-                        <div style={{ flex: 1, minHeight: 0 }}>
-                            <AIStrategyIntelliHub condensed={true} />
-                        </div>
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* ─── MOBILE COMMAND CENTER (TABBED INTERFACE) ─── */}
@@ -325,6 +425,9 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                   height: calc(100vh - var(--total-header-height));
                   overflow: hidden;
                 }
+                .hover-bg-accent:hover {
+                    background: rgba(168, 85, 247, 0.1) !important;
+                }
                 .custom-scroll {
                   scrollbar-width: thin;
                   scrollbar-color: var(--color-accent-light) transparent;
@@ -349,6 +452,5 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
         </div>
     );
 };
-
 
 export default AIRecommendations;
