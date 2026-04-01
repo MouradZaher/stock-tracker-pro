@@ -556,48 +556,9 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                 changePercent={stock.changePercent}
             />
 
-            {/* Institutional Alpha Intelligence Hub */}
-            <div className="section" style={{ marginTop: '2.5rem' }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: '1.5rem',
-                    borderBottom: '1px solid var(--glass-border)',
-                    paddingBottom: '1rem'
-                }}>
-                    <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-                        <Shield size={24} className="text-accent" />
-                        Institutional Alpha Intelligence
-                    </h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', fontSize: '0.6rem', fontWeight: 900, padding: '4px 10px', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>📡 ACTIVE_SYNC</div>
-                        <div style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--color-accent)', fontSize: '0.6rem', fontWeight: 900, padding: '4px 10px', borderRadius: '4px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>🔐 SECURE_NODE</div>
-                    </div>
-                </div>
 
-                {/* Alpha Pulse Bar */}
-                <div className="glass-card" style={{ padding: '0', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '2rem', border: '1px solid rgba(99, 102, 241, 0.3)', background: 'rgba(10, 10, 20, 0.4)' }}>
-                    <div style={{ padding: '1rem 1.5rem', borderRight: '1px solid var(--glass-border)' }}>
-                        <div className="alpha-label">GLOBAL_RANK</div>
-                        <div className="alpha-value" style={{ color: 'var(--color-accent)', fontSize: '1rem' }}>#12 / Institutional</div>
-                    </div>
-                    <div style={{ padding: '1rem 1.5rem', borderRight: '1px solid var(--glass-border)' }}>
-                        <div className="alpha-label">LIVE MOMENTUM FLOW</div>
-                        <LiveMomentum symbol={symbol} compact={true} />
-                    </div>
-                    <div style={{ padding: '1rem 1.5rem', borderRight: '1px solid var(--glass-border)' }}>
-                        <div className="alpha-label">SENTIMENT_FLOW</div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-success)' }}>
-                            <div className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-success)' }} />
-                            <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>ACCUMULATING</span>
-                        </div>
-                    </div>
-                    <div style={{ padding: '1rem 1.5rem' }}>
-                        <div className="alpha-label">SECURE_NODE</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>ARIA_CORE_v4.2</div>
-                    </div>
-                </div>
+            {/* Detailed ARIA Research Hub */}
+            <div className="section" style={{ marginTop: '2.5rem' }}>
 
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 3fr', gap: '2rem' }}>
