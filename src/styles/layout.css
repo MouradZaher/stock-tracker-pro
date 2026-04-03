@@ -137,7 +137,7 @@
   width: 100%;
   padding: 0;
   margin: 0;
-  overflow-y: auto;
+  overflow: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
 }
@@ -194,10 +194,15 @@
 .bento-span-4 { grid-column: span 4; }
 .bento-span-3 { grid-column: span 3; }
 
-/* Desktop Tab Responsiveness */
+/* Desktop Tab Responsiveness — NO padding on .tab-content itself.
+   Each page component handles its own internal padding via dashboard-viewport. */
 @media (min-width: 769px) {
   .tab-content {
-    padding: 0 2rem 1rem 2rem;
+    padding: 0;
+  }
+  /* ONLY the home tab is allowed to scroll vertically */
+  .home-tab-content {
+    overflow-y: auto !important;
   }
 }
 
