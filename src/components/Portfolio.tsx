@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save, Cloud, CheckCircle, RefreshCw, AlertTriangle, Sparkles } from 'lucide-react';
+import { Plus, Trash2, X, Zap, Bell, ShieldCheck, BarChart2, TrendingUp, TrendingDown, Minus, ArrowRight, Pencil, Save, Cloud, CheckCircle, RefreshCw, AlertTriangle, Sparkles, LayoutGrid } from 'lucide-react';
 
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +20,7 @@ import RealTimePrice from './RealTimePrice';
 import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 import CompanyLogo from './CompanyLogo';
 import RiskReturnChart from './RiskReturnChart';
+import SubNavbar from './SubNavbar';
 
 // --- NEW: Scenario Hedging Component ---
 const ScenarioHedging: React.FC<{ positions: any[] }> = ({ positions }) => {
@@ -108,6 +109,7 @@ const ScenarioHedging: React.FC<{ positions: any[] }> = ({ positions }) => {
         </div>
     );
 };
+
 interface PortfolioProps {
     onSelectSymbol?: (symbol: string) => void;
 }
@@ -115,122 +117,52 @@ interface PortfolioProps {
 const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
     const { selectedMarket } = useMarket();
-    // Currency formatter shorthand
     const fmt = (v: number) => formatCurrencyForMarket(v, selectedMarket.currency);
-    // ... existing hooks ...
-    const { positions: allPositions, addPosition, removePosition, updatePosition, getSummary, getAdvancedMetrics, updatePrice, syncPrices, isSyncing } = usePortfolioStore();
+    const { positions: allPositions, addPosition, removePosition, updatePosition, getAdvancedMetrics, updatePrice, syncPrices } = usePortfolioStore();
 
-    // Filter positions based on selected market
     const positions = React.useMemo(() => {
         return allPositions.filter(pos => getMarketForSymbol(pos.symbol) === selectedMarket.id);
     }, [allPositions, selectedMarket.id]);
+
     const [showModal, setShowModal] = useState(false);
-    const [editingPosition, setEditingPosition] = useState<{ id: string; symbol: string; name: string; units: number; avgCost: number; currentPrice: number } | null>(null);
+    const [editingPosition, setEditingPosition] = useState<any | null>(null);
     const [editForm, setEditForm] = useState({ units: '', avgCost: '' });
     const [isSavingEdit, setIsSavingEdit] = useState(false);
-    const [activeSubTab, setActiveSubTab] = useState<'positions' | 'intelligence'>('positions');
-
-    // ... existing state ...
+    const [activeSubTab, setActiveSubTab] = useState<'overview' | 'positions' | 'intelligence'>('overview');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showAIAdvice, setShowAIAdvice] = useState(false);
     const [aiRecs, setAiRecs] = useState<Record<string, StockRecommendation>>({});
     const [newlyAddedSymbol, setNewlyAddedSymbol] = useState<string | null>(null);
-
-    const [formData, setFormData] = useState({
-        symbol: '',
-        units: '',
-        avgCost: '',
-        name: '',
-        currentPrice: 0 as number
-    });
-
+    const [formData, setFormData] = useState({ symbol: '', units: '', avgCost: '', name: '', currentPrice: 0 });
     const [alertConfig, setAlertConfig] = useState<{ symbol: string; price: number } | null>(null);
-    const { checkPrice } = usePriceAlerts();
 
-    // Safety: Ensure getSummary never crashes
     const summary = React.useMemo(() => {
-        try {
-            // Calculate GLOBAL totals across all markets for the summary cards
-            const globalTotalValueUSD = allPositions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
-            
-            // Local market totals (for the list context)
-            const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
-            const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
-            const totalProfitLoss = totalValue - totalCost;
-            const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
+        const globalTotalValueUSD = allPositions.reduce((sum, pos) => sum + (pos.marketValueUSD || 0), 0);
+        const totalValue = positions.reduce((sum, pos) => sum + pos.marketValue, 0);
+        const totalCost = positions.reduce((sum, pos) => sum + pos.purchaseValue, 0);
+        const totalProfitLoss = totalValue - totalCost;
+        const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
 
-            return {
-                totalValue,
-                normalizedTotalValueUSD: globalTotalValueUSD,
-                totalCost,
-                totalProfitLoss,
-                totalProfitLossPercent,
-                positions
-            };
-        } catch (error) {
-            console.error('Error getting portfolio summary:', error);
-            return {
-                totalValue: 0,
-                normalizedTotalValueUSD: 0,
-                totalCost: 0,
-                totalProfitLoss: 0,
-                totalProfitLossPercent: 0,
-                positions: []
-            };
-        }
-    }, [allPositions, positions]); // Recompute when any positions change
+        return {
+            totalValue,
+            normalizedTotalValueUSD: globalTotalValueUSD,
+            totalCost,
+            totalProfitLoss,
+            totalProfitLossPercent,
+            positions
+        };
+    }, [allPositions, positions]);
 
-    // --- NEW: Live Ticker State ---
-    const [liveTicker, setLiveTicker] = useState<{ symbol: string, type: 'up' | 'down', value: number } | null>(null);
-
-    // Effect to simulate live activity for visual feedback
     useEffect(() => {
-        if (positions.length === 0) return;
-        
-        const tickInterval = setInterval(() => {
-            const randomPos = positions[Math.floor(Math.random() * positions.length)];
-            const isUp = Math.random() > 0.45;
-            const fluctuation = (randomPos.currentPrice * 0.0001);
-            
-            setLiveTicker({
-                symbol: randomPos.symbol,
-                type: isUp ? 'up' : 'down',
-                value: fluctuation
-            });
-            
-            // Clear ticker after 1.5s
-            setTimeout(() => setLiveTicker(null), 1500);
-        }, 3000);
-
-        return () => clearInterval(tickInterval);
-    }, [positions.length]);
-
-    // Use ref to track symbols for price updates without causing re-renders
-    const positionSymbolsRef = useRef<string[]>([]);
-
-    // Update the ref when positions change (but don't trigger effect)
-    useEffect(() => {
-        positionSymbolsRef.current = positions.map(p => p.symbol);
-    }, [positions]);
-
-    // Update prices periodically using the multi-source syncPrices action
-    useEffect(() => {
-        // Initial sync
         syncPrices();
-
-        const interval = setInterval(() => {
-            syncPrices();
-        }, REFRESH_INTERVALS.PORTFOLIO);
-
+        const interval = setInterval(syncPrices, REFRESH_INTERVALS.PORTFOLIO);
         return () => clearInterval(interval);
     }, [syncPrices]);
 
-    // Fetch AI Recommendations for positions
     useEffect(() => {
         const fetchAIRecs = async () => {
             const symbols = positions.map(p => p.symbol);
             if (symbols.length === 0) return;
-
             const recs: Record<string, StockRecommendation> = {};
             for (const sym of symbols) {
                 const rec = await analyzeSymbol(sym);
@@ -238,108 +170,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             }
             setAiRecs(recs);
         };
-
         fetchAIRecs();
-        const interval = setInterval(fetchAIRecs, 60000); // Refresh AI recs every minute
-        return () => clearInterval(interval);
-    }, [positions.length]); // Re-fetch only when a position is added/removed
-
-    const getRecIcon = (rec?: string) => {
-        if (rec === 'Buy') return <TrendingUp size={14} color="var(--color-success)" />;
-        if (rec === 'Sell') return <TrendingDown size={14} color="var(--color-error)" />;
-        return <Minus size={14} color="var(--color-warning)" />;
-    };
-
-    // Compute rebalancing advice synchronously — stays live with positions
-    const rebalancingActions = React.useMemo(() => {
-        if (!showAIAdvice || positions.length === 0) return [];
-        const totalValue = positions.reduce((sum, p) => sum + (p.marketValue || 0), 0);
-        if (totalValue === 0) return [];
-
-        const actions: import('../services/aiRecommendationService').RebalancingAction[] = [];
-        const sectorTotals: Record<string, number> = {};
-
-        for (const p of positions) {
-            const allocation = (p.marketValue / totalValue) * 100;
-            const sector = p.sector || 'Other';
-            sectorTotals[sector] = (sectorTotals[sector] || 0) + allocation;
-
-            // Relaxed rules for hedging assets (GLD, SLV, VOO)
-            const isHedgingAsset = ['GLD', 'SLV', 'VOO'].includes(p.symbol);
-            const limit = isHedgingAsset ? 30 : 5;
-
-            if (allocation > limit) {
-                actions.push({
-                    symbol: p.symbol,
-                    action: 'Trim',
-                    reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the ${limit}% ${isHedgingAsset ? 'strategic hedging' : 'institutional'} limit.`,
-                    impact: `Trim to ~${limit}% to maintain balanced exposure.`,
-                    priority: allocation > (limit + 10) ? 'High' : 'Medium'
-                });
-            }
-
-            const plPct = p.profitLossPercent ?? 0;
-            if (plPct < -15 && !actions.find(a => a.symbol === p.symbol)) {
-                actions.push({
-                    symbol: p.symbol,
-                    action: plPct < -25 ? 'Exit' : 'Trim',
-                    reason: `Down ${Math.abs(plPct).toFixed(1)}% — exceeds drawdown threshold.`,
-                    impact: `Cut loss to free capital for higher-conviction positions.`,
-                    priority: plPct < -25 ? 'High' : 'Medium'
-                });
-            }
-        }
-
-        for (const [sector, allocation] of Object.entries(sectorTotals)) {
-            // Relaxed rules for Commodities and Diversified sectors
-            const isHedgingSector = ['Commodities', 'Diversified'].includes(sector);
-            const sectorLimit = isHedgingSector ? 40 : 20;
-
-            if (allocation > sectorLimit) {
-                actions.push({
-                    symbol: sector,
-                    action: 'Trim',
-                    reason: `${sector} is ${allocation.toFixed(1)}% of portfolio — exceeds ${sectorLimit}% sector cap.`,
-                    impact: `Improve diversification across other sectors.`,
-                    priority: allocation > (sectorLimit + 10) ? 'High' : 'Medium'
-                });
-            }
-        }
-
-        if (actions.length === 0) {
-            actions.push({
-                symbol: 'PORTFOLIO',
-                action: 'Hold',
-                reason: 'All positions within strategic/institutional risk limits.',
-                impact: 'No rebalancing required. Portfolio is optimized for current market dynamics.',
-                priority: 'Low'
-            });
-        }
-
-        return actions;
-    }, [showAIAdvice, positions]);
+    }, [positions.length]);
 
     const handleAddPosition = async () => {
-        if (!formData.symbol || !formData.units || !formData.avgCost) {
-            toast.error('Please fill in all fields');
-            return;
-        }
-
+        if (!formData.symbol || !formData.units || !formData.avgCost) return;
         setIsSubmitting(true);
         const upperSymbol = formData.symbol.toUpperCase();
-
-        // 1. Fetch live price FIRST so the position is added with a real price
-        let livePrice = formData.currentPrice || parseFloat(formData.avgCost);
         try {
             const quote = await getStockQuote(upperSymbol);
-            if (quote?.price && quote.price > 0) {
-                livePrice = quote.price;
-            }
-        } catch {
-            // Silently fall back to avg cost as currentPrice
-        }
-
-        try {
+            const livePrice = quote?.price || parseFloat(formData.avgCost);
             await addPosition({
                 symbol: upperSymbol,
                 name: formData.name || upperSymbol,
@@ -349,36 +189,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 sector: getSectorForSymbol(upperSymbol),
                 dividends: [],
             }, user?.id);
-
-            // 2. Force immediate price sync for the new symbol so it appears instantly
-            updatePrice(upperSymbol, livePrice, user?.id);
-
-            soundService.playSuccess();
-            toast.success(`Position added: ${upperSymbol}`);
             setNewlyAddedSymbol(upperSymbol);
             setShowModal(false);
             setFormData({ symbol: '', units: '', avgCost: '', name: '', currentPrice: 0 });
-
-            // Clear highlight after 3 seconds
             setTimeout(() => setNewlyAddedSymbol(null), 3000);
-        } catch (error) {
-            soundService.playError();
-            toast.error('Failed to add position.');
         } finally {
             setIsSubmitting(false);
         }
-    };
-
-    const handleQuickAdd = (symbol: string, name: string, price: number) => {
-        soundService.playTap();
-        setFormData({
-            symbol,
-            units: '10', // Default units
-            avgCost: price.toString(),
-            name,
-            currentPrice: price
-        });
-        setShowModal(true);
     };
 
     const handleRemove = (id: string, symbol: string, e: React.MouseEvent) => {
@@ -386,61 +203,27 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         removePosition(id, symbol, user?.id);
     };
 
-    const handleRowClick = (symbol: string) => {
-        soundService.playTap();
-        onSelectSymbol?.(symbol);
-    };
-
-    const handleEditClick = (position: typeof positions[0], e: React.MouseEvent) => {
+    const handleEditClick = (position: any, e: React.MouseEvent) => {
         e.stopPropagation();
-        soundService.playTap();
-        setEditingPosition({
-            id: position.id,
-            symbol: position.symbol,
-            name: position.name,
-            units: position.units,
-            avgCost: position.avgCost,
-            currentPrice: position.currentPrice
-        });
+        setEditingPosition(position);
         setEditForm({ units: position.units.toString(), avgCost: position.avgCost.toString() });
     };
 
     const handleSaveEdit = async () => {
         if (!editingPosition) return;
-        const newUnits = parseFloat(editForm.units);
-        const newAvgCost = parseFloat(editForm.avgCost);
-        if (isNaN(newUnits) || newUnits <= 0 || isNaN(newAvgCost) || newAvgCost <= 0) {
-            toast.error('Please enter valid units and average cost.');
-            return;
-        }
         setIsSavingEdit(true);
         try {
-            await updatePosition(editingPosition.id, { units: newUnits, avgCost: newAvgCost }, user?.id);
-            soundService.playSuccess();
-            toast.success(`${editingPosition.symbol} position updated.`);
+            await updatePosition(editingPosition.id, { units: parseFloat(editForm.units), avgCost: parseFloat(editForm.avgCost) }, user?.id);
             setEditingPosition(null);
-        } catch {
-            soundService.playError();
-            toast.error('Failed to update position.');
         } finally {
             setIsSavingEdit(false);
         }
     };
 
-    // Calculate allocations
-    const stockAllocations = positions.map((pos) => ({
-        symbol: pos.symbol,
-        allocation: calculateAllocation(pos.marketValue, summary.totalValue),
-        valid: checkAllocationLimits(calculateAllocation(pos.marketValue, summary.totalValue), 'stock', pos.symbol),
-    }));
-
     const sectorAllocations = positions.reduce((acc, pos) => {
         const existing = acc.find((a) => a.sector === pos.sector);
-        if (existing) {
-            existing.value += pos.marketValue;
-        } else {
-            acc.push({ sector: pos.sector, value: pos.marketValue });
-        }
+        if (existing) existing.value += pos.marketValue;
+        else acc.push({ sector: pos.sector, value: pos.marketValue });
         return acc;
     }, [] as { sector: string; value: number }[]).map((s) => ({
         ...s,
@@ -448,11 +231,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         valid: checkAllocationLimits(calculateAllocation(s.value, summary.totalValue), 'sector', s.sector),
     }));
 
-    const hasAllocationWarnings = stockAllocations.some((a) => !a.valid.valid) || sectorAllocations.some((a) => !a.valid.valid);
+    const hasAllocationWarnings = sectorAllocations.some((a) => !a.valid.valid);
     const advMetrics = getAdvancedMetrics();
-
-    // Risk Meter Calculation (Simulated Beta/Volatility)
-    const riskScore = hasAllocationWarnings ? 65 : 88; // 0-100
+    const riskScore = hasAllocationWarnings ? 65 : 88;
     const riskLabel = riskScore > 80 ? 'Conservative' : riskScore > 60 ? 'Moderate' : 'Aggressive';
     const riskColor = riskScore > 80 ? 'var(--color-success)' : riskScore > 60 ? 'var(--color-warning)' : 'var(--color-error)';
 
@@ -466,829 +247,165 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
         return Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
     }, [positions]);
 
+    const getRecIcon = (rec?: string) => {
+        if (rec === 'Buy') return <TrendingUp size={14} color="var(--color-success)" />;
+        if (rec === 'Sell') return <TrendingDown size={14} color="var(--color-error)" />;
+        return <Minus size={14} color="var(--color-warning)" />;
+    };
+
+    const rebalancingActions = React.useMemo(() => {
+        if (!showAIAdvice || positions.length === 0) return [];
+        const totalValue = positions.reduce((sum, p) => sum + (p.marketValue || 0), 0);
+        if (totalValue === 0) return [];
+
+        const actions: import('../services/aiRecommendationService').RebalancingAction[] = [];
+        const sectorTotals: Record<string, number> = {};
+
+        for (const p of positions) {
+            const allocation = (p.marketValue / totalValue) * 100;
+            const sector = p.sector || 'Other';
+            sectorTotals[sector] = (sectorTotals[sector] || 0) + allocation;
+            const limit = ['GLD', 'SLV', 'VOO'].includes(p.symbol) ? 30 : 5;
+
+            if (allocation > limit) {
+                actions.push({
+                    symbol: p.symbol,
+                    action: 'Trim',
+                    reason: `Allocation is ${allocation.toFixed(1)}%, exceeding the ${limit}% limit.`,
+                    impact: `Trim to ~${limit}% to maintain balanced exposure.`,
+                    priority: allocation > (limit + 10) ? 'High' : 'Medium'
+                });
+            }
+        }
+        return actions;
+    }, [showAIAdvice, positions]);
+
+    const handleRowClick = (symbol: string) => onSelectSymbol?.(symbol);
+
     return (
-        <div className="tab-content dashboard-viewport" style={{ 
-            padding: 0,
-            gap: 0
-        }}>
-            {/* Compact action bar */}
-            <div style={{
-                flexShrink: 0,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                padding: '0.5rem 1.5rem',
-                borderBottom: '1px solid var(--glass-border)'
-            }}>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => setShowModal(true)}
-                    style={{
-                        background: 'var(--gradient-primary)',
-                        border: 'none',
-                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
-                        padding: '0.6rem 1.25rem',
-                        borderRadius: '12px',
-                        fontWeight: 700,
-                        fontSize: '0.85rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}
-                >
-                    <Plus size={16} strokeWidth={3} />
-                    <span>Add Position</span>
-                </button>
-            </div>
+        <div className="tab-content dashboard-viewport" style={{ padding: 0, gap: 0 }}>
+            <SubNavbar 
+                activeTab={activeSubTab}
+                onTabChange={setActiveSubTab}
+                tabs={[
+                    { id: 'overview', label: 'Overview', icon: LayoutGrid, color: 'var(--color-accent)' },
+                    { id: 'positions', label: 'Positions', icon: BarChart2, color: 'var(--color-success)' },
+                    { id: 'intelligence', label: 'Intelligence', icon: Zap, color: 'var(--color-warning)' }
+                ]}
+            />
 
-            {/* Summary Cards */}
-            <div className="portfolio-summary-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '1.25rem',
-                marginBottom: '1rem',
-                flexShrink: 0,
-                padding: '0 1.5rem'
-            }}>
-                <div className="summary-card glass-card hover-glow" style={{
-                    padding: '2.5rem',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-                    border: '1px solid var(--glass-border)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center'
-                }}>
-                    <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.08 }}>
-                        <BarChart2 size={180} />
-                    </div>
-                    <div className="summary-label" style={{
-                        fontSize: '1rem',
-                        color: 'var(--color-text-secondary)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.15em',
-                        fontWeight: 900,
-                        marginBottom: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                    }}>
-                        <BarChart2 size={24} /> Global Assets (USD)
-                    </div>
-                    <div className="summary-value" style={{
-                        fontSize: '3.5rem',
-                        fontWeight: 900,
-                        letterSpacing: '-0.05em',
-                        color: 'white',
-                        textShadow: '0 4px 20px rgba(0,0,0,0.5)'
-                    }}>
-                        {formatCurrency(summary.normalizedTotalValueUSD)}
-                    </div>
-                    {/* Live Alpha Indicator */}
-                    <div style={{
-                        marginTop: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        background: 'rgba(255,255,255,0.03)',
-                        padding: '6px 12px',
-                        borderRadius: '100px',
-                        width: 'fit-content'
-                    }}>
-                        <div className="pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 10px var(--color-success)' }} />
-                        <span style={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-success)' }}>Living Data Source Stream</span>
-                        {liveTicker && (
-                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)', marginLeft: '8px', animation: 'fadeIn 0.3s ease' }}>
-                                <span style={{ color: liveTicker.type === 'up' ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                    {liveTicker.symbol} {liveTicker.type === 'up' ? '▲' : '▼'}
-                                </span>
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                <div className={`summary-card glass-card hover-glow ${summary.totalProfitLoss >= 0 ? 'success' : 'error'}`} style={{
-                    padding: '2.5rem',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    border: '1px solid var(--glass-border)',
-                    background: summary.totalProfitLoss >= 0 ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%)' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.02) 100%)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center'
-                }}>
-                    <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.08 }}>
-                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={180} /> : <TrendingDown size={180} />}
-                    </div>
-                    <div className="summary-label" style={{
-                        fontSize: '1rem',
-                        color: 'var(--color-text-secondary)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.15em',
-                        fontWeight: 900,
-                        marginBottom: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                    }}>
-                        {summary.totalProfitLoss >= 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />} P&L Dynamics
-                    </div>
-                    <div className="summary-value" style={{
-                        fontSize: '3.5rem',
-                        fontWeight: 900,
-                        letterSpacing: '-0.05em',
-                        color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)',
-                        textShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        gap: '10px'
-                    }}>
-                        {fmt(summary.totalProfitLoss)}
-                        <span style={{ fontSize: '1.1rem', fontWeight: 700, opacity: 0.9 }}>
-                            ({formatPercent(summary.totalProfitLossPercent)})
-                        </span>
-                    </div>
-                </div>
-
-                <div className="summary-card glass-card hover-glow" style={{
-                    padding: '1.5rem',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-                    border: '1px solid var(--glass-border)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
-                }}>
-                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
-                        <ShieldCheck size={120} />
-                    </div>
-                    <div className="summary-label" style={{
-                        fontSize: '0.8rem',
-                        color: 'var(--color-text-tertiary)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        fontWeight: 800,
-                        marginBottom: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}>
-                        <ShieldCheck size={16} /> Portfolio Health
-                    </div>
-                    <div className="summary-value" style={{
-                        fontSize: '1.75rem',
-                        fontWeight: 900,
-                        letterSpacing: '-0.03em',
-                        color: !hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
-                    }}>
-                        {!hasAllocationWarnings ? 'Optimized' : 'Rebalance Required'}
-                        <div style={{
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            fontSize: '0.7rem',
-                            background: !hasAllocationWarnings ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                            border: `1px solid ${!hasAllocationWarnings ? 'var(--color-success)' : 'var(--color-warning)'}44`,
-                            color: !hasAllocationWarnings ? 'inherit' : 'var(--theme-warning-text, inherit)'
-                        }}>
-                            {riskScore}/100
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Sub-Navigation */}
-            <div style={{
-                display: 'flex',
-                gap: '4px',
-                padding: '4px',
-                background: 'rgba(255,255,255,0.02)',
-                borderRadius: '12px',
-                border: '1px solid var(--glass-border)',
-                marginBottom: '1rem',
-                width: 'fit-content',
-                margin: '0 1.5rem 1rem 1.5rem',
-                flexShrink: 0
-            }}>
-                <button
-                    onClick={() => setActiveSubTab('positions')}
-                    style={{
-                        padding: '8px 20px',
-                        borderRadius: '10px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        border: 'none',
-                        cursor: 'pointer',
-                        background: activeSubTab === 'positions' ? 'var(--gradient-primary)' : 'transparent',
-                        color: activeSubTab === 'positions' ? '#fff' : 'var(--color-text-tertiary)',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}
-                >
-                    <BarChart2 size={16} />
-                    Positions
-                </button>
-                <button
-                    onClick={() => setActiveSubTab('intelligence')}
-                    style={{
-                        padding: '8px 20px',
-                        borderRadius: '10px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        border: 'none',
-                        cursor: 'pointer',
-                        background: activeSubTab === 'intelligence' ? 'var(--gradient-primary)' : 'transparent',
-                        color: activeSubTab === 'intelligence' ? '#fff' : 'var(--color-text-tertiary)',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}
-                >
-                    <Zap size={16} />
-                    Intelligence
-                </button>
-            </div>
-
-
-            {/* Portfolio Content - Main Table and Cards */}
-            {activeSubTab === 'positions' ? (
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden', padding: '0 1.5rem 1.5rem 1.5rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        📊 My Positions
-                    </h3>
-                    {positions.length === 0 ? (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '3rem 1.5rem',
-                            background: 'rgba(255,255,255,0.02)',
-                            borderRadius: '24px',
-                            border: '1px dashed var(--glass-border)',
-                            color: 'var(--color-text-secondary)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '1rem'
-                        }}>
-                            <div style={{
-                                width: '64px',
-                                height: '64px',
-                                borderRadius: '50%',
-                                background: 'rgba(255,255,255,0.05)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'var(--color-text-tertiary)'
-                            }}>
-                                <Plus size={32} strokeWidth={1.5} />
-                            </div>
-                            <div style={{ maxWidth: '300px' }}>
-                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 700, color: 'var(--color-text-primary)' }}>No {selectedMarket.id.toUpperCase()} positions</p>
-                                <p style={{ fontSize: '0.85rem', margin: 0 }}>Select a symbol to add your first position in this market.</p>
-                            </div>
-
-                            {allPositions.length > 0 && (
-                                <div style={{
-                                    marginTop: '1.5rem',
-                                    padding: '1rem',
-                                    background: 'rgba(99, 102, 241, 0.05)',
-                                    borderRadius: '16px',
-                                    border: '1px solid rgba(99, 102, 241, 0.1)',
-                                    fontSize: '0.8rem',
-                                    color: 'var(--color-accent)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px'
-                                }}>
-                                    <AlertTriangle size={16} />
-                                    <span>
-                                        You have <strong>{allPositions.length}</strong> other positions.
-                                        <br />
-                                        Switch the market in the top header to view them.
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            {/* Desktop Table */}
-                            <div className="table-container glass-card desktop-only scrollable-panel custom-scrollbar" style={{
-                                padding: '0',
-                                border: '1px solid var(--glass-border-bright)'
-                            }}>
-                                <table className="portfolio-table sticky-header">
-                                    <thead>
-                                        <tr>
-                                            <th style={{ paddingLeft: '1.5rem' }}>Asset</th>
-                                            <th style={{ textAlign: 'right' }}>Units</th>
-                                            <th style={{ textAlign: 'right' }}>Avg Cost</th>
-                                            <th style={{ textAlign: 'right' }}>Price</th>
-                                            <th style={{ textAlign: 'right' }}>Market Value</th>
-                                            <th style={{ textAlign: 'right' }}>P/L Total</th>
-                                            <th style={{ textAlign: 'right' }}>P/L %</th>
-                                            <th style={{ textAlign: 'center' }}>AI Strategy</th>
-                                            <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Allocation</th>
-                                            <th style={{ textAlign: 'center' }}>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {groupedPositions.map(([sector, sectorPositions]) => (
-                                            <React.Fragment key={sector}>
-                                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                                    <td colSpan={10} style={{
-                                                        padding: '0.6rem 1.5rem',
-                                                        fontWeight: 800,
-                                                        color: 'var(--color-text-tertiary)',
-                                                        textTransform: 'uppercase',
-                                                        letterSpacing: '0.08em',
-                                                        fontSize: '0.65rem',
-                                                        borderBottom: '1px solid var(--glass-border)',
-                                                        borderTop: '1px solid var(--glass-border)'
-                                                    }}>
-                                                        {sector} — {sectorPositions.length} position{sectorPositions.length !== 1 ? 's' : ''}
-                                                    </td>
-                                                </tr>
-                                                {sectorPositions.map((position) => {
-                                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                                    const allocationCheck = checkAllocationLimits(allocation, 'stock');
-
-                                                    return (
-                                                        <tr
-                                                            key={position.id}
-                                                            onClick={() => handleRowClick(position.symbol)}
-                                                            className="portfolio-row"
-                                                            style={{
-                                                                cursor: 'pointer',
-                                                                background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                                                                transition: 'all 0.2s ease'
-                                                            }}
-                                                        >
-                                                            <td style={{ paddingLeft: '1.5rem' }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                                    <CompanyLogo symbol={position.symbol} size={36} />
-                                                                    <div>
-                                                                        <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{position.symbol}</div>
-                                                                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{position.name}</div>
-                                                                    </div>
-                                                                    <button
-                                                                        className="btn-icon glass-button"
-                                                                        style={{ padding: '4px', borderRadius: '50%', color: 'var(--color-text-tertiary)' }}
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setAlertConfig({ symbol: position.symbol, price: position.currentPrice });
-                                                                        }}
-                                                                        title="Set Price Alert"
-                                                                    >
-                                                                        <Bell size={12} />
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{position.units.toLocaleString()}</td>
-                                                            <td style={{ textAlign: 'right', color: 'var(--color-text-secondary)' }}>{fmt(position.avgCost)}</td>
-                                                            <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                                                                <RealTimePrice 
-                                                                    price={position.currentPrice} 
-                                                                    isFallback={position.isFallback}
-                                                                    showCurrency={false} 
-                                                                />
-                                                            </td>
-                                                            <td style={{ textAlign: 'right' }}><strong style={{ color: 'var(--color-text-primary)' }}>{fmt(position.marketValue)}</strong></td>
-                                                            <td style={{ textAlign: 'right', fontWeight: 700 }} className={getChangeClass(position.profitLoss)}>
-                                                                {fmt(position.profitLoss)}
-                                                            </td>
-                                                            <td style={{ textAlign: 'right' }}>
-                                                                <span style={{
-                                                                    padding: '4px 8px',
-                                                                    borderRadius: '6px',
-                                                                    fontSize: '0.8rem',
-                                                                    fontWeight: 800,
-                                                                    background: position.profitLossPercent >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                                                    color: position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)',
-                                                                    border: `1px solid ${position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)'}22`
-                                                                }}>
-                                                                    {formatPercent(position.profitLossPercent)}
-                                                                </span>
-                                                            </td>
-                                                            <td style={{ textAlign: 'center' }}>
-                                                                {aiRecs[position.symbol] ? (
-                                                                    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                                                                        <div style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: '4px',
-                                                                            padding: '3px 8px',
-                                                                            background: aiRecs[position.symbol].score >= 75 ? 'rgba(16, 185, 129, 0.1)' : (aiRecs[position.symbol].score >= 50 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-                                                                            borderRadius: '6px',
-                                                                            border: `1px solid ${aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)')}44`
-                                                                        }}>
-                                                                            {getRecIcon(aiRecs[position.symbol].recommendation)}
-                                                                            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: aiRecs[position.symbol].score >= 75 ? 'var(--color-success)' : (aiRecs[position.symbol].score >= 50 ? 'var(--color-warning)' : 'var(--color-error)') }}>
-                                                                                {aiRecs[position.symbol].recommendation?.toUpperCase()}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="animate-pulse" style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', margin: '0 auto' }} />
-                                                                )}
-                                                            </td>
-                                                            <td style={{ textAlign: 'right', paddingRight: '1.5rem' }}>
-                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
-                                                                    <div style={{ width: '40px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                                                                        <div style={{ width: `${Math.min(allocation, 100)}%`, height: '100%', background: allocationCheck.valid ? 'var(--color-accent)' : 'var(--color-error)' }} />
-                                                                    </div>
-                                                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: allocationCheck.valid ? 'var(--color-text-secondary)' : 'var(--color-error)' }}>
-                                                                        {allocation.toFixed(1)}%
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
-                                                                    <button
-                                                                        className="btn-icon glass-button"
-                                                                        onClick={(e) => handleEditClick(position, e)}
-                                                                        title="Edit Position"
-                                                                        style={{ padding: '6px', borderRadius: '8px', color: 'var(--color-accent)' }}
-                                                                    >
-                                                                        <Pencil size={14} />
-                                                                    </button>
-                                                                    <button
-                                                                        className="btn-icon glass-button text-error"
-                                                                        onClick={(e) => handleRemove(position.id, position.symbol, e)}
-                                                                        title="Remove Position"
-                                                                        style={{ padding: '6px', borderRadius: '8px' }}
-                                                                    >
-                                                                        <Trash2 size={14} />
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Mobile Card View (Flat Sequential List - iOS Optimized) */}
-                            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.5rem' }}>
-                                {positions.map((position) => {
-                                    const allocation = calculateAllocation(position.marketValue, summary.totalValue);
-                                    return (
-                                        <div
-                                            key={position.id}
-                                            className="glass-card"
-                                            style={{
-                                                padding: '0.65rem 0.85rem',
-                                                background: newlyAddedSymbol === position.symbol ? 'rgba(16, 185, 129, 0.1)' : 'var(--glass-bg)',
-                                                transition: 'all 0.3s ease',
-                                                border: '1px solid var(--glass-border)',
-                                                borderRadius: '10px'
-                                            }}
-                                            onClick={() => handleRowClick(position.symbol)}
-                                        >
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                                                    <div style={{ fontWeight: 900, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>{position.symbol}</div>
-                                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{(position.name || position.symbol).split(' ')[0]}</div>
-                                                </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'right' }}>
-                                                    <div>
-                                                        <div style={{ fontWeight: 800, fontSize: '0.85rem' }}>{fmt(position.currentPrice)}</div>
-                                                        <div style={{
-                                                            fontSize: '0.65rem',
-                                                            fontWeight: 800,
-                                                            color: position.profitLossPercent >= 0 ? 'var(--color-success)' : 'var(--color-error)',
-                                                            marginTop: '-2px'
-                                                        }}>
-                                                            {position.profitLossPercent >= 0 ? '▲' : '▼'} {Math.abs(position.profitLossPercent).toFixed(2)}%
-                                                        </div>
-                                                    </div>
-                                                    <div style={{ minWidth: '70px' }}>
-                                                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'var(--color-accent)' }}>{fmt(position.marketValue)}</div>
-                                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{position.units} SHARES</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                                {positions.length === 0 && (
-                                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-tertiary)', fontSize: '0.8rem' }}>
-                                        No positions found. Start by adding a stock.
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </div>
-            ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.4s ease' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
-                        <RiskReturnChart positions={positions} />
-                        <ScenarioHedging positions={positions} />
-                    </div>
-
-                    <div className="glass-card" style={{ padding: '1.75rem', marginBottom: '1.5rem', border: '1px solid var(--glass-border-bright)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
-                            <Sparkles size={20} color="var(--color-accent)" />
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>AI Deep Analytics</h3>
-                            <span style={{ fontSize: '0.65rem', padding: '3px 8px', borderRadius: '6px', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: 'rgba(99,102,241,0.9)', fontWeight: 800 }}>v2.0</span>
-                        </div>
-                        <PortfolioIntelligencePanel />
-                    </div>
-
-                    {/* Tactical Risk Audit & Report Section */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-
-                        {/* 1. Tactical Risk Audit Report */}
-                        <div className="glass-card animate-fade-in-up stagger-1" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.03 }}>
-                                <ShieldCheck size={140} />
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                                <div>
-                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <ShieldCheck size={22} color="var(--color-accent)" />
-                                        Tactical Risk Audit
-                                    </h3>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>Exposure & Concentration Analysis</div>
-                                </div>
-                                <div style={{
-                                    fontSize: '0.65rem',
-                                    color: riskColor,
-                                    fontWeight: 900,
-                                    padding: '6px 12px',
-                                    background: `${riskColor}10`,
-                                    borderRadius: '8px',
-                                    border: `1px solid ${riskColor}22`,
-                                    letterSpacing: '0.05em',
-                                    textTransform: 'uppercase'
-                                }}>
-                                    {riskLabel} Profile
-                                </div>
-                            </div>
-
-                            <div style={{ marginBottom: '2rem' }}>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>Sector Diversification</span>
-                                    <span>Institutional Limit: 20%</span>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                    {sectorAllocations.length > 0 ? sectorAllocations.map((sa, idx) => (
-                                        <div key={idx}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px', alignItems: 'baseline' }}>
-                                                <span style={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>{sa.sector}</span>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                    {!sa.valid.valid && <AlertTriangle size={12} color="var(--color-warning)" />}
-                                                    <span style={{ fontWeight: 800, color: sa.valid.valid ? 'var(--color-text-primary)' : 'var(--color-warning)' }}>
-                                                        {sa.allocation.toFixed(1)}%
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.02)' }}>
-                                                <div style={{
-                                                    width: `${Math.min(sa.allocation, 100)}%`,
-                                                    height: '100%',
-                                                    background: sa.valid.valid ? 'var(--gradient-primary)' : 'linear-gradient(90deg, #f59e0b, #d97706)',
-                                                    boxShadow: sa.valid.valid ? '0 0 12px rgba(99, 102, 241, 0.2)' : '0 0 12px rgba(245, 158, 11, 0.2)',
-                                                    transition: 'width 1s cubic-bezier(0.16, 1, 0.3, 1)'
-                                                }} />
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--color-text-tertiary)', fontSize: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                                            Add positions to see sector analysis
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.25fr', gap: '1rem' }}>
-                                <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>Tail Risk Alpha</div>
-                                    {stockAllocations.length > 0 ? (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Highest Impact:</div>
-                                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                {stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].symbol}
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: !stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].valid.valid ? 'var(--color-error)' : 'var(--color-text-tertiary)' }}>
-                                                    {stockAllocations.sort((a, b) => b.allocation - a.allocation)[0].allocation.toFixed(1)}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-tertiary)' }}>No data</div>
-                                    )}
-                                </div>
-                                <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 800, letterSpacing: '0.05em' }}>Risk Intelligence</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, fontWeight: 500 }}>
-                                        {hasAllocationWarnings
-                                            ? 'Concentration threshold breached. Systematic rebalancing recommended to maintain 5/20 institutional rules.'
-                                            : 'Portfolio structure is highly optimized with professional-grade diversification metrics.'}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 2. Risk Meter & Strategy Profile */}
-                        <div className="glass-card animate-fade-in-up stagger-2" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--glass-border-bright)', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.03 }}>
-                                <Zap size={140} />
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.5rem' }}>
-                                <Zap size={22} color="var(--color-warning)" fill="var(--color-warning)" style={{ opacity: 0.8 }} />
-                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Strategic Intelligence</h3>
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', padding: '1.5rem 0', background: 'rgba(255,255,255,0.01)', borderRadius: '20px', margin: '0 -0.5rem', border: '1px solid rgba(255,255,255,0.02)' }}>
-                                <div style={{ position: 'relative', width: '130px', height: '75px', marginLeft: '1.5rem' }}>
-                                    <svg width="130" height="75" viewBox="0 0 120 70">
-                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" strokeLinecap="round" />
-                                        <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="var(--color-accent)" strokeWidth="12" strokeLinecap="round" strokeDasharray="157" strokeDashoffset={157 - (advMetrics.diversificationScore / 100 * 157)} style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
-                                    </svg>
-                                    <div style={{ position: 'absolute', bottom: '2px', left: '50%', transform: 'translateX(-50%)', fontWeight: 900, fontSize: '1.75rem', color: 'white', letterSpacing: '-0.03em' }}>
-                                        {Math.round(advMetrics.diversificationScore)}<span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: '2px' }}>%</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.12em' }}>Diversification Score</div>
-                                    <div style={{ fontSize: '1.6rem', fontWeight: 950, color: 'white', margin: '2px 0', letterSpacing: '-0.02em' }}>{advMetrics.concentrationRisk} Risk</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.4, maxWidth: '180px' }}>
-                                        Herfindahl-Hirschman (HHI) index optimized for retail exposure.
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Benchmarking */}
-                            <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', marginTop: 'auto' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '1.5rem', alignItems: 'center' }}>
-                                    <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Performance Benchmark (1Y)</span>
-                                    <div style={{
-                                        color: 'var(--color-success)',
-                                        fontWeight: 900,
-                                        fontSize: '0.65rem',
-                                        background: 'rgba(16, 185, 129, 0.1)',
-                                        padding: '4px 10px',
-                                        borderRadius: '6px',
-                                        border: '1px solid rgba(16, 185, 129, 0.2)',
-                                        textTransform: 'uppercase'
-                                    }}>
-                                        Outperforming
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                                        <div style={{ width: '80px', fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 700 }}>Portfolio</div>
-                                        <div style={{ flex: 1, height: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', overflow: 'hidden' }}>
-                                            <div style={{ width: '92%', height: '100%', background: 'var(--gradient-primary)', borderRadius: '5px', boxShadow: '0 0 10px rgba(99, 102, 241, 0.3)' }} />
-                                        </div>
-                                        <div style={{ width: '50px', fontSize: '0.9rem', fontWeight: 900, color: 'var(--color-success)', textAlign: 'right' }}>+24.2%</div>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                                        <div style={{ width: '80px', fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 700 }}>S&P 500</div>
-                                        <div style={{ flex: 1, height: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', overflow: 'hidden' }}>
-                                            <div style={{ width: '70%', height: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: '5px' }} />
-                                        </div>
-                                        <div style={{ width: '50px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-text-tertiary)', textAlign: 'right' }}>+18.5%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Regional & Momentum Analytics Section (NEW) */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                        {/* 3. Regional Global Allocation */}
-                        <div className="glass-card animate-fade-in-up stagger-3" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                                <Cloud size={20} color="var(--color-accent)" />
-                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Global Market Exposure</h3>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                                {[
-                                    { label: 'US Markets (Nasdaq/NYSE)', value: advMetrics.regionalBreakdown.us, color: '#3b82f6' },
-                                    { label: 'Egyptian Exchange (EGX)', value: advMetrics.regionalBreakdown.egypt, color: '#ef4444' },
-                                    { label: 'Abu Dhabi (ADX)', value: advMetrics.regionalBreakdown.uae, color: '#10b981' }
-                                ].map((reg, i) => (
-                                    <div key={i}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px', fontWeight: 700 }}>
-                                            <span style={{ color: 'var(--color-text-secondary)' }}>{reg.label}</span>
-                                            <span style={{ color: 'white' }}>{reg.value.toFixed(1)}%</span>
-                                        </div>
-                                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.03)', borderRadius: '3px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${reg.value}%`, height: '100%', background: reg.color, borderRadius: '3px' }} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* 4. Sector Sentiment/Momentum */}
-                        <div className="glass-card animate-fade-in-up stagger-4" style={{ padding: '1.75rem', border: '1px solid var(--glass-border-bright)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                                <Sparkles size={20} color="var(--color-warning)" />
-                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Sector Alpha Momentum</h3>
-                            </div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                {Object.entries(advMetrics.sectorMomentum).length > 0 ? Object.entries(advMetrics.sectorMomentum).map(([sector, momentum], i) => (
-                                    <div key={i} style={{
-                                        padding: '8px 12px',
-                                        background: (momentum as number) >= 0 ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
-                                        border: `1px solid ${(momentum as number) >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
-                                        borderRadius: '10px',
-                                        fontSize: '0.75rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px'
-                                    }}>
-                                        <span style={{ fontWeight: 800, color: 'var(--color-text-primary)' }}>{sector}</span>
-                                        <span style={{ fontWeight: 900, color: (momentum as number) >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            {(momentum as number) >= 0 ? '+' : ''}{(momentum as number).toFixed(1)}%
-                                        </span>
-                                    </div>
-                                )) : (
-                                    <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>No sector data yet.</div>
-                                )}
-                            </div>
-                            <div style={{ marginTop: '1.5rem', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', lineHeight: 1.5, padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
-                                <Zap size={10} style={{ marginRight: '4px' }} /> Sector momentum is calculated by the weighted average performance of your assets within each specialized vertical.
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Warnings and AI Analysis Button */}
-                    {hasAllocationWarnings && (
-                        <div style={{
-                            padding: '1.5rem',
-                            background: 'rgba(245, 158, 11, 0.05)',
-                            border: '1px solid rgba(245, 158, 11, 0.15)',
-                            borderRadius: '20px',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            gap: '1.5rem',
-                            marginBottom: '2rem',
-                            backdropFilter: 'blur(10px)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div style={{
-                                    width: '44px',
-                                    height: '44px',
-                                    borderRadius: '12px',
-                                    background: 'rgba(245, 158, 11, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <AlertTriangle size={24} color="var(--color-warning)" />
-                                </div>
-                                <div>
-                                    <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--color-warning)' }}>Risk Exposure Alert</h4>
-                                    <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'rgba(245, 158, 11, 0.8)', fontWeight: 500 }}>
-                                        Some positions exceed strategic allocation limits. Institutional rules permit higher 30/40% weighting for hedging assets and diversified indexes.
-                                    </p>
-                                </div>
-                            </div>
-                            <button
-                                className="btn btn-primary ai-pulse-button"
-                                style={{
-                                    background: 'var(--gradient-warning)',
-                                    color: '#000',
-                                    fontWeight: 900,
-                                    fontSize: '0.8rem',
-                                    padding: '12px 28px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    border: 'none',
-                                    boxShadow: '0 10px 25px rgba(245, 158, 11, 0.25)',
-                                    borderRadius: '14px',
-                                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => setShowAIAdvice(true)}
-                            >
-                                <Zap size={18} fill="currentColor" /> Analyze Portfolio Optimization
-                            </button>
-                        </div>
-                    )}
+            {activeSubTab === 'positions' && (
+                <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end', padding: '0.25rem 1.5rem', borderBottom: '1px solid var(--glass-border)' }}>
+                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                        <Plus size={14} /> Add Asset
+                    </button>
                 </div>
             )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                {activeSubTab === 'overview' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto', padding: '1rem 1.5rem' }}>
+                        <div className="portfolio-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
+                                <div className="summary-label">Total Assets (USD)</div>
+                                <div className="summary-value" style={{ fontSize: '2rem', fontWeight: 900 }}>{formatCurrency(summary.normalizedTotalValueUSD)}</div>
+                            </div>
+                            <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
+                                <div className="summary-label">P&L Performance</div>
+                                <div className="summary-value" style={{ fontSize: '2rem', fontWeight: 900, color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                    {fmt(summary.totalProfitLoss)} ({formatPercent(summary.totalProfitLossPercent)})
+                                </div>
+                            </div>
+                            <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
+                                <div className="summary-label">Risk Health</div>
+                                <div className="summary-value" style={{ fontSize: '2rem', fontWeight: 900, color: riskColor }}>{riskScore}/100</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '1.5rem' }}>
+                            <ScenarioHedging positions={positions} />
+                            <div className="glass-card" style={{ padding: '1.25rem' }}>
+                                <RiskReturnChart positions={positions} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeSubTab === 'positions' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden', padding: '0 1.5rem 1.5rem 1.5rem' }}>
+                        <div className="table-container glass-card desktop-only scrollable-panel custom-scrollbar" style={{ flex: 1 }}>
+                            <table className="portfolio-table sticky-header">
+                                <thead>
+                                    <tr>
+                                        <th>Asset</th>
+                                        <th style={{ textAlign: 'right' }}>Units</th>
+                                        <th style={{ textAlign: 'right' }}>Avg Cost</th>
+                                        <th style={{ textAlign: 'right' }}>Price</th>
+                                        <th style={{ textAlign: 'right' }}>Market Value</th>
+                                        <th style={{ textAlign: 'right' }}>P/L %</th>
+                                        <th style={{ textAlign: 'center' }}>AI Strategy</th>
+                                        <th style={{ textAlign: 'center' }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {groupedPositions.map(([sector, sectorPositions]) => (
+                                        <React.Fragment key={sector}>
+                                            <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                <td colSpan={8} style={{ padding: '0.6rem 1rem', fontWeight: 800, fontSize: '0.7rem' }}>{sector}</td>
+                                            </tr>
+                                            {sectorPositions.map((pos) => (
+                                                <tr key={pos.id} onClick={() => handleRowClick(pos.symbol)} className="portfolio-row">
+                                                    <td>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                            <CompanyLogo symbol={pos.symbol} size={32} />
+                                                            <div>
+                                                                <div style={{ fontWeight: 800 }}>{pos.symbol}</div>
+                                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{pos.name}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ textAlign: 'right' }}>{pos.units.toLocaleString()}</td>
+                                                    <td style={{ textAlign: 'right' }}>{fmt(pos.avgCost)}</td>
+                                                    <td style={{ textAlign: 'right' }}><RealTimePrice price={pos.currentPrice} showCurrency={false} /></td>
+                                                    <td style={{ textAlign: 'right' }}>{fmt(pos.marketValue)}</td>
+                                                    <td style={{ textAlign: 'right' }}>
+                                                        <span className={getChangeClass(pos.profitLossPercent)}>{formatPercent(pos.profitLossPercent)}</span>
+                                                    </td>
+                                                    <td style={{ textAlign: 'center' }}>
+                                                        {aiRecs[pos.symbol] ? (
+                                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                                {getRecIcon(aiRecs[pos.symbol].recommendation)}
+                                                                <span style={{ fontSize: '0.65rem', fontWeight: 900 }}>{aiRecs[pos.symbol].recommendation?.toUpperCase()}</span>
+                                                            </div>
+                                                        ) : '...'}
+                                                    </td>
+                                                    <td style={{ textAlign: 'center' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+                                                            <button className="btn-icon" onClick={(e) => handleEditClick(pos, e)}><Pencil size={14} /></button>
+                                                            <button className="btn-icon text-error" onClick={(e) => handleRemove(pos.id, pos.symbol, e)}><Trash2 size={14} /></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </React.Fragment>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {activeSubTab === 'intelligence' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto', padding: '1.5rem', gap: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
+                            <RiskReturnChart positions={positions} />
+                            <ScenarioHedging positions={positions} />
+                        </div>
+                        <div className="glass-card" style={{ padding: '1.75rem' }}>
+                            <PortfolioIntelligencePanel />
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* AI Advice Modal */}
             {showAIAdvice && (
@@ -1387,22 +504,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                             {action.priority} Priority
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '6px',
-                                                    padding: '6px 12px',
-                                                    background: action.action === 'Trim' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                                                    borderRadius: '8px',
-                                                    border: `1px solid ${action.action === 'Trim' ? 'var(--color-error)' : 'var(--color-success)'}33`,
-                                                    color: action.action === 'Trim' ? 'var(--color-error)' : 'var(--color-success)',
-                                                    fontWeight: 800,
-                                                    fontSize: '0.75rem',
-                                                    textTransform: 'uppercase'
-                                                }}>
-                                                    {action.action === 'Trim' ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
-                                                    {action.action}
                                                 </div>
                                             </div>
                                             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
@@ -1591,19 +692,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleSaveEdit(); }}
                                 />
                             </div>
-
-                            <div className="glass-card" style={{ padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '4px' }}>Current Price</div>
-                                    <div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{fmt(editingPosition.currentPrice)}</div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '4px' }}>Market Value</div>
-                                    <div style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--color-accent)' }}>
-                                        {editForm.units ? fmt(parseFloat(editForm.units) * editingPosition.currentPrice) : '—'}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div className="modal-footer" style={{ padding: '0 2rem 2rem', border: 'none', display: 'flex', gap: '1rem' }}>
@@ -1640,7 +728,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 </div>
             )}
 
-            {/* Price Alerts Modal */}
             {alertConfig && (
                 <PriceAlertsModal
                     symbol={alertConfig.symbol}
@@ -1648,7 +735,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                     onClose={() => setAlertConfig(null)}
                 />
             )}
-
         </div>
     );
 };

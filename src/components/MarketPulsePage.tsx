@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import { FileText, Calendar as CalendarIcon, Move, RefreshCw } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { FileText, Calendar as CalendarIcon, Move, RefreshCw, Radio } from 'lucide-react';
 import { useMarket } from '../contexts/MarketContext';
 import { usePiPStore } from '../services/usePiPStore';
 import { CHANNELS } from './LiveIntelligenceStreams';
 import { soundService } from '../services/soundService';
+import SubNavbar from './SubNavbar';
 
 interface MarketPulsePageProps {
     onSelectStock?: (symbol: string) => void;
@@ -125,6 +126,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
     const { effectiveMarket } = useMarket();
     const newsContainerRef = useRef<HTMLDivElement>(null);
     const eventsContainerRef = useRef<HTMLDivElement>(null);
+    const [activeTab, setActiveTab] = useState<'streams' | 'news' | 'events'>('streams');
 
     // Reset PiP when directly viewing this page
     useEffect(() => {
@@ -199,64 +201,76 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
 
     return (
         <div className="tab-content dashboard-viewport" style={{ 
-            gap: '1rem',
-            padding: '1rem',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column'
+            padding: 0,
+            gap: 0
         }}>
-            {/* Live Stream Section */}
-            <div style={{ flexShrink: 0 }}>
-                <LiveStreamsPlayer streams={MARKET_STREAMS} />
-            </div>
+            {/* Unified Sub-Navbar */}
+            <SubNavbar 
+                activeTab={activeTab}
+                onTabChange={(id) => setActiveTab(id as any)}
+                tabs={[
+                    { id: 'streams', label: 'Live Streams', icon: Radio, color: 'var(--color-accent)' },
+                    { id: 'news', label: 'Market News', icon: FileText, color: 'var(--color-success)' },
+                    { id: 'events', label: 'Company Events', icon: CalendarIcon, color: 'var(--color-warning)' }
+                ]}
+            />
 
-            {/* Real Reports & Events Grid */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-                gap: '1rem',
-                flex: 1,
-                minHeight: 0
-            }}>
-                {/* Real Time News Reports */}
-                <div className="glass-card" style={{ 
-                    border: '1px solid var(--glass-border)', 
-                    borderRadius: '16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
-                    background: 'var(--glass-bg)'
-                }}>
-                    <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
-                        <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
-                            <FileText size={16} color="var(--color-accent)" /> 
-                            Real-Time Market Reports
-                        </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                {activeTab === 'streams' && (
+                    <div className="scrollable-panel" style={{ display: 'flex', flexDirection: 'column', padding: '1.5rem', background: 'rgba(0,0,0,0.1)' }}>
+                        <div style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+                            <LiveStreamsPlayer streams={MARKET_STREAMS} />
+                        </div>
                     </div>
-                    <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
-                        <div className="tradingview-widget-container" ref={newsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
-                    </div>
-                </div>
+                )}
 
-                {/* Real Events & Earnings Indicators */}
-                <div className="glass-card" style={{ 
-                    border: '1px solid var(--glass-border)', 
-                    borderRadius: '16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
-                    background: 'var(--glass-bg)'
-                }}>
-                    <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
-                        <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
-                            <CalendarIcon size={16} color="var(--color-warning)" /> 
-                            Company Reports & Events
-                        </h3>
+                {activeTab === 'news' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: '1.5rem' }}>
+                        <div className="glass-card" style={{ 
+                            border: '1px solid var(--glass-border-bright)', 
+                            borderRadius: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                            background: 'var(--glass-bg)',
+                            height: '100%'
+                        }}>
+                            <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
+                                <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                                    <FileText size={16} color="var(--color-accent)" /> 
+                                    Real-Time Market Reports
+                                </h3>
+                            </div>
+                            <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
+                                <div className="tradingview-widget-container" ref={newsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
+                            </div>
+                        </div>
                     </div>
-                    <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
-                        <div className="tradingview-widget-container" ref={eventsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+                )}
+
+                {activeTab === 'events' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: '1.5rem' }}>
+                        <div className="glass-card" style={{ 
+                            border: '1px solid var(--glass-border-bright)', 
+                            borderRadius: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                            background: 'var(--glass-bg)',
+                            height: '100%'
+                        }}>
+                            <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
+                                <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                                    <CalendarIcon size={16} color="var(--color-warning)" /> 
+                                    Company Reports & Events
+                                </h3>
+                            </div>
+                            <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
+                                <div className="tradingview-widget-container" ref={eventsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

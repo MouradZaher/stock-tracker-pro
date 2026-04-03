@@ -19,6 +19,8 @@ import FamousHoldings from './FamousHoldings';
 import RealTimePrice from './RealTimePrice';
 import MiniSparkline from './MiniSparkline';
 
+import SubNavbar from './SubNavbar';
+
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
 }
@@ -116,6 +118,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
     const { selectedMarket } = useMarket();
     const { marketWatchlists, removeFromWatchlist, addToWatchlist } = useWatchlist();
+    const [activeTab, setActiveTab] = useState<'watchlist' | 'indices' | 'discovery'>('watchlist');
 
     const watchlist = marketWatchlists[selectedMarket.id] || [];
 
@@ -198,38 +201,54 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
 
     return (
         <div className="tab-content dashboard-viewport" style={{
-            padding: 0, /* Override global padding for full-bleed header */
-            gap: 0
+            padding: '1rem',
+            gap: '1rem',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            overflow: 'hidden'
         }}>
-            <div className="section-header" style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0.75rem 1rem',
-                borderBottom: '1px solid var(--glass-border)',
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)',
-                marginBottom: '0.5rem'
-            }}>
-                <div>
-                    <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.2rem', fontWeight: 950 }}>
-                        <Star size={20} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' }} />
-                        {selectedMarket.shortName} Alpha
-                    </h2>
-                </div>
-                <div style={{ width: '100%', maxWidth: '220px' }}>
-                    <SymbolSearchInput
-                        placeholder="Search Alpha..."
-                        marketId={selectedMarket.id}
-                        onSelect={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)}
-                    />
-                </div>
-            </div>
+            {/* Unified Sub-Navbar */}
+            <SubNavbar 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                tabs={[
+                    { id: 'watchlist', label: 'My Watchlist', icon: Star, color: 'var(--color-warning)' },
+                    { id: 'indices', label: 'Indices', icon: Activity, color: 'var(--color-accent)' },
+                    { id: 'discovery', label: 'Discovery', icon: Search, color: 'var(--color-success)' }
+                ]}
+            />
 
-            <div className="grid-sidebar-layout" style={{
-                padding: '0 1.5rem 1.5rem 1.5rem'
-            }}>
-                {/* Main Content: Personal Watchlist Table */}
-                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                {activeTab === 'watchlist' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div className="section-header" style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '0.75rem 1rem',
+                            borderBottom: '1px solid var(--glass-border)',
+                            background: 'linear-gradient(to bottom, rgba(255,255,255,0.02), transparent)',
+                            marginBottom: '0.5rem',
+                            flexShrink: 0,
+                            borderRadius: '12px'
+                        }}>
+                            <div>
+                                <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.2rem', fontWeight: 950 }}>
+                                    <Star size={20} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' }} />
+                                    {selectedMarket.shortName} Alpha
+                                </h2>
+                            </div>
+                            <div style={{ width: '100%', maxWidth: '220px' }}>
+                                <SymbolSearchInput
+                                    placeholder="Search Alpha..."
+                                    marketId={selectedMarket.id}
+                                    onSelect={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)}
+                                />
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden' }}>
                     {loading && Object.keys(stockData).length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '3rem' }}>
                             <div className="spinner" style={{ margin: '0 auto 1rem' }} />
@@ -365,22 +384,36 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                             </div>
                         </div>
                     )}
-                </div>
-
-                {/* Sidebar Content: Discovery Widgets (hidden on mobile) */}
-                <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-                    <div className="scrollable-panel custom-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', paddingRight: '8px' }}>
-                        <div className="glass-card" style={{ padding: '1.25rem' }}>
-                            <IndexComponents onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
                         </div>
-                        
-                        {selectedMarket.id === 'us' && (
-                            <div className="glass-card" style={{ padding: '1.25rem' }}>
-                                <FamousHoldings onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
-                            </div>
-                        )}
                     </div>
-                </div>
+                )}
+
+                {activeTab === 'indices' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden' }}>
+                        <div className="scrollable-panel custom-scrollbar" style={{ padding: '4px' }}>
+                            <div className="glass-card" style={{ padding: '1.25rem' }}>
+                                <IndexComponents onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'discovery' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden' }}>
+                        <div className="scrollable-panel custom-scrollbar" style={{ padding: '4px' }}>
+                            <div className="glass-card" style={{ padding: '1.25rem' }}>
+                                {selectedMarket.id === 'us' ? (
+                                    <FamousHoldings onQuickAdd={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)} />
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-tertiary)' }}>
+                                        <Search size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
+                                        <p>Discovery modules are currently optimized for the US Market.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {alertConfig && (
