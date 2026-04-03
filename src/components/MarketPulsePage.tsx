@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Layers, Activity, FileText, Calendar as CalendarIcon, Move, RefreshCw, ExternalLink } from 'lucide-react';
+import { FileText, Calendar as CalendarIcon, Move, RefreshCw } from 'lucide-react';
 import { useMarket } from '../contexts/MarketContext';
 import { usePiPStore } from '../services/usePiPStore';
 import { CHANNELS } from './LiveIntelligenceStreams';
@@ -20,8 +20,6 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
             setActiveStream(streams[0]);
         }
     }, [activeStream, setActiveStream, streams]);
-
-    const scrollRef = React.useRef<HTMLDivElement>(null);
 
     return (
         <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)', WebkitBackdropFilter: 'var(--glass-blur)', position: 'relative' }}>
@@ -85,7 +83,7 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
                 </div>
             </div>
 
-            <div ref={scrollRef} style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none', flexWrap: 'nowrap', msOverflowStyle: 'none' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.75rem', scrollbarWidth: 'none', flexWrap: 'nowrap', msOverflowStyle: 'none' }}>
                 {streams.map((ch) => {
                     const isActive = ch.id === active.id;
                     return (

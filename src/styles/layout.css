@@ -36,46 +36,13 @@
   padding-top: var(--total-header-height);
 }
 
-.content-tab-nav {
-  height: 52px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 1rem;
-  border-bottom: 1px solid var(--glass-border);
-  background: rgba(10, 10, 15, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  flex-shrink: 0;
-}
-
-.content-tab-btn {
-  height: 36px;
-  padding: 0 0.85rem;
-  border-radius: 10px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--color-text-secondary);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.75rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.content-tab-btn.active {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.content-route-shell {
+/* Matched route root fills remaining space below fixed header */
+.main-content > .tab-content {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
 }
 
 .no-page-scroll-tab {
-  height: 100%;
   overflow: hidden !important;
 }
 
@@ -103,14 +70,17 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Viewport Dashboard Framework */
+/* Viewport Dashboard Framework — fills parent flex area, not raw 100vh */
 .dashboard-viewport {
-  height: calc(100vh - var(--total-header-height));
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
   gap: 1.5rem;
+  box-sizing: border-box;
 }
 
 .scrollable-panel {
@@ -160,23 +130,6 @@
   .bento-span-8, .bento-span-6, .bento-span-4, .bento-span-3 { grid-column: span 12; }
   .dashboard-viewport { padding: 0.5rem; gap: 0.5rem; }
   .desktop-only { display: none !important; }
-
-  .content-tab-nav {
-    height: 44px;
-    padding: 0.25rem 0.45rem;
-    gap: 0.3rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .content-tab-btn {
-    height: 32px;
-    padding: 0 0.55rem;
-    font-size: 0.67rem;
-    white-space: nowrap;
-    flex: 1;
-    justify-content: center;
-  }
 }
 
 @media (min-width: 769px) {

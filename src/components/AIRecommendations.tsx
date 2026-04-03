@@ -422,7 +422,9 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
 
             <style>{`
                 .ai-cockpit-container {
-                  height: calc(100vh - var(--total-header-height));
+                  flex: 1;
+                  min-height: 0;
+                  height: 100%;
                   overflow: hidden;
                 }
                 .hover-bg-accent:hover {
