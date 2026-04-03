@@ -28,7 +28,6 @@ const SubNavbar: React.FC<SubNavbarProps> = ({ activeTab, onTabChange, tabs }) =
                         >
                             <Icon size={14} strokeWidth={isActive ? 2.5 : 2} />
                             <span>{tab.label}</span>
-                            {isActive && <div className="active-indicator" />}
                         </button>
                     );
                 })}
