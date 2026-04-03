@@ -41,6 +41,7 @@
   --header-height: 56px;
   --topbar-height: 28px;
   --total-header-height: calc(var(--header-height) + var(--topbar-height));
+  --workspace-subnav-height: 48px;
 
   --topbar-bg: rgba(0,0,0,0.85);
   --landing-nav-bg: linear-gradient(90deg, rgba(8, 13, 40, 0.95), rgba(15, 18, 50, 0.94));

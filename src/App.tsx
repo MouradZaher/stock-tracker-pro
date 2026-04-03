@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense, useEffect, useMemo } from 'react';
+import type { ElementType } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { soundService } from './services/soundService';
 import { Toaster } from 'react-hot-toast';
@@ -44,6 +45,7 @@ import PriceAlertManager from './components/PriceAlertManager';
 import './index.css';
 import './styles/ios-mobile.css';
 import Dashboard from './components/Dashboard';
+import { Brain, Eye, PieChart, Activity } from 'lucide-react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -242,6 +244,18 @@ function MainLayout({
     navigate(`/stock/${symbol}?from=${currentTab}`);
   };
 
+  const workspaceTabs: { id: TabType; label: string; icon: ElementType; color: string }[] = [
+    { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' },
+    { id: 'watchlist', label: 'Watchlist', icon: Eye, color: '#3b82f6' },
+    { id: 'portfolio', label: 'Portfolio', icon: PieChart, color: '#10b981' },
+    { id: 'pulse', label: 'Pulse', icon: Activity, color: '#f97316' },
+  ];
+
+  const goWorkspaceTab = (tab: TabType) => {
+    soundService.playTap();
+    handleTabChange(tab);
+  };
+
   // Listen for symbol query parameters (from legacy heatmap deep-linking)
   // Now redirects to the new persistent /stock/ route while preserving other params
   useEffect(() => {
@@ -280,6 +294,25 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
           <main className="main-content">
+            <nav className="workspace-tab-nav" aria-label="Workspace">
+              {workspaceTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={`workspace-tab-btn ${isActive ? 'active' : ''}`}
+                    onClick={() => goWorkspaceTab(tab.id)}
+                    style={isActive ? { borderColor: tab.color, color: tab.color } : undefined}
+                  >
+                    <Icon size={14} strokeWidth={isActive ? 2.5 : 2} aria-hidden />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="content-route-shell">
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
@@ -329,6 +362,7 @@ function MainLayout({
               } />
               <Route path="*" element={<Navigate to={{ pathname: '/home', search: location.search }} replace />} />
             </Routes>
+            </div>
           </main>
         </div>
       </ErrorBoundary>
