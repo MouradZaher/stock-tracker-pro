@@ -304,7 +304,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
                 {activeSubTab === 'overview' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto', padding: '1rem 1.5rem' }}>
+                    <div className="scrollable-panel" style={{ padding: '1rem 1.5rem' }}>
                         <div className="portfolio-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                             <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
                                 <div className="summary-label">Total Assets (USD)</div>
@@ -395,7 +395,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 )}
 
                 {activeSubTab === 'intelligence' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto', padding: '1.5rem', gap: '1.5rem' }}>
+                    <div className="scrollable-panel" style={{ padding: '1.5rem', gap: '1.5rem', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
                             <RiskReturnChart positions={positions} />
                             <ScenarioHedging positions={positions} />
