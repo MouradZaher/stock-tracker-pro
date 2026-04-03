@@ -422,7 +422,10 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         return finalStock;
     }
 
-    console.error(`❌ All sources failed for ${symbol}`);
+    // All sources failed — cache for 5 min to prevent poll spam on unavailable symbols
+    if (import.meta.env.DEV) {
+        console.debug(`[StockService] No data for ${symbol} — will retry in 5 min.`);
+    }
 
     finalStock = {
         symbol,
@@ -447,8 +450,11 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         totalBuy: 0,
         totalSell: 0,
         lastUpdated: new Date(),
+        isFallback: true,
     };
-    setCachedData(`quote_full_${symbol}`, finalStock);
+    // Cache with a 5-minute TTL so the poller doesn't retry on every cycle
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    cache.set(`quote_full_${symbol}`, { data: finalStock, timestamp: Date.now() - CACHE_DURATION + FIVE_MINUTES });
     return finalStock;
     }); // end withPromisePool
 };
