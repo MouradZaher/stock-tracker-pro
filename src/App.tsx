@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense, useEffect, useMemo } from 'react';
+import type { ElementType } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { soundService } from './services/soundService';
 import { Toaster } from 'react-hot-toast';
@@ -245,7 +246,7 @@ function MainLayout({
     navigate(`/stock/${symbol}?from=${currentTab}`);
   };
 
-  const contentTabs: { id: TabType; label: string; icon: React.ElementType; color: string }[] = [
+  const contentTabs: { id: TabType; label: string; icon: ElementType; color: string }[] = [
     { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' },
     { id: 'watchlist', label: 'Watchlist', icon: Eye, color: '#3b82f6' },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart, color: '#10b981' },
