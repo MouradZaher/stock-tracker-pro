@@ -45,6 +45,11 @@ interface PortfolioStore {
     clearError: () => void;
 }
 
+// Module-level blacklist: symbols that have permanently failed to fetch data.
+// These are skipped on all subsequent sync cycles to avoid console spam
+// and wasted network requests. Resets on full page reload.
+const unavailableSymbols = new Set<string>();
+
 export const usePortfolioStore = create<PortfolioStore>()(
     persist(
         (set, get) => {
@@ -251,12 +256,27 @@ export const usePortfolioStore = create<PortfolioStore>()(
                     try {
                         const { getMultipleQuotes } = await import('../services/stockDataService');
                         const { fetchExchangeRates, convertToUSD } = await import('../services/currencyService');
-                        
+
+                        // Skip symbols that are already known to be unavailable
+                        const symbolsToFetch = positions
+                            .map(p => p.symbol)
+                            .filter(s => !unavailableSymbols.has(s));
+
+                        if (symbolsToFetch.length === 0) return;
+
                         // Parallel fetch exchange rates and quotes
                         const [quotes, rates] = await Promise.all([
-                            getMultipleQuotes(positions.map(p => p.symbol)),
+                            getMultipleQuotes(symbolsToFetch),
                             fetchExchangeRates()
                         ]);
+
+                        // Track symbols that returned no data and blacklist them
+                        symbolsToFetch.forEach(sym => {
+                            const q = quotes.get(sym);
+                            if (!q || q.price <= 0) {
+                                unavailableSymbols.add(sym);
+                            }
+                        });
 
                         set((state) => ({
                             positions: state.positions.map(pos => {
@@ -265,7 +285,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
 
                                 const marketValue = pos.units * quote.price;
                                 const { amount, percent } = calculateProfitLoss(quote.price, pos.avgCost, pos.units);
-                                
+
                                 // Normalized value calculation
                                 const currency = pos.currency || (pos.symbol.includes('.CA') ? 'EGP' : pos.symbol.includes('.AD') ? 'AED' : 'USD');
                                 const marketValueUSD = convertToUSD(marketValue, currency, rates);
@@ -276,7 +296,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                                     currentPrice: quote.price,
                                     marketValue,
                                     marketValueUSD,
-                                    purchaseValueUSD, // Added new field to state
+                                    purchaseValueUSD,
                                     currency,
                                     profitLoss: amount,
                                     profitLossPercent: percent,
@@ -285,7 +305,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
                             })
                         }));
                     } catch (error) {
-                        console.error('Error syncing portfolio prices:', error);
+                        // Suppress verbose logging to keep console clean
                     }
                 },
 

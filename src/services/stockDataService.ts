@@ -422,10 +422,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
         return finalStock;
     }
 
-    // All sources failed — cache for 5 min to prevent poll spam on unavailable symbols
-    if (import.meta.env.DEV) {
-        console.debug(`[StockService] No data for ${symbol} — will retry in 5 min.`);
-    }
+    // All sources failed — cache for 5 min to stop repeated retries
 
     finalStock = {
         symbol,
