@@ -203,7 +203,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
         <div className="tab-content dashboard-viewport" style={{ 
             gap: '1rem',
             padding: '1rem',
-            overflowY: 'auto', // Allow scrolling on this massive page
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column'
         }}>
@@ -218,7 +218,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
                 gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
                 gap: '1rem',
                 flex: 1,
-                minHeight: '600px' // Ensure widgets have room to breathe
+                minHeight: 0
             }}>
                 {/* Real Time News Reports */}
                 <div className="glass-card" style={{ 
