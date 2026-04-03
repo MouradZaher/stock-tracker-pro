@@ -30,9 +30,10 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Core Layout Chain */
+/* Core Layout Chain — locked to viewport, no root scroll */
 html, body, #root {
   height: 100%;
+  overflow: hidden;
 }
 
 /* --- Ultra Sleek Scrollbars --- */
