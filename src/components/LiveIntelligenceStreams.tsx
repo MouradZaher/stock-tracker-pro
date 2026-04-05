@@ -54,7 +54,7 @@ export const CHANNELS: Channel[] = [
         name: 'Sky News Live',
         shortName: 'Sky News',
         youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
-        videoId: 'YDvsBbKfLPA', // Direct stable ID
+        videoId: '', // Removed hardcoded ID to use dynamic live_stream?channel= fallback
         logo: 'https://www.google.com/s2/favicons?sz=64&domain=sky.com',
         color: '#E00034',
         region: 'UK',
@@ -65,7 +65,7 @@ export const CHANNELS: Channel[] = [
         name: 'Euronews English',
         shortName: 'Euronews',
         youtubeId: 'UCSrZ3UV4jOidv8ppoVuvW9Q',
-        videoId: 'pykpO5kQJ98', // Direct stable ID
+        videoId: '', // Removed hardcoded ID to use dynamic live_stream?channel= fallback
         logo: 'https://www.google.com/s2/favicons?sz=64&domain=euronews.com',
         color: '#00548F',
         region: 'Europe',
