@@ -43,7 +43,7 @@ export const CHANNELS: Channel[] = [
         name: 'LiveNOW from FOX',
         shortName: 'Fox News',
         youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
-        videoId: 'OrCH6XEzMwI', // Direct stable ID
+        videoId: '', // Removed hardcoded ID to use dynamic live_stream?channel= fallback
         logo: 'https://www.google.com/s2/favicons?sz=64&domain=foxnews.com',
         color: '#003087',
         region: 'USA',
