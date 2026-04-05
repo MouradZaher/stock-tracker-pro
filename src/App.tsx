@@ -22,7 +22,7 @@ const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
 const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioIntelligencePanel'));
 const PricingPage = lazy(() => import('./components/PricingPage'));
 
-import WatchlistSidebar from './components/WatchlistSidebar';
+
 import AIChatWidget from './components/AIChatWidget';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
@@ -64,7 +64,6 @@ function AppContent() {
   const { isAuthenticated, logout, user } = usePinAuth();
   const syncPrices = usePortfolioStore(state => state.syncPrices);
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
-  const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -141,8 +140,6 @@ function AppContent() {
         logout={handleLogout}
         selectedSymbol={selectedSymbol}
         setSelectedSymbol={setSelectedSymbol}
-        isWatchlistOpen={isWatchlistOpen}
-        setIsWatchlistOpen={setIsWatchlistOpen}
         isAdminOpen={isAdminOpen}
         setIsAdminOpen={setIsAdminOpen}
         onOpenTutorial={() => setIsTutorialOpen(true)}
@@ -157,8 +154,6 @@ interface MainLayoutProps {
   logout: () => void;
   selectedSymbol: string | null;
   setSelectedSymbol: (symbol: string | null) => void;
-  isWatchlistOpen: boolean;
-  setIsWatchlistOpen: (open: boolean) => void;
   isAdminOpen: boolean;
   setIsAdminOpen: (open: boolean) => void;
   onOpenTutorial: () => void;
@@ -187,8 +182,6 @@ function MainLayout({
   logout,
   selectedSymbol,
   setSelectedSymbol,
-  isWatchlistOpen,
-  setIsWatchlistOpen,
   isAdminOpen,
   setIsAdminOpen,
   onOpenTutorial,
@@ -252,11 +245,7 @@ function MainLayout({
             onOpenSettings={onOpenSettings}
           />
 
-          <WatchlistSidebar
-            isOpen={isWatchlistOpen}
-            onClose={() => setIsWatchlistOpen(false)}
-            onSelectSymbol={handleSelectSymbol}
-          />
+
 
           <AdminDashboard
             isOpen={isAdminOpen}
