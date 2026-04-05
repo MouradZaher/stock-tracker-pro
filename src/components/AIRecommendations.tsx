@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     LayoutGrid, Fingerprint, Cpu, Target
 } from 'lucide-react';
-import AIIntelligenceStream from './AIIntelligenceStream';
 import AIPerformanceTracker from './AIPerformanceTracker';
 import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 import AIInstitutionalHub from './AIInstitutionalHub';
@@ -13,12 +12,6 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
 
     return (
         <div className="tab-content dashboard-viewport" style={{ padding: 0, gap: 0 }}>
-            {/* TOP HEADER ROW (Intelligence Stream) */}
-            <div style={{ display: 'flex', gap: '1rem', padding: '0.75rem 1.5rem', borderBottom: '1px solid var(--glass-border)', flexShrink: 0, alignItems: 'center' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    <AIIntelligenceStream />
-                </div>
-            </div>
 
             {/* Unified Sub-Navbar */}
             <SubNavbar
