@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, usePa
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
-import OnboardingModal from './components/OnboardingModal';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
 
@@ -70,10 +69,7 @@ function AppContent() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
-  // Track Terms of Use acceptance
-  const [hasAcceptedTerms, setHasAcceptedTerms] = useState<boolean>(() => {
-    return localStorage.getItem('hasAcceptedTerms') === 'true';
-  });
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(true);
 
   // Auto-sync portfolio prices on login/refresh to replace $150 placeholders
   useEffect(() => {
@@ -114,17 +110,6 @@ function AppContent() {
     logout();
   };
 
-  const handleOnboardingComplete = (choice: 'sample' | 'fresh') => {
-    localStorage.setItem('hasAcceptedTerms', 'true');
-    setHasAcceptedTerms(true);
-    setIsTutorialOpen(true);
-    
-    // If choice is fresh, we do nothing. If sample, ideally we load sample data
-    if (choice === 'sample') {
-      // Future: load explicit sample trades here
-      console.log('User elected to explore with sample data');
-    }
-  };
 
   const handleOpenAI = () => {
     window.dispatchEvent(new CustomEvent('open-ai-chat'));
@@ -132,12 +117,6 @@ function AppContent() {
 
   return (
     <BrowserRouter>
-      {!hasAcceptedTerms && (
-        <OnboardingModal 
-          onComplete={handleOnboardingComplete} 
-          onDecline={handleLogout} 
-        />
-      )}
       {isTutorialOpen && (
         <TutorialModal 
           onClose={() => setIsTutorialOpen(false)}
@@ -244,17 +223,7 @@ function MainLayout({
     navigate(`/stock/${symbol}?from=${currentTab}`);
   };
 
-  const workspaceTabs: { id: TabType; label: string; icon: ElementType; color: string }[] = [
-    { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' },
-    { id: 'watchlist', label: 'Watchlist', icon: Eye, color: '#3b82f6' },
-    { id: 'portfolio', label: 'Portfolio', icon: PieChart, color: '#10b981' },
-    { id: 'pulse', label: 'Pulse', icon: Activity, color: '#f97316' },
-  ];
 
-  const goWorkspaceTab = (tab: TabType) => {
-    soundService.playTap();
-    handleTabChange(tab);
-  };
 
   // Listen for symbol query parameters (from legacy heatmap deep-linking)
   // Now redirects to the new persistent /stock/ route while preserving other params
@@ -294,24 +263,7 @@ function MainLayout({
             onClose={() => setIsAdminOpen(false)}
           />
           <main className="main-content">
-            <nav className="workspace-tab-nav" aria-label="Workspace">
-              {workspaceTabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    className={`workspace-tab-btn ${isActive ? 'active' : ''}`}
-                    onClick={() => goWorkspaceTab(tab.id)}
-                    style={isActive ? { borderColor: tab.color, color: tab.color } : undefined}
-                  >
-                    <Icon size={14} strokeWidth={isActive ? 2.5 : 2} aria-hidden />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+
             <div className="content-route-shell">
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />

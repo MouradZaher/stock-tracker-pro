@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Shield, Lock, Sun, Moon, User, ArrowRight, X, BarChart3, TrendingUp, Zap } from 'lucide-react';
+import { Shield, Lock, Sun, Moon, User, ArrowRight, X, BarChart3, TrendingUp, Zap, Activity, Globe, Brain, LineChart, Layers, Sparkles, Eye, Target, ChevronRight, Award, Clock, Cpu } from 'lucide-react';
 import { usePinAuth } from '../contexts/PinAuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 
-import AIPerformanceTracker from '../components/AIPerformanceTracker';
 import TopBar from '../components/TopBar';
 import './LandingPage.css';
+import './PreviewStyles.css';
 
 const PinLoginPage: React.FC = () => {
     const { checkUser, login, register } = usePinAuth();
@@ -17,22 +17,15 @@ const PinLoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [pin, setPin] = useState(['', '', '', '']);
     const [mode, setMode] = useState<'username' | 'login' | 'signup'>('username');
+    const [hoveredFeature, setHoveredFeature] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'support' | 'compliance' | null>(null);
 
-
-    const FOOTER_CONTENT = {
-        privacy: {
-            title: "Privacy Policy",
-            content: "At StockTracker Pro, we prioritize the protection of your personal and financial data. We employ industry-standard encryption and security protocols to ensure your information remains confidential. We do not sell your data to third parties.\n\nStockTracker Pro adheres to all relevant financial regulations and data protection laws. We maintain strict compliance standards to ensure a safe and transparent trading environment for all users."
-        },
-        terms: {
-            title: "Terms of Service",
-            content: "By using StockTracker Pro, you agree to our terms. Our platform provides financial data for informational purposes only. We are not responsible for investment decisions made based on this data. Trading involves risk."
-        },
-        support: {
-            title: "Support",
-            content: "Our dedicated support team is available 24/7 to assist you. Whether you have technical issues or questions about our features, we are here to help. Contact us at support@stocktracker.pro."
+    const handleCardInteraction = (feature: string) => {
+        if (hoveredFeature === feature) {
+            setHoveredFeature(null);
+        } else {
+            setHoveredFeature(feature);
+            soundService.playTap();
         }
     };
 
@@ -169,6 +162,9 @@ const PinLoginPage: React.FC = () => {
         <div className="landing-page">
             <TopBar />
             
+            {/* Premium Texture Overlay */}
+            <div className="noise-overlay" style={{ opacity: 0.1, mixBlendMode: 'overlay' }}></div>
+            
             {/* Background elements */}
             <div className="landing-bg-elements">
                 <div className="bg-blob blob-1"></div>
@@ -177,40 +173,29 @@ const PinLoginPage: React.FC = () => {
             </div>
 
             <nav className="landing-nav">
-                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: '1.25rem', fontWeight: 700 }}>
+                <a href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', fontSize: '1.25rem', fontWeight: 700, textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
                     <div style={{ background: 'var(--gradient-primary)', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Shield size={18} color="white" />
                     </div>
                     <span>StockTracker <span className="gradient-text">Pro</span></span>
-                </div>
-                <div className="landing-nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div className="access-badge" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Lock size={12} color="var(--color-warning)" />
-                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            Secure Channel
-                        </span>
+                </a>
+                <div className="landing-nav-actions">
+                    <div className="nav-private-badge">
+                        <Lock size={11} />
+                        <span>Private Access</span>
                     </div>
-
                     <button
-                        className="glass-button"
+                        className="theme-toggle-btn"
                         onClick={() => {
                             soundService.playTap();
                             toggleTheme();
                         }}
-                        style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '50%',
-                            width: '40px',
-                            height: '40px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: 'white'
-                        }}
+                        title={theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
                     >
-                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        {theme === 'dark'
+                            ? <span className="theme-icon theme-icon-sun">☀</span>
+                            : <span className="theme-icon theme-icon-moon">☾</span>
+                        }
                     </button>
                 </div>
             </nav>
@@ -219,34 +204,36 @@ const PinLoginPage: React.FC = () => {
                 {/* Left: Login Sidebar */}
                 <div className="login-sidebar">
                     <div className="login-form-wrapper">
-                        <div style={{ marginBottom: '2.5rem' }}>
-                            <div style={{ display: 'inline-flex', background: 'rgba(99,102,241,0.1)', padding: '8px', borderRadius: '12px', marginBottom: '1.25rem' }}>
-                                <Shield size={24} color="var(--color-accent)" />
+                        {/* Header */}
+                        <div className="login-header">
+                            <div className="login-title-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.4rem' }}>
+                                <div className="login-shield-icon" style={{ margin: 0 }}>
+                                    <Shield size={22} />
+                                </div>
+                                <h2 className="login-title" style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800 }}>
+                                    {mode === 'username' ? 'Login / Sign Up' : 'Verify Identity'}
+                                </h2>
                             </div>
-                            <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white', letterSpacing: '-0.02em' }}>
-                                {mode === 'username' ? 'Access Terminal' : 'Verify Identity'}
-                            </h2>
-                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '1rem' }}>
-                                {mode === 'username' ? 'Enter your institutional credentials' : `Confirming access for ${username}`}
-                            </p>
+                            {mode !== 'username' && (
+                                <p className="login-subtitle">
+                                    Confirming access for: {username}
+                                </p>
+                            )}
                         </div>
-                        
+
                         <div className="login-form">
                             {/* Step 1: Username Input */}
                             {mode === 'username' && (
                                 <div className="form-step-container">
-                                    <div className="input-group" style={{ position: 'relative' }}>
-                                        <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', pointerEvents: 'none' }}>
-                                            <User size={20} />
-                                        </div>
+                                    <div className="login-input-wrap">
+                                        <div className="login-input-icon"><User size={18} /></div>
                                         <input
                                             ref={usernameRef}
                                             type="text"
-                                            className="landing-input"
-                                            placeholder="Standard ID"
+                                            className="landing-input login-field"
+                                            placeholder="username"
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
-                                            style={{ height: '60px', paddingLeft: '52px', fontSize: '1rem', color: 'white' }}
                                             onKeyDown={(e) => e.key === 'Enter' && handleUsernameSubmit()}
                                             disabled={isLoading}
                                             autoCapitalize="none"
@@ -255,27 +242,14 @@ const PinLoginPage: React.FC = () => {
                                         <button
                                             onClick={handleUsernameSubmit}
                                             disabled={isLoading || !username.trim()}
-                                            className="btn btn-primary"
-                                            style={{
-                                                position: 'absolute',
-                                                right: '8px',
-                                                top: '8px',
-                                                bottom: '8px',
-                                                borderRadius: '10px',
-                                                padding: '0 16px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                fontWeight: 600,
-                                                fontSize: '0.9rem'
-                                            }}
+                                            className="login-submit-btn"
                                         >
-                                            {isLoading ? '...' : <><ArrowRight size={18} /></>}
+                                            {isLoading ? <span className="login-spinner" /> : <ArrowRight size={18} />}
                                         </button>
                                     </div>
-                                    <div style={{ marginTop: '1.5rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Zap size={14} />
-                                        <span>Authorized access points only</span>
+                                    <div className="login-hint">
+                                        <Zap size={12} />
+                                        <span>Authorized access only</span>
                                     </div>
                                 </div>
                             )}
@@ -283,12 +257,11 @@ const PinLoginPage: React.FC = () => {
                             {/* Step 2: PIN Input */}
                             {(mode === 'login' || mode === 'signup') && (
                                 <div className="form-step-container" style={{ animation: 'slideInUp 0.4s ease-out' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                                        <button onClick={goBack} className="glass-button" style={{ width: '36px', height: '36px', borderRadius: '10px', padding: 0 }}>←</button>
-                                        <span style={{ color: 'white', fontWeight: 600 }}>{username}</span>
+                                    <div className="pin-back-row">
+                                        <button onClick={goBack} className="pin-back-btn">←</button>
+                                        <span className="pin-username-label">{username}</span>
                                     </div>
-
-                                    <div className="pin-input-group" style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+                                    <div className="pin-input-group">
                                         {pin.map((digit, index) => (
                                             <input
                                                 key={index}
@@ -300,99 +273,305 @@ const PinLoginPage: React.FC = () => {
                                                 onChange={(e) => handlePinChange(index, e.target.value)}
                                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                                 disabled={isLoading}
-                                                className="landing-input"
-                                                style={{ width: '100%', height: '70px', textAlign: 'center', fontSize: '1.75rem', fontWeight: 800, padding: 0, color: 'white' }}
+                                                className="landing-input pin-square-input"
                                                 onFocus={(e) => e.target.select()}
                                             />
                                         ))}
                                     </div>
-                                    <p style={{ marginTop: '1.5rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', textAlign: 'center' }}>
+                                    <p className="pin-hint">
                                         {mode === 'signup' ? 'Create a secure 4-digit PIN' : 'Enter your 4-digit security PIN'}
                                     </p>
                                 </div>
                             )}
                         </div>
                     </div>
+
+                    {/* Social Footer */}
+                    <div className="landing-footer" style={{ marginTop: 'auto', paddingTop: '3rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
+                         <a href="https://x.com/stocktrackerpro" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, transition: 'all 0.2s', padding: '8px 16px', borderRadius: '100px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}>
+                             <svg width="12" height="12" viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" />
+                             </svg>
+                             @stocktrackerpro
+                         </a>
+                    </div>
                 </div>
 
-                {/* Right: Content Showcase */}
-                <div className="content-showcase">
-                    <div className="showcase-header">
-                        <div className="access-badge" style={{ display: 'inline-flex', marginBottom: '1.5rem' }}>
-                            <span className="gradient-text" style={{ fontWeight: 800, letterSpacing: '0.1em', fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                                The Future of Trading
-                            </span>
+                {/* Right: Content Showcase — Premium Bento Layout */}
+                <div className={`content-showcase ${hoveredFeature ? 'is-previewing' : ''}`}>
+                    {/* Full Area Preview Overlay */}
+                    {hoveredFeature && (
+                        <div className={`sc-full-preview-overlay theme-${hoveredFeature.replace(/\s+/g, '-').toLowerCase()}`}>
+                            <div className="preview-scanlines"></div>
+                            
+                            <div className="full-preview-header">
+                                <div className="full-header-left">
+                                    <div className="full-preview-rec">
+                                        <div className="rec-dot"></div>
+                                        <span>LIVE RECORDING</span>
+                                    </div>
+                                    <h2 className="full-preview-title">{hoveredFeature}</h2>
+                                </div>
+                                <div className="full-header-right">
+                                    <div className="header-meta">
+                                        <span className="meta-label">CHANNEL</span>
+                                        <span className="meta-value">SECURE FEED 04</span>
+                                    </div>
+                                    <div className="header-meta">
+                                        <span className="meta-label">STABILITY</span>
+                                        <span className="meta-value">99.9%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="full-preview-content">
+                                {hoveredFeature === 'AI Command Center' && (
+                                    <div className="preview-ai-module">
+                                        <div className="module-stats">
+                                            <div className="m-stat"><h3>0.08s</h3><span>INFERENCE</span></div>
+                                            <div className="m-stat"><h3>L407</h3><span>ENGINE ID</span></div>
+                                            <div className="m-stat"><h3>GPT+</h3><span>MODEL</span></div>
+                                        </div>
+                                        <div className="ai-intelligence-feed">
+                                            <div className="ai-row active"><span>{">"} ANALYZING MARKET BREADTH...</span></div>
+                                            <div className="ai-row"><span>{">"} SECTOR SCAN COMPLETE: TECH BULLISH</span></div>
+                                            <div className="ai-row highlight"><span>{">"} STRATEGY GENERATED: BETA NEUTRAL HYBRID</span></div>
+                                        </div>
+                                    </div>
+                                )}
+                                {hoveredFeature === 'Smart Watchlists' && (
+                                    <div className="preview-watchlist-module">
+                                        <div className="watchlist-tickers">
+                                            {[
+                                                { s: 'NVDA', p: '942.12', c: '+2.4%' },
+                                                { s: 'AAPL', p: '174.55', c: '+0.8%' },
+                                                { s: 'MSFT', p: '412.3', c: '+1.2%' },
+                                                { s: 'META', p: '492.3', c: '-0.3%' }
+                                            ].map((t, i) => (
+                                                <div key={i} className="m-ticker-card">
+                                                    <div className="m-symbol">{t.s}</div>
+                                                    <div className="m-price">${t.p}</div>
+                                                    <div className={`m-change ${t.c.startsWith('+') ? 'up' : 'down'}`}>{t.c}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {hoveredFeature === 'Portfolio Engine' && (
+                                    <div className="preview-portfolio-module">
+                                        <div className="portfolio-analytics-grid">
+                                            <div className="p-chart-box">
+                                                <div className="p-donut-large"></div>
+                                                <div className="p-donut-inner">84%</div>
+                                            </div>
+                                            <div className="p-metrics">
+                                                <div className="p-metric-row"><span>BETA</span> <span>1.04</span></div>
+                                                <div className="p-metric-row"><span>ALPHA</span> <span className="up">+0.42</span></div>
+                                                <div className="p-metric-row"><span>VAR</span> <span>3.2%</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {hoveredFeature === 'Market Pulse' && (
+                                    <div className="preview-pulse-module">
+                                        <div className="pulse-heatmap-v2">
+                                            {[...Array(20)].map((_, i) => (
+                                                <div key={i} className="pulse-cell" style={{ opacity: 0.8 - (i * 0.03), background: i % 3 === 0 ? 'var(--emerald-500)' : i % 5 === 0 ? 'var(--rose-500)' : 'var(--slate-700)' }}></div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {hoveredFeature === 'Live Screening' && (
+                                    <div className="preview-scanner-module">
+                                        <div className="scanner-active-list">
+                                            {[
+                                                'WHALE FLOW DETECTED - TSLA CALL 200',
+                                                'DARK POOL ACTIVITY - MSFT $415 LEVEL',
+                                                'SCALPING SIGNAL - ES FUTURES SHORT',
+                                                'MOMENTUM SPIKE - SOLANA DEX VOLUME',
+                                                'LIQUIDITY SHIFT - BTC-USDT BINANCE'
+                                            ].map((msg, i) => (
+                                                <div key={i} className="scanner-msg">
+                                                    <Activity size={14} />
+                                                    <span>{msg}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {hoveredFeature === 'Risk Analytics' && (
+                                    <div className="preview-risk-module">
+                                        <div className="risk-visual-row">
+                                            {[...Array(10)].map((_, i) => (
+                                                <div key={i} className="risk-spike" style={{ height: `${20 + (i * 8)}%`, background: i > 7 ? 'var(--rose-500)' : 'var(--violet-500)' }}></div>
+                                            ))}
+                                        </div>
+                                        <div className="risk-level-badge">EXPOSURE: LOW</div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <h1 className="showcase-title">
-                            Institutional Grade <br />
-                            <span className="gradient-text">Intelligence.</span>
-                        </h1>
-                        <p className="showcase-subtitle">
-                            Supercharge your portfolio with AI-driven sentiment analysis, real-time market breadth, and institutional-grade risk management tools.
-                        </p>
+                    )}
+
+                    <div className={`showcase-inner ${hoveredFeature ? 'is-blurred' : ''}`}>
+                        {/* ── Top: Hero Headline + Live Pulse ─── */}
+                    <div className="sc-top-row">
+                        <div className="sc-headline">
+                            <h1 className="sc-title">
+                                Trade Smarter with
+                                <span className="gradient-text"> AI-Powered</span> Insights
+                            </h1>
+                            <p className="sc-subtitle">
+                                Real-time analytics, risk management, and sentiment analysis — all in one institutional-grade terminal.
+                            </p>
+                        </div>
+                        <div className="sc-pulse-card">
+                            <div className="sc-pulse-dot"></div>
+                            <div className="sc-pulse-info">
+                                <span className="sc-pulse-label">MARKET STATUS</span>
+                                <span className="sc-pulse-value">Live Tracking</span>
+                            </div>
+                            <Activity size={18} className="sc-pulse-icon" />
+                        </div>
                     </div>
 
-                    <div className="features-compact-grid">
-                        <div className="feature-item-card">
-                            <div className="feature-icon-box">
-                                <Zap size={22} />
-                            </div>
-                            <h3 className="feature-card-title">Smart Momentum</h3>
-                            <p className="feature-card-desc">AI-detected trend shifts before they manifest in price action.</p>
+                    {/* ── Stats Row ─── */}
+                    <div className="sc-stats-row">
+                        <div className="sc-stat">
+                            <span className="sc-stat-value">50K+</span>
+                            <span className="sc-stat-label">Signals / Day</span>
                         </div>
-                        <div className="feature-item-card">
-                            <div className="feature-icon-box">
-                                <BarChart3 size={22} />
-                            </div>
-                            <h3 className="feature-card-title">Market Breadth</h3>
-                            <p className="feature-card-desc">Deep sector rotation analysis and institutional positioning data.</p>
+                        <div className="sc-stat-divider"></div>
+                        <div className="sc-stat">
+                            <span className="sc-stat-value">0.3s</span>
+                            <span className="sc-stat-label">Avg Latency</span>
                         </div>
-                        <div className="feature-item-card">
-                            <div className="feature-icon-box">
-                                <Shield size={22} />
-                            </div>
-                            <h3 className="feature-card-title">Risk Engine</h3>
-                            <p className="feature-card-desc">Advanced correlation matrix and volatility clustering models.</p>
+                        <div className="sc-stat-divider"></div>
+                        <div className="sc-stat">
+                            <span className="sc-stat-value">99.9%</span>
+                            <span className="sc-stat-label">Uptime SLA</span>
                         </div>
-                        <div className="feature-item-card">
-                            <div className="feature-icon-box">
-                                <TrendingUp size={22} />
-                            </div>
-                            <h3 className="feature-card-title">Global Sentiment</h3>
-                            <p className="feature-card-desc">Multi-channel NLP processing for real-time market psychology.</p>
+                        <div className="sc-stat-divider"></div>
+                        <div className="sc-stat">
+                            <span className="sc-stat-value">24/7</span>
+                            <span className="sc-stat-label">Global Coverage</span>
                         </div>
                     </div>
 
-                    {/* Integrated mini-tracker peeking from bottom */}
-                    <div style={{ 
-                        position: 'absolute', 
-                        bottom: '-50px', 
-                        right: '4rem', 
-                        width: '400px', 
-                        opacity: 0.4,
-                        pointerEvents: 'none' 
-                    }}>
-                        <AIPerformanceTracker />
+                    {/* ── Bento Benefit Grid 3×2 ─── */}
+                    <div className="sc-bento-grid" onMouseLeave={() => setHoveredFeature(null)}>
+                        {/* Row 1: AI Command Center (wide) */}
+                        <div 
+                            className="sc-bento-card sc-bento-wide" 
+                            tabIndex={0}
+                            onMouseEnter={() => setHoveredFeature('AI Command Center')}
+                            onClick={() => handleCardInteraction('AI Command Center')}
+                        >
+                            <div className="sc-bento-icon-wrap sc-icon-indigo"><Brain size={18} /></div>
+                            <div className="sc-bento-body">
+                                <h3>AI Command Center</h3>
+                                <p>GPT-driven asset analysis, smart picks, and automated strategy recommendations in real-time.</p>
+                            </div>
+                            <ChevronRight size={14} className="sc-bento-arrow" />
+                        </div>
+
+                        {/* Row 2: 2-col */}
+                        <div 
+                            className="sc-bento-card" 
+                            tabIndex={0}
+                            onMouseEnter={() => setHoveredFeature('Smart Watchlists')}
+                            onClick={() => handleCardInteraction('Smart Watchlists')}
+                        >
+                            <div className="sc-bento-icon-wrap sc-icon-emerald"><TrendingUp size={18} /></div>
+                            <div className="sc-bento-body">
+                                <h3>Smart Watchlists</h3>
+                                <p>Track sectors, set alerts, and monitor momentum shifts instantly.</p>
+                            </div>
+                            <ChevronRight size={14} className="sc-bento-arrow" />
+                        </div>
+
+                        <div 
+                            className="sc-bento-card" 
+                            tabIndex={0}
+                            onMouseEnter={() => setHoveredFeature('Portfolio Engine')}
+                            onClick={() => handleCardInteraction('Portfolio Engine')}
+                        >
+                            <div className="sc-bento-icon-wrap sc-icon-amber"><Layers size={18} /></div>
+                            <div className="sc-bento-body">
+                                <h3>Portfolio Engine</h3>
+                                <p>Correlation matrices, risk scoring, and diversification grading.</p>
+                            </div>
+                            <ChevronRight size={14} className="sc-bento-arrow" />
+                        </div>
+
+                        {/* Row 3: Market Pulse + Live Screening side-by-side */}
+                        <div 
+                            className="sc-bento-card" 
+                            tabIndex={0}
+                            onMouseEnter={() => setHoveredFeature('Market Pulse')}
+                            onClick={() => handleCardInteraction('Market Pulse')}
+                        >
+                            <div className="sc-bento-icon-wrap sc-icon-rose"><Activity size={18} /></div>
+                            <div className="sc-bento-body">
+                                <h3>Market Pulse</h3>
+                                <p>Breadth analytics, global sentiment, and sector rotation heat maps.</p>
+                            </div>
+                            <ChevronRight size={14} className="sc-bento-arrow" />
+                        </div>
+
+                        <div 
+                            className="sc-bento-card" 
+                            tabIndex={0}
+                            onMouseEnter={() => setHoveredFeature('Live Screening')}
+                            onClick={() => handleCardInteraction('Live Screening')}
+                        >
+                            <div className="sc-bento-icon-wrap sc-icon-cyan"><Eye size={18} /></div>
+                            <div className="sc-bento-body">
+                                <h3>Live Screening</h3>
+                                <p>Multi-timeframe scanners with institutional flow detection.</p>
+                            </div>
+                            <ChevronRight size={14} className="sc-bento-arrow" />
+                        </div>
+
+                        {/* Row 4: New ─ Risk Analytics (wide) */}
+                        <div 
+                            className="sc-bento-card sc-bento-wide" 
+                            tabIndex={0}
+                            onMouseEnter={() => setHoveredFeature('Risk Analytics')}
+                            onClick={() => handleCardInteraction('Risk Analytics')}
+                        >
+                            <div className="sc-bento-icon-wrap sc-icon-violet"><BarChart3 size={18} /></div>
+                            <div className="sc-bento-body">
+                                <h3>Risk Analytics</h3>
+                                <p>VaR modeling, drawdown analysis, and live volatility scoring across all your positions.</p>
+                            </div>
+                            <ChevronRight size={14} className="sc-bento-arrow" />
+                        </div>
+                    </div>
+
+                    {/* ── Trust Row ─── */}
+                    <div className="sc-trust-row">
+                        <div className="sc-trust-item">
+                            <Shield size={14} className="sc-trust-icon-blue" />
+                            <span>Bank-Grade Encryption</span>
+                        </div>
+                        <div className="sc-trust-item">
+                            <Award size={14} className="sc-trust-icon-gold" />
+                            <span>SOC 2 Compliant</span>
+                        </div>
+                        <div className="sc-trust-item">
+                            <Globe size={14} className="sc-trust-icon-cyan" />
+                            <span>Multi-Region Infra</span>
+                        </div>
+                        <div className="sc-trust-item">
+                            <Cpu size={14} className="sc-trust-icon-purple" />
+                            <span>Edge Computing</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            {activeModal && (
-                <div className="modal-overlay glass-blur" onClick={() => setActiveModal(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 'clamp(320px, 90vw, 500px)', width: '90%', background: 'rgb(10, 11, 20)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', padding: '0', overflow: 'hidden' }}>
-                        <div className="modal-header" style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 className="modal-title" style={{ margin: 0, color: 'white' }}>{FOOTER_CONTENT[activeModal].title}</h3>
-                            <button className="btn btn-icon glass-button" onClick={() => setActiveModal(null)} style={{ color: 'white' }}><X size={20} /></button>
-                        </div>
-                        <div className="modal-body" style={{ padding: '1.5rem', fontSize: '1rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.6)' }}>
-                            {FOOTER_CONTENT[activeModal].content}
-                        </div>
-                        <div className="modal-footer" style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'flex-end' }}>
-                            <button className="btn btn-primary" onClick={() => setActiveModal(null)}>Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

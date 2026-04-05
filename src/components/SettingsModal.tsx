@@ -115,7 +115,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onClearData, onD
               {tabs.find(t => t.id === activeTab)?.label}
             </h2>
 
-            {/* NOTIFICATIONS TAB */
+            {/* NOTIFICATIONS TAB */}
             {activeTab === 'notifications' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
                 

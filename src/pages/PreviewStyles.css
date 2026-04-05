@@ -1,0 +1,71 @@
+
+/* ── Ultra-Performance Zero-Lag Preview Styles ─── */
+.sc-full-preview-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  /* Use solid background instead of blur to eliminate GPU lag */
+  background: var(--color-bg-primary); 
+  padding: 3rem 4rem;
+  display: flex;
+  flex-direction: column;
+  animation: overlayFadeFast 0.2s ease-out both; 
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--glass-border);
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+@keyframes overlayFadeFast {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Background Grayscale - Very cheap to render */
+.is-blurred {
+  opacity: 0.1;
+  filter: grayscale(1);
+  transition: opacity 0.3s ease-out;
+  will-change: opacity;
+}
+
+/* Accent Themes */
+.theme-ai-command-center { --accent: #6366f1; }
+.theme-smart-watchlists { --accent: #10b981; }
+.theme-portfolio-engine { --accent: #f59e0b; }
+.theme-market-pulse { --accent: #f43f5e; }
+.theme-live-screening { --accent: #06b6d4; }
+.theme-risk-analytics { --accent: #8b5cf6; }
+
+/* Dashboard Detail Headers */
+.full-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1.25rem;
+}
+.full-preview-title { font-size: 2.22rem; font-weight: 800; color: var(--color-text-primary); letter-spacing: -0.02em; margin: 0; }
+
+.header-meta { display: flex; flex-direction: column; gap: 4px; }
+.meta-label { font-size: 0.6rem; font-weight: 800; color: var(--color-text-secondary); letter-spacing: 0.1em; }
+.meta-value { font-size: 0.85rem; font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+
+/* Module Containers */
+.full-preview-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+/* AI Layout */
+.preview-ai-module { max-width: 600px; }
+.ai-intelligence-feed { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+.ai-row { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--color-text-tertiary); }
+.ai-row.active { color: var(--accent); }
+
+/* Recording Box */
+.full-preview-rec { display: flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.1); padding: 4px 12px; border-radius: 6px; }
+.rec-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 10px #ef4444; }
+.full-preview-rec span { font-size: 0.7rem; font-weight: 900; color: #ef4444; }
+
+
