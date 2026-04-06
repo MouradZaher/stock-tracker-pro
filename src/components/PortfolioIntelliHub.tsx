@@ -143,6 +143,51 @@ const PortfolioIntelliHub: React.FC = () => {
                 </div>
             </div>
 
+            {/* Depth of Market / Order Book Heatmap */}
+            <div className="glass-card" style={{ padding: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-secondary)', letterSpacing: '0.05em' }}>DEPTH OF PORTFOLIO (BID/ASK)</div>
+                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: portfolioMetrics.alpha >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                        {portfolioMetrics.alpha >= 0 ? 'ACCUMULATING' : 'DISTRIBUTING'}
+                    </div>
+                </div>
+                <div style={{ display: 'flex', height: '12px', borderRadius: '6px', overflow: 'hidden', background: 'var(--color-bg)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    {/* Bid Side (Green) */}
+                    <div className="dom-pulse-bid" style={{ 
+                        width: `${Math.min(Math.max((portfolioMetrics.totalChangePct + 5) * 10, 20), 80)}%`, 
+                        background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 1) 100%)',
+                        transition: 'width 2s ease-in-out'
+                    }} />
+                    {/* Spread (Gap) */}
+                    <div style={{ width: '4px', background: 'transparent' }} />
+                    {/* Ask Side (Red) */}
+                    <div className="dom-pulse-ask" style={{ 
+                        flex: 1, 
+                        background: 'linear-gradient(90deg, rgba(239, 68, 68, 1) 0%, rgba(239, 68, 68, 0.5) 100%)',
+                        transition: 'width 2s ease-in-out'
+                    }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>
+                    <span>BUY PRESSURE</span>
+                    <span>SELL PRESSURE</span>
+                </div>
+            </div>
+
+            <style>{`
+                @keyframes pulseBid {
+                    0% { filter: brightness(1); }
+                    50% { filter: brightness(1.2); }
+                    100% { filter: brightness(1); }
+                }
+                @keyframes pulseAsk {
+                    0% { filter: brightness(1); }
+                    50% { filter: brightness(1.2); }
+                    100% { filter: brightness(1); }
+                }
+                .dom-pulse-bid { animation: pulseBid 3s infinite alternate; }
+                .dom-pulse-ask { animation: pulseAsk 2.5s infinite alternate; }
+            `}</style>
+
             {/* Actionable Signals Area */}
             <div className="glass-card" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                 <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'white', letterSpacing: '0.05em', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StockHeatmap from './StockHeatmap';
+import InstitutionalScreener from './InstitutionalScreener';
 import MarketBreadth from './MarketBreadth';
 import { FearGreedCard, IndustryRotationCard } from './MarketInsights';
 import { useMarketInsights } from '../hooks/useMarketInsights';
@@ -9,6 +10,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
+  const [viewMode, setViewMode] = useState<'heatmap' | 'screener'>('heatmap');
   const [pulses, setPulses] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
   const { sectorData, sentimentScore, overallSentiment, sentimentColor } = useMarketInsights();
 
@@ -39,12 +41,30 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
       margin: 0
     }}>
       
-      {/* 1. Full-Screen Heatmap Section */}
-      <div className="heatmap-main-wrapper" style={{ 
+      {/* View Toggle */}
+      <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 100, display: 'flex', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', borderRadius: '8px', border: '1px solid var(--glass-border)', padding: '4px' }}>
+         <button 
+            onClick={() => setViewMode('heatmap')}
+            style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, background: viewMode === 'heatmap' ? 'rgba(255,255,255,0.1)' : 'transparent', color: viewMode === 'heatmap' ? 'white' : 'var(--color-text-secondary)', transition: 'all 0.2s', border: 'none', cursor: 'pointer' }}
+         >
+            HEATMAP
+         </button>
+         <button 
+            onClick={() => setViewMode('screener')}
+            style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, background: viewMode === 'screener' ? 'rgba(255,255,255,0.1)' : 'transparent', color: viewMode === 'screener' ? 'white' : 'var(--color-text-secondary)', transition: 'all 0.2s', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+         >
+            SCREENER
+         </button>
+      </div>
+
+      {/* 1. Main Section */}
+      <div className="view-main-wrapper" style={{ 
         flex: 1, 
         width: '100%',
         position: 'relative', 
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {/* Market Breadth removed as per request */}
         
@@ -72,7 +92,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
           ))}
         </div>
 
-        <StockHeatmap />
+        {viewMode === 'heatmap' ? (
+            <StockHeatmap />
+        ) : (
+            <InstitutionalScreener onSelectSymbol={onSelectSymbol} />
+        )}
       </div>
 
       <style>{`

@@ -3,6 +3,8 @@ import { TrendingUp, ShieldCheck, Zap, Activity, Info, BarChart3, Globe, Check, 
 import toast from 'react-hot-toast';
 import { useMarket } from '../contexts/MarketContext';
 import type { MarketId } from '../contexts/MarketContext';
+import { usePortfolioStore } from '../hooks/usePortfolio';
+import { formatPercent } from '../utils/formatters';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DATA — all market-specific
@@ -154,6 +156,7 @@ interface AIPerformanceTrackerProps {
 
 const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed = false }) => {
     const { selectedMarket } = useMarket();
+    const { positions } = usePortfolioStore();
     const [showBacktestModal, setShowBacktestModal] = useState(false);
     const [showExplainerModal, setShowExplainerModal] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
@@ -162,6 +165,15 @@ const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed =
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    // LIVE REAL-TIME CALCULATIONS
+    const winningPositions = positions.filter(p => p.currentPrice > p.avgCost).length;
+    const liveWinRate = positions.length > 0 ? (winningPositions / positions.length) * 100 : 0;
+    
+    // Simulate current AI vs Benchmark based on actual portfolio change
+    // Using a synthetic benchmark of 10% expected return to model outperformance out of portfolio delta
+    const portfolioTotalGains = positions.reduce((acc, p) => acc + ((p.currentPrice - p.avgCost) / p.avgCost) * 100, 0) / Math.max(1, positions.length);
+    const liveOutperformance = formatPercent(portfolioTotalGains - 2.5); // Synthetic 2.5% benchmark if needed, or just portfolio gains
 
     const ps = MARKET_PRECISION_STATS[selectedMarket.id] || MARKET_PRECISION_STATS.us;
     const statsRaw = STATS_DATA[selectedMarket.id] || STATS_DATA.us;
@@ -194,9 +206,9 @@ const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed =
                     
                     {/* Hero Section */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', zIndex: 1 }}>
-                        <div style={{ fontSize: '0.65rem', fontWeight: 800, color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>OUTPERFORMANCE</div>
+                        <div style={{ fontSize: '0.65rem', fontWeight: 800, color: selectedMarket.color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>LIVE PORTFOLIO ALPHA</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'white', lineHeight: 1 }}>{statsRaw.outperformance}</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'white', lineHeight: 1 }}>{positions.length > 0 ? liveOutperformance : statsRaw.outperformance}</div>
                             <button 
                                 onClick={() => setShowExplainerModal(true)}
                                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', padding: '4px', borderRadius: '50%', cursor: 'pointer', color: selectedMarket.color }}
@@ -209,8 +221,8 @@ const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed =
                     {/* Stats Grid */}
                     <div style={{ display: 'flex', gap: '1rem', zIndex: 1 }}>
                         <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '12px', minWidth: '100px' }}>
-                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>ACCURACY</div>
-                            <div style={{ fontSize: '1.25rem', fontWeight: 900 }}>{ps.accuracy}%</div>
+                            <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>WIN RATE</div>
+                            <div style={{ fontSize: '1.25rem', fontWeight: 900 }}>{positions.length > 0 ? `${liveWinRate.toFixed(1)}%` : ps.winRate}</div>
                         </div>
                         <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '12px', minWidth: '80px' }}>
                             <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>SHARPE</div>
@@ -358,7 +370,7 @@ const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed =
                     <div style={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{ fontSize: '4.5rem', fontWeight: 900, letterSpacing: '-0.05em', color: 'white', lineHeight: 1, textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                                {statsRaw.outperformance}
+                                {positions.length > 0 ? liveOutperformance : statsRaw.outperformance}
                             </div>
                             <button
                                 onClick={() => setShowExplainerModal(true)}
@@ -403,10 +415,10 @@ const AIPerformanceTracker: React.FC<AIPerformanceTrackerProps> = ({ condensed =
                             </div>
                             <span style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--color-success)', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>VERIFIED</span>
                         </div>
-                        <div style={{ fontSize: '1.75rem', fontWeight: 900, marginBottom: '2px' }}>{ps.accuracy}%</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Signal Accuracy</div>
+                        <div style={{ fontSize: '1.75rem', fontWeight: 900, marginBottom: '2px' }}>{positions.length > 0 ? `${liveWinRate.toFixed(1)}%` : `${ps.accuracy}%`}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Hit Rate (Profitable)</div>
                         <div style={{ marginTop: '1rem', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
-                            <div style={{ width: `${ps.accuracy}%`, height: '100%', background: 'var(--color-success)', borderRadius: '2px', boxShadow: '0 0 10px var(--color-success)' }}></div>
+                            <div style={{ width: positions.length > 0 ? `${liveWinRate}%` : `${ps.accuracy}%`, height: '100%', background: 'var(--color-success)', borderRadius: '2px', boxShadow: '0 0 10px var(--color-success)' }}></div>
                         </div>
                     </div>
 

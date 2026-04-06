@@ -6,8 +6,10 @@ import {
   ChevronRight, ArrowUpRight, ArrowDownRight, Fingerprint
 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
+import { useMarket } from '../contexts/MarketContext';
 
 const AIInstitutionalHub: React.FC = () => {
+  const { selectedMarket } = useMarket();
   const [activeResearchTab, setActiveResearchTab] = useState<'thesis' | 'analyst' | 'scenarios' | 'moat'>('thesis');
 
   // Dummy data extracted from user request
@@ -103,7 +105,7 @@ const AIInstitutionalHub: React.FC = () => {
               <div style={{ marginBottom: '1rem' }}>
                 <div style={{ fontSize: '0.7rem', color: 'var(--color-warning)', fontWeight: 800, marginBottom: '6px' }}>CORE THESIS</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                  Consensus Tier-1 accumulation detected. Margin expansion expected via AI optimization. Institutional flow remains "ACCUMULATING".
+                  Consensus Tier-1 accumulation detected in key {selectedMarket.indexName} benchmark assets. Momentum flow remains "ACCUMULATING" as capital rotates into defensive positions.
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
@@ -117,26 +119,60 @@ const AIInstitutionalHub: React.FC = () => {
                 </div>
                 <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-warning)' }}>
                   <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>MOMENTUM FLOW</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>51.8% STABLE</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>{selectedMarket.name} STABLE</div>
                 </div>
               </div>
             </div>
           )}
 
           {activeResearchTab === 'scenarios' && (
-            <div className="animate-fade-in">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div className="animate-fade-in" style={{ display: 'flex', gap: '1rem', height: '100%' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)' }}>ALPHA VECTORS</div>
                 {[
-                  { label: 'BULL', val: '+25%', desc: 'AI productivity breakout', color: 'var(--color-success)' },
-                  { label: 'BASE', val: '+12%', desc: 'Organic scaling', color: 'var(--color-accent)' },
-                  { label: 'BEAR', val: '-8%', desc: 'Macro slowdown', color: 'var(--color-error)' }
+                  { label: 'Momentum', val: '82', color: 'rgba(56, 189, 248, 1)' },
+                  { label: 'Value', val: '64', color: 'rgba(16, 185, 129, 1)' },
+                  { label: 'Volatility', val: '45', color: 'rgba(239, 68, 68, 1)' },
+                  { label: 'Liquidity', val: '91', color: 'rgba(245, 158, 11, 1)' },
+                  { label: 'Sentiment', val: '78', color: 'rgba(139, 92, 246, 1)' },
                 ].map(s => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
-                    <div style={{ width: '40px', fontSize: '0.65rem', fontWeight: 900, color: s.color }}>{s.label}</div>
-                    <div style={{ fontWeight: 900, fontSize: '0.8rem', color: 'white', minWidth: '40px' }}>{s.val}</div>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)' }}>{s.desc}</div>
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: s.color }} />
+                      <span style={{ fontSize: '0.6rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>{s.label}</span>
+                    </div>
+                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'white' }}>{s.val}</div>
                   </div>
                 ))}
+              </div>
+              
+              <div style={{ width: '130px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                  {/* Background Pentagon */}
+                  <polygon points="50,5 93,36 77,86 23,86 7,36" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                  <polygon points="50,27 71,43 63,68 37,68 28,43" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                  
+                  {/* Web Lines */}
+                  <line x1="50" y1="50" x2="50" y2="5" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                  <line x1="50" y1="50" x2="93" y2="36" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                  <line x1="50" y1="50" x2="77" y2="86" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                  <line x1="50" y1="50" x2="23" y2="86" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                  <line x1="50" y1="50" x2="7" y2="36" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+
+                  {/* Data Pentagon (Animated via CSS) */}
+                  <polygon 
+                    className="radar-data-polygon"
+                    points="50,13 89,39 71,78 25,65 11,46" 
+                    fill="rgba(56, 189, 248, 0.2)" 
+                    stroke="rgba(56, 189, 248, 1)" 
+                    strokeWidth="2" 
+                  />
+                  <circle cx="50" cy="13" r="3" fill="rgba(56, 189, 248, 1)" />
+                  <circle cx="89" cy="39" r="3" fill="rgba(16, 185, 129, 1)" />
+                  <circle cx="71" cy="78" r="3" fill="rgba(239, 68, 68, 1)" />
+                  <circle cx="25" cy="65" r="3" fill="rgba(245, 158, 11, 1)" />
+                  <circle cx="11" cy="46" r="3" fill="rgba(139, 92, 246, 1)" />
+                </svg>
               </div>
             </div>
           )}
@@ -157,6 +193,15 @@ const AIInstitutionalHub: React.FC = () => {
         }
         .institutional-hub-root::-webkit-scrollbar { width: 4px; }
         .institutional-hub-root::-webkit-scrollbar-thumb { background: var(--color-accent-light); border-radius: 4px; }
+        
+        @keyframes radarPulse {
+          0% { filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)); }
+          50% { filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8)); }
+          100% { filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)); }
+        }
+        .radar-data-polygon {
+          animation: radarPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
       `}</style>
     </div>
   );

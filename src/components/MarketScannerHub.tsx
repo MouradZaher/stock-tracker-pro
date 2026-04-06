@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useMarket } from '../contexts/MarketContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { getMultipleQuotes } from '../services/stockDataService';
 import { STOCKS_BY_INDEX } from '../data/sectors';
 import { Globe, TrendingUp, TrendingDown, Activity, ChevronRight, BarChart2 } from 'lucide-react';
 import { formatCurrencyForMarket, formatPercent } from '../utils/formatters';
+import { soundService } from '../services/soundService';
 import type { Stock } from '../types';
 
 const MarketScannerHub: React.FC = () => {
@@ -12,6 +13,7 @@ const MarketScannerHub: React.FC = () => {
     const { getWatchlistByMarket } = useWatchlist();
     const [liveData, setLiveData] = useState<Stock[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const prevLeaderRef = useRef<string | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -80,6 +82,18 @@ const MarketScannerHub: React.FC = () => {
 
     const totalTracked = metrics.advances + metrics.declines || 1;
     const breadthPct = (metrics.advances / totalTracked) * 100;
+
+    // Trigger Audio Anomaly Alert on Leadership Swap
+    useEffect(() => {
+        if (metrics.topGainers.length > 0) {
+            const currentLeader = metrics.topGainers[0].symbol;
+            if (prevLeaderRef.current && prevLeaderRef.current !== currentLeader) {
+                // Anomaly detected: Market structure shifted!
+                soundService.playSuccess();
+            }
+            prevLeaderRef.current = currentLeader;
+        }
+    }, [metrics.topGainers]);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>

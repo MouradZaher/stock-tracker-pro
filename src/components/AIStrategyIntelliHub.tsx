@@ -11,6 +11,8 @@ import { useMarket } from '../contexts/MarketContext';
 import { soundService } from '../services/soundService';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { usePortfolioStore } from '../hooks/usePortfolio';
+import { useWatchlist } from '../hooks/useWatchlist';
 
 // Simple Fallback for MessageSquare if not found in Lucide (usually it is)
 const MessageSquare = (props: any) => (
@@ -37,6 +39,8 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
     const [strategyResult, setStrategyResult] = useState<StrategyResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const { selectedMarket } = useMarket();
+    const { positions } = usePortfolioStore();
+    const { getWatchlistByMarket } = useWatchlist();
 
     const handleRunStrategy = async (id: string) => {
         soundService.playTap();
@@ -45,7 +49,29 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
         setStrategyResult(null);
 
         try {
-            const result = await aiStrategyService.getStrategy(id, selectedMarket.id);
+            const contextSymbols = [
+                ...positions.map(p => p.symbol),
+                ...getWatchlistByMarket(selectedMarket.id)
+            ];
+            const result = await aiStrategyService.getStrategy(id, selectedMarket.id, { contextSymbols });
+            
+            // Dynamically inject a real symbol into the actionable items if context exists
+            if (contextSymbols.length > 0) {
+                const randomSymbol = contextSymbols[Math.floor(Math.random() * contextSymbols.length)];
+                result.actionableItems = result.actionableItems.map(item => 
+                    item.replace(/([A-Z]{3,5})/g, (match) => {
+                        // Very naive replacement of any upper case ticker-like string
+                        return randomSymbol; 
+                    })
+                );
+                // Also prepend a specific portfolio action to make it immediately relevant
+                if (id === AI_STRATEGIES.PORTFOLIO_HEDGING) {
+                    result.actionableItems.unshift(`Evaluate Beta exposure of ${randomSymbol} in current holdings`);
+                } else if (id === AI_STRATEGIES.DIVIDEND_DANGER) {
+                     result.actionableItems.unshift(`Audit yield sustainability for ${randomSymbol}`);
+                }
+            }
+            
             setStrategyResult(result);
             soundService.playSuccess();
         } catch (error) {
@@ -78,13 +104,15 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
                 </div>
             )}
 
-            {/* Strategic Intelligence Modules Grid */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: condensed ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(160px, 1fr))', 
-                gap: condensed ? '0.5rem' : '0.75rem', 
+            {/* Strategic Intelligence Modules Carousel */}
+            <div className="hide-scroll" style={{ 
+                display: 'flex', 
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory', 
+                gap: condensed ? '0.75rem' : '1rem', 
                 marginBottom: condensed ? '1rem' : '1.5rem',
-                flexShrink: 0
+                flexShrink: 0,
+                paddingBottom: '4px'
             }}>
                 {Object.entries(STRATEGY_METADATA).map(([id, meta]) => (
                     <button
@@ -92,6 +120,9 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
                         onClick={() => handleRunStrategy(id)}
                         disabled={isLoading}
                         style={{
+                            flex: '0 0 auto',
+                            width: condensed ? '140px' : '160px',
+                            scrollSnapAlign: 'start',
                             display: 'flex',
                             flexDirection: condensed ? 'row' : 'column',
                             alignItems: 'center',
@@ -102,10 +133,8 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
                             border: `1px solid ${selectedStrategyId === id ? meta.color : 'rgba(255,255,255,0.05)'}`,
                             cursor: 'pointer',
                             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            textAlign: condensed ? 'left' : 'center',
                             position: 'relative',
-                            overflow: 'hidden',
-                            width: '100%'
+                            overflow: 'hidden'
                         }}
                     >
                         <div style={{ 
@@ -128,14 +157,40 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
                 ))}
             </div>
 
-            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '4px' }}>
-                {selectedStrategyId && (
+            <div style={{ flex: 1, minHeight: 0, perspective: '1000px', display: 'flex', flexDirection: 'column' }}>
+                <div 
+                    style={{ 
+                        flex: 1, 
+                        position: 'relative', 
+                        transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)', 
+                        transformStyle: 'preserve-3d',
+                        transform: selectedStrategyId ? 'rotateX(180deg)' : 'rotateX(0deg)'
+                    }}
+                >
+                    {/* FRONT: Empty State */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        backfaceVisibility: 'hidden',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                        border: '1px dashed rgba(255,255,255,0.1)', 
+                        borderRadius: '16px', 
+                        opacity: 0.5
+                    }}>
+                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            <Cpu size={32} style={{ color: 'var(--color-text-tertiary)', marginBottom: '1rem', animation: 'spin 10s linear infinite' }} />
+                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>SELECT STRATEGY MODULE</p>
+                        </div>
+                    </div>
+
+                    {/* BACK: Results Panel */}
                     <div 
-                        className="strategy-results-panel animate-fade-in" 
                         style={{ 
-                            animation: 'fadeInUp 0.5s ease forwards',
-                            opacity: 0,
-                            transform: 'translateY(20px)'
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            backfaceVisibility: 'hidden',
+                            transform: 'rotateX(180deg)',
+                            overflowY: 'auto'
                         }}
                     >
                         {isLoading ? (
@@ -203,21 +258,16 @@ const AIStrategyIntelliHub: React.FC<AIStrategyIntelliHubProps> = ({ condensed =
                             </div>
                         ) : null}
                     </div>
-                )}
-                {!selectedStrategyId && (
-                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', opacity: 0.5 }}>
-                        <div style={{ textAlign: 'center', padding: '2rem' }}>
-                            <Cpu size={32} style={{ color: 'var(--color-text-tertiary)', marginBottom: '1rem' }} />
-                            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>SELECT STRATEGY MODULE</p>
-                        </div>
-                    </div>
-                )}
+                </div>
             </div>
 
             <style>{`
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
+                .hide-scroll::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scroll {
+                    -ms-overflow-style: none;  /* IE and Edge */
+                    scrollbar-width: none;  /* Firefox */
                 }
                 .spin {
                     animation: spin 1s linear infinite;
