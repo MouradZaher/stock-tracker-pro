@@ -62,7 +62,7 @@ const StockHeatmap: React.FC = () => {
                     "blockSize": blockSize,
                     "blockColor": blockColor,
                     "locale": "en",
-                    "symbolUrl": window.location.origin + "/recommendations?tab=top100&aiStock={SYMBOL}",
+                    "symbolUrl": window.location.origin + "/recommendations?tab=navigator&aiStock={SYMBOL}",
                     "colorTheme": theme === 'dark' ? 'dark' : 'light',
                     "hasTopBar": true,
                     "isDataSetEnabled": true,

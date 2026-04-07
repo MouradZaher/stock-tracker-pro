@@ -11,12 +11,13 @@ import AIStrategyIntelliHub from './AIStrategyIntelliHub';
 import SubNavbar from './SubNavbar';
 import StockDetail from './StockDetail';
 import AITop100Tab from './AITop100Tab';
+import InstitutionalScreener from './InstitutionalScreener';
 
 import { useMarket } from '../contexts/MarketContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 
 const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> = ({ onSelectStock }) => {
-    const [viewMode, setViewMode] = useState<'top100' | 'terminal' | 'alpha' | 'strategy'>('top100');
+    const [viewMode, setViewMode] = useState<'stocks' | 'navigator' | 'terminal' | 'alpha' | 'strategy'>('stocks');
     const [selectedAiStock, setSelectedAiStock] = useState<string | null>(null);
     const { selectedMarket } = useMarket();
     const { getWatchlistByMarket } = useWatchlist();
@@ -78,9 +79,10 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
                 }}
                 tabs={[
-                    { id: 'top100', label: 'TOP 100 S&P', icon: Zap, color: '#facc15' },
-                    { id: 'terminal', label: 'TERMINAL', icon: LayoutGrid, color: 'var(--color-accent)' },
-                    { id: 'alpha', label: 'ALPHA INTEL', icon: Target, color: '#38bdf8' },
+                    { id: 'stocks', label: 'STOCKS', icon: Briefcase, color: '#facc15' },
+                    { id: 'navigator', label: 'NAVIGATOR', icon: Zap, color: 'var(--color-accent)' },
+                    { id: 'terminal', label: 'TERMINAL', icon: LayoutGrid, color: '#38bdf8' },
+                    { id: 'alpha', label: 'ALPHA INTEL', icon: Target, color: '#a855f7' },
                     { id: 'strategy', label: 'STRATEGY', icon: Fingerprint, color: '#10b981' }
                 ]}
             />
@@ -105,8 +107,22 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             </div>
 
             {/* Main Content Area */}
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto', padding: '1.5rem', gap: '1.5rem' }}>
-                {viewMode === 'top100' && (
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                flex: 1, 
+                minHeight: 0, 
+                overflowY: (viewMode === 'stocks' || viewMode === 'navigator') ? 'hidden' : 'auto', 
+                padding: (viewMode === 'stocks' || viewMode === 'navigator') ? '0' : '1.5rem', 
+                gap: (viewMode === 'stocks' || viewMode === 'navigator') ? '0' : '1.5rem' 
+            }}>
+                {viewMode === 'stocks' && (
+                    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                        <InstitutionalScreener onSelectSymbol={handleSelectStock} />
+                    </div>
+                )}
+
+                {viewMode === 'navigator' && (
                     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0, gap: '1rem' }}>
                         {/* 1. Ticker Dock (Idea 2 Ribbon) */}
                         <div style={{ flexShrink: 0, height: '70px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
