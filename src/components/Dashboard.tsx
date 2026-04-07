@@ -4,26 +4,15 @@ import InstitutionalScreener from './InstitutionalScreener';
 import MarketBreadth from './MarketBreadth';
 import { FearGreedCard, IndustryRotationCard } from './MarketInsights';
 import { useMarketInsights } from '../hooks/useMarketInsights';
+import { useMarket } from '../contexts/MarketContext';
 
 interface DashboardProps {
   onSelectSymbol: (symbol: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
-  const [viewMode, setViewMode] = useState<'heatmap' | 'screener'>('heatmap');
+  const { homeView: viewMode } = useMarket();
   const [pulses, setPulses] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
-  const { sectorData, sentimentScore, overallSentiment, sentimentColor } = useMarketInsights();
-
-  // Listen for view changes from Header/Global navigation
-  useEffect(() => {
-    const handleViewChange = (e: any) => {
-      if (e.detail?.mode) {
-        setViewMode(e.detail.mode);
-      }
-    };
-    window.addEventListener('change-home-view', handleViewChange);
-    return () => window.removeEventListener('change-home-view', handleViewChange);
-  }, []);
 
   // Simulation: Add random "Volume Pulses" over the heatmap
   useEffect(() => {

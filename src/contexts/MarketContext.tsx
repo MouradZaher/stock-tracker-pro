@@ -79,6 +79,12 @@ interface MarketContextType {
     /** Global market sentiment score (0-100) */
     sentimentScore: number;
     setSentimentScore: (score: number) => void;
+    /** Home tab view mode: 'heatmap' | 'screener' */
+    homeView: 'heatmap' | 'screener';
+    setHomeView: (view: 'heatmap' | 'screener') => void;
+    /** Favorite view mode persisted in localStorage */
+    favoriteHomeView: 'heatmap' | 'screener';
+    setFavoriteHomeView: (view: 'heatmap' | 'screener') => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -112,6 +118,19 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem('preferred_market', id);
     };
 
+    const [favoriteHomeView, setFavoriteHomeViewInternal] = useState<'heatmap' | 'screener'>(() => {
+        const stored = localStorage.getItem('favorite_home_view');
+        return (stored === 'heatmap' || stored === 'screener') ? stored : 'heatmap';
+    });
+
+    const [homeView, setHomeView] = useState<'heatmap' | 'screener'>(favoriteHomeView);
+
+    const setFavoriteHomeView = (view: 'heatmap' | 'screener') => {
+        setFavoriteHomeViewInternal(view);
+        localStorage.setItem('favorite_home_view', view);
+        setHomeView(view);
+    };
+
     const setHoverMarket = (id: MarketId | null) => setHoverMarketId(id);
 
     return (
@@ -124,7 +143,11 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setHoverMarket, 
             effectiveMarket,
             sentimentScore,
-            setSentimentScore
+            setSentimentScore,
+            homeView,
+            setHomeView,
+            favoriteHomeView,
+            setFavoriteHomeView
         }}>
             {children}
         </MarketContext.Provider>

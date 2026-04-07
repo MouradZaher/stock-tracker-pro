@@ -21,7 +21,10 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showAdmin, onAdminClick, onOpenTutorial, onOpenSettings }) => {
     const { theme, toggleTheme } = useTheme();
     const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
-    const { selectedMarket, setMarket, favoriteMarketId, setFavoriteMarket, setHoverMarket } = useMarket();
+    const { 
+        selectedMarket, setMarket, favoriteMarketId, setFavoriteMarket, setHoverMarket,
+        homeView, setHomeView, favoriteHomeView, setFavoriteHomeView 
+    } = useMarket();
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [isMarketOpen, setIsMarketOpen] = useState(false);
     const marketBtnRef = useRef<HTMLButtonElement>(null);
@@ -64,8 +67,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         soundService.playTap();
         setIsHomeMenuOpen(false);
         onTabChange('home');
-        // Dispatch custom event to notify Dashboard/multi-tab components
-        window.dispatchEvent(new CustomEvent('change-home-view', { detail: { mode } }));
+        setHomeView(mode);
     };
 
     // Close dropdowns on Escape key
@@ -409,6 +411,74 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                         </button>
                                     </button>
                                 ))}
+
+                                {/* Dashboard View Selection */}
+                                <div style={{ 
+                                    marginTop: '0.5rem', 
+                                    padding: '0.75rem 0.75rem 0.25rem', 
+                                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                                    fontSize: '0.6rem', 
+                                    color: 'var(--color-text-tertiary)', 
+                                    textTransform: 'uppercase', 
+                                    letterSpacing: '0.12em', 
+                                    fontWeight: 700 
+                                }}>
+                                    Default Dashboard View
+                                </div>
+                                
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    {[
+                                        { id: 'heatmap', label: 'Heatmap', icon: LayoutGrid, color: 'var(--color-accent)' },
+                                        { id: 'screener', label: 'Screener', icon: '#10b981' } // Green for success/screener
+                                    ].map(view => {
+                                        const Icon = view.id === 'heatmap' ? LayoutGrid : Activity;
+                                        const isActive = homeView === view.id;
+                                        const isFavorite = favoriteHomeView === view.id;
+                                        
+                                        return (
+                                            <div key={view.id} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <button
+                                                    onClick={() => { setHomeView(view.id as 'heatmap' | 'screener'); soundService.playTap(); }}
+                                                    style={{
+                                                        flex: 1,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.75rem',
+                                                        padding: '0.65rem 0.75rem',
+                                                        borderRadius: 'var(--radius-md)',
+                                                        background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                                        border: '1px solid transparent',
+                                                        cursor: 'pointer',
+                                                        textAlign: 'left',
+                                                        transition: 'all 0.15s',
+                                                        color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)',
+                                                        font: 'inherit',
+                                                    }}
+                                                >
+                                                    <Icon size={14} color={isActive ? (view.id === 'heatmap' ? 'var(--color-accent)' : '#10b981') : 'currentColor'} />
+                                                    <span style={{ fontWeight: isActive ? 700 : 500, fontSize: isMobile ? '0.75rem' : '0.85rem' }}>
+                                                        {view.label}
+                                                    </span>
+                                                    {isActive && <div style={{ marginLeft: 'auto', width: '4px', height: '4px', borderRadius: '50%', background: view.id === 'heatmap' ? 'var(--color-accent)' : '#10b981' }} />}
+                                                </button>
+                                                <button
+                                                    onClick={() => { setFavoriteHomeView(view.id as 'heatmap' | 'screener'); soundService.playTap(); }}
+                                                    style={{
+                                                        border: 'none',
+                                                        background: 'transparent',
+                                                        cursor: 'pointer',
+                                                        padding: '8px',
+                                                        opacity: isFavorite ? 1 : 0.3,
+                                                        transition: 'all 0.2s ease',
+                                                    }}
+                                                    title={isFavorite ? 'Default View' : 'Set as default'}
+                                                >
+                                                    <Star size={14} color={isFavorite ? '#facc15' : 'var(--color-text-tertiary)'} fill={isFavorite ? '#facc15' : 'none'} />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </>,
                         document.body
