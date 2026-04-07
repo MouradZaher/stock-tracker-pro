@@ -119,6 +119,8 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                         <div style={{ width: '120px', padding: '0 1rem', textAlign: 'right' }}>Price</div>
                         <div style={{ width: '120px', padding: '0 1rem', textAlign: 'right' }}>Change %</div>
                         <div style={{ width: '140px', padding: '0 1rem', textAlign: 'right' }}>Volume</div>
+                        <div style={{ width: '140px', padding: '0 1rem', textAlign: 'right' }}>PEG Ratio</div>
+                        <div style={{ width: '160px', padding: '0 1rem', textAlign: 'center' }}>52W Range</div>
                         <div style={{ width: '140px', padding: '0 1rem', textAlign: 'right' }}>Momentum Est.</div>
                         <div style={{ width: '160px', padding: '0 1rem', textAlign: 'right' }}>RSI (Simulated)</div>
                         <div style={{ width: '120px', padding: '0 1rem', textAlign: 'right' }}>Analysis</div>
@@ -150,12 +152,20 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                     <div style={{ width: '140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', color: 'var(--color-text-secondary)' }}>
                                         {formatNumberPlain(stock.volume)}
                                     </div>
+                                    <div style={{ width: '140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontWeight: 600 }}>
+                                        {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '-'}
+                                    </div>
+                                    <div style={{ width: '160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', position: 'relative' }}>
+                                            <div style={{ position: 'absolute', height: '8px', width: '2px', background: 'white', top: '-2px', left: `${Math.max(0, Math.min(100, ((stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)) * 100))}%` }} />
+                                        </div>
+                                    </div>
                                     <div style={{ width: '140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', justifyContent: 'flex-end' }}>
-                                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: fakeMomentum > 60 ? 'var(--color-success)' : fakeMomentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }}>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: fakeMomentum > 60 ? 'var(--color-success)' : fakeMomentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }}>
                                                 {Math.max(0, Math.min(100, fakeMomentum)).toFixed(1)}
                                             </div>
-                                            <div style={{ width: '40px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                                            <div style={{ width: '30px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
                                                 <div style={{ width: `${Math.max(0, Math.min(100, fakeMomentum))}%`, height: '100%', background: fakeMomentum > 60 ? 'var(--color-success)' : fakeMomentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
                                             </div>
                                         </div>
@@ -190,11 +200,11 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                 }
                 .screener-row {
                     display: flex;
-                    flex: 1;
+                    height: 32px;
                     border-bottom: 1px solid rgba(255,255,255,0.02);
                     cursor: pointer;
                     transition: all 0.15s;
-                    font-size: 0.85rem;
+                    font-size: 0.8rem;
                 }
                 .screener-row:hover {
                     background: rgba(56, 189, 248, 0.05);
