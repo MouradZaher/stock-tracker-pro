@@ -305,23 +305,28 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
                 {activeSubTab === 'overview' && (
                     <div className="scrollable-panel" style={{ padding: '1rem 1.5rem' }}>
-                        <div className="portfolio-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
-                                <div className="summary-label">Total Assets (USD)</div>
-                                <div className="summary-value" style={{ fontSize: '2rem', fontWeight: 900 }}>{formatCurrency(summary.normalizedTotalValueUSD)}</div>
+                        <div className="portfolio-summary-grid" style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: window.innerWidth < 480 ? '1fr 1fr' : 'repeat(auto-fit, minmax(130px, 1fr))', 
+                            gap: '0.5rem', 
+                            marginBottom: '1rem' 
+                        }}>
+                            <div className="summary-card glass-card" style={{ padding: '0.75rem', gridColumn: window.innerWidth < 480 ? 'span 2' : 'auto' }}>
+                                <div className="summary-label" style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Net Assets (USD)</div>
+                                <div className="summary-value" style={{ fontSize: '1.4rem', fontWeight: 950, color: 'white' }}>{formatCurrency(summary.normalizedTotalValueUSD)}</div>
                             </div>
-                            <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
-                                <div className="summary-label">P&L Performance</div>
-                                <div className="summary-value" style={{ fontSize: '2rem', fontWeight: 900, color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                    {fmt(summary.totalProfitLoss)} ({formatPercent(summary.totalProfitLossPercent)})
+                            <div className="summary-card glass-card" style={{ padding: '0.75rem' }}>
+                                <div className="summary-label" style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Performance</div>
+                                <div className="summary-value" style={{ fontSize: '1.1rem', fontWeight: 950, color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                    {formatPercent(summary.totalProfitLossPercent)}
                                 </div>
                             </div>
-                            <div className="summary-card glass-card" style={{ padding: '1.5rem' }}>
-                                <div className="summary-label">Risk Health</div>
-                                <div className="summary-value" style={{ fontSize: '2rem', fontWeight: 900, color: riskColor }}>{riskScore}/100</div>
+                            <div className="summary-card glass-card" style={{ padding: '0.75rem' }}>
+                                <div className="summary-label" style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Alpha Delta</div>
+                                <div className="summary-value" style={{ fontSize: '1.1rem', fontWeight: 950, color: riskColor }}>{riskScore}</div>
                             </div>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '1.5rem' }}>
+                        <div className="adaptive-grid-layout" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
                             <ScenarioHedging positions={positions} />
                             <div className="glass-card" style={{ padding: '1.25rem' }}>
                                 <RiskReturnChart positions={positions} />
@@ -331,65 +336,118 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                 )}
 
                 {activeSubTab === 'positions' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden', padding: '0 1.5rem 1.5rem 1.5rem' }}>
-                        <div className="table-container glass-card desktop-only scrollable-panel custom-scrollbar" style={{ flex: 1 }}>
-                            <table className="portfolio-table sticky-header">
-                                <thead>
-                                    <tr>
-                                        <th>Asset</th>
-                                        <th style={{ textAlign: 'right' }}>Units</th>
-                                        <th style={{ textAlign: 'right' }}>Avg Cost</th>
-                                        <th style={{ textAlign: 'right' }}>Price</th>
-                                        <th style={{ textAlign: 'right' }}>Market Value</th>
-                                        <th style={{ textAlign: 'right' }}>P/L %</th>
-                                        <th style={{ textAlign: 'center' }}>AI Strategy</th>
-                                        <th style={{ textAlign: 'center' }}>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {groupedPositions.map(([sector, sectorPositions]) => (
-                                        <React.Fragment key={sector}>
-                                            <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                                <td colSpan={8} style={{ padding: '0.6rem 1rem', fontWeight: 800, fontSize: '0.7rem' }}>{sector}</td>
-                                            </tr>
-                                            {sectorPositions.map((pos) => (
-                                                <tr key={pos.id} onClick={() => handleRowClick(pos.symbol)} className="portfolio-row">
-                                                    <td>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                            <CompanyLogo symbol={pos.symbol} size={32} />
-                                                            <div>
-                                                                <div style={{ fontWeight: 800 }}>{pos.symbol}</div>
-                                                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{pos.name}</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ textAlign: 'right' }}>{pos.units.toLocaleString()}</td>
-                                                    <td style={{ textAlign: 'right' }}>{fmt(pos.avgCost)}</td>
-                                                    <td style={{ textAlign: 'right' }}><RealTimePrice price={pos.currentPrice} showCurrency={false} /></td>
-                                                    <td style={{ textAlign: 'right' }}>{fmt(pos.marketValue)}</td>
-                                                    <td style={{ textAlign: 'right' }}>
-                                                        <span className={getChangeClass(pos.profitLossPercent)}>{formatPercent(pos.profitLossPercent)}</span>
-                                                    </td>
-                                                    <td style={{ textAlign: 'center' }}>
-                                                        {aiRecs[pos.symbol] ? (
-                                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                                                                {getRecIcon(aiRecs[pos.symbol].recommendation)}
-                                                                <span style={{ fontSize: '0.65rem', fontWeight: 900 }}>{aiRecs[pos.symbol].recommendation?.toUpperCase()}</span>
-                                                            </div>
-                                                        ) : '...'}
-                                                    </td>
-                                                    <td style={{ textAlign: 'center' }}>
-                                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
-                                                            <button className="btn-icon" onClick={(e) => handleEditClick(pos, e)}><Pencil size={14} /></button>
-                                                            <button className="btn-icon text-error" onClick={(e) => handleRemove(pos.id, pos.symbol, e)}><Trash2 size={14} /></button>
-                                                        </div>
-                                                    </td>
+                    <div className="positions-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 1.5rem 1.5rem 1.5rem' }}>
+                        {/* Desktop Table View */}
+                        <div className="desktop-only" style={{ display: window.innerWidth >= 768 ? 'block' : 'none' }}>
+                            <div className="table-container glass-card custom-scrollbar">
+                                <table className="portfolio-table sticky-header">
+                                    <thead>
+                                        <tr>
+                                            <th>Asset</th>
+                                            <th style={{ textAlign: 'right' }}>Units</th>
+                                            <th style={{ textAlign: 'right' }}>Avg Cost</th>
+                                            <th style={{ textAlign: 'right' }}>Price</th>
+                                            <th style={{ textAlign: 'right' }}>Market Value</th>
+                                            <th style={{ textAlign: 'right' }}>P/L %</th>
+                                            <th style={{ textAlign: 'center' }}>AI Strategy</th>
+                                            <th style={{ textAlign: 'center' }}>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {groupedPositions.map(([sector, sectorPositions]) => (
+                                            <React.Fragment key={sector}>
+                                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                    <td colSpan={8} style={{ padding: '0.6rem 1rem', fontWeight: 800, fontSize: '0.7rem' }}>{sector}</td>
                                                 </tr>
-                                            ))}
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
+                                                {sectorPositions.map((pos) => (
+                                                    <tr key={pos.id} onClick={() => handleRowClick(pos.symbol)} className="portfolio-row">
+                                                        <td>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                                <CompanyLogo symbol={pos.symbol} size={32} />
+                                                                <div>
+                                                                    <div style={{ fontWeight: 800 }}>{pos.symbol}</div>
+                                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{pos.name}</div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td style={{ textAlign: 'right' }}>{pos.units.toLocaleString()}</td>
+                                                        <td style={{ textAlign: 'right' }}>{fmt(pos.avgCost)}</td>
+                                                        <td style={{ textAlign: 'right' }}><RealTimePrice price={pos.currentPrice} showCurrency={false} /></td>
+                                                        <td style={{ textAlign: 'right' }}>{fmt(pos.marketValue)}</td>
+                                                        <td style={{ textAlign: 'right' }}>
+                                                            <span className={getChangeClass(pos.profitLossPercent)}>{formatPercent(pos.profitLossPercent)}</span>
+                                                        </td>
+                                                        <td style={{ textAlign: 'center' }}>
+                                                            {aiRecs[pos.symbol] ? (
+                                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                                    {getRecIcon(aiRecs[pos.symbol].recommendation)}
+                                                                    <span style={{ fontSize: '0.65rem', fontWeight: 900 }}>{aiRecs[pos.symbol].recommendation?.toUpperCase()}</span>
+                                                                </div>
+                                                            ) : '...'}
+                                                        </td>
+                                                        <td style={{ textAlign: 'center' }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+                                                                <button className="btn-icon" onClick={(e) => handleEditClick(pos, e)}><Pencil size={14} /></button>
+                                                                <button className="btn-icon text-error" onClick={(e) => handleRemove(pos.id, pos.symbol, e)}><Trash2 size={14} /></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </React.Fragment>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Mobile Card View (optimized for 390px) */}
+                        <div className="mobile-only" style={{ display: window.innerWidth < 768 ? 'flex' : 'none', flexDirection: 'column', gap: '0.75rem' }}>
+                            {positions.map((pos) => (
+                                <div key={pos.id} className="glass-card" style={{ padding: '1rem', border: '1px solid var(--glass-border)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} onClick={() => handleRowClick(pos.symbol)}>
+                                            <CompanyLogo symbol={pos.symbol} size={36} />
+                                            <div>
+                                                <div style={{ fontWeight: 900, fontSize: '0.95rem' }}>{pos.symbol}</div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{pos.name}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontWeight: 900, fontSize: '1rem' }}><RealTimePrice price={pos.currentPrice} showCurrency={false} /></div>
+                                            <div className={getChangeClass(pos.profitLossPercent)} style={{ fontWeight: 800, fontSize: '0.75rem' }}>
+                                                {formatPercent(pos.profitLossPercent)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'rgba(0,0,0,0.15)', borderRadius: '8px', marginBottom: '0.75rem' }}>
+                                        <div>
+                                            <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Units</div>
+                                            <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>{pos.units}</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Avg Cost</div>
+                                            <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>{fmt(pos.avgCost)}</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Value</div>
+                                            <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>{fmt(pos.marketValue)}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            {aiRecs[pos.symbol] && (
+                                                <span style={{ fontSize: '0.65rem', fontWeight: 900, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <Zap size={10} color="var(--color-accent)" /> {aiRecs[pos.symbol].recommendation?.toUpperCase()}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="glass-button" onClick={(e) => handleEditClick(pos, e)} style={{ padding: '6px 12px', fontSize: '0.7rem' }}>EDIT</button>
+                                            <button className="glass-button text-error" onClick={(e) => handleRemove(pos.id, pos.symbol, e)} style={{ padding: '6px 12px', fontSize: '0.7rem' }}>REMOVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}

@@ -82,7 +82,6 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                     { id: 'stocks', label: 'STOCKS', icon: Briefcase, color: '#facc15' },
                     { id: 'navigator', label: 'NAVIGATOR', icon: Zap, color: 'var(--color-accent)' },
                     { id: 'terminal', label: 'TERMINAL', icon: LayoutGrid, color: '#38bdf8' },
-                    { id: 'alpha', label: 'ALPHA INTEL', icon: Target, color: '#a855f7' },
                     { id: 'strategy', label: 'STRATEGY', icon: Fingerprint, color: '#10b981' }
                 ]}
             />
@@ -112,9 +111,9 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                 flexDirection: 'column', 
                 flex: 1, 
                 minHeight: 0, 
-                overflowY: (viewMode === 'stocks' || viewMode === 'navigator') ? 'hidden' : 'auto', 
-                padding: (viewMode === 'stocks' || viewMode === 'navigator') ? '0' : '1.5rem', 
-                gap: (viewMode === 'stocks' || viewMode === 'navigator') ? '0' : '1.5rem' 
+                overflowY: 'auto', 
+                padding: '1.5rem', 
+                gap: '1.5rem' 
             }}>
                 {viewMode === 'stocks' && (
                     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
@@ -124,11 +123,7 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
 
                 {viewMode === 'navigator' && (
                     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0, gap: '1rem' }}>
-                        {/* 1. Ticker Dock (Idea 2 Ribbon) */}
-                        <div style={{ flexShrink: 0, height: '70px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
-                            <AITop100Tab onStockClick={handleSelectStock} selectedSymbol={selectedAiStock} />
-                        </div>
-                        {/* 2. Analysis View (Bottom 80%) */}
+                        {/* Analysis View (Full Space) */}
                         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                             {selectedAiStock ? (
                                 <StockDetail symbol={selectedAiStock} onBack={handleBackTo100} />
@@ -142,25 +137,23 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                 )}
 
                 {viewMode === 'terminal' && (
-                     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '1.5rem', height: '100%' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: 0 }}>
-                            <div style={{ flexShrink: 0 }}><AIPerformanceTracker condensed /></div>
-                            <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}><MarketScannerHub /></div>
+                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', height: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+                        {/* Summary Layer */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <AIPerformanceTracker condensed />
+                                <MarketScannerHub />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <PortfolioIntelliHub />
+                            </div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: 0 }}>
-                            <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}><PortfolioIntelliHub /></div>
-                        </div>
-                     </div>
-                )}
 
-                {viewMode === 'alpha' && (
-                     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1.5rem', height: '100%' }}>
-                         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-                            <MarketScannerHub />
-                         </div>
-                         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflowY: 'auto' }}>
+                        {/* Intelligence Layer (Formerly Alpha Intel) */}
+                        <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '2.5rem' }}>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 900, color: 'white', marginBottom: '1.5rem', letterSpacing: '0.05em' }}>INSTITUTIONAL CORE INTELLIGENCE</h3>
                             <AIInstitutionalHub />
-                         </div>
+                        </div>
                      </div>
                 )}
 
@@ -183,8 +176,8 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
                 display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>{selectedMarket.indexName} PULSE</span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 800 }}>LIVE</span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>SYSTEM PULSE</span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800 }}>ACTIVE</span>
                 </div>
                 <div style={{ flex: 1, position: 'relative', marginTop: '8px' }}>
                     <svg viewBox="0 0 100 30" style={{ width: '100%', height: '100%', overflow: 'visible' }}>

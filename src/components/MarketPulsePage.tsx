@@ -128,6 +128,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
     const eventsContainerRef = useRef<HTMLDivElement>(null);
     const [activeTab, setActiveTab] = useState<'streams' | 'news' | 'events'>('streams');
 
+    const [newsMode, setNewsMode] = useState<'company' | 'world'>('company');
+
     // Reset PiP when directly viewing this page
     useEffect(() => {
         setPiPActive(false);
@@ -157,20 +159,24 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
         script.type = 'text/javascript';
         script.async = true;
         
+        // Map market to specific symbols or headlines
+        const marketSymbols = effectiveMarket.id === 'us' ? [] : effectiveMarket.id === 'egypt' ? ["EGX:EGX30", "EGX:COMI", "EGX:EAST"] : ["ADX:ADI", "ADX:IHC", "ADX:FAB"];
+        
         script.innerHTML = JSON.stringify({
-            "feedMode": "market",
-            "market": effectiveMarket.id === 'us' ? "stock" : "crypto", // fallback to crypto/forex for global if needed
+            "feedMode": newsMode === 'company' ? "all_symbols" : "headlines",
+            "symbols": newsMode === 'company' ? marketSymbols : [],
             "isTransparent": true,
             "displayMode": "regular",
             "width": "100%",
             "height": "100%",
             "colorTheme": "dark",
-            "locale": "en"
+            "locale": "en",
+            "importanceFilter": "-1,0,1"
         });
         newsContainerRef.current.appendChild(script);
-    }, [effectiveMarket.id]);
+    }, [effectiveMarket.id, newsMode]);
 
-    // Load TradingView Events Calendar Widget (Economic & Earnings impact)
+    // Load TradingView Events Calendar Widget
     useEffect(() => {
         if (!eventsContainerRef.current) return;
         eventsContainerRef.current.innerHTML = '';
@@ -185,7 +191,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
         script.type = 'text/javascript';
         script.async = true;
 
-        const curFilter = effectiveMarket.id === 'us' ? "USD" : effectiveMarket.id === 'egypt' ? "USD,EUR" : "AED,USD";
+        const curFilter = effectiveMarket.id === 'us' ? "USD" : effectiveMarket.id === 'egypt' ? "EGP,USD" : "AED,USD";
         
         script.innerHTML = JSON.stringify({
             "colorTheme": "dark",
@@ -194,7 +200,8 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
             "height": "100%",
             "locale": "en",
             "importanceFilter": "-1,0,1",
-            "currencyFilter": curFilter
+            "currencyFilter": curFilter,
+            "eventTypes": "earnings,dividends,splits,mergers,spinoffs,holidays"
         });
         eventsContainerRef.current.appendChild(script);
     }, [effectiveMarket.id]);
@@ -209,15 +216,15 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
                 activeTab={activeTab}
                 onTabChange={(id) => setActiveTab(id as any)}
                 tabs={[
-                    { id: 'streams', label: 'Live Streams', icon: Radio, color: 'var(--color-accent)' },
-                    { id: 'news', label: 'Market News', icon: FileText, color: 'var(--color-success)' },
-                    { id: 'events', label: 'Company Events', icon: CalendarIcon, color: 'var(--color-warning)' }
+                    { id: 'streams', label: 'Live Intelligence', icon: Radio, color: 'var(--color-accent)' },
+                    { id: 'news', label: 'Institutional News', icon: FileText, color: 'var(--color-success)' },
+                    { id: 'events', label: 'Corporate Events', icon: CalendarIcon, color: 'var(--color-warning)' }
                 ]}
             />
 
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
                 {activeTab === 'streams' && (
-                    <div className="scrollable-panel" style={{ display: 'flex', flexDirection: 'column', padding: '1.5rem', background: 'rgba(0,0,0,0.1)' }}>
+                    <div className="scrollable-panel" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', background: 'rgba(0,0,0,0.1)' }}>
                         <div style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
                             <LiveStreamsPlayer streams={MARKET_STREAMS} />
                         </div>
@@ -225,7 +232,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
                 )}
 
                 {activeTab === 'news' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: '1.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: '1rem' }}>
                         <div className="glass-card" style={{ 
                             border: '1px solid var(--glass-border-bright)', 
                             borderRadius: '16px',
@@ -235,13 +242,28 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
                             background: 'var(--glass-bg)',
                             height: '100%'
                         }}>
-                            <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
-                                <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                            <div style={{ padding: '0.75rem 1.25rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h3 style={{ margin: 0, fontSize: '0.85rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 900 }}>
                                     <FileText size={16} color="var(--color-accent)" /> 
-                                    Real-Time Market Reports
+                                    Institutional Wire
                                 </h3>
+                                
+                                <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '2px', borderRadius: '8px' }}>
+                                    <button 
+                                        onClick={() => setNewsMode('company')}
+                                        style={{ padding: '4px 10px', fontSize: '0.65rem', fontWeight: 800, borderRadius: '6px', border: 'none', background: newsMode === 'company' ? 'var(--color-accent)' : 'transparent', color: newsMode === 'company' ? 'white' : 'var(--color-text-tertiary)', cursor: 'pointer' }}
+                                    >
+                                        COMPANY NEWS
+                                    </button>
+                                    <button 
+                                        onClick={() => setNewsMode('world')}
+                                        style={{ padding: '4px 10px', fontSize: '0.65rem', fontWeight: 800, borderRadius: '6px', border: 'none', background: newsMode === 'world' ? 'var(--color-accent)' : 'transparent', color: newsMode === 'world' ? 'white' : 'var(--color-text-tertiary)', cursor: 'pointer' }}
+                                    >
+                                        WORLD NEWS
+                                    </button>
+                                </div>
                             </div>
-                            <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
+                            <div style={{ flex: 1, padding: '0.25rem', position: 'relative' }}>
                                 <div className="tradingview-widget-container" ref={newsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
                             </div>
                         </div>
@@ -249,7 +271,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
                 )}
 
                 {activeTab === 'events' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: '1.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, padding: '1rem' }}>
                         <div className="glass-card" style={{ 
                             border: '1px solid var(--glass-border-bright)', 
                             borderRadius: '16px',
@@ -260,12 +282,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
                             height: '100%'
                         }}>
                             <div style={{ padding: '1rem', borderBottom: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
-                                <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                                <h3 style={{ margin: 0, fontSize: '0.85rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 900 }}>
                                     <CalendarIcon size={16} color="var(--color-warning)" /> 
-                                    Company Reports & Events
+                                    Corporate Action Calendar
                                 </h3>
                             </div>
-                            <div style={{ flex: 1, padding: '0.5rem', position: 'relative' }}>
+                            <div style={{ flex: 1, padding: '0.25rem', position: 'relative' }}>
                                 <div className="tradingview-widget-container" ref={eventsContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
                             </div>
                         </div>

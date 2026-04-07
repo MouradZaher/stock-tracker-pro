@@ -11,6 +11,7 @@ interface MobileNavProps {
 
 const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const { triggerLight } = useHaptics();
+    const [isHomeMenuOpen, setIsHomeMenuOpen] = React.useState(false);
 
     const navItems: { id: TabType; label: string; icon: React.ElementType; color?: string }[] = [
         { id: 'home', label: 'Home', icon: LayoutDashboard },
@@ -23,7 +24,18 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
     const handleTabClick = (tabId: TabType) => {
         soundService.playTap();
         triggerLight();
+        if (tabId === 'home') {
+            setIsHomeMenuOpen(!isHomeMenuOpen);
+        } else {
+            setIsHomeMenuOpen(false);
+        }
         setActiveTab(tabId);
+    };
+
+    const handleHomeOptionSelect = (mode: 'heatmap' | 'screener') => {
+        soundService.playTap();
+        setIsHomeMenuOpen(false);
+        window.dispatchEvent(new CustomEvent('change-home-view', { detail: { mode } }));
     };
 
     // Hide on desktop
@@ -101,29 +113,61 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeTab, setActiveTab }) => {
                         );
                     }
 
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => handleTabClick(item.id)}
-                            aria-label={item.label}
-                            style={{
-                                flex: 1,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '4px',
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                WebkitTapHighlightColor: 'transparent',
-                                color: isActive ? (item.color || 'var(--color-accent)') : 'rgba(255,255,255,0.4)',
-                                transition: 'all 0.2s ease',
-                            }}
-                        >
-                             <IconComponent size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-                             <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500, color: isActive ? (item.color || 'var(--color-accent)') : 'inherit' }}>{item.label}</span>
-                        </button>
-                    );
+                        return (
+                            <div key={item.id} style={{ flex: 1, position: 'relative' }}>
+                                <button
+                                    onClick={() => handleTabClick(item.id)}
+                                    aria-label={item.label}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        WebkitTapHighlightColor: 'transparent',
+                                        color: isActive ? (item.color || 'var(--color-accent)') : 'rgba(255,255,255,0.4)',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                     <IconComponent size={20} strokeWidth={isActive ? 2.5 : 1.5} />
+                                     <span style={{ fontSize: '0.65rem', fontWeight: isActive ? 800 : 500, color: isActive ? (item.color || 'var(--color-accent)') : 'inherit' }}>{item.label}</span>
+                                </button>
+
+                                {item.id === 'home' && isHomeMenuOpen && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '100%',
+                                        left: '50%',
+                                        transform: 'translateX(-50%)',
+                                        background: 'rgba(15, 15, 25, 0.98)',
+                                        border: '1px solid var(--glass-border-bright)',
+                                        borderRadius: '12px',
+                                        padding: '4px',
+                                        marginBottom: '12px',
+                                        minWidth: '120px',
+                                        boxShadow: '0 -10px 40px rgba(0,0,0,0.8)',
+                                        zIndex: 100,
+                                        backdropFilter: 'blur(20px)'
+                                    }}>
+                                        <button 
+                                            onClick={() => handleHomeOptionSelect('heatmap')}
+                                            style={{ width: '100%', padding: '10px', textAlign: 'left', background: 'transparent', border: 'none', color: 'white', fontSize: '0.7rem', fontWeight: 800, borderRadius: '8px' }}
+                                        >
+                                            HEATMAP
+                                        </button>
+                                        <button 
+                                            onClick={() => handleHomeOptionSelect('screener')}
+                                            style={{ width: '100%', padding: '10px', textAlign: 'left', background: 'transparent', border: 'none', color: 'white', fontSize: '0.7rem', fontWeight: 800, borderRadius: '8px' }}
+                                        >
+                                            SCREENER
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        );
                 })}
             </div>
         </nav>

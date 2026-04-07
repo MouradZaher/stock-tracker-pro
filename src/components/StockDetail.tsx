@@ -459,7 +459,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         )}
                     </div>
                     <div className="stat-card glass-card">
-                        <div className="stat-label">52W Range</div>
+                        <div className="stat-label">Yearly Range</div>
                         <div className="stat-value" style={{ fontSize: '1.1rem', fontWeight: 600 }}>
                             {stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh ?
                                 `${formatCurrency(stock.fiftyTwoWeekLow)} - ${formatCurrency(stock.fiftyTwoWeekHigh)}` : 'N/A'

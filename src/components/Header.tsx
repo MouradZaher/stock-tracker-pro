@@ -37,6 +37,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const iconSize = isMobile ? 18 : 12;
     const btnH = isMobile ? '28px' : '22px';
 
+    const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
+    const homeBtnRef = useRef<HTMLButtonElement>(null);
+
     const tabs: { id: TabType; label: string; icon: React.ElementType; color?: string; isCustomIcon?: boolean }[] = [
         { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' }, // Purple AI
         { id: 'home', label: 'Home', icon: Home },
@@ -48,7 +51,21 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
     const handleTabClick = (tabId: TabType) => {
         soundService.playTap();
-        onTabChange(tabId);
+        if (tabId === 'home') {
+            setIsHomeMenuOpen(!isHomeMenuOpen);
+            onTabChange(tabId);
+        } else {
+            setIsHomeMenuOpen(false);
+            onTabChange(tabId);
+        }
+    };
+
+    const handleHomeOptionSelect = (mode: 'heatmap' | 'screener') => {
+        soundService.playTap();
+        setIsHomeMenuOpen(false);
+        onTabChange('home');
+        // Dispatch custom event to notify Dashboard/multi-tab components
+        window.dispatchEvent(new CustomEvent('change-home-view', { detail: { mode } }));
     };
 
     // Close dropdowns on Escape key
@@ -57,6 +74,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
             if (e.key === 'Escape') {
                 setIsMarketOpen(false);
                 setIsNotifyOpen(false);
+                setIsHomeMenuOpen(false);
             }
         };
         document.addEventListener('keydown', keyHandler);
@@ -177,52 +195,110 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
                         return (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabClick(tab.id)}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    color: isActive ? (tab.color || 'var(--color-accent)') : 'var(--color-text-tertiary)',
-                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    padding: '4px',
-                                    borderBottom: isActive ? `2px solid ${tab.color || 'var(--color-accent)'}` : '2px solid transparent',
-                                    position: 'relative'
-                                }}
-                                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
-                                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
-                            >
-                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ 
-                                    filter: isActive ? `drop-shadow(0 0 8px ${tab.color}55)` : 'none',
-                                    transition: 'all 0.3s ease'
-                                }} />
-                                <span style={{ 
-                                    fontSize: '0.65rem', 
-                                    fontWeight: isActive ? 800 : 500, 
-                                    letterSpacing: '0.05em', 
-                                    textTransform: 'uppercase',
-                                    opacity: isActive ? 1 : 0.7
-                                }}>
-                                    {tab.label}
-                                </span>
-                                {isActive && (
+                            <div key={tab.id} style={{ position: 'relative' }}>
+                                <button
+                                    ref={tab.id === 'home' ? homeBtnRef : null}
+                                    onClick={() => handleTabClick(tab.id)}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: isActive ? (tab.color || 'var(--color-accent)') : 'var(--color-text-tertiary)',
+                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        padding: '4px',
+                                        borderBottom: isActive ? `2px solid ${tab.color || 'var(--color-accent)'}` : '2px solid transparent',
+                                        position: 'relative'
+                                    }}
+                                    onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+                                    onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
+                                >
+                                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ 
+                                        filter: isActive ? `drop-shadow(0 0 8px ${tab.color}55)` : 'none',
+                                        transition: 'all 0.3s ease'
+                                    }} />
+                                    <span style={{ 
+                                        fontSize: '0.65rem', 
+                                        fontWeight: isActive ? 800 : 500, 
+                                        letterSpacing: '0.05em', 
+                                        textTransform: 'uppercase',
+                                        opacity: isActive ? 1 : 0.7,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '2px'
+                                    }}>
+                                        {tab.label}
+                                        {tab.id === 'home' && <ChevronDown size={10} style={{ transform: isHomeMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />}
+                                    </span>
+                                </button>
+
+                                {/* Home Dropdown Menu */}
+                                {tab.id === 'home' && isHomeMenuOpen && (
                                     <div style={{
                                         position: 'absolute',
-                                        bottom: '-2px',
-                                        left: '15%',
-                                        right: '15%',
-                                        height: '2px',
-                                        background: tab.color || 'var(--color-accent)',
-                                        boxShadow: `0 0 12px ${tab.color || 'var(--color-accent)'}`,
-                                        borderRadius: '2px'
-                                    }} />
+                                        top: '100%',
+                                        left: '50%',
+                                        transform: 'translateX(-50%)',
+                                        background: 'rgba(10,10,18,0.98)',
+                                        border: '1px solid var(--glass-border-bright)',
+                                        borderRadius: '12px',
+                                        padding: '6px',
+                                        marginTop: '4px',
+                                        minWidth: '140px',
+                                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                                        zIndex: 2000,
+                                        backdropFilter: 'blur(20px)'
+                                    }}>
+                                        <button 
+                                            onClick={() => handleHomeOptionSelect('heatmap')}
+                                            style={{ 
+                                                width: '100%', 
+                                                padding: '8px 12px', 
+                                                textAlign: 'left', 
+                                                background: 'transparent', 
+                                                border: 'none', 
+                                                color: 'var(--color-text-primary)', 
+                                                fontSize: '0.75rem', 
+                                                fontWeight: 800, 
+                                                borderRadius: '8px', 
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <LayoutGrid size={14} className="text-accent" /> HEATMAP
+                                        </button>
+                                        <button 
+                                            onClick={() => handleHomeOptionSelect('screener')}
+                                            style={{ 
+                                                width: '100%', 
+                                                padding: '8px 12px', 
+                                                textAlign: 'left', 
+                                                background: 'transparent', 
+                                                border: 'none', 
+                                                color: 'var(--color-text-primary)', 
+                                                fontSize: '0.75rem', 
+                                                fontWeight: 800, 
+                                                borderRadius: '8px', 
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <Activity size={14} className="text-success" /> SCREENER
+                                        </button>
+                                    </div>
                                 )}
-                            </button>
+                            </div>
                         );
                     })}
                 </div>

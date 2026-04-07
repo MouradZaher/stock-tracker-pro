@@ -118,7 +118,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
     const { user } = useAuth();
     const { selectedMarket } = useMarket();
     const { marketWatchlists, removeFromWatchlist, addToWatchlist } = useWatchlist();
-    const [activeTab, setActiveTab] = useState<'watchlist' | 'indices' | 'discovery'>('watchlist');
+    const [activeTab, setActiveTab] = useState<'watchlist' | 'indices' | 'famous-portfolios'>('watchlist');
 
     const watchlist = marketWatchlists[selectedMarket.id] || [];
 
@@ -215,7 +215,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                 tabs={[
                     { id: 'watchlist', label: 'My Watchlist', icon: Star, color: 'var(--color-warning)' },
                     { id: 'indices', label: 'Indices', icon: Activity, color: 'var(--color-accent)' },
-                    { id: 'discovery', label: 'Discovery', icon: Search, color: 'var(--color-success)' }
+                    { id: 'famous-portfolios', label: 'Famous Portfolios', icon: Search, color: 'var(--color-success)' }
                 ]}
             />
 
@@ -236,12 +236,12 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                             <div>
                                 <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.2rem', fontWeight: 950 }}>
                                     <Star size={20} fill="var(--color-warning)" color="var(--color-warning)" style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' }} />
-                                    {selectedMarket.shortName} Alpha
+                                    {selectedMarket.shortName} Market
                                 </h2>
                             </div>
                             <div style={{ width: '100%', maxWidth: '220px' }}>
                                 <SymbolSearchInput
-                                    placeholder="Search Alpha..."
+                                    placeholder="Search Tickers..."
                                     marketId={selectedMarket.id}
                                     onSelect={(symbol) => addToWatchlist(symbol, selectedMarket.id, user?.id)}
                                 />
@@ -302,9 +302,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                                 {formatPercent(stockData[selectedMarket.indexSymbol.replace('%5E', '^')].changePercent)}
                                             </td>
                                             <td className="hidden-mobile">
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text-secondary)', fontSize: '0.75rem', fontWeight: 600 }}>
-                                                    <Activity size={12} /> Institutional Alpha Ref
-                                                </div>
+                                                {/* Diagnostic labels removed */}
                                             </td>
                                             <td className="hidden-mobile">
                                                 <div style={{ opacity: 0.8, transform: 'scale(1.1)' }}>
@@ -398,7 +396,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                     </div>
                 )}
 
-                {activeTab === 'discovery' && (
+                {activeTab === 'famous-portfolios' && (
                     <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden' }}>
                         <div className="scrollable-panel custom-scrollbar" style={{ padding: '4px' }}>
                             <div className="glass-card" style={{ padding: '1.25rem' }}>
@@ -407,7 +405,7 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
                                 ) : (
                                     <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-tertiary)' }}>
                                         <Search size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
-                                        <p>Discovery modules are currently optimized for the US Market.</p>
+                                        <p>Institutional portfolios are currently optimized for the US Market.</p>
                                     </div>
                                 )}
                             </div>
