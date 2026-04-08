@@ -19,40 +19,47 @@ const SP100_SYMBOLS = [
     'NOC', 'DG', 'SO', 'D', 'DUK', 'USB', 'T', 'GPN', 'FIS', 'FDX'
 ];
 
+const EGX30_SYMBOLS = [
+    'MFOT.CA', 'COMI.CA', 'TMGH.CA', 'SKPC.CA', 'FWRY.CA', 'EKHO.CA', 'ETEL.CA', 'ABUK.CA', 'HELI.CA', 'SWDY.CA',
+    'ORAS.CA', 'ESRS.CA', 'CCAP.CA', 'MNHD.CA', 'EKHOA.CA', 'AMOC.CA', 'MICH.CA', 'EFID.CA', 'PHDC.CA', 'CIRA.CA',
+    'SAUD.CA', 'EGCH.CA', 'JUFO.CA', 'OBRI.CA', 'AUTO.CA', 'DOMT.CA', 'RMDA.CA', 'ALCN.CA', 'ISPH.CA', 'BINV.CA'
+];
+
+const ADX15_SYMBOLS = [
+    'IHC.AD', 'FAB.AD', 'ETISALAT.AD', 'ADNOCDIST.AD', 'ADCB.AD', 'ALDAR.AD', 'BOROUGE.AD', 'ADPORTS.AD',
+    'ALYAHSAT.AD', 'ADNOCLS.AD', 'ADNOCDRILL.AD', 'MULTIPLY.AD', 'BAYANAT.AD', 'FERTIGLOBE.AD', 'DANA.AD'
+];
+
 const SECTOR_MAP: Record<string, string> = {
+    // US IT
     'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology',
     'AVGO': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
     'CSCO': 'Information Technology', 'INTU': 'Information Technology', 'ORCL': 'Information Technology',
     'TXN': 'Information Technology', 'NOW': 'Information Technology', 'INTC': 'Information Technology',
     'IBM': 'Information Technology', 'QCOM': 'Information Technology', 'ADI': 'Information Technology',
     'MU': 'Information Technology', 'LRCX': 'Information Technology', 'PANW': 'Information Technology',
+    // US Consumer
     'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
     'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
     'TJX': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary', 'ABNB': 'Consumer Discretionary',
     'DG': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'F': 'Consumer Discretionary',
+    // US Communication
     'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services',
     'DIS': 'Communication Services', 'VZ': 'Communication Services', 'CMCSA': 'Communication Services',
-    'T': 'Communication Services', 'CHTR': 'Communication Services', 'GPN': 'Financials',
-    'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BAC': 'Financials',
-    'BRK-B': 'Financials', 'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials',
-    'BLK': 'Financials', 'AXP': 'Financials', 'C': 'Financials', 'PNC': 'Financials',
-    'USB': 'Financials', 'SCHW': 'Financials', 'CB': 'Financials', 'MMC': 'Financials',
-    'SPGI': 'Financials', 'FIS': 'Financials', 'LLY': 'Health Care', 'UNH': 'Health Care',
-    'JNJ': 'Health Care', 'MRK': 'Health Care', 'ABBV': 'Health Care', 'TMO': 'Health Care',
-    'PFE': 'Health Care', 'ABT': 'Health Care', 'DHR': 'Health Care', 'AMGN': 'Health Care',
-    'ISRG': 'Health Care', 'GILD': 'Health Care', 'REGN': 'Health Care', 'VRTX': 'Health Care',
-    'SYK': 'Health Care', 'ZTS': 'Health Care', 'CI': 'Health Care', 'HUM': 'Health Care',
-    'PG': 'Consumer Staples', 'COST': 'Consumer Staples', 'KO': 'Consumer Staples',
-    'PEP': 'Consumer Staples', 'WMT': 'Consumer Staples', 'PM': 'Consumer Staples',
-    'MO': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'CL': 'Consumer Staples',
-    'TGT': 'Consumer Staples', 'EL': 'Consumer Staples', 'XOM': 'Energy', 'CVX': 'Energy',
-    'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy', 'MPC': 'Energy', 'PSX': 'Energy',
-    'GE': 'Industrials', 'CAT': 'Industrials', 'UNP': 'Industrials', 'HON': 'Industrials',
-    'BA': 'Industrials', 'LMT': 'Industrials', 'RTX': 'Industrials', 'DE': 'Industrials',
-    'UPS': 'Industrials', 'FDX': 'Industrials', 'MMM': 'Industrials', 'EMR': 'Industrials',
-    'ITW': 'Industrials', 'NOC': 'Industrials', 'LIN': 'Materials', 'SHW': 'Materials',
-    'APD': 'Materials', 'PLD': 'Real Estate', 'AMT': 'Real Estate', 'CCI': 'Real Estate',
-    'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities'
+    'T': 'Communication Services', 'CHTR': 'Communication Services',
+    // Egypt Sectors
+    'COMI.CA': 'Banking & Finance', 'FWRY.CA': 'Fintech & Tech', 'ETEL.CA': 'Telecom',
+    'TMGH.CA': 'Real Estate', 'HELI.CA': 'Real Estate', 'MNHD.CA': 'Real Estate', 'PHDC.CA': 'Real Estate',
+    'ABUK.CA': 'Chemicals & Materials', 'SKPC.CA': 'Chemicals & Materials', 'MICH.CA': 'Chemicals & Materials', 'MFOT.CA': 'Chemicals & Materials',
+    'SWDY.CA': 'Industrials', 'ORAS.CA': 'Construction', 'ESRS.CA': 'Materials', 'CCAP.CA': 'Diversified',
+    'JUFO.CA': 'Consumer Staples', 'DOMT.CA': 'Consumer Staples', 'OBRI.CA': 'Consumer Staples', 'EFID.CA': 'Consumer Staples',
+    // ADX Sectors
+    'IHC.AD': 'Direct Investment', 'MULTIPLY.AD': 'Direct Investment',
+    'FAB.AD': 'Financials', 'ADCB.AD': 'Financials',
+    'ETISALAT.AD': 'Telecommunication', 'ALYAHSAT.AD': 'Space & Satellite',
+    'ADNOCDIST.AD': 'Energy', 'ADNOCLS.AD': 'Energy', 'ADNOCDRILL.AD': 'Energy', 'DANA.AD': 'Energy',
+    'BOROUGE.AD': 'Materials', 'FERTIGLOBE.AD': 'Materials',
+    'ALDAR.AD': 'Real Estate', 'ADPORTS.AD': 'Logistics',
 };
 
 interface InstitutionalScreenerProps {
@@ -60,7 +67,7 @@ interface InstitutionalScreenerProps {
 }
 
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
-    const { timeframe, setTimeframe } = useMarket();
+    const { timeframe, setTimeframe, selectedMarket } = useMarket();
     const [stocks, setStocks] = useState<Stock[]>([]);
     const [prevPrices, setPrevPrices] = useState<Record<string, number>>({});
     const [flashStates, setFlashStates] = useState<Record<string, 'up' | 'down' | null>>({});
@@ -69,13 +76,21 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
 
     useEffect(() => {
         let isMounted = true;
+        
+        // Resolve symbols based on selected market
+        const marketSymbols = selectedMarket.id === 'egypt' 
+            ? EGX30_SYMBOLS 
+            : selectedMarket.id === 'abudhabi' 
+                ? ADX15_SYMBOLS 
+                : SP100_SYMBOLS;
+
         const fetchStocks = async () => {
             try {
-                const map = await getMultipleQuotes(SP100_SYMBOLS);
+                const map = await getMultipleQuotes(marketSymbols);
                 if (!isMounted) return;
                 
                 const loadedStocks: Stock[] = [];
-                SP100_SYMBOLS.forEach(sym => {
+                marketSymbols.forEach(sym => {
                     if (map.has(sym)) loadedStocks.push(map.get(sym)!);
                 });
                 
@@ -108,7 +123,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                 setStocks(loadedStocks);
                 setPrevPrices(newPrevPrices);
             } catch (err) {
-                console.error('Failed to load Top 100 Screener:', err);
+                console.error(`Failed to load ${selectedMarket.id} Screener:`, err);
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -120,7 +135,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
             isMounted = false;
             clearInterval(interval);
         };
-    }, [prevPrices]); 
+    }, [prevPrices, selectedMarket.id]); 
 
     // Simulation: Independent Live Drift to keep metrics "Ticking" between polls
     useEffect(() => {
