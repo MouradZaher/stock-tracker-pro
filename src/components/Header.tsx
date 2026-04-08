@@ -355,38 +355,54 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                         const isFavorite = favoriteHomeView === view.id;
                                         
                                         return (
-                                            <button
-                                                key={view.id}
-                                                onClick={() => { 
-                                                    setHomeView(view.id as 'heatmap' | 'screener');
-                                                    setFavoriteHomeView(view.id as 'heatmap' | 'screener');
-                                                    setIsMarketOpen(false);
-                                                    soundService.playTap(); 
-                                                }}
-                                                style={{
-                                                    width: '100%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.75rem',
-                                                    padding: '0.65rem 0.75rem',
-                                                    borderRadius: 'var(--radius-md)',
-                                                    background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                                    border: '1px solid transparent',
-                                                    cursor: 'pointer',
-                                                    textAlign: 'left',
-                                                    transition: 'all 0.15s',
-                                                    color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)',
-                                                    font: 'inherit',
-                                                }}
-                                            >
-                                                <Icon size={14} color={isActive ? (view.id === 'heatmap' ? 'var(--color-accent)' : '#10b981') : 'currentColor'} />
-                                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <div key={view.id} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <button
+                                                    onClick={() => { 
+                                                        setHomeView(view.id as 'heatmap' | 'screener');
+                                                        setIsMarketOpen(false);
+                                                        soundService.playTap(); 
+                                                    }}
+                                                    style={{
+                                                        flex: 1,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.75rem',
+                                                        padding: '0.65rem 0.75rem',
+                                                        borderRadius: 'var(--radius-md)',
+                                                        background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                                        border: '1px solid transparent',
+                                                        cursor: 'pointer',
+                                                        textAlign: 'left',
+                                                        transition: 'all 0.15s',
+                                                        color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)',
+                                                        font: 'inherit',
+                                                    }}
+                                                >
+                                                    <Icon size={14} color={isActive ? (view.id === 'heatmap' ? 'var(--color-accent)' : '#10b981') : 'currentColor'} />
                                                     <span style={{ fontWeight: isActive ? 700 : 500, fontSize: isMobile ? '0.75rem' : '0.85rem' }}>
                                                         {view.label}
                                                     </span>
-                                                    {isFavorite && <Star size={12} color="#facc15" fill="#facc15" style={{ opacity: 0.8 }} />}
-                                                </div>
-                                            </button>
+                                                    {isActive && <div style={{ marginLeft: 'auto', width: '4.5px', height: '4.5px', borderRadius: '50%', background: view.id === 'heatmap' ? 'var(--color-accent)' : '#10b981' }} />}
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setFavoriteHomeView(view.id as 'heatmap' | 'screener');
+                                                        soundService.playTap();
+                                                    }}
+                                                    style={{
+                                                        border: 'none',
+                                                        background: 'transparent',
+                                                        cursor: 'pointer',
+                                                        padding: '8px',
+                                                        opacity: isFavorite ? 1 : 0.3,
+                                                        transition: 'all 0.2s ease',
+                                                    }}
+                                                    title={isFavorite ? 'Default View' : 'Set as default'}
+                                                >
+                                                    <Star size={14} color={isFavorite ? '#facc15' : 'var(--color-text-tertiary)'} fill={isFavorite ? '#facc15' : 'none'} />
+                                                </button>
+                                            </div>
                                         );
                                     })
                                 }

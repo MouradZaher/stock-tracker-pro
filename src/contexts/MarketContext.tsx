@@ -131,7 +131,8 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const setFavoriteHomeView = (view: 'heatmap' | 'screener') => {
         setFavoriteHomeViewInternal(view);
         localStorage.setItem('favorite_home_view', view);
-        setHomeView(view);
+        // We no longer force setHomeView(view) here, 
+        // allowing 'favoriting' to be a background persistence action.
     };
 
     const [timeframe, setTimeframe] = useState<string>(() => {
