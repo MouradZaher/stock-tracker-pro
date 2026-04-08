@@ -1,179 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-    LayoutGrid, Fingerprint, Cpu, Target, Briefcase, Zap, Activity
-} from 'lucide-react';
-import PortfolioIntelliHub from './PortfolioIntelliHub';
-import MarketScannerHub from './MarketScannerHub';
+import React from 'react';
 import AIInstitutionalHub from './AIInstitutionalHub';
-import AIPerformanceTracker from './AIPerformanceTracker';
-import AIStrategyIntelliHub from './AIStrategyIntelliHub';
-import SubNavbar from './SubNavbar';
-import StockDetail from './StockDetail';
-import AITop100Tab from './AITop100Tab';
-import InstitutionalScreener from './InstitutionalScreener';
-
-import { useMarket } from '../contexts/MarketContext';
-import { useWatchlist } from '../hooks/useWatchlist';
+import ErrorBoundary from './ErrorBoundary';
 
 const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> = ({ onSelectStock }) => {
-    const [viewMode, setViewMode] = useState<'stocks' | 'navigator' | 'terminal' | 'alpha' | 'strategy'>('stocks');
-    const [selectedAiStock, setSelectedAiStock] = useState<string | null>(null);
-    const { selectedMarket } = useMarket();
-    const { getWatchlistByMarket } = useWatchlist();
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const tabParam = params.get('tab');
-        const aiStockParam = params.get('aiStock');
-        
-        if (tabParam) {
-            setViewMode(tabParam as any);
-        }
-        if (aiStockParam) {
-            setSelectedAiStock(aiStockParam);
-        }
-    }, [location.search]);
-
-    const handleSelectStock = (symbol: string) => {
-        setSelectedAiStock(symbol);
-        // Update URL to support sharing/refreshing
-        const params = new URLSearchParams(location.search);
-        params.set('aiStock', symbol);
-        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-    };
-
-    const handleBackTo100 = () => {
-        setSelectedAiStock(null);
-        const params = new URLSearchParams(location.search);
-        params.delete('aiStock');
-        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-    };
-
-    const generateTickerItems = () => {
-        const watchlistItems = getWatchlistByMarket(selectedMarket.id);
-        const symbols = watchlistItems.length > 0 ? watchlistItems.slice(0, 3) : ['AAPL', 'MSFT', 'NVDA'];
-        return [
-            `[DARK POOL] 🟢 ${symbols[0]} 500k Sweep detected ...`,
-            `[OPTIONS FLOW] 🔴 ${symbols[1]} Put Volume +300% ...`,
-            `[LIQUIDITY] 🟠 ${symbols[2]} Spread widening`,
-            `[REGIME] 🔵 ${selectedMarket.indexName} volatility shifting to defensive posture ...`,
-            `[MACRO] 🟢 Treasury yields dipping, triggering growth factor accumulation ...`
-        ].join(' \u00A0\u00A0\u00A0•\u00A0\u00A0\u00A0 ');
-    };
-
     return (
-        <div className="tab-content dashboard-viewport" style={{ padding: 0, gap: 0 }}>
-
-            {/* Unified Sub-Navbar */}
-            <SubNavbar
-                activeTab={viewMode}
-                onTabChange={(id) => {
-                    setViewMode(id as any);
-                    setSelectedAiStock(null);
-                    const params = new URLSearchParams(location.search);
-                    params.set('tab', id);
-                    params.delete('aiStock');
-                    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-                }}
-                tabs={[
-                    { id: 'stocks', label: 'STOCKS', icon: Briefcase, color: '#facc15' },
-                    { id: 'navigator', label: 'NAVIGATOR', icon: Zap, color: 'var(--color-accent)' },
-                    { id: 'terminal', label: 'TERMINAL', icon: LayoutGrid, color: '#38bdf8' },
-                    { id: 'strategy', label: 'STRATEGY', icon: Fingerprint, color: '#10b981' }
-                ]}
-            />
-
-            {/* Live Marquee Ticker */}
-            <div style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                padding: '4px 0',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                display: 'flex',
-                alignItems: 'center',
-                flexShrink: 0
-            }}>
-                <div style={{ padding: '0 1rem', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.1em', borderRight: '1px solid rgba(255,255,255,0.1)', marginRight: '1rem', flexShrink: 0, zIndex: 2, background: 'var(--color-bg)' }}>
-                    LIVE SIGNAL
-                </div>
-                <div className="ticker-scroll" style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)', fontWeight: 600, display: 'inline-block' }}>
-                    {generateTickerItems()} \u00A0\u00A0\u00A0•\u00A0\u00A0\u00A0 {generateTickerItems()}
-                </div>
-            </div>
-
-            {/* Main Content Area */}
+        <div className="tab-content dashboard-viewport" style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
+            {/* 
+                Simplified AI Architecture
+                Removes fragmented sub-tabs (Stocks, Navigator, Terminal, Strategy)
+                Consolidates into a single, high-intelligence Search & Insight hub.
+            */}
             <div style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
                 flex: 1, 
+                height: '100%',
                 minHeight: 0, 
-                overflowY: 'auto', 
-                padding: '1.5rem', 
-                gap: '1.5rem' 
+                overflow: 'hidden'
             }}>
-                {viewMode === 'stocks' && (
-                    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                        <InstitutionalScreener onSelectSymbol={handleSelectStock} />
-                    </div>
-                )}
-
-                {viewMode === 'navigator' && (
-                    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0, gap: '1rem' }}>
-                        {/* Analysis View (Full Space) */}
-                        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                            {selectedAiStock ? (
-                                <StockDetail symbol={selectedAiStock} onBack={handleBackTo100} />
-                            ) : (
-                                <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.8rem', letterSpacing: '0.05em', fontWeight: 800 }}>
-                                    SELECT ASSET FROM TICKER DOCK
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                {viewMode === 'terminal' && (
-                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', height: '100%', maxWidth: '1400px', margin: '0 auto' }}>
-                        {/* Summary Layer */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '1.5rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                <AIPerformanceTracker condensed />
-                                <MarketScannerHub />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <PortfolioIntelliHub />
-                            </div>
-                        </div>
-
-                        {/* Intelligence Layer (Formerly Alpha Intel) */}
-                        <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '2.5rem' }}>
-                            <h3 style={{ fontSize: '1rem', fontWeight: 900, color: 'white', marginBottom: '1.5rem', letterSpacing: '0.05em' }}>INSTITUTIONAL CORE INTELLIGENCE</h3>
-                            <AIInstitutionalHub />
-                        </div>
-                     </div>
-                )}
-
-                {viewMode === 'strategy' && (
-                     <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1.5rem', height: '100%' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-                            <PortfolioIntelliHub />
-                         </div>
-                         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflowY: 'auto' }}>
-                            <AIStrategyIntelliHub />
-                         </div>
-                     </div>
-                )}
+                <ErrorBoundary>
+                    <AIInstitutionalHub />
+                </ErrorBoundary>
             </div>
 
-            {/* PIP Market Widget */}
+            {/* PIP System Pulse Visualizer (Institutional Aesthetic) */}
             <div className="pip-widget glass-card" style={{
                 position: 'absolute', bottom: '2rem', right: '2rem', width: '220px', height: '80px', padding: '0.75rem', zIndex: 50,
                 boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid var(--color-accent)', borderRadius: '12px',
-                display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                pointerEvents: 'none',
+                background: 'rgba(10,10,18,0.8)',
+                backdropFilter: 'blur(10px)'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>SYSTEM PULSE</span>
@@ -195,22 +52,6 @@ const AIRecommendations: React.FC<{ onSelectStock?: (symbol: string) => void }> 
             </div>
 
             <style>{`
-                @media (max-width: 1024px) {
-                    .tab-content.dashboard-viewport > div > div {
-                        grid-template-columns: 1fr !important;
-                    }
-                }
-                
-                @keyframes tickerMove {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .ticker-scroll {
-                    animation: tickerMove 30s linear infinite;
-                }
-                .ticker-scroll:hover {
-                    animation-play-state: paused;
-                }
                 .pip-path {
                     stroke-dasharray: 200;
                     stroke-dashoffset: 200;
