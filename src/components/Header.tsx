@@ -31,7 +31,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const [isMarketOpen, setIsMarketOpen] = useState(false);
     const marketBtnRef = useRef<HTMLButtonElement>(null);
     const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
-    // Detect mobile viewport to pass smaller icon sizes directly to Lucide
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     
     useEffect(() => {
@@ -39,11 +38,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+    
     const iconSize = isMobile ? 18 : 12;
-    const btnH = isMobile ? '28px' : '22px';
-
-    const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
-    const homeBtnRef = useRef<HTMLButtonElement>(null);
 
     const tabs: { id: TabType; label: string; icon: React.ElementType; color?: string; isCustomIcon?: boolean }[] = [
         { id: 'home', label: 'Home', icon: Home },
@@ -56,20 +52,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
 
     const handleTabClick = (tabId: TabType) => {
         soundService.playTap();
-        if (tabId === 'home') {
-            setIsHomeMenuOpen(!isHomeMenuOpen);
-            onTabChange(tabId);
-        } else {
-            setIsHomeMenuOpen(false);
-            onTabChange(tabId);
-        }
-    };
-
-    const handleHomeOptionSelect = (mode: 'heatmap' | 'screener') => {
-        soundService.playTap();
-        setIsHomeMenuOpen(false);
-        setHomeView(mode);
-        navigate(`/home/${mode}`);
+        onTabChange(tabId);
     };
 
     // Close dropdowns on Escape key
@@ -78,7 +61,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
             if (e.key === 'Escape') {
                 setIsMarketOpen(false);
                 setIsNotifyOpen(false);
-                setIsHomeMenuOpen(false);
             }
         };
         document.addEventListener('keydown', keyHandler);
@@ -201,7 +183,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                         return (
                             <div key={tab.id} style={{ position: 'relative' }}>
                                 <button
-                                    ref={tab.id === 'home' ? homeBtnRef : null}
                                     onClick={() => handleTabClick(tab.id)}
                                     style={{
                                         display: 'flex',
@@ -235,73 +216,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                         gap: '2px'
                                     }}>
                                         {tab.label}
-                                        {tab.id === 'home' && <ChevronDown size={10} style={{ transform: isHomeMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />}
                                     </span>
                                 </button>
-
-                                {/* Home Dropdown Menu */}
-                                {tab.id === 'home' && isHomeMenuOpen && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        left: '50%',
-                                        transform: 'translateX(-50%)',
-                                        background: 'rgba(10,10,18,0.98)',
-                                        border: '1px solid var(--glass-border-bright)',
-                                        borderRadius: '12px',
-                                        padding: '6px',
-                                        marginTop: '4px',
-                                        minWidth: '140px',
-                                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                                        zIndex: 2000,
-                                        backdropFilter: 'blur(20px)'
-                                    }}>
-                                        <button 
-                                            onClick={() => handleHomeOptionSelect('heatmap')}
-                                            style={{ 
-                                                width: '100%', 
-                                                padding: '8px 12px', 
-                                                textAlign: 'left', 
-                                                background: 'transparent', 
-                                                border: 'none', 
-                                                color: 'var(--color-text-primary)', 
-                                                fontSize: '0.75rem', 
-                                                fontWeight: 800, 
-                                                borderRadius: '8px', 
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px'
-                                            }}
-                                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                        >
-                                            <LayoutGrid size={14} className="text-accent" /> HEATMAP
-                                        </button>
-                                        <button 
-                                            onClick={() => handleHomeOptionSelect('screener')}
-                                            style={{ 
-                                                width: '100%', 
-                                                padding: '8px 12px', 
-                                                textAlign: 'left', 
-                                                background: 'transparent', 
-                                                border: 'none', 
-                                                color: 'var(--color-text-primary)', 
-                                                fontSize: '0.75rem', 
-                                                fontWeight: 800, 
-                                                borderRadius: '8px', 
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px'
-                                            }}
-                                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                        >
-                                            <Activity size={14} className="text-success" /> SCREENER
-                                        </button>
-                                    </div>
-                                )}
                             </div>
                         );
                     })}
