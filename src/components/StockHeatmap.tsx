@@ -129,56 +129,58 @@ const StockHeatmap: React.FC = () => {
                 </div>
             ) : (
                 <>
-                    {/* Header / Institutional Controls (Consistent with Screener) */}
+                    {/* Header / Institutional Controls (Mimics Screener Table Header for Consistency) */}
                     <div style={{ 
                         display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        padding: '8px 1.5rem', 
                         borderBottom: '1px solid var(--glass-border)', 
-                        background: 'rgba(255,255,255,0.02)', 
+                        padding: '0.6rem 0', 
+                        background: 'rgba(10,10,18,0.95)', 
+                        backdropFilter: 'blur(10px)',
+                        fontWeight: 900, 
+                        fontSize: '0.62rem', 
+                        color: 'var(--color-text-tertiary)', 
+                        textTransform: 'uppercase', 
+                        letterSpacing: '0.12em',
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         right: 0,
-                        zIndex: 100,
-                        backdropFilter: 'blur(10px)'
+                        zIndex: 100
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                            <Activity size={14} className="text-accent" />
-                            Market Pulse Heatmap
+                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem' }}>Asset Heatmap</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Pricing</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', position: 'relative' }}>
+                            <select 
+                                value={timeframe} 
+                                onChange={(e) => setTimeframe(e.target.value)}
+                                style={{
+                                    appearance: 'none',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--color-accent)',
+                                    fontSize: '0.62rem',
+                                    fontWeight: 900,
+                                    padding: '0 14px 0 0',
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    textTransform: 'uppercase',
+                                    textAlign: 'right',
+                                    width: '100%',
+                                    fontFamily: 'inherit',
+                                    letterSpacing: 'inherit'
+                                }}
+                            >
+                                {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
+                                    <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
+                                ))}
+                            </select>
+                            <ChevronDown size={10} style={{ position: 'absolute', right: '0.5rem', pointerEvents: 'none', opacity: 0.8, color: 'var(--color-accent)' }} />
                         </div>
-
-                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>INTERVAL:</span>
-                            <div style={{ position: 'relative' }}>
-                                <select 
-                                    value={timeframe} 
-                                    onChange={(e) => setTimeframe(e.target.value)}
-                                    style={{
-                                        appearance: 'none',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid var(--glass-border)',
-                                        borderRadius: '6px',
-                                        color: 'white',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 900,
-                                        padding: '4px 28px 4px 10px',
-                                        cursor: 'pointer',
-                                        outline: 'none',
-                                        transition: 'all 0.2s',
-                                        textTransform: 'uppercase',
-                                        minWidth: '80px'
-                                    }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                                >
-                                    {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
-                                        <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown size={12} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.6 }} />
-                            </div>
+                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Vol {timeframe}</div>
+                        <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-end', padding: '0 1.5rem', gap: '2rem' }}>
+                            <div className="desktop-only">PEG</div>
+                            <div className="desktop-only">MOMENTUM</div>
+                            <div className="desktop-only text-accent">LIVE FEED</div>
                         </div>
                     </div>
 

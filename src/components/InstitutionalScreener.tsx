@@ -70,53 +70,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden', background: 'var(--color-bg)' }}>
-            {/* Header / Institutional Controls */}
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', // Changed to between for label/dropdown placement if title removed
-                alignItems: 'center', 
-                padding: '8px 1.5rem', 
-                borderBottom: '1px solid var(--glass-border)', 
-                background: 'rgba(255,255,255,0.02)', 
-                flexShrink: 0 
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    <Activity size={14} className="text-accent" />
-                    Market Pulse Matrix
-                </div>
-
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>INTERVAL:</span>
-                    <div style={{ position: 'relative' }}>
-                        <select 
-                            value={timeframe} 
-                            onChange={(e) => setTimeframe(e.target.value)}
-                            style={{
-                                appearance: 'none',
-                                background: 'rgba(255,255,255,0.05)',
-                                border: '1px solid var(--glass-border)',
-                                borderRadius: '6px',
-                                color: 'white',
-                                fontSize: '0.7rem',
-                                fontWeight: 900,
-                                padding: '4px 28px 4px 10px',
-                                cursor: 'pointer',
-                                outline: 'none',
-                                transition: 'all 0.2s',
-                                textTransform: 'uppercase',
-                                minWidth: '80px'
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                        >
-                            {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
-                                <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
-                            ))}
-                        </select>
-                        <ChevronDown size={12} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.6 }} />
-                    </div>
-                </div>
-            </div>
+            {/* Header removed and integrated into table header below */}
 
             {/* Matrix Table - High Density Container */}
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
@@ -139,7 +93,33 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                     }}>
                         <div style={{ flex: '0 0 320px', padding: '0 1.5rem' }}>Company & Asset</div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
-                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>% {timeframe}</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', position: 'relative' }}>
+                            <select 
+                                value={timeframe} 
+                                onChange={(e) => setTimeframe(e.target.value)}
+                                style={{
+                                    appearance: 'none',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--color-accent)', // Highlight to show it's interactive
+                                    fontSize: '0.62rem',
+                                    fontWeight: 900,
+                                    padding: '0 14px 0 0',
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    textTransform: 'uppercase',
+                                    textAlign: 'right',
+                                    width: '100%',
+                                    fontFamily: 'inherit',
+                                    letterSpacing: 'inherit'
+                                }}
+                            >
+                                {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
+                                    <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
+                                ))}
+                            </select>
+                            <ChevronDown size={10} style={{ position: 'absolute', right: '0.5rem', pointerEvents: 'none', opacity: 0.8, color: 'var(--color-accent)' }} />
+                        </div>
                         <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Vol {timeframe}</div>
                         <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right' }}>PEG</div>
                         <div style={{ flex: '0 0 160px', padding: '0 1rem', textAlign: 'center' }}>Yearly Range</div>
