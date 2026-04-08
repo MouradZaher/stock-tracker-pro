@@ -129,67 +129,12 @@ const StockHeatmap: React.FC = () => {
                 </div>
             ) : (
                 <>
-                    {/* Header / Institutional Controls (Mimics Screener Table Header for Consistency) */}
-                    <div style={{ 
-                        display: 'flex', 
-                        borderBottom: '1px solid var(--glass-border)', 
-                        padding: '0.6rem 0', 
-                        background: 'rgba(10,10,18,0.95)', 
-                        backdropFilter: 'blur(10px)',
-                        fontWeight: 900, 
-                        fontSize: '0.62rem', 
-                        color: 'var(--color-text-tertiary)', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.12em',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        zIndex: 100
-                    }}>
-                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem' }}>Asset Heatmap</div>
-                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Pricing</div>
-                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', position: 'relative' }}>
-                            <select 
-                                value={timeframe} 
-                                onChange={(e) => setTimeframe(e.target.value)}
-                                style={{
-                                    appearance: 'none',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'var(--color-accent)',
-                                    fontSize: '0.62rem',
-                                    fontWeight: 900,
-                                    padding: '0 14px 0 0',
-                                    cursor: 'pointer',
-                                    outline: 'none',
-                                    textTransform: 'uppercase',
-                                    textAlign: 'right',
-                                    width: '100%',
-                                    fontFamily: 'inherit',
-                                    letterSpacing: 'inherit'
-                                }}
-                            >
-                                {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
-                                    <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
-                                ))}
-                            </select>
-                            <ChevronDown size={10} style={{ position: 'absolute', right: '0.5rem', pointerEvents: 'none', opacity: 0.8, color: 'var(--color-accent)' }} />
-                        </div>
-                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Vol {timeframe}</div>
-                        <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-end', padding: '0 1.5rem', gap: '2rem' }}>
-                            <div className="desktop-only">PEG</div>
-                            <div className="desktop-only">MOMENTUM</div>
-                            <div className="desktop-only text-accent">LIVE FEED</div>
-                        </div>
-                    </div>
-
                     <div
                         className="tradingview-widget-container"
                         ref={containerRef}
                         style={{
                             position: 'absolute',
-                            top: '40px', // Below the new header
+                            top: 0,
                             left: 0,
                             right: 0,
                             bottom: 0,
