@@ -280,7 +280,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                     <button
                                         key={m.id}
                                         onMouseEnter={() => !isMobile && setHoverMarket(m.id as MarketId)}
-                                        onClick={() => { setMarket(m.id as MarketId); setIsMarketOpen(false); soundService.playTap(); }}
+                                        onClick={() => { 
+                                            setMarket(m.id as MarketId); 
+                                            navigate(`/home/${homeView}`);
+                                            setIsMarketOpen(false); 
+                                            soundService.playTap(); 
+                                        }}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -313,6 +318,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                                 e.stopPropagation();
                                                 setFavoriteMarket(m.id as MarketId);
                                                 setMarket(m.id as MarketId);
+                                                navigate(`/home/${homeView}`);
                                                 setIsMarketOpen(false);
                                                 soundService.playTap();
                                             }}
@@ -330,18 +336,17 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                     </button>
                                 ))}
 
-                                {/* Dashboard View Selection */}
                                 <div style={{ 
-                                    marginTop: '0.5rem', 
-                                    padding: '0.75rem 0.75rem 0.25rem', 
-                                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                                    marginTop: '0.75rem', 
+                                    padding: '0.75rem 0.75rem 0.35rem', 
+                                    borderTop: '1px solid rgba(255,255,255,0.08)',
                                     fontSize: '0.6rem', 
-                                    color: 'var(--color-text-tertiary)', 
+                                    color: 'var(--color-accent)', 
                                     textTransform: 'uppercase', 
-                                    letterSpacing: '0.12em', 
-                                    fontWeight: 700 
+                                    letterSpacing: '0.15em', 
+                                    fontWeight: 900 
                                 }}>
-                                    Default Dashboard View
+                                    Default Terminal View
                                 </div>
                                 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
