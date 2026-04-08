@@ -19,6 +19,42 @@ const SP100_SYMBOLS = [
     'NOC', 'DG', 'SO', 'D', 'DUK', 'USB', 'T', 'GPN', 'FIS', 'FDX'
 ];
 
+const SECTOR_MAP: Record<string, string> = {
+    'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology',
+    'AVGO': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
+    'CSCO': 'Information Technology', 'INTU': 'Information Technology', 'ORCL': 'Information Technology',
+    'TXN': 'Information Technology', 'NOW': 'Information Technology', 'INTC': 'Information Technology',
+    'IBM': 'Information Technology', 'QCOM': 'Information Technology', 'ADI': 'Information Technology',
+    'MU': 'Information Technology', 'LRCX': 'Information Technology', 'PANW': 'Information Technology',
+    'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
+    'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
+    'TJX': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary', 'ABNB': 'Consumer Discretionary',
+    'DG': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'F': 'Consumer Discretionary',
+    'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services',
+    'DIS': 'Communication Services', 'VZ': 'Communication Services', 'CMCSA': 'Communication Services',
+    'T': 'Communication Services', 'CHTR': 'Communication Services', 'GPN': 'Financials',
+    'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BAC': 'Financials',
+    'BRK-B': 'Financials', 'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials',
+    'BLK': 'Financials', 'AXP': 'Financials', 'C': 'Financials', 'PNC': 'Financials',
+    'USB': 'Financials', 'SCHW': 'Financials', 'CB': 'Financials', 'MMC': 'Financials',
+    'SPGI': 'Financials', 'FIS': 'Financials', 'LLY': 'Health Care', 'UNH': 'Health Care',
+    'JNJ': 'Health Care', 'MRK': 'Health Care', 'ABBV': 'Health Care', 'TMO': 'Health Care',
+    'PFE': 'Health Care', 'ABT': 'Health Care', 'DHR': 'Health Care', 'AMGN': 'Health Care',
+    'ISRG': 'Health Care', 'GILD': 'Health Care', 'REGN': 'Health Care', 'VRTX': 'Health Care',
+    'SYK': 'Health Care', 'ZTS': 'Health Care', 'CI': 'Health Care', 'HUM': 'Health Care',
+    'PG': 'Consumer Staples', 'COST': 'Consumer Staples', 'KO': 'Consumer Staples',
+    'PEP': 'Consumer Staples', 'WMT': 'Consumer Staples', 'PM': 'Consumer Staples',
+    'MO': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'CL': 'Consumer Staples',
+    'TGT': 'Consumer Staples', 'EL': 'Consumer Staples', 'XOM': 'Energy', 'CVX': 'Energy',
+    'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy', 'MPC': 'Energy', 'PSX': 'Energy',
+    'GE': 'Industrials', 'CAT': 'Industrials', 'UNP': 'Industrials', 'HON': 'Industrials',
+    'BA': 'Industrials', 'LMT': 'Industrials', 'RTX': 'Industrials', 'DE': 'Industrials',
+    'UPS': 'Industrials', 'FDX': 'Industrials', 'MMM': 'Industrials', 'EMR': 'Industrials',
+    'ITW': 'Industrials', 'NOC': 'Industrials', 'LIN': 'Materials', 'SHW': 'Materials',
+    'APD': 'Materials', 'PLD': 'Real Estate', 'AMT': 'Real Estate', 'CCI': 'Real Estate',
+    'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities'
+};
+
 interface InstitutionalScreenerProps {
     onSelectSymbol: (symbol: string) => void;
 }
@@ -84,7 +120,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
             isMounted = false;
             clearInterval(interval);
         };
-    }, [prevPrices]); // Added prevPrices to dependency to ensure detection logic has latest
+    }, [prevPrices]); 
 
     // Simulation: Independent Live Drift to keep metrics "Ticking" between polls
     useEffect(() => {
@@ -93,7 +129,6 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                 const next = { ...prev };
                 stocks.forEach(s => {
                     const currentDrift = prev[s.symbol] || 0;
-                    // Brownian random motion (-0.02 to +0.02)
                     next[s.symbol] = currentDrift + (Math.random() * 0.04 - 0.02);
                 });
                 return next;
@@ -113,9 +148,6 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden', background: 'var(--color-bg)' }}>
-            {/* Header removed and integrated into table header below */}
-
-            {/* Matrix Table - High Density Container */}
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
                 <div style={{ minWidth: '1250px', display: 'flex', flexDirection: 'column' }}>
                     {/* Table Header Overlay */}
@@ -150,7 +182,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                     appearance: 'none',
                                     background: 'transparent',
                                     border: 'none',
-                                    color: 'var(--color-accent)', // Highlight to show it's interactive
+                                    color: 'var(--color-accent)', 
                                     fontSize: '0.62rem',
                                     fontWeight: 900,
                                     padding: '0 14px 0 0',
@@ -177,136 +209,188 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                         <div style={{ flex: '0 0 70px', padding: '0 1rem', textAlign: 'center' }}>Analyze</div>
                     </div>
 
-                    {/* Table Body - Result Matrix */}
+                    {/* Table Body - Result Matrix Grouped by Sector */}
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {stocks.map((stock, i) => {
-                            const drift = liveDrift[stock.symbol] || 0;
-                            const tfFactor = timeframe === '5m' ? 0.08 : timeframe === '1h' ? 0.25 : timeframe === '4h' ? 0.45 : timeframe === 'W' ? 1.8 : timeframe === 'M' ? 3.2 : timeframe === '6M' ? 7.5 : timeframe === '1Y' ? 14 : 1;
-                            const displayChange = (stock.changePercent + drift * 0.1) * tfFactor;
-                            const displayVolume = stock.volume * tfFactor;
-                            const isPositive = displayChange >= 0;
-                            const flash = flashStates[stock.symbol];
-                            
-                            // Advanced Estimations for Institutional Density
-                            const momentum = 50 + (stock.symbol.length * 1.5) + (stock.changePercent * 4) + drift;
-                            const rsi = Math.max(15, Math.min(85, 45 + (stock.symbol.charCodeAt(0) % 15) + (stock.changePercent * 2) + drift * 2));
-                            
+                        {Object.entries(
+                            stocks.reduce((acc, stock) => {
+                                const sector = SECTOR_MAP[stock.symbol] || 'Miscellaneous';
+                                if (!acc[sector]) acc[sector] = [];
+                                acc[sector].push(stock);
+                                return acc;
+                            }, {} as Record<string, Stock[]>)
+                        )
+                        .sort((a, b) => {
+                            const avgA = a[1].reduce((sum, s) => sum + s.changePercent, 0) / a[1].length;
+                            const avgB = b[1].reduce((sum, s) => sum + s.changePercent, 0) / b[1].length;
+                            return avgB - avgA;
+                        })
+                        .map(([sector, sectorStocks]) => {
+                            const sectorAvgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
+                            const isPositiveSector = sectorAvgChange >= 0;
+
                             return (
-                                <div 
-                                    key={stock.symbol} 
-                                    className={`screener-row ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`} 
-                                    onClick={() => onSelectSymbol(stock.symbol)} 
-                                    style={{
-                                        display: 'flex',
-                                        height: '52px',
-                                        borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'background 0.2s',
-                                    }}
-                                >
-                                    {/* Column 1: Identity & Action */}
-                                    <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div style={{ position: 'relative' }}>
-                                            <CompanyLogo symbol={stock.symbol} size={32} />
+                                <React.Fragment key={sector}>
+                                    {/* Sector Header Row */}
+                                    <div style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        padding: '12px 1.5rem', 
+                                        background: 'rgba(255,255,255,0.03)', 
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                        position: 'sticky',
+                                        top: '40px', 
+                                        zIndex: 80,
+                                        backdropFilter: 'blur(10px)'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             <div style={{ 
-                                                position: 'absolute', 
-                                                bottom: -2, 
-                                                right: -2, 
-                                                width: 8, 
-                                                height: 8, 
-                                                borderRadius: '50%', 
-                                                background: isPositive ? 'var(--color-success)' : 'var(--color-error)',
-                                                border: '2px solid var(--color-bg)'
+                                                width: '4px', 
+                                                height: '20px', 
+                                                background: isPositiveSector ? 'var(--color-success)' : 'var(--color-error)',
+                                                borderRadius: '2px',
+                                                boxShadow: `0 0 10px ${isPositiveSector ? 'var(--color-success)' : 'var(--color-error)'}`
                                             }} />
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                                                {stock.name}
-                                            </div>
-                                            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.04em' }}>
-                                                ({stock.symbol})
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Column 2: Price */}
-                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950, fontSize: '0.9rem', color: 'white' }}>
-                                        {formatCurrency(stock.price)}
-                                    </div>
-
-                                    {/* Column 3: Change */}
-                                    <div className={getChangeClass(displayChange)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-                                        {isPositive ? <TrendingUp size={12} strokeWidth={3} /> : <TrendingDown size={12} strokeWidth={3} />}
-                                        {formatPercent(displayChange)}
-                                    </div>
-
-                                    {/* Column 4: Volume */}
-                                    <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem' }}>
-                                        {formatNumberPlain(displayVolume)}
-                                    </div>
-
-                                    {/* Column 5: PEG */}
-                                    <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.8rem' }}>
-                                        {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '1.38'}
-                                    </div>
-
-                                    {/* Column 6: Yearly Range */}
-                                    <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
-                                            <div style={{ 
-                                                position: 'absolute', 
-                                                height: '9px', 
-                                                width: '2px', 
-                                                background: 'var(--color-accent)', 
-                                                top: '-3px', 
-                                                left: `${Math.max(2, Math.min(98, ((stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)) * 100))}%`, 
-                                                boxShadow: '0 0 8px var(--color-accent)',
-                                                zIndex: 2
-                                            }} />
-                                        </div>
-                                    </div>
-
-                                    {/* Column 7: Momentum */}
-                                    <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-                                            <span style={{ fontSize: '0.75rem', fontWeight: 950, color: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }}>
-                                                {momentum.toFixed(1)}
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 950, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                                {sector}
                                             </span>
-                                            <div style={{ width: '40px', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                                                <div style={{ width: `${momentum}%`, height: '100%', background: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
+                                            <span style={{ 
+                                                fontSize: '0.62rem', 
+                                                fontWeight: 800, 
+                                                color: isPositiveSector ? 'var(--color-success)' : 'var(--color-error)',
+                                                background: isPositiveSector ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                padding: '2px 6px',
+                                                borderRadius: '4px',
+                                                marginLeft: '8px'
+                                            }}>
+                                                AVG: {formatPercent(sectorAvgChange)}
+                                            </span>
+                                            <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>
+                                                ({sectorStocks.length} Assets)
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {sectorStocks.map((stock) => {
+                                        const drift = liveDrift[stock.symbol] || 0;
+                                        const tfFactor = timeframe === '5m' ? 0.08 : timeframe === '1h' ? 0.25 : timeframe === '4h' ? 0.45 : timeframe === 'W' ? 1.8 : timeframe === 'M' ? 3.2 : timeframe === '6M' ? 7.5 : timeframe === '1Y' ? 14 : 1;
+                                        const displayChange = (stock.changePercent + drift * 0.1) * tfFactor;
+                                        const displayVolume = stock.volume * tfFactor;
+                                        const isPositive = displayChange >= 0;
+                                        const flash = flashStates[stock.symbol];
+                                        
+                                        const momentum = 50 + (stock.symbol.length * 1.5) + (stock.changePercent * 4) + drift;
+                                        const rsi = Math.max(15, Math.min(85, 45 + (stock.symbol.charCodeAt(0) % 15) + (stock.changePercent * 2) + drift * 2));
+                                        
+                                        return (
+                                            <div 
+                                                key={stock.symbol} 
+                                                className={`screener-row ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`} 
+                                                onClick={() => onSelectSymbol(stock.symbol)} 
+                                                style={{
+                                                    display: 'flex',
+                                                    height: '52px',
+                                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                                    alignItems: 'center',
+                                                    cursor: 'pointer',
+                                                    transition: 'background 0.2s',
+                                                }}
+                                            >
+                                                <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <div style={{ position: 'relative' }}>
+                                                        <CompanyLogo symbol={stock.symbol} size={32} />
+                                                        <div style={{ 
+                                                            position: 'absolute', 
+                                                            bottom: -2, 
+                                                            right: -2, 
+                                                            width: 8, 
+                                                            height: 8, 
+                                                            borderRadius: '50%', 
+                                                            background: isPositive ? 'var(--color-success)' : 'var(--color-error)',
+                                                            border: '2px solid var(--color-bg)'
+                                                        }} />
+                                                    </div>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
+                                                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                                            {stock.name}
+                                                        </div>
+                                                        <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.04em' }}>
+                                                            ({stock.symbol})
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950, fontSize: '0.9rem', color: 'white' }}>
+                                                    {formatCurrency(stock.price)}
+                                                </div>
+
+                                                <div className={getChangeClass(displayChange)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                                                    {isPositive ? <TrendingUp size={12} strokeWidth={3} /> : <TrendingDown size={12} strokeWidth={3} />}
+                                                    {formatPercent(displayChange)}
+                                                </div>
+
+                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem' }}>
+                                                    {formatNumberPlain(displayVolume)}
+                                                </div>
+
+                                                <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.8rem' }}>
+                                                    {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '1.38'}
+                                                </div>
+
+                                                <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
+                                                        <div style={{ 
+                                                            position: 'absolute', 
+                                                            height: '9px', 
+                                                            width: '2px', 
+                                                            background: 'var(--color-accent)', 
+                                                            top: '-3px', 
+                                                            left: `${Math.max(2, Math.min(98, ((stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)) * 100))}%`, 
+                                                            boxShadow: '0 0 8px var(--color-accent)',
+                                                            zIndex: 2
+                                                        }} />
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+                                                        <span style={{ fontSize: '0.75rem', fontWeight: 950, color: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }}>
+                                                            {momentum.toFixed(1)}
+                                                        </span>
+                                                        <div style={{ width: '40px', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                            <div style={{ width: `${momentum}%`, height: '100%', background: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                    <div style={{ 
+                                                        display: 'inline-block',
+                                                        padding: '3px 8px', 
+                                                        borderRadius: '4px', 
+                                                        fontSize: '0.7rem', 
+                                                        fontWeight: 950, 
+                                                        background: rsi > 70 ? 'rgba(239, 68, 68, 0.15)' : rsi < 30 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.04)', 
+                                                        color: rsi > 70 ? 'var(--color-error)' : rsi < 30 ? 'var(--color-success)' : 'var(--color-text-primary)',
+                                                        border: `1px solid ${rsi > 70 ? 'rgba(239, 68, 68, 0.2)' : rsi < 30 ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`
+                                                    }}>
+                                                        {rsi.toFixed(1)}
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <button 
+                                                        className="btn-icon glass-button highlight-on-hover"
+                                                        onClick={(e) => { e.stopPropagation(); onSelectSymbol(stock.symbol); }}
+                                                        style={{ padding: '6px', borderRadius: '6px', color: 'var(--color-accent)' }}
+                                                        title="Deep Analysis"
+                                                    >
+                                                        <Eye size={15} strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Column 8: RSI */}
-                                    <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                        <div style={{ 
-                                            display: 'inline-block',
-                                            padding: '3px 8px', 
-                                            borderRadius: '4px', 
-                                            fontSize: '0.7rem', 
-                                            fontWeight: 950, 
-                                            background: rsi > 70 ? 'rgba(239, 68, 68, 0.15)' : rsi < 30 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.04)', 
-                                            color: rsi > 70 ? 'var(--color-error)' : rsi < 30 ? 'var(--color-success)' : 'var(--color-text-primary)',
-                                            border: `1px solid ${rsi > 70 ? 'rgba(239, 68, 68, 0.2)' : rsi < 30 ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`
-                                        }}>
-                                            {rsi.toFixed(1)}
-                                        </div>
-                                    </div>
-
-                                    {/* Column 9: Analyze (Eye) */}
-                                    <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <button 
-                                            className="btn-icon glass-button highlight-on-hover"
-                                            onClick={(e) => { e.stopPropagation(); onSelectSymbol(stock.symbol); }}
-                                            style={{ padding: '6px', borderRadius: '6px', color: 'var(--color-accent)' }}
-                                            title="Deep Analysis"
-                                        >
-                                            <Eye size={15} strokeWidth={2.5} />
-                                        </button>
-                                    </div>
-                                </div>
+                                        );
+                                    })}
+                                </React.Fragment>
                             );
                         })}
                     </div>
