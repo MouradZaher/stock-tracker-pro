@@ -359,6 +359,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                                 <button
                                                     onClick={() => { 
                                                         setHomeView(view.id as 'heatmap' | 'screener');
+                                                        navigate(`/home/${view.id}`);
                                                         setIsMarketOpen(false);
                                                         soundService.playTap(); 
                                                     }}
@@ -388,7 +389,9 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setFavoriteHomeView(view.id as 'heatmap' | 'screener');
+                                                        navigate(`/home/${view.id}`);
                                                         soundService.playTap();
+                                                        setIsMarketOpen(false);
                                                     }}
                                                     style={{
                                                         border: 'none',
