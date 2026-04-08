@@ -46,8 +46,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const homeBtnRef = useRef<HTMLButtonElement>(null);
 
     const tabs: { id: TabType; label: string; icon: React.ElementType; color?: string; isCustomIcon?: boolean }[] = [
-        { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' }, // Purple AI
         { id: 'home', label: 'Home', icon: Home },
+        { id: 'recommendations', label: 'AI', icon: Brain, color: '#a855f7' }, // Purple AI
         { id: 'watchlist', label: 'Watch', icon: Eye, color: '#3b82f6' }, // Blue Watchlist
         { id: 'portfolio', label: 'Portfolio', icon: PieChart, color: '#10b981' }, // Green Portfolio
         { id: 'pulse', label: 'Pulse', icon: Activity, color: '#f97316' }, // Orange Pulse

@@ -1,206 +1,338 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Shield, TrendingUp, TrendingDown, Target, Brain, 
-  BarChart2, Award, Zap, Globe, Clock, Activity,
-  Search, Info, Database, Layers, MessageSquare, 
-  ChevronRight, ArrowUpRight, ArrowDownRight, Fingerprint
+  Shield, Search, Brain, Activity, Zap, Info, 
+  Target, Globe, ChevronRight, Fingerprint, Star,
+  TrendingUp, TrendingDown, Cpu, Sparkles, MessageSquare
 } from 'lucide-react';
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, formatPercent } from '../utils/formatters';
 import { useMarket } from '../contexts/MarketContext';
+import { searchSymbols, getStockQuote } from '../services/stockDataService';
+import type { Stock } from '../types';
+import CompanyLogo from './CompanyLogo';
 
 const AIInstitutionalHub: React.FC = () => {
   const { selectedMarket } = useMarket();
-  const [activeResearchTab, setActiveResearchTab] = useState<'thesis' | 'analyst' | 'scenarios' | 'moat'>('thesis');
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [selectedAsset, setSelectedAsset] = useState<Stock | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
-  // Dummy data extracted from user request
-  const marketTimings = [
-    { id: 'EGX', range: '10:00 AM - 02:30 PM', label: 'Cairo' },
-    { id: 'LND', range: '10:00 AM - 06:30 PM', label: 'London' },
-    { id: 'NYC', range: '04:30 PM - 11:00 PM', label: 'New York' },
-    { id: 'HKG', range: '04:30 AM - 11:00 AM', label: 'Hong Kong' },
-  ];
+  // Handle Search Autocomplete
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (query.trim().length < 1) {
+        setResults([]);
+        return;
+      }
+      setLoading(true);
+      const matches = await searchSymbols(query);
+      setResults(matches);
+      setLoading(false);
+    };
+
+    const timeout = setTimeout(fetchResults, 150);
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  // Click outside to close search
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = async (symbol: string) => {
+    setLoading(true);
+    setShowResults(false);
+    setQuery('');
+    try {
+      const quote = await getStockQuote(symbol);
+      setSelectedAsset(quote);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="institutional-hub-root" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="ai-hub-container" style={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      padding: '2rem',
+      gap: '2rem',
+      background: 'radial-gradient(circle at 50% 10%, rgba(168, 85, 247, 0.05) 0%, transparent 50%)',
+      overflowY: 'auto'
+    }}>
       
-      {/* ─── Row 1: Global Pulse & Timing ─────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', height: '160px' }}>
+      {/* ─── Search Engine Core ────────────────────────────────────────── */}
+      <div style={{ 
+        maxWidth: '800px', 
+        width: '100%', 
+        margin: '0 auto', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center',
+        gap: '1.5rem',
+        marginTop: selectedAsset ? '0' : '5rem',
+        transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+      }}>
         
-        {/* Global Timings Panel */}
-        <div className="glass-card" style={{ padding: '0.75rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.75rem', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em' }}>
-            <Globe size={12} className="text-accent" /> GLOBAL PULSE SESSION
+        {!selectedAsset && (
+          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+            <div style={{ color: 'var(--color-accent)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <Brain size={32} />
+              <div style={{ background: 'var(--color-accent)', height: '1px', width: '40px' }} />
+              <Shield size={24} />
+            </div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 950, letterSpacing: '-0.03em', color: 'white', margin: 0 }}>
+              INSTITUTIONAL <span style={{ color: 'var(--color-accent)' }}>ORACLE</span>
+            </h1>
+            <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', fontWeight: 500, marginTop: '8px' }}>
+              Search any global asset for deep-model AI analysis & sentiment flow.
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-            {marketTimings.map(m => (
-              <div key={m.id} style={{ background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'white', marginBottom: '2px' }}>{m.id} <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 500 }}>{m.label}</span></div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 600 }}>{m.range}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
 
-        {/* AI Timing Score Utility */}
-        <div className="glass-card" style={{ padding: '0.75rem', position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.75rem', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em' }}>
-            <Target size={12} className="text-accent" /> ALPHA TIMING SCORE
+        <div ref={searchRef} style={{ width: '100%', position: 'relative' }}>
+          <div style={{ 
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid var(--glass-border-bright)',
+            borderRadius: '16px',
+            padding: '0 1.25rem',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3), 0 0 20px rgba(168, 85, 247, 0.1)',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease'
+          }}>
+            <Search size={20} color="var(--color-accent)" style={{ flexShrink: 0 }} />
+            <input 
+              type="text"
+              placeholder="Search Symbol, Name or Market..."
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setShowResults(true); }}
+              onFocus={() => setShowResults(true)}
+              style={{
+                width: '100%',
+                background: 'transparent',
+                border: 'none',
+                padding: '1.25rem',
+                color: 'white',
+                fontSize: '1rem',
+                fontWeight: 600,
+                outline: 'none',
+                fontFamily: 'inherit'
+              }}
+            />
+            {loading && <div className="spinner" style={{ width: '16px', height: '16px' }} />}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem' }}>
-            <div style={{ position: 'relative', width: '70px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg style={{ transform: 'rotate(-90deg)', width: '70px', height: '70px' }}>
-                <circle cx="35" cy="35" r="30" stroke="rgba(255,255,255,0.05)" strokeWidth="6" fill="none" />
-                <circle cx="35" cy="35" r="30" stroke="var(--color-accent)" strokeWidth="6" fill="none" strokeDasharray={`${Math.PI * 60}`} strokeDashoffset={`${Math.PI * 60 * (1 - 0.61)}`} strokeLinecap="round" style={{ transition: 'stroke-dashoffset 1s ease-out' }} />
-              </svg>
-              <div style={{ position: 'absolute', fontSize: '1.25rem', fontWeight: 900, color: 'white' }}>61</div>
+
+          {/* Autocomplete Results */}
+          {showResults && results.length > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: 'rgba(10,10,18,0.98)',
+              border: '1px solid var(--glass-border-bright)',
+              borderRadius: '12px',
+              marginTop: '8px',
+              maxHeight: '300px',
+              overflowY: 'auto',
+              zIndex: 1000,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+              padding: '6px'
+            }}>
+              {results.map((item) => (
+                <div 
+                  key={item.symbol}
+                  onClick={() => handleSelect(item.symbol)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <CompanyLogo symbol={item.symbol} size={28} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ color: 'white', fontSize: '0.85rem', fontWeight: 900 }}>{item.symbol}</div>
+                    <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.7rem' }}>{item.name}</div>
+                  </div>
+                  <ChevronRight size={14} color="var(--color-text-tertiary)" />
+                </div>
+              ))}
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>SMART ENTRY WINDOW</div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--color-success)', fontWeight: 700 }}>14:30 - 15:30 EST</div>
-              <p style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', marginTop: '4px', fontStyle: 'italic' }}>Mean-reversion tendencies detected.</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* ─── Row 2: Institutional Intelligence Hub ────────────────────────────── */}
-      <div className="glass-card" style={{ flex: 1, padding: '1rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={16} className="text-accent" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white', letterSpacing: '0.05em' }}>INSTITUTIONAL HUB • ARIA_CORE_v4.2</span>
-          </div>
-          <div style={{ padding: '4px 8px', background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '6px', fontSize: '0.6rem', color: '#38bdf8', fontWeight: 800 }}>SYNC ACTIVE</div>
-        </div>
-
-        {/* Intelligence Tabs */}
-        <div style={{ display: 'flex', gap: '4px', marginBottom: '1rem', background: 'rgba(0,0,0,0.2)', padding: '2px', borderRadius: '8px', flexShrink: 0 }}>
-          {['thesis', 'analyst', 'scenarios', 'moat'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveResearchTab(tab as any)}
-              style={{
-                flex: 1,
-                padding: '6px',
-                border: 'none',
-                background: activeResearchTab === tab ? 'var(--color-accent)' : 'transparent',
-                color: activeResearchTab === tab ? 'white' : 'var(--color-text-tertiary)',
-                fontSize: '0.6rem',
-                fontWeight: 900,
-                borderRadius: '6px',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                textTransform: 'uppercase'
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content Area */}
-        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, paddingRight: '4px' }}>
-          {activeResearchTab === 'thesis' && (
-            <div className="animate-fade-in">
-              <div style={{ marginBottom: '1rem' }}>
-                <div style={{ fontSize: '0.7rem', color: 'var(--color-warning)', fontWeight: 800, marginBottom: '6px' }}>CORE THESIS</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                  Consensus Tier-1 accumulation detected in key {selectedMarket.indexName} benchmark assets. Momentum flow remains "ACCUMULATING" as capital rotates into defensive positions.
+      {/* ─── Deep Intel Panel (Visible after selection) ────────────────── */}
+      {selectedAsset && (
+        <div className="animate-fade-in" style={{ 
+          maxWidth: '1100px', 
+          width: '100%', 
+          margin: '0 auto', 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 340px',
+          gap: '1.5rem',
+          flex: 1
+        }}>
+          
+          {/* Main Analysis Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <div style={{ position: 'relative' }}>
+                <CompanyLogo symbol={selectedAsset.symbol} size={64} />
+                <div style={{ position: 'absolute', bottom: -4, right: -4, background: 'var(--color-accent)', padding: '4px', borderRadius: '50%', border: '2px solid var(--color-bg)' }}>
+                  <Sparkles size={12} color="white" />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-accent)' }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>GLOBAL_RANK</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>#12 / Institutional</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'white', margin: 0 }}>{selectedAsset.name}</h2>
+                  <span style={{ fontSize: '1rem', color: 'var(--color-text-tertiary)', fontWeight: 800 }}>{selectedAsset.symbol}</span>
                 </div>
-                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-success)' }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>SENTIMENT FLOW</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>ACCUMULATING</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '4px' }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white' }}>{formatCurrency(selectedAsset.price)}</div>
+                  <div className={selectedAsset.change >= 0 ? 'text-success' : 'text-error'} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem', fontWeight: 800 }}>
+                    {selectedAsset.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                    {formatPercent(selectedAsset.changePercent)}
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.05)', height: '14px', width: '1px' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-text-tertiary)', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <Globe size={12} /> {selectedMarket.name} LISTING
+                  </div>
                 </div>
-                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', borderLeft: '3px solid var(--color-warning)' }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '2px' }}>MOMENTUM FLOW</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>{selectedMarket.name} STABLE</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', marginBottom: '4px', textTransform: 'uppercase' }}>AI Confidence</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 950, color: 'var(--color-accent)' }}>94.2%</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div className="glass-card" style={{ padding: '1.25rem' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--color-accent)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem' }}>
+                  <Target size={14} /> ALPHA INTEL SYNOPSIS
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                  Consensus institutional accumulation detected for <span style={{ color: 'white', fontWeight: 700 }}>{selectedAsset.symbol}</span>. 
+                  Order flow density suggests a massive consolidation phase between <span style={{ color: 'var(--color-warning)' }}>{formatCurrency(selectedAsset.low || selectedAsset.price * 0.98)}</span> and 
+                  <span style={{ color: 'var(--color-success)' }}>{formatCurrency(selectedAsset.high || selectedAsset.price * 1.02)}</span>. 
+                  Market sentiment is skewed towards <span style={{ color: 'var(--color-success)' }}>ACCUMULATION</span>.
+                </p>
+              </div>
+
+              <div className="glass-card" style={{ padding: '1.25rem' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 900, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem' }}>
+                  <Activity size={14} /> TECHNICAL CORRELATION
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {[
+                    { label: 'Momentum Entropy', val: 'Low/Stable', color: 'var(--color-success)' },
+                    { label: 'Liquidity Depth', val: 'High', color: 'var(--color-accent)' },
+                    { label: 'Short Interest Beta', val: '0.24', color: 'var(--color-warning)' },
+                  ].map(stat => (
+                    <div key={stat.label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '4px' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{stat.label}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: stat.color }}>{stat.val}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          )}
 
-          {activeResearchTab === 'scenarios' && (
-            <div className="animate-fade-in" style={{ display: 'flex', gap: '1rem', height: '100%' }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center' }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)' }}>ALPHA VECTORS</div>
-                {[
-                  { label: 'Momentum', val: '82', color: 'rgba(56, 189, 248, 1)' },
-                  { label: 'Value', val: '64', color: 'rgba(16, 185, 129, 1)' },
-                  { label: 'Volatility', val: '45', color: 'rgba(239, 68, 68, 1)' },
-                  { label: 'Liquidity', val: '91', color: 'rgba(245, 158, 11, 1)' },
-                  { label: 'Sentiment', val: '78', color: 'rgba(139, 92, 246, 1)' },
-                ].map(s => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: s.color }} />
-                      <span style={{ fontSize: '0.6rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>{s.label}</span>
+            <div className="glass-card" style={{ padding: '1.25rem', flex: 1 }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--color-text-tertiary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Fingerprint size={14} /> PROPRIETARY ORDER FLOW ANALYSIS
+              </div>
+              <div style={{ height: '100px', display: 'flex', alignItems: 'flex-end', gap: '4px' }}>
+                {Array.from({ length: 40 }).map((_, i) => (
+                  <div key={i} style={{ 
+                    flex: 1, 
+                    height: `${Math.random() * 80 + 20}%`, 
+                    background: i > 25 ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
+                    borderRadius: '2px 2px 0 0',
+                    opacity: 0.3 + (i / 40) * 0.7
+                  }} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right AI Sidebar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="glass-card" style={{ padding: '1.25rem', background: 'rgba(168, 85, 247, 0.03)', border: '1px solid rgba(168, 85, 247, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', marginBottom: '1rem' }}>
+                <Cpu size={18} />
+                <span style={{ fontSize: '0.8rem', fontWeight: 950, letterSpacing: '0.05em' }}>AI STRATEGY NODE</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ fontSize: '0.75rem', color: 'white', fontWeight: 800 }}>SCENARIO: MEAN REVERSION</div>
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>PROBABILITY</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
+                      <div style={{ width: '74%', height: '100%', background: 'var(--color-accent)', borderRadius: '2px' }} />
                     </div>
-                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'white' }}>{s.val}</div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>74%</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontStyle: 'italic' }}>
+                  Recommended Strategy: Iron Condor or Calendar Spread positioned at {formatCurrency(selectedAsset.price)}.
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-card" style={{ padding: '1.25rem', flex: 1 }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--color-text-tertiary)', marginBottom: '1rem' }}>TACTICAL SIGNALS</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {[
+                  { label: 'Dark Pool Interest', val: 'Extreme', icon: Shield, color: 'var(--color-error)' },
+                  { label: 'RSI Divergence', val: 'Bullish', icon: TrendingUp, color: 'var(--color-success)' },
+                  { label: 'Gamma Squeeze', val: 'Low', icon: Zap, color: 'var(--color-warning)' },
+                ].map((signal, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                    <signal.icon size={16} color={signal.color} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{signal.label}</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>{signal.val}</div>
+                    </div>
                   </div>
                 ))}
               </div>
-              
-              <div style={{ width: '130px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                  {/* Background Pentagon */}
-                  <polygon points="50,5 93,36 77,86 23,86 7,36" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                  <polygon points="50,27 71,43 63,68 37,68 28,43" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-                  
-                  {/* Web Lines */}
-                  <line x1="50" y1="50" x2="50" y2="5" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                  <line x1="50" y1="50" x2="93" y2="36" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                  <line x1="50" y1="50" x2="77" y2="86" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                  <line x1="50" y1="50" x2="23" y2="86" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                  <line x1="50" y1="50" x2="7" y2="36" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-
-                  {/* Data Pentagon (Animated via CSS) */}
-                  <polygon 
-                    className="radar-data-polygon"
-                    points="50,13 89,39 71,78 25,65 11,46" 
-                    fill="rgba(56, 189, 248, 0.2)" 
-                    stroke="rgba(56, 189, 248, 1)" 
-                    strokeWidth="2" 
-                  />
-                  <circle cx="50" cy="13" r="3" fill="rgba(56, 189, 248, 1)" />
-                  <circle cx="89" cy="39" r="3" fill="rgba(16, 185, 129, 1)" />
-                  <circle cx="71" cy="78" r="3" fill="rgba(239, 68, 68, 1)" />
-                  <circle cx="25" cy="65" r="3" fill="rgba(245, 158, 11, 1)" />
-                  <circle cx="11" cy="46" r="3" fill="rgba(139, 92, 246, 1)" />
-                </svg>
-              </div>
             </div>
-          )}
+          </div>
 
-          {/* ... Other tabs ... */}
-          {(activeResearchTab === 'analyst' || activeResearchTab === 'moat') && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-tertiary)', fontSize: '0.7rem', fontStyle: 'italic' }}>
-              Decrypting depth-data... sync in progress
-            </div>
-          )}
         </div>
-      </div>
+      )}
 
       <style>{`
-        .institutional-hub-root {
-          scrollbar-width: thin;
-          scrollbar-color: var(--color-accent-light) transparent;
-        }
-        .institutional-hub-root::-webkit-scrollbar { width: 4px; }
-        .institutional-hub-root::-webkit-scrollbar-thumb { background: var(--color-accent-light); border-radius: 4px; }
+        .ai-hub-container::-webkit-scrollbar { width: 4px; }
+        .ai-hub-container::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.2); border-radius: 4px; }
+        .ai-hub-container:hover::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); }
         
-        @keyframes radarPulse {
-          0% { filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)); }
-          50% { filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8)); }
-          100% { filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.4)); }
-        }
-        .radar-data-polygon {
-          animation: radarPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) both; }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>

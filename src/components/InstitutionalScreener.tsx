@@ -278,8 +278,16 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                         const isPositive = displayChange >= 0;
                                         const flash = flashStates[stock.symbol];
                                         
-                                        const momentum = 50 + (stock.symbol.length * 1.5) + (stock.changePercent * 4) + drift;
-                                        const rsi = Math.max(15, Math.min(85, 45 + (stock.symbol.charCodeAt(0) % 15) + (stock.changePercent * 2) + drift * 2));
+                                        const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow) 
+                                            ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)
+                                            : 0.5;
+                                        
+                                        // Realistically derive RSI from range position + current momentum
+                                        const rsiReal = (rangePos * 60) + 20 + (stock.changePercent * 2.5);
+                                        const rsi = Math.max(15, Math.min(85, rsiReal + drift * 0.2));
+                                        
+                                        // Realistically derive Momentum from trend + relative position
+                                        const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10) + drift * 0.1;
                                         
                                         return (
                                             <div 
