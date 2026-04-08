@@ -256,7 +256,7 @@ function MainLayout({
             <div className="content-route-shell">
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/home" element={
+              <Route path="/home/*" element={
                 <div className="tab-content home-tab-content">
                   <Dashboard onSelectSymbol={handleSelectSymbol} />
                 </div>

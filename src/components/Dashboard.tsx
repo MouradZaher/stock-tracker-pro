@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import StockHeatmap from './StockHeatmap';
 import InstitutionalScreener from './InstitutionalScreener';
 import MarketBreadth from './MarketBreadth';
@@ -11,8 +12,24 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
-  const { homeView: viewMode } = useMarket();
+  const { homeView, setHomeView } = useMarket();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [pulses, setPulses] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
+
+  // Sync state with URL path and redirect if needed
+  useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    if (path === '/home' || path === '/home/') {
+      navigate(`/home/${homeView}`, { replace: true });
+    } else if (path.includes('/heatmap')) {
+      if (homeView !== 'heatmap') setHomeView('heatmap');
+    } else if (path.includes('/screener')) {
+      if (homeView !== 'screener') setHomeView('screener');
+    }
+  }, [location.pathname, navigate, homeView, setHomeView]);
+
+  const viewMode = location.pathname.includes('/screener') ? 'screener' : 'heatmap';
 
   // Simulation: Add random "Volume Pulses" over the heatmap
   useEffect(() => {

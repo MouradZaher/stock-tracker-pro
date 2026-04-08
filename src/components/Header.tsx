@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import { LogOut, Sun, Moon, Shield, Star, Wallet, Zap, Bell, X, Trash2, MessageSquare, ChevronDown, LayoutGrid, Sparkles, Home, Eye, PieChart, Activity, Brain, HelpCircle, Settings as SettingsIcon } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -25,6 +26,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
         selectedMarket, setMarket, favoriteMarketId, setFavoriteMarket, setHoverMarket,
         homeView, setHomeView, favoriteHomeView, setFavoriteHomeView 
     } = useMarket();
+    const navigate = useNavigate();
     const [isNotifyOpen, setIsNotifyOpen] = useState(false);
     const [isMarketOpen, setIsMarketOpen] = useState(false);
     const marketBtnRef = useRef<HTMLButtonElement>(null);
@@ -66,8 +68,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange, onLogout, showA
     const handleHomeOptionSelect = (mode: 'heatmap' | 'screener') => {
         soundService.playTap();
         setIsHomeMenuOpen(false);
-        onTabChange('home');
         setHomeView(mode);
+        navigate(`/home/${mode}`);
     };
 
     // Close dropdowns on Escape key
