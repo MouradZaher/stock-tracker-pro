@@ -85,6 +85,9 @@ interface MarketContextType {
     /** Favorite view mode persisted in localStorage */
     favoriteHomeView: 'heatmap' | 'screener';
     setFavoriteHomeView: (view: 'heatmap' | 'screener') => void;
+    /** Global timeframe for heatmap/screener */
+    timeframe: string;
+    setTimeframe: (tf: string) => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -131,6 +134,15 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setHomeView(view);
     };
 
+    const [timeframe, setTimeframe] = useState<string>(() => {
+        return localStorage.getItem('global_timeframe') || 'D';
+    });
+
+    const setTimeframeWithStorage = (tf: string) => {
+        setTimeframe(tf);
+        localStorage.setItem('global_timeframe', tf);
+    };
+
     const setHoverMarket = (id: MarketId | null) => setHoverMarketId(id);
 
     return (
@@ -147,7 +159,9 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             homeView,
             setHomeView,
             favoriteHomeView,
-            setFavoriteHomeView
+            setFavoriteHomeView,
+            timeframe,
+            setTimeframe: setTimeframeWithStorage
         }}>
             {children}
         </MarketContext.Provider>

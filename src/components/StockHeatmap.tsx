@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw, AlertTriangle, Activity, ChevronDown } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket } from '../contexts/MarketContext';
 import { socialFeedService } from '../services/SocialFeedService';
@@ -11,7 +11,7 @@ const StockHeatmap: React.FC = () => {
     const [retryKey, setRetryKey] = useState(0);
     const [sentiment, setSentiment] = useState<{ score: number; label: string; count: number } | null>(null);
     const { theme } = useTheme();
-    const { effectiveMarket } = useMarket();
+    const { effectiveMarket, timeframe, setTimeframe } = useMarket();
     const [blockSize, setBlockSize] = useState<'market_cap_basic' | 'volume'>('market_cap_basic');
     const [blockColor, setBlockColor] = useState<'change' | 'high_low_range'>('change');
     const [width, setWidth] = useState(window.innerWidth);
@@ -129,12 +129,65 @@ const StockHeatmap: React.FC = () => {
                 </div>
             ) : (
                 <>
+                    {/* Header / Institutional Controls (Consistent with Screener) */}
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        padding: '8px 1.5rem', 
+                        borderBottom: '1px solid var(--glass-border)', 
+                        background: 'rgba(255,255,255,0.02)', 
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 100,
+                        backdropFilter: 'blur(10px)'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                            <Activity size={14} className="text-accent" />
+                            Market Pulse Heatmap
+                        </div>
+
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>INTERVAL:</span>
+                            <div style={{ position: 'relative' }}>
+                                <select 
+                                    value={timeframe} 
+                                    onChange={(e) => setTimeframe(e.target.value)}
+                                    style={{
+                                        appearance: 'none',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid var(--glass-border)',
+                                        borderRadius: '6px',
+                                        color: 'white',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 900,
+                                        padding: '4px 28px 4px 10px',
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        textTransform: 'uppercase',
+                                        minWidth: '80px'
+                                    }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                                >
+                                    {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
+                                        <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={12} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.6 }} />
+                            </div>
+                        </div>
+                    </div>
+
                     <div
                         className="tradingview-widget-container"
                         ref={containerRef}
                         style={{
                             position: 'absolute',
-                            top: 0,
+                            top: '40px', // Below the new header
                             left: 0,
                             right: 0,
                             bottom: 0,

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { getMultipleQuotes } from '../services/stockDataService';
 import type { Stock } from '../types';
 import { formatCurrency, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
-import { TrendingUp, TrendingDown, Activity, Eye, Info } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, Eye, Info, ChevronDown } from 'lucide-react';
 import CompanyLogo from './CompanyLogo';
+import { useMarket } from '../contexts/MarketContext';
 
 const SP100_SYMBOLS = [
     'AAPL', 'MSFT', 'NVDA', 'AMZN', 'META', 'GOOGL', 'BRK-B', 'LLY', 'AVGO', 'JPM',
@@ -23,9 +24,9 @@ interface InstitutionalScreenerProps {
 }
 
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
+    const { timeframe, setTimeframe } = useMarket();
     const [stocks, setStocks] = useState<Stock[]>([]);
     const [loading, setLoading] = useState(true);
-    const [timeframe, setTimeframe] = useState<'5m' | '1h' | '4h' | 'D' | 'W' | 'M' | '6M' | '1Y'>('D');
 
     useEffect(() => {
         let isMounted = true;
@@ -72,39 +73,48 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
             {/* Header / Institutional Controls */}
             <div style={{ 
                 display: 'flex', 
-                justifyContent: 'space-between', 
+                justifyContent: 'space-between', // Changed to between for label/dropdown placement if title removed
                 alignItems: 'center', 
-                padding: '10px 1.5rem', 
+                padding: '8px 1.5rem', 
                 borderBottom: '1px solid var(--glass-border)', 
                 background: 'rgba(255,255,255,0.02)', 
                 flexShrink: 0 
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 950, color: 'white', letterSpacing: '0.04em' }}>
-                    <Activity size={16} className="text-accent" />
-                    INSTITUTIONAL ALPHA MATRIX
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    <Activity size={14} className="text-accent" />
+                    Market Pulse Matrix
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.04)', padding: '2px', borderRadius: '8px' }}>
-                    {(['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'] as const).map(tf => (
-                        <button
-                            key={tf}
-                            onClick={() => setTimeframe(tf)}
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>INTERVAL:</span>
+                    <div style={{ position: 'relative' }}>
+                        <select 
+                            value={timeframe} 
+                            onChange={(e) => setTimeframe(e.target.value)}
                             style={{
-                                padding: '4px 10px',
-                                background: timeframe === tf ? 'var(--color-accent)' : 'transparent',
-                                border: 'none',
-                                color: timeframe === tf ? 'white' : 'var(--color-text-tertiary)',
-                                fontSize: '0.6rem',
-                                fontWeight: 850,
+                                appearance: 'none',
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid var(--glass-border)',
                                 borderRadius: '6px',
+                                color: 'white',
+                                fontSize: '0.7rem',
+                                fontWeight: 900,
+                                padding: '4px 28px 4px 10px',
                                 cursor: 'pointer',
+                                outline: 'none',
                                 transition: 'all 0.2s',
-                                textTransform: 'uppercase'
+                                textTransform: 'uppercase',
+                                minWidth: '80px'
                             }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-accent)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
                         >
-                            {tf}
-                        </button>
-                    ))}
+                            {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
+                                <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
+                            ))}
+                        </select>
+                        <ChevronDown size={12} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.6 }} />
+                    </div>
                 </div>
             </div>
 
