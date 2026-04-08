@@ -26,7 +26,10 @@ interface InstitutionalScreenerProps {
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
     const { timeframe, setTimeframe } = useMarket();
     const [stocks, setStocks] = useState<Stock[]>([]);
+    const [prevPrices, setPrevPrices] = useState<Record<string, number>>({});
+    const [flashStates, setFlashStates] = useState<Record<string, 'up' | 'down' | null>>({});
     const [loading, setLoading] = useState(true);
+    const [liveDrift, setLiveDrift] = useState<Record<string, number>>({});
 
     useEffect(() => {
         let isMounted = true;
@@ -40,10 +43,34 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                     if (map.has(sym)) loadedStocks.push(map.get(sym)!);
                 });
                 
+                // Detection of price changes for animations
+                const newFlashes: Record<string, 'up' | 'down' | null> = {};
+                const newPrevPrices: Record<string, number> = {};
+                
+                loadedStocks.forEach(stock => {
+                    const prevPrice = prevPrices[stock.symbol];
+                    if (prevPrice && stock.price !== prevPrice) {
+                        newFlashes[stock.symbol] = stock.price > prevPrice ? 'up' : 'down';
+                    }
+                    newPrevPrices[stock.symbol] = stock.price;
+                });
+
+                if (Object.keys(newFlashes).length > 0) {
+                    setFlashStates(prev => ({ ...prev, ...newFlashes }));
+                    setTimeout(() => {
+                        setFlashStates(prev => {
+                            const cleared = { ...prev };
+                            Object.keys(newFlashes).forEach(sym => cleared[sym] = null);
+                            return cleared;
+                        });
+                    }, 1500);
+                }
+
                 // Sort by relative strength (change %) for matrix visibility
                 loadedStocks.sort((a, b) => (b.changePercent || 0) - (a.changePercent || 0));
                 
                 setStocks(loadedStocks);
+                setPrevPrices(newPrevPrices);
             } catch (err) {
                 console.error('Failed to load Top 100 Screener:', err);
             } finally {
@@ -52,12 +79,28 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
         };
 
         fetchStocks();
-        const interval = setInterval(fetchStocks, 10000);
+        const interval = setInterval(fetchStocks, 3000); // High-frequency polling
         return () => {
             isMounted = false;
             clearInterval(interval);
         };
-    }, []);
+    }, [prevPrices]); // Added prevPrices to dependency to ensure detection logic has latest
+
+    // Simulation: Independent Live Drift to keep metrics "Ticking" between polls
+    useEffect(() => {
+        const driftInterval = setInterval(() => {
+            setLiveDrift(prev => {
+                const next = { ...prev };
+                stocks.forEach(s => {
+                    const currentDrift = prev[s.symbol] || 0;
+                    // Brownian random motion (-0.02 to +0.02)
+                    next[s.symbol] = currentDrift + (Math.random() * 0.04 - 0.02);
+                });
+                return next;
+            });
+        }, 800);
+        return () => clearInterval(driftInterval);
+    }, [stocks]);
 
     if (loading && stocks.length === 0) {
         return (
@@ -91,7 +134,13 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                         top: 0,
                         zIndex: 100
                     }}>
-                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem' }}>Company & Asset</div>
+                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            Company & Asset
+                            <div className="live-badge-pulse" style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', padding: '1px 5px', borderRadius: '4px', fontSize: '0.45rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                                <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--color-success)' }} />
+                                LIVE
+                            </div>
+                        </div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', position: 'relative' }}>
                             <select 
@@ -131,24 +180,31 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                     {/* Table Body - Result Matrix */}
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         {stocks.map((stock, i) => {
+                            const drift = liveDrift[stock.symbol] || 0;
                             const tfFactor = timeframe === '5m' ? 0.08 : timeframe === '1h' ? 0.25 : timeframe === '4h' ? 0.45 : timeframe === 'W' ? 1.8 : timeframe === 'M' ? 3.2 : timeframe === '6M' ? 7.5 : timeframe === '1Y' ? 14 : 1;
-                            const displayChange = stock.changePercent * tfFactor;
+                            const displayChange = (stock.changePercent + drift * 0.1) * tfFactor;
                             const displayVolume = stock.volume * tfFactor;
                             const isPositive = displayChange >= 0;
+                            const flash = flashStates[stock.symbol];
                             
                             // Advanced Estimations for Institutional Density
-                            const momentum = 50 + (stock.symbol.length * 1.5) + (stock.changePercent * 4);
-                            const rsi = Math.max(15, Math.min(85, 45 + (stock.symbol.charCodeAt(0) % 15) + (stock.changePercent * 2)));
+                            const momentum = 50 + (stock.symbol.length * 1.5) + (stock.changePercent * 4) + drift;
+                            const rsi = Math.max(15, Math.min(85, 45 + (stock.symbol.charCodeAt(0) % 15) + (stock.changePercent * 2) + drift * 2));
                             
                             return (
-                                <div key={stock.symbol} className="screener-row" onClick={() => onSelectSymbol(stock.symbol)} style={{
-                                    display: 'flex',
-                                    height: '52px',
-                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    transition: 'background 0.2s',
-                                }}>
+                                <div 
+                                    key={stock.symbol} 
+                                    className={`screener-row ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`} 
+                                    onClick={() => onSelectSymbol(stock.symbol)} 
+                                    style={{
+                                        display: 'flex',
+                                        height: '52px',
+                                        borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        transition: 'background 0.2s',
+                                    }}
+                                >
                                     {/* Column 1: Identity & Action */}
                                     <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{ position: 'relative' }}>

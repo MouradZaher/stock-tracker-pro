@@ -81,3 +81,31 @@ body::after {
   50% { transform: translate(200px, 100px) scale(1.2); }
   100% { transform: translate(-100px, 300px) scale(0.8); }
 }
+
+/* Terminal Flash Animations - For Live Updates */
+.flash-up {
+  animation: flash-up-anim 1.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+.flash-down {
+  animation: flash-down-anim 1.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes flash-up-anim {
+  0% { background-color: rgba(16, 185, 129, 0.3); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-down-anim {
+  0% { background-color: rgba(239, 68, 68, 0.3); }
+  100% { background-color: transparent; }
+}
+
+.live-badge-pulse {
+  animation: live-pulse-anim 2s infinite ease-in-out;
+}
+
+@keyframes live-pulse-anim {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
+}
