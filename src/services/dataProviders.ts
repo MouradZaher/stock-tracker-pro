@@ -160,12 +160,29 @@ export const parsers = {
     yahoo: (data: any, symbol: string): StockQuote | null => {
         const quote = data?.quoteResponse?.result?.[0];
         if (!quote) return null;
+
+        // Determine the most relevant price based on market state
+        let price = quote.regularMarketPrice || 0;
+        let change = quote.regularMarketChange || 0;
+        let changePercent = quote.regularMarketChangePercent || 0;
+
+        const state = quote.marketState;
+        if ((state === 'PRE' || state === 'PREPRE') && quote.preMarketPrice) {
+            price = quote.preMarketPrice;
+            change = quote.preMarketChange ?? change;
+            changePercent = quote.preMarketChangePercent ?? changePercent;
+        } else if ((state === 'POST' || state === 'CLOSED') && quote.postMarketPrice) {
+            price = quote.postMarketPrice;
+            change = quote.postMarketChange ?? change;
+            changePercent = quote.postMarketChangePercent ?? changePercent;
+        }
+
         return {
             symbol: quote.symbol || symbol,
             name: quote.longName || quote.shortName || symbol,
-            price: quote.postMarketPrice || quote.preMarketPrice || quote.regularMarketPrice || 0,
-            change: quote.postMarketChange ?? quote.preMarketChange ?? quote.regularMarketChange ?? 0,
-            changePercent: quote.postMarketChangePercent ?? quote.preMarketChangePercent ?? quote.regularMarketChangePercent ?? 0,
+            price,
+            change,
+            changePercent,
             previousClose: quote.regularMarketPreviousClose || 0,
             open: quote.regularMarketOpen || 0,
             high: quote.regularMarketDayHigh || 0,

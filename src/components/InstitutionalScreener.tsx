@@ -274,9 +274,8 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                     </div>
 
                                     {sectorStocks.map((stock) => {
-                                        const tfFactor = timeframe === '5m' ? 0.08 : timeframe === '1h' ? 0.25 : timeframe === '4h' ? 0.45 : timeframe === 'W' ? 1.8 : timeframe === 'M' ? 3.2 : timeframe === '6M' ? 7.5 : timeframe === '1Y' ? 14 : 1;
-                                        const displayChange = (stock.changePercent) * tfFactor;
-                                        const displayVolume = stock.volume * tfFactor;
+                                        const displayChange = stock.changePercent;
+                                        const displayVolume = stock.volume;
                                         const isPositive = displayChange >= 0;
                                         const flash = flashStates[stock.symbol];
                                         
@@ -332,13 +331,17 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                 <div style={{ 
                                                     flex: '0 0 110px', 
                                                     padding: '0 0.5rem', 
-                                                    textAlign: 'right', 
-                                                    fontWeight: 950, 
-                                                    fontSize: '0.9rem', 
-                                                    color: flash === 'up' ? 'var(--color-success)' : flash === 'down' ? 'var(--color-error)' : 'white',
-                                                    transition: 'color 0.3s ease'
+                                                    textAlign: 'right'
                                                 }}>
-                                                    {formatCurrency(stock.price)}
+                                                    <span style={{
+                                                        fontWeight: 800,
+                                                        fontFamily: "'JetBrains Mono', monospace",
+                                                        fontSize: '1rem',
+                                                        color: flashStates[stock.symbol] === 'up' ? 'var(--color-success)' : flashStates[stock.symbol] === 'down' ? 'var(--color-error)' : 'white',
+                                                        transition: 'color 0.2s ease'
+                                                    }}>
+                                                        {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
+                                                    </span>
                                                 </div>
 
                                                 <div className={getChangeClass(displayChange)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>

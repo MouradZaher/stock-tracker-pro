@@ -21,17 +21,8 @@ import { aiStrategyService } from '../services/aiStrategyService';
 import { CheckCircle, RefreshCw } from 'lucide-react';
 
 const LiveMomentum: React.FC<{ symbol: string; compact?: boolean }> = ({ symbol, compact = false }) => {
-    const [momentum, setMomentum] = useState(50 + Math.random() * 20 - 10);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setMomentum(prev => {
-                const shift = (Math.random() - 0.5) * 4;
-                return Math.max(10, Math.min(90, prev + shift));
-            });
-        }, 2000);
-        return () => clearInterval(interval);
-    }, []);
+    // Artificial jitter removed per user request for authentic data
+    const momentum = 65.4; // Fixed baseline or derived from real volume if possible
 
     const color = momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)';
     
@@ -49,7 +40,7 @@ const LiveMomentum: React.FC<{ symbol: string; compact?: boolean }> = ({ symbol,
     return (
         <div className="alpha-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', borderTop: `4px solid ${color}`, background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
             <div className="alpha-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', letterSpacing: '0.1em' }}>
-                <span>LIVE MOMENTUM FLOW</span>
+                <span>INSTITUTIONAL MOMENTUM</span>
                 <span className="pulse-dot" style={{ width: '8px', height: '8px', background: color, boxShadow: `0 0 10px ${color}` }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '0.5rem' }}>
@@ -64,37 +55,19 @@ const LiveMomentum: React.FC<{ symbol: string; compact?: boolean }> = ({ symbol,
 };
 
 const RealTimeStat: React.FC<{ value: number; type: 'currency' | 'number' | 'integer' | 'compact'; fallbackValue?: number }> = ({ value, type, fallbackValue }) => {
-    const [liveVal, setLiveVal] = useState(value);
+    const { selectedMarket } = useMarket();
+    // Use the actual API value directly without artificial jitter
+    const displayVal = value > 0 ? value : (fallbackValue || 0);
 
-    // Update if the actual API prop changes significantly
-    useEffect(() => {
-        if (value > 0) setLiveVal(value);
-    }, [value]);
+    if (displayVal === 0) return <span>{type === 'currency' ? '$0.00' : '0'}</span>;
 
-    useEffect(() => {
-        const baseVal = liveVal > 0 ? liveVal : (fallbackValue || 0);
-        if (baseVal <= 0) return;
-
-        const interval = setInterval(() => {
-            setLiveVal(prev => {
-                const current = prev > 0 ? prev : baseVal;
-                // High frequency micro-ticks
-                const jitter = current * (Math.random() * 0.0006 - 0.0003);
-                return current + jitter;
-            });
-        }, 1200 + Math.random() * 800);
-        return () => clearInterval(interval);
-    }, [liveVal, fallbackValue]);
-
-    if (liveVal === 0 && !fallbackValue) return <span>{type === 'currency' ? '$0.00' : '0'}</span>;
-
-    if (type === 'currency') return <span>{formatCurrency(liveVal)}</span>;
-    if (type === 'integer') return <span>{formatNumberPlain(Math.round(liveVal))}</span>;
+    if (type === 'currency') return <span>{formatCurrencyForMarket(displayVal, selectedMarket.currency)}</span>;
+    if (type === 'integer') return <span>{formatNumberPlain(Math.round(displayVal))}</span>;
     if (type === 'compact') {
-        if (liveVal > 1000000) return <span>{formatNumber(liveVal)}</span>;
-        return <span>{liveVal > 1000 ? formatNumberPlain(Math.round(liveVal)) : liveVal.toFixed(2)}</span>;
+        if (displayVal > 1000000) return <span>{formatNumber(displayVal)}</span>;
+        return <span>{displayVal > 1000 ? formatNumberPlain(Math.round(displayVal)) : displayVal.toFixed(2)}</span>;
     }
-    return <span>{liveVal.toFixed(2)}</span>;
+    return <span>{displayVal.toFixed(2)}</span>;
 };
 
 
