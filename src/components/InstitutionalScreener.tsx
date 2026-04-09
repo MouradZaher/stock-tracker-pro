@@ -148,7 +148,8 @@ const SECTOR_PRIORITY: Record<string, number> = {
 
 const getDisplayName = (symbol: string, apiName: string): string => {
     const s = symbol.toUpperCase();
-    return NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? symbol : apiName.split('(')[0].split('[')[0].trim());
+    const baseName = NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? symbol : apiName.split('(')[0].split('[')[0].trim());
+    return baseName.replace(/[()]/g, '').trim(); 
 };
 
 const getSector = (symbol: string): string => {
@@ -351,7 +352,14 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                             }}>
                                                 {index + 1}
                                             </div>
-                                            <span style={{ fontSize: '0.75rem', fontWeight: 950, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                            <span style={{ 
+                                                fontSize: '0.78rem', 
+                                                fontWeight: 950, 
+                                                color: 'white', 
+                                                letterSpacing: '0.08em', 
+                                                textTransform: 'uppercase',
+                                                textShadow: '0 0 10px rgba(255,255,255,0.1)' 
+                                            }}>
                                                 {sector}
                                             </span>
                                             <span style={{
@@ -422,12 +430,29 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                                 border: '2px solid var(--color-bg)'
                                                             }} />
                                                         </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
-                                                            <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', lineHeight: 1.2 }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', overflow: 'hidden' }}>
+                                                            <div style={{ 
+                                                                fontSize: '0.9rem', 
+                                                                fontWeight: 950, 
+                                                                color: 'white', 
+                                                                whiteSpace: 'nowrap', 
+                                                                textOverflow: 'ellipsis', 
+                                                                overflow: 'hidden', 
+                                                                lineHeight: 1.1,
+                                                                letterSpacing: '-0.01em'
+                                                            }}>
                                                                 { getDisplayName(stock.symbol, stock.name) }
                                                             </div>
-                                                            <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.1em', fontFamily: "'JetBrains Mono', monospace", opacity: 0.8 }}>
-                                                                {stock.symbol.toUpperCase()}
+                                                            <div style={{ 
+                                                                fontSize: '0.62rem', 
+                                                                color: 'var(--color-accent)', 
+                                                                fontWeight: 900, 
+                                                                letterSpacing: '0.12em', 
+                                                                fontFamily: "'JetBrains Mono', monospace", 
+                                                                textTransform: 'uppercase',
+                                                                marginTop: '2px'
+                                                            }}>
+                                                                {stock.symbol.toUpperCase().replace(/[()]/g, '')}
                                                             </div>
                                                         </div>
                                                     </div>
