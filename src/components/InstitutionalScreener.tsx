@@ -72,8 +72,8 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
     const [prevPrices, setPrevPrices] = useState<Record<string, number>>({});
     const [flashStates, setFlashStates] = useState<Record<string, 'up' | 'down' | null>>({});
     const [loading, setLoading] = useState(true);
-    const [liveDrift, setLiveDrift] = useState<Record<string, number>>({});
 
+    // High-frequency polling to ensure live data sync
     useEffect(() => {
         let isMounted = true;
         
@@ -96,32 +96,35 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                 
                 // Detection of price changes for animations
                 const newFlashes: Record<string, 'up' | 'down' | null> = {};
-                const newPrevPrices: Record<string, number> = {};
+                const newPrevPrices: Record<string, number> = { ...prevPrices };
                 
                 loadedStocks.forEach(stock => {
                     const prevPrice = prevPrices[stock.symbol];
-                    if (prevPrice && stock.price !== prevPrice) {
+                    if (prevPrice !== undefined && stock.price !== prevPrice) {
                         newFlashes[stock.symbol] = stock.price > prevPrice ? 'up' : 'down';
+                        newPrevPrices[stock.symbol] = stock.price;
+                    } else if (prevPrice === undefined) {
+                        newPrevPrices[stock.symbol] = stock.price;
                     }
-                    newPrevPrices[stock.symbol] = stock.price;
                 });
 
                 if (Object.keys(newFlashes).length > 0) {
                     setFlashStates(prev => ({ ...prev, ...newFlashes }));
+                    setPrevPrices(newPrevPrices);
+                    
                     setTimeout(() => {
                         setFlashStates(prev => {
                             const cleared = { ...prev };
                             Object.keys(newFlashes).forEach(sym => cleared[sym] = null);
                             return cleared;
                         });
-                    }, 1500);
+                    }, 2000);
                 }
 
                 // Sort by relative strength (change %) for matrix visibility
                 loadedStocks.sort((a, b) => (b.changePercent || 0) - (a.changePercent || 0));
                 
                 setStocks(loadedStocks);
-                setPrevPrices(newPrevPrices);
             } catch (err) {
                 console.error(`Failed to load ${selectedMarket.id} Screener:`, err);
             } finally {
@@ -130,27 +133,12 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
         };
 
         fetchStocks();
-        const interval = setInterval(fetchStocks, 3000); // High-frequency polling
+        const interval = setInterval(fetchStocks, 3000); 
         return () => {
             isMounted = false;
             clearInterval(interval);
         };
-    }, [prevPrices, selectedMarket.id]); 
-
-    // Simulation: Independent Live Drift to keep metrics "Ticking" between polls
-    useEffect(() => {
-        const driftInterval = setInterval(() => {
-            setLiveDrift(prev => {
-                const next = { ...prev };
-                stocks.forEach(s => {
-                    const currentDrift = prev[s.symbol] || 0;
-                    next[s.symbol] = currentDrift + (Math.random() * 0.04 - 0.02);
-                });
-                return next;
-            });
-        }, 800);
-        return () => clearInterval(driftInterval);
-    }, [stocks]);
+    }, [selectedMarket.id, prevPrices]);
 
     if (loading && stocks.length === 0) {
         return (
@@ -286,9 +274,8 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                     </div>
 
                                     {sectorStocks.map((stock) => {
-                                        const drift = liveDrift[stock.symbol] || 0;
                                         const tfFactor = timeframe === '5m' ? 0.08 : timeframe === '1h' ? 0.25 : timeframe === '4h' ? 0.45 : timeframe === 'W' ? 1.8 : timeframe === 'M' ? 3.2 : timeframe === '6M' ? 7.5 : timeframe === '1Y' ? 14 : 1;
-                                        const displayChange = (stock.changePercent + drift * 0.1) * tfFactor;
+                                        const displayChange = (stock.changePercent) * tfFactor;
                                         const displayVolume = stock.volume * tfFactor;
                                         const isPositive = displayChange >= 0;
                                         const flash = flashStates[stock.symbol];
@@ -299,10 +286,10 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                         
                                         // Realistically derive RSI from range position + current momentum
                                         const rsiReal = (rangePos * 60) + 20 + (stock.changePercent * 2.5);
-                                        const rsi = Math.max(15, Math.min(85, rsiReal + drift * 0.2));
+                                        const rsi = Math.max(15, Math.min(85, rsiReal));
                                         
                                         // Realistically derive Momentum from trend + relative position
-                                        const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10) + drift * 0.1;
+                                        const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
                                         
                                         return (
                                             <div 
@@ -342,7 +329,15 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                     </div>
                                                 </div>
 
-                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950, fontSize: '0.9rem', color: 'white' }}>
+                                                <div style={{ 
+                                                    flex: '0 0 110px', 
+                                                    padding: '0 0.5rem', 
+                                                    textAlign: 'right', 
+                                                    fontWeight: 950, 
+                                                    fontSize: '0.9rem', 
+                                                    color: flash === 'up' ? 'var(--color-success)' : flash === 'down' ? 'var(--color-error)' : 'white',
+                                                    transition: 'color 0.3s ease'
+                                                }}>
                                                     {formatCurrency(stock.price)}
                                                 </div>
 

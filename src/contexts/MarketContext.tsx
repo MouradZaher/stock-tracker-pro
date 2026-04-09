@@ -146,13 +146,13 @@ export const MarketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const setHoverMarket = (id: MarketId | null) => setHoverMarketId(id);
 
     return (
-        <MarketContext.Provider value={{ 
-            selectedMarket, 
+        <MarketContext.Provider value={{
+            selectedMarket,
             setMarket,
             favoriteMarketId,
             setFavoriteMarket,
-            hoverMarketId, 
-            setHoverMarket, 
+            hoverMarketId,
+            setHoverMarket,
             effectiveMarket,
             sentimentScore,
             setSentimentScore,

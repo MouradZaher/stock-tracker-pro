@@ -364,7 +364,7 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
 
         // ADD REAL-TIME JITTER (Simulate micro-fluctuations for a "living" feel)
         // This ensures the UI continuously "pulses" even if the API data is slightly delayed or flat
-        const jitterEnabled = true;
+        const jitterEnabled = false;
         let finalPrice = price;
 
         if (jitterEnabled && price > 0) {
@@ -406,12 +406,11 @@ export const getStockQuote = async (rawSymbol: string): Promise<Stock> => {
     // Return unavailable placeholder — but first check index fallback
     const indexFallback = INDEX_FALLBACK_PRICES[symbol];
     if (indexFallback) {
-        const jitter = 1 + (Math.random() * 0.001 - 0.0005);
-        const p = indexFallback.price * jitter;
+        const p = indexFallback.price;
         finalStock = {
             symbol, name: indexFallback.name, price: p,
-            change: p * (Math.random() * 0.02 - 0.01),
-            changePercent: parseFloat((Math.random() * 2 - 1).toFixed(2)),
+            change: 0,
+            changePercent: 0,
             previousClose: p, open: p, high: p * 1.005, low: p * 0.995,
             volume: 0, avgVolume: 0, marketCap: 0, peRatio: 0, eps: 0,
             dividendYield: 0, pegRatio: 0, fiftyTwoWeekHigh: 0, fiftyTwoWeekLow: 0,
@@ -735,9 +734,8 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
             const originalSymbol = symbols.find(s => s === sym || s === quote.symbol) || sym;
 
             if (quote.price > 0) {
-                // ADD REAL-TIME JITTER for "living" feel in batch mode
-                const jitterFactor = 1 + (Math.random() * 0.0006 - 0.0003);
-                const finalPrice = quote.price * jitterFactor;
+                // Real-time jitter disabled per user request for "not simulation"
+                const finalPrice = quote.price;
 
                 const stock: Stock = {
                     symbol: originalSymbol,
@@ -881,15 +879,8 @@ export const getSectorPerformance = async (marketId: string = 'us') => {
         // Find exact or suffixed match since Yahoo Finance may append .CA or .AD
         const quote = quotes.get(symbol) || quotes.get(`${symbol}.CA`) || quotes.get(`${symbol}.AD`);
 
-        let change = quote?.changePercent;
-
-        // If data is missing or completely flat (0), simulate a realistic market fluctuation so UI never dies
-        if (change === undefined || change === 0) {
-            change = (Math.random() * 4) - 2; // -2% to +2%
-        }
-
-        // Sanitize: Absolute change capped at 15% to avoid UI glitches with wild mock data
-        if (Math.abs(change) > 15) change = (Math.random() * 5 * (change > 0 ? 1 : -1));
+        let change = quote?.changePercent || 0;
+        if (change > 15) change = 0; // Sanity cap for outliers
 
         return {
             name,
@@ -926,13 +917,10 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
         });
 
         if (stock) {
-            // Apply a minor realistic fluctuation for perfectly flat fake feeds
-            if (stock.changePercent === 0) stock.changePercent = (Math.random() * 4) - 2;
-
             if (stock.volume > stock.avgVolume * 1.5 && stock.avgVolume > 0) {
                 const ratio = (stock.volume / stock.avgVolume);
-                const cleanChange = Math.abs(stock.changePercent) > 20 ? (Math.random() * 8 * (stock.changePercent > 0 ? 1 : -1)) : stock.changePercent;
-                const cleanRatio = ratio > 10 ? (Math.random() * 3 + 1.2) : ratio;
+                const cleanChange = Math.abs(stock.changePercent) > 20 ? 0 : stock.changePercent;
+                const cleanRatio = ratio > 10 ? 10 : ratio;
 
                 anomalies.push({
                     symbol: stock.symbol.replace('.CA', '').replace('.AD', ''),
@@ -945,21 +933,15 @@ export const getVolumeAnomalies = async (marketId: string = 'us') => {
     });
 
     if (anomalies.length < 4) {
-        // Ensure UI doesn't look broken by surfacing at least some top movers
+        // Ensure UI stays clean by surfacing top movers
         return quoteList
-            // Use Math.random fallback if price is 0
-            .map(s => {
-                let cp = s.changePercent;
-                if (cp === 0) cp = (Math.random() * 6) - 3;
-                return { ...s, changePercent: cp };
-            })
             .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
             .slice(0, 4)
             .map(s => {
-                const cleanChange = Math.abs(s.changePercent) > 20 ? (Math.random() * 8 * (s.changePercent > 0 ? 1 : -1)) : s.changePercent;
+                const cleanChange = Math.abs(s.changePercent) > 20 ? 0 : s.changePercent;
                 return {
                     symbol: s.symbol.replace('.CA', '').replace('.AE', ''),
-                    vol: `${(Math.random() * 1.5 + 1.2).toFixed(1)}x`,
+                    vol: `${(s.volume / (s.avgVolume || 1)).toFixed(1)}x`,
                     reason: cleanChange > 0 ? 'Bullish Momentum' : 'Bearish Pressure',
                     change: cleanChange
                 };

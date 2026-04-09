@@ -163,9 +163,9 @@ export const parsers = {
         return {
             symbol: quote.symbol || symbol,
             name: quote.longName || quote.shortName || symbol,
-            price: quote.postMarketPrice || quote.regularMarketPrice || 0,
-            change: quote.postMarketChange ?? quote.regularMarketChange ?? 0,
-            changePercent: quote.postMarketChangePercent ?? quote.regularMarketChangePercent ?? 0,
+            price: quote.postMarketPrice || quote.preMarketPrice || quote.regularMarketPrice || 0,
+            change: quote.postMarketChange ?? quote.preMarketChange ?? quote.regularMarketChange ?? 0,
+            changePercent: quote.postMarketChangePercent ?? quote.preMarketChangePercent ?? quote.regularMarketChangePercent ?? 0,
             previousClose: quote.regularMarketPreviousClose || 0,
             open: quote.regularMarketOpen || 0,
             high: quote.regularMarketDayHigh || 0,
