@@ -391,6 +391,12 @@ export default async function handler(req, res) {
             'NEE': 69.00, 'DUK': 99.00, 'SO': 85.00,
             // REAL ESTATE
             'AMT': 185.00, 'PLD': 105.00, 'SPG': 160.00,
+            // S&P 100 ORPHANS (ADDITIONAL)
+            'ABNB': 135.00, 'DG': 120.00, 'AMGN': 310.00, 'GILD': 88.00, 'BA': 175.00,
+            'MDLZ': 70.00, 'MMM': 125.00, 'ZTS': 175.00, 'MO': 52.00, 'CB': 260.00,
+            'BSX': 85.00, 'MTD': 1300.00, 'EL': 105.00, 'EMR': 110.00, 'EW': 70.00,
+            'HUM': 320.00, 'PNC': 185.00, 'NOC': 450.00, 'D': 55.00, 'USB': 48.00,
+            'GPN': 105.00, 'FIS': 80.00,
             // ETFs
             'VOO': 603.00, 'SPY': 603.00, 'QQQ': 582.00, 'VTI': 273.00, 'IWM': 200.00,
             'DIA': 425.00, 'VGT': 530.00, 'VHT': 235.00, 'VFH': 97.00,
