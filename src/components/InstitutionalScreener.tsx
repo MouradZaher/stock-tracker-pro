@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getMultipleQuotes } from '../services/stockDataService';
 import type { Stock } from '../types';
-import { formatCurrency, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
+import { formatCurrency, formatCurrencyForMarket, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
 import { TrendingUp, TrendingDown, Activity, Eye, Info, ChevronDown } from 'lucide-react';
 import CompanyLogo from './CompanyLogo';
 import { useMarket } from '../contexts/MarketContext';
@@ -31,28 +31,80 @@ const ADX15_SYMBOLS = [
 ];
 
 const SECTOR_MAP: Record<string, string> = {
-    // US IT
+    // INFORMATION TECHNOLOGY (SP100)
     'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology',
     'AVGO': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
     'CSCO': 'Information Technology', 'INTU': 'Information Technology', 'ORCL': 'Information Technology',
     'TXN': 'Information Technology', 'NOW': 'Information Technology', 'INTC': 'Information Technology',
     'IBM': 'Information Technology', 'QCOM': 'Information Technology', 'ADI': 'Information Technology',
     'MU': 'Information Technology', 'LRCX': 'Information Technology', 'PANW': 'Information Technology',
-    // US Consumer
+    'AMAT': 'Information Technology', 'KLAC': 'Information Technology', 'ADBE': 'Information Technology',
+    'ISRG': 'Information Technology', 'CDNS': 'Information Technology', 'SNPS': 'Information Technology',
+    'ROP': 'Information Technology', 'ACN': 'Information Technology',
+    
+    // CONSUMER DISCRETIONARY (SP100)
     'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
     'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
     'TJX': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary', 'ABNB': 'Consumer Discretionary',
     'DG': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'F': 'Consumer Discretionary',
-    // US Communication
+    'GM': 'Consumer Discretionary', 'MAR': 'Consumer Discretionary', 'ORLY': 'Consumer Discretionary',
+    'AZO': 'Consumer Discretionary', 'LVS': 'Consumer Discretionary', 'DHI': 'Consumer Discretionary',
+    
+    // COMMUNICATION SERVICES (SP100)
     'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services',
     'DIS': 'Communication Services', 'VZ': 'Communication Services', 'CMCSA': 'Communication Services',
-    'T': 'Communication Services', 'CHTR': 'Communication Services',
+    'T': 'Communication Services', 'CHTR': 'Communication Services', 'TMUS': 'Communication Services',
+    'ATVI': 'Communication Services', 'EA': 'Communication Services', 'WBD': 'Communication Services',
+    
+    // FINANCIALS (SP100)
+    'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK-B': 'Financials',
+    'BAC': 'Financials', 'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials',
+    'AXP': 'Financials', 'C': 'Financials', 'BLK': 'Financials', 'SCHW': 'Financials',
+    'SPGI': 'Financials', 'CME': 'Financials', 'CB': 'Financials', 'PNC': 'Financials',
+    'USB': 'Financials', 'TROW': 'Financials', 'AIG': 'Financials', 'MET': 'Financials',
+    'MMC': 'Financials', 'AON': 'Financials', 'ICE': 'Financials', 'MCO': 'Financials',
+    
+    // HEALTH CARE (SP100)
+    'LLY': 'Health Care', 'UNH': 'Health Care', 'JNJ': 'Health Care', 'ABBV': 'Health Care',
+    'MRK': 'Health Care', 'TMO': 'Health Care', 'ABT': 'Health Care', 'PFE': 'Health Care',
+    'AMGN': 'Health Care', 'GILD': 'Health Care', 'DHR': 'Health Care', 'ISRG': 'Health Care',
+    'SYK': 'Health Care', 'BMY': 'Health Care', 'VRTX': 'Health Care', 'REGN': 'Health Care',
+    'CI': 'Health Care', 'HUM': 'Health Care', 'ZTS': 'Health Care', 'BSX': 'Health Care',
+    'ELV': 'Health Care', 'CVS': 'Health Care', 'BDX': 'Health Care', 'MCK': 'Health Care',
+    
+    // INDUSTRIALS (SP100)
+    'GE': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'UNP': 'Industrials',
+    'HON': 'Industrials', 'LMT': 'Industrials', 'BA': 'Industrials', 'RTX': 'Industrials',
+    'DE': 'Industrials', 'MMM': 'Industrials', 'FDX': 'Industrials', 'NSC': 'Industrials',
+    'NOC': 'Industrials', 'GD': 'Industrials', 'WM': 'Industrials', 'ITW': 'Industrials',
+    'EMR': 'Industrials', 'ETN': 'Industrials', 'PH': 'Industrials', 'TDG': 'Industrials',
+    'ADP': 'Industrials', 'CPRT': 'Industrials',
+    
+    // ENERGY (SP100)
+    'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy',
+    'MPC': 'Energy', 'PSX': 'Energy', 'VLO': 'Energy', 'PXD': 'Energy', 'OXY': 'Energy',
+    'HES': 'Energy', 'DVN': 'Energy',
+    
+    // CONSUMER STAPLES (SP100)
+    'PG': 'Consumer Staples', 'KO': 'Consumer Staples', 'PEP': 'Consumer Staples',
+    'WMT': 'Consumer Staples', 'COST': 'Consumer Staples', 'PM': 'Consumer Staples',
+    'MO': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'EL': 'Consumer Staples',
+    'CL': 'Consumer Staples', 'KDP': 'Consumer Staples', 'KMB': 'Consumer Staples',
+    'GIS': 'Consumer Staples', 'ADM': 'Consumer Staples', 'STZ': 'Consumer Staples',
+    
+    // MATERIALS & UTILITIES & REAL ESTATE
+    'LIN': 'Materials', 'APD': 'Materials', 'SHW': 'Materials', 'FCX': 'Materials', 'NEM': 'Materials',
+    'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities', 'EXC': 'Utilities',
+    'AEP': 'Utilities', 'SRE': 'Utilities',
+    'PLD': 'Real Estate', 'AMT': 'Real Estate', 'CCI': 'Real Estate', 'EQIX': 'Real Estate', 'PSA': 'Real Estate',
+
     // Egypt Sectors
     'COMI.CA': 'Banking & Finance', 'FWRY.CA': 'Fintech & Tech', 'ETEL.CA': 'Telecom',
     'TMGH.CA': 'Real Estate', 'HELI.CA': 'Real Estate', 'MNHD.CA': 'Real Estate', 'PHDC.CA': 'Real Estate',
     'ABUK.CA': 'Chemicals & Materials', 'SKPC.CA': 'Chemicals & Materials', 'MICH.CA': 'Chemicals & Materials', 'MFOT.CA': 'Chemicals & Materials',
     'SWDY.CA': 'Industrials', 'ORAS.CA': 'Construction', 'ESRS.CA': 'Materials', 'CCAP.CA': 'Diversified',
     'JUFO.CA': 'Consumer Staples', 'DOMT.CA': 'Consumer Staples', 'OBRI.CA': 'Consumer Staples', 'EFID.CA': 'Consumer Staples',
+    
     // ADX Sectors
     'IHC.AD': 'Direct Investment', 'MULTIPLY.AD': 'Direct Investment',
     'FAB.AD': 'Financials', 'ADCB.AD': 'Financials',
@@ -287,7 +339,6 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                 ({sectorStocks.length} Assets)
                                             </span>
                                         </div>
-                                    </div>
 
                                     {sortedSectorStocks.map((stock) => {
                                         const displayChange = stock.changePercent;
@@ -299,12 +350,15 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                             ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)
                                             : 0.5;
                                         
-                                        // Realistically derive RSI from range position + current momentum
-                                        const rsiReal = (rangePos * 60) + 20 + (stock.changePercent * 2.5);
-                                        const rsi = Math.max(15, Math.min(85, rsiReal));
+                                        // Handle null states for missing data to match professional terminals
+                                        const hasData = stock.price > 0 && stock.fiftyTwoWeekHigh > 0;
+                                        
+                                        // Realistically derive RSI from range position + current momentum if data exists
+                                        const rsiReal = hasData ? (rangePos * 60) + 20 + (stock.changePercent * 2.5) : null;
+                                        const rsi = rsiReal !== null ? Math.max(15, Math.min(85, rsiReal)) : null;
                                         
                                         // Realistically derive Momentum from trend + relative position
-                                        const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
+                                        const momentum = hasData ? 50 + (stock.changePercent * 6) + (rangePos * 20 - 10) : null;
                                         
                                         return (
                                             <div 
@@ -335,11 +389,11 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                         }} />
                                                     </div>
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
-                                                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                                                            {stock.name}
+                                                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                            { (stock.name === stock.symbol || stock.name.toLowerCase().includes('unavailable')) ? stock.symbol : stock.name }
                                                         </div>
-                                                        <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.04em' }}>
-                                                            ({stock.symbol})
+                                                        <div style={{ fontSize: '0.62rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.04em' }}>
+                                                            {stock.name.toLowerCase().includes('unavailable') ? 'REAL-TIME SYNCING...' : `(${stock.symbol})`}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -365,12 +419,12 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                     {formatPercent(displayChange)}
                                                 </div>
 
-                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem' }}>
-                                                    {formatNumberPlain(displayVolume)}
+                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                    { stock.volume > 0 ? formatNumberPlain(stock.volume) : '--' }
                                                 </div>
 
                                                 <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.8rem' }}>
-                                                    {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '1.38'}
+                                                    {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '--'}
                                                 </div>
 
                                                 <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -389,29 +443,34 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                 </div>
 
                                                 <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-                                                        <span style={{ fontSize: '0.75rem', fontWeight: 950, color: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }}>
-                                                            {momentum.toFixed(1)}
-                                                        </span>
-                                                        <div style={{ width: '40px', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                                                            <div style={{ width: `${momentum}%`, height: '100%', background: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
+                                                    {momentum !== null ? (
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+                                                            <span style={{ fontSize: '0.72rem', fontWeight: 950, color: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                                {momentum.toFixed(1)}
+                                                            </span>
+                                                            <div style={{ width: '30px', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '1px', overflow: 'hidden' }}>
+                                                                <div style={{ width: `${momentum}%`, height: '100%', background: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    ) : '--'}
                                                 </div>
 
                                                 <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                    <div style={{ 
-                                                        display: 'inline-block',
-                                                        padding: '3px 8px', 
-                                                        borderRadius: '4px', 
-                                                        fontSize: '0.7rem', 
-                                                        fontWeight: 950, 
-                                                        background: rsi > 70 ? 'rgba(239, 68, 68, 0.15)' : rsi < 30 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.04)', 
-                                                        color: rsi > 70 ? 'var(--color-error)' : rsi < 30 ? 'var(--color-success)' : 'var(--color-text-primary)',
-                                                        border: `1px solid ${rsi > 70 ? 'rgba(239, 68, 68, 0.2)' : rsi < 30 ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`
-                                                    }}>
-                                                        {rsi.toFixed(1)}
-                                                    </div>
+                                                    {rsi !== null ? (
+                                                        <div style={{ 
+                                                            display: 'inline-block',
+                                                            padding: '2px 8px', 
+                                                            borderRadius: '4px', 
+                                                            fontSize: '0.65rem', 
+                                                            fontWeight: 950, 
+                                                            background: rsi > 70 ? 'rgba(239, 68, 68, 0.15)' : rsi < 30 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.04)', 
+                                                            color: rsi > 70 ? 'var(--color-error)' : rsi < 30 ? 'var(--color-success)' : 'var(--color-text-primary)',
+                                                            border: `1px solid ${rsi > 70 ? 'rgba(239, 68, 68, 0.2)' : rsi < 30 ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`,
+                                                            fontFamily: "'JetBrains Mono', monospace"
+                                                        }}>
+                                                            {rsi.toFixed(1)}
+                                                        </div>
+                                                    ) : '--'}
                                                 </div>
 
                                                 <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
