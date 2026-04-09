@@ -138,26 +138,16 @@ const SECTOR_PRIORITY: Record<string, number> = {
     'Energy': 8,
     'Utilities': 9,
     'Real Estate': 10,
-    'Materials': 11,
-    'Finance': 12,
-    'Telecom': 13,
-    'Banking': 14,
-    'Insurance': 15,
-    'Investment': 16,
+    'Information Technology': 1, 'Communication Services': 2, 'Consumer Discretionary': 3, 'Financials': 4,
+    'Health Care': 5, 'Industrials': 6, 'Consumer Staples': 7, 'Energy': 8, 'Utilities': 9, 'Real Estate': 10,
+    'Materials': 11, 'Finance': 12, 'Telecom': 13, 'Banking': 14, 'Insurance': 15, 'Investment': 16,
 };
 
 const formatCurrencyForMarket = (value: number, currency: string): string => {
     if (!currency || currency === 'USD') return formatCurrency(value);
     try {
         const precision = value < 1 ? 4 : 2;
-        const formatted = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-            minimumFractionDigits: precision,
-            maximumFractionDigits: precision,
-            currencyDisplay: 'code',
-        }).format(value);
-        return formatted.trim();
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: precision, maximumFractionDigits: precision, currencyDisplay: 'code' }).format(value).trim();
     } catch {
         const abs = Math.abs(value);
         const sign = value < 0 ? '-' : '';
@@ -170,7 +160,7 @@ const getDisplayName = (symbol: string, apiName: string): string => {
     if (!symbol) return '';
     const s = symbol.split('.')[0].split(':')[0].split('-')[0].trim().toUpperCase();
     const name = NAME_MAP[symbol.toUpperCase().trim()] || NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? s : apiName.split('(')[0].split('[')[0].split('-')[0].trim());
-    return name.replace(/\(/g, '').replace(/\)/g, '').trim(); 
+    return name.replace(/[()]/g, '').trim(); 
 };
 
 const getSector = (symbol: string): string => {
@@ -186,28 +176,17 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
     const [flashStates, setFlashStates] = useState<Record<string, 'up' | 'down' | null>>({});
     const [loading, setLoading] = useState(true);
 
-    // High-frequency polling to ensure live data sync
     useEffect(() => {
         let isMounted = true;
-
-        // Resolve symbols based on selected market
-        const marketSymbols = selectedMarket.id === 'egypt'
-            ? EGX30_SYMBOLS
-            : selectedMarket.id === 'abudhabi'
-                ? ADX15_SYMBOLS
-                : SP100_SYMBOLS;
+        const marketSymbols = selectedMarket.id === 'egypt' ? EGX30_SYMBOLS : selectedMarket.id === 'abudhabi' ? ADX15_SYMBOLS : SP100_SYMBOLS;
 
         const fetchStocks = async () => {
             try {
                 const map = await getMultipleQuotes(marketSymbols);
                 if (!isMounted) return;
-
                 const loadedStocks: Stock[] = [];
-                marketSymbols.forEach(sym => {
-                    if (map.has(sym)) loadedStocks.push(map.get(sym)!);
-                });
+                marketSymbols.forEach(sym => { if (map.has(sym)) loadedStocks.push(map.get(sym)!); });
 
-                // Detection of price changes for animations
                 const newFlashes: Record<string, 'up' | 'down' | null> = {};
                 const newPrevPrices: Record<string, number> = { ...prevPrices };
 
@@ -224,7 +203,6 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                 if (Object.keys(newFlashes).length > 0) {
                     setFlashStates(prev => ({ ...prev, ...newFlashes }));
                     setPrevPrices(newPrevPrices);
-
                     setTimeout(() => {
                         setFlashStates(prev => {
                             const cleared = { ...prev };
@@ -234,271 +212,52 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                     }, 2000);
                 }
 
-                // Sort by relative strength (change %) for matrix visibility
                 loadedStocks.sort((a, b) => (b.changePercent || 0) - (a.changePercent || 0));
-
                 setStocks(loadedStocks);
-            } catch (err) {
-                console.error(`Failed to load ${selectedMarket.id} Screener:`, err);
-            } finally {
-                if (isMounted) setLoading(false);
-            }
+            } catch (err) { console.error(err); } finally { if (isMounted) setLoading(false); }
         };
 
         fetchStocks();
         const interval = setInterval(fetchStocks, 2000);
-        return () => {
-            isMounted = false;
-            clearInterval(interval);
-        };
+        return () => { isMounted = false; clearInterval(interval); };
     }, [selectedMarket.id, prevPrices]);
-
-    if (loading && stocks.length === 0) {
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-tertiary)' }}>
-                <div className="spinner" style={{ width: '40px', height: '40px', marginBottom: '1rem' }} />
-                <div style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.1em' }}>SYNCING INSTITUTIONAL DATA...</div>
-            </div>
-        );
-    }
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden', background: 'var(--color-bg)' }}>
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
                 <div style={{ minWidth: '1250px', display: 'flex', flexDirection: 'column' }}>
-                    {/* Table Header Overlay */}
-                    <div style={{
-                        display: 'flex',
-                        borderBottom: '1px solid var(--glass-border)',
-                        padding: '0.6rem 0',
-                        background: 'rgba(10,10,18,0.95)',
-                        backdropFilter: 'blur(10px)',
-                        fontWeight: 900,
-                        fontSize: '0.62rem',
-                        color: 'var(--color-text-tertiary)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.12em',
-                        position: 'sticky',
-                        top: 0,
-                        zIndex: 100
-                    }}>
-                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            Company & Asset
-                            <div className="live-badge-pulse" style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', padding: '1px 5px', borderRadius: '4px', fontSize: '0.45rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                                <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--color-success)' }} />
-                                LIVE
-                            </div>
-                        </div>
+                    <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.6rem 0', background: 'rgba(10,10,18,0.95)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.62rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
+                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem' }}>Company & Asset</div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
-                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', position: 'relative' }}>
-                            <select
-                                value={timeframe}
-                                onChange={(e) => setTimeframe(e.target.value)}
-                                style={{
-                                    appearance: 'none',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'var(--color-accent)',
-                                    fontSize: '0.62rem',
-                                    fontWeight: 900,
-                                    padding: '0 14px 0 0',
-                                    cursor: 'pointer',
-                                    outline: 'none',
-                                    textTransform: 'uppercase',
-                                    textAlign: 'right',
-                                    width: '100%',
-                                    fontFamily: 'inherit',
-                                    letterSpacing: 'inherit'
-                                }}
-                            >
-                                {['5m', '1h', '4h', 'D', 'W', 'M', '6M', '1Y'].map(tf => (
-                                    <option key={tf} value={tf} style={{ background: '#0a0a12', color: 'white' }}>% {tf}</option>
-                                ))}
-                            </select>
-                            <ChevronDown size={10} style={{ position: 'absolute', right: '0.5rem', pointerEvents: 'none', opacity: 0.8, color: 'var(--color-accent)' }} />
-                        </div>
-                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Vol {timeframe}</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>% Change</div>
+                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Volume</div>
                         <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right' }}>PEG</div>
-                        <div style={{ flex: '0 0 160px', padding: '0 1rem', textAlign: 'center' }}>Yearly Range</div>
+                        <div style={{ flex: '0 0 160px', padding: '0 1rem', textAlign: 'center' }}>Range</div>
                         <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Momentum</div>
-                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>RSI Index</div>
+                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>RSI</div>
                         <div style={{ flex: '0 0 70px', padding: '0 1rem', textAlign: 'center' }}>Analyze</div>
                     </div>
-
-                    {/* Table Body - Result Matrix Grouped by Sector */}
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {Object.entries(
-                            stocks.reduce((acc, stock) => {
-                                const sector = getSector(stock.symbol);
-                                if (!acc[sector]) acc[sector] = [];
-                                acc[sector].push(stock);
-                                return acc;
-                            }, {} as Record<string, Stock[]>)
-                        )
-                            .sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99))
-                            .map(([sector, sectorStocks], index) => {
-                                const sectorAvgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
-                                const upCount = sectorStocks.filter(s => s.changePercent > 0).length;
-                                const downCount = sectorStocks.length - upCount;
-                                const isPositiveSector = sectorAvgChange >= 0;
-
-                                // Sort stocks inside each sector by highest returns as requested
-                                const sortedSectorStocks = [...sectorStocks].sort((a, b) => b.changePercent - a.changePercent);
-
+                    {Object.entries(stocks.reduce((acc, stock) => {
+                        const sector = getSector(stock.symbol);
+                        if (!acc[sector]) acc[sector] = [];
+                        acc[sector].push(stock);
+                        return acc;
+                    }, {} as Record<string, Stock[]>)).sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99)).map(([sector, sectorStocks], index) => (
+                        <React.Fragment key={sector}>
+                            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 1.5rem', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: '40px', zIndex: 80 }}>
+                                <span style={{ fontSize: '0.78rem', fontWeight: 950, color: 'white', textTransform: 'uppercase' }}>{sector}</span>
+                            </div>
+                            {sectorStocks.sort((a, b) => b.changePercent - a.changePercent).map((stock) => {
+                                const isPositive = stock.changePercent >= 0;
+                                const flash = flashStates[stock.symbol];
                                 return (
-                                    <React.Fragment key={sector}>
-                                        {/* Sector Header Row */}
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            padding: '12px 1.5rem',
-                                            background: 'rgba(255,255,255,0.03)',
-                                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                            position: 'sticky',
-                                            top: '40px',
-                                            zIndex: 80,
-                                            backdropFilter: 'blur(10px)'
-                                        }}>
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                width: '24px',
-                                                height: '24px',
-                                                borderRadius: '50%',
-                                                background: index === 0 ? 'var(--color-accent)' : index < 3 ? 'var(--color-success-light)' : 'rgba(255,255,255,0.05)',
-                                                color: 'white',
-                                                fontSize: '0.65rem',
-                                                fontWeight: 900,
-                                                border: '1px solid rgba(255,255,255,0.1)'
-                                            }}>
-                                                {index + 1}
+                                    <div key={stock.symbol} onClick={() => onSelectSymbol(stock.symbol)} className="screener-row-hover" style={{ display: 'flex', alignItems: 'center', padding: '12px 1.5rem', borderBottom: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.8s ease-in-out', background: 'rgba(255,255,255,0.01)' }}>
+                                        <div style={{ flex: '0 0 320px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <CompanyLogo symbol={stock.symbol} size={32} />
+                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                <div style={{ fontSize: '0.9rem', fontWeight: 950, color: 'white' }}>{getDisplayName(stock.symbol, stock.name)}</div>
+                                                <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 900 }}>{stock.symbol.replace(/[()]/g, '')}</div>
                                             </div>
-                                            <span style={{ 
-                                                fontSize: '0.78rem', 
-                                                fontWeight: 950, 
-                                                color: 'white', 
-                                                letterSpacing: '0.08em', 
-                                                textTransform: 'uppercase',
-                                                textShadow: '0 0 10px rgba(255,255,255,0.1)' 
-                                            }}>
-                                                {sector}
-                                            </span>
-                                            <span style={{
-                                                fontSize: '0.62rem',
-                                                fontWeight: 800,
-                                                color: isPositiveSector ? 'var(--color-success)' : 'var(--color-error)',
-                                                background: isPositiveSector ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                                padding: '2px 6px',
-                                                borderRadius: '4px',
-                                                marginLeft: '8px',
-                                                border: `1px solid ${isPositiveSector ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
-                                            }}>
-                                                AVG: {formatPercent(sectorAvgChange)}
-                                            </span>
-                                            <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginLeft: '4px' }}>
-                                                [{upCount} <TrendingUp size={8} style={{ display: 'inline' }} /> / {downCount} <TrendingDown size={8} style={{ display: 'inline' }} />]
-                                            </span>
-                                            <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>
-                                                ({sectorStocks.length} Assets)
-                                            </span>
-                                        </div>
-
-                                        {sortedSectorStocks.map((stock) => {
-                                            const displayChange = stock.changePercent;
-                                            const displayVolume = stock.volume;
-                                            const isPositive = displayChange >= 0;
-                                            const flash = flashStates[stock.symbol];
-
-                                            const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow)
-                                                ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)
-                                                : 0.5;
-
-                                            // Handle null states for missing data to match professional terminals
-                                            const hasData = stock.price > 0 && stock.fiftyTwoWeekHigh > 0;
-
-                                            // Realistically derive RSI from range position + current momentum if data exists
-                                            const rsiReal = hasData ? (rangePos * 60) + 20 + (stock.changePercent * 2.5) : null;
-                                            const rsi = rsiReal !== null ? Math.max(15, Math.min(85, rsiReal)) : null;
-
-                                            // Realistically derive Momentum from trend + relative position
-                                            const momentum = hasData ? 50 + (stock.changePercent * 6) + (rangePos * 20 - 10) : null;
-
-                                            return (
-                                                <div
-                                                    key={stock.symbol}
-                                                    className={`screener-row ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`}
-                                                    onClick={() => onSelectSymbol(stock.symbol)}
-                                                    style={{
-                                                        display: 'flex',
-                                                        height: '52px',
-                                                        borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                                        alignItems: 'center',
-                                                        cursor: 'pointer',
-                                                        transition: 'background 0.2s',
-                                                    }}
-                                                >
-                                                    <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                        <div style={{ position: 'relative' }}>
-                                                            <CompanyLogo symbol={stock.symbol} size={32} />
-                                                            <div style={{
-                                                                position: 'absolute',
-                                                                bottom: -2,
-                                                                right: -2,
-                                                                width: 8,
-                                                                height: 8,
-                                                                borderRadius: '50%',
-                                                                background: isPositive ? 'var(--color-success)' : 'var(--color-error)',
-                                                                border: '2px solid var(--color-bg)'
-                                                            }} />
-                                                        </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', overflow: 'hidden' }}>
-                                                            <div style={{ 
-                                                                fontSize: '0.9rem', 
-                                                                fontWeight: 950, 
-                                                                color: 'white', 
-                                                                whiteSpace: 'nowrap', 
-                                                                textOverflow: 'ellipsis', 
-                                                                overflow: 'hidden', 
-                                                                lineHeight: 1.1,
-                                                                letterSpacing: '-0.01em'
-                                                            }}>
-                                                                { getDisplayName(stock.symbol, stock.name) }
-                                                            </div>
-                                                            <div style={{ 
-                                                                fontSize: '0.62rem', 
-                                                                color: 'var(--color-accent)', 
-                                                                fontWeight: 900, 
-                                                                letterSpacing: '0.12em', 
-                                                                fontFamily: "'JetBrains Mono', monospace", 
-                                                                textTransform: 'uppercase',
-                                                                marginTop: '2px'
-                                                            }}>
-                                                                {stock.symbol.toUpperCase().replace(/\(/g, '').replace(/\)/g, '')}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div style={{
-                                                        flex: '0 0 110px',
-                                                        padding: '0 0.5rem',
-                                                        textAlign: 'right'
-                                                    }}>
-                                                        <span style={{
-                                                            fontWeight: 800,
-                                                            fontFamily: "'JetBrains Mono', monospace",
-                                                            fontSize: '1rem',
-                                                            color: flashStates[stock.symbol] === 'up' ? 'var(--color-success)' : flashStates[stock.symbol] === 'down' ? 'var(--color-error)' : 'white',
-                                                            transition: 'color 0.2s ease'
-                                                        }}>
-                                                            {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className={getChangeClass(displayChange)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-                                                        {isPositive ? <TrendingUp size={12} strokeWidth={3} /> : <TrendingDown size={12} strokeWidth={3} />}
-                                                        {formatPercent(displayChange)}
-                                                    </div>
 
                                                     <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem', fontFamily: "'JetBrains Mono', monospace" }}>
                                                         {stock.volume > 0 ? formatNumberPlain(stock.volume) : '--'}
