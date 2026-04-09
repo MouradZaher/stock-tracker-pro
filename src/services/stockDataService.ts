@@ -189,6 +189,8 @@ const fetchFromFMP = async (symbol: string): Promise<StockQuote | null> => {
 export const getSearchSymbol = (symbol: string): string => {
     if (!symbol || symbol.includes('.')) return symbol;
 
+    if (symbol === 'BRK-B') return 'BRK.B';
+
     const market = getMarketForSymbol(symbol);
 
     // Specialized Egypt Mapping (Using .CA suffix for Cairo assets)
@@ -718,6 +720,8 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     return withPromisePool(cacheKey, async () => {
         const stockMap = new Map<string, Stock>();
         if (symbols.length === 0) return stockMap;
+
+        const mappedSymbols = symbols.map(getSearchSymbol);
 
     // Try batch request first via proxy
     try {

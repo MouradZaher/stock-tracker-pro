@@ -32,86 +32,69 @@ const ADX15_SYMBOLS = [
 
 const SECTOR_MAP: Record<string, string> = {
     // INFORMATION TECHNOLOGY (SP100)
-    'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology',
-    'AVGO': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
-    'CSCO': 'Information Technology', 'INTU': 'Information Technology', 'ORCL': 'Information Technology',
-    'TXN': 'Information Technology', 'NOW': 'Information Technology', 'INTC': 'Information Technology',
-    'IBM': 'Information Technology', 'QCOM': 'Information Technology', 'ADI': 'Information Technology',
-    'MU': 'Information Technology', 'LRCX': 'Information Technology', 'PANW': 'Information Technology',
-    'AMAT': 'Information Technology', 'KLAC': 'Information Technology', 'ADBE': 'Information Technology',
-    'CDNS': 'Information Technology', 'SNPS': 'Information Technology',
-    'ROP': 'Information Technology', 'ACN': 'Information Technology',
-
-    // CONSUMER DISCRETIONARY (SP100)
-    'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
-    'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
-    'TJX': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary', 'ABNB': 'Consumer Discretionary',
-    'DG': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'F': 'Consumer Discretionary',
-    'GM': 'Consumer Discretionary', 'MAR': 'Consumer Discretionary', 'ORLY': 'Consumer Discretionary',
-    'AZO': 'Consumer Discretionary', 'LVS': 'Consumer Discretionary', 'DHI': 'Consumer Discretionary',
-
-    // COMMUNICATION SERVICES (SP100)
-    'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services',
-    'DIS': 'Communication Services', 'VZ': 'Communication Services', 'CMCSA': 'Communication Services',
-    'T': 'Communication Services', 'CHTR': 'Communication Services', 'TMUS': 'Communication Services',
-    'ATVI': 'Communication Services', 'EA': 'Communication Services', 'WBD': 'Communication Services',
+    'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology', 'AVGO': 'Information Technology',
+    'ORCL': 'Information Technology', 'ADBE': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
+    'CSCO': 'Information Technology', 'ACN': 'Information Technology', 'TXN': 'Information Technology', 'INTU': 'Information Technology',
+    'QCOM': 'Information Technology', 'IBM': 'Information Technology', 'NOW': 'Information Technology', 'INTC': 'Information Technology',
+    'AMAT': 'Information Technology', 'MU': 'Information Technology', 'ADI': 'Information Technology', 'LRCX': 'Information Technology',
+    'PANW': 'Information Technology', 'SNPS': 'Information Technology', 'CDNS': 'Information Technology', 'KLAC': 'Information Technology',
+    'ROP': 'Information Technology', 'MSI': 'Information Technology', 'APH': 'Information Technology', 'TEL': 'Information Technology',
+    'ADSK': 'Information Technology', 'FTNT': 'Information Technology', 'FIS': 'Information Technology', 'GPN': 'Information Technology',
+    'ITW': 'Information Technology',
 
     // FINANCIALS (SP100)
-    'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK-B': 'Financials',
-    'BAC': 'Financials', 'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials',
-    'AXP': 'Financials', 'C': 'Financials', 'BLK': 'Financials', 'SCHW': 'Financials',
-    'SPGI': 'Financials', 'CME': 'Financials', 'CB': 'Financials', 'PNC': 'Financials',
-    'USB': 'Financials', 'TROW': 'Financials', 'AIG': 'Financials', 'MET': 'Financials',
-    'MMC': 'Financials', 'AON': 'Financials', 'ICE': 'Financials', 'MCO': 'Financials',
+    'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK-B': 'Financials', 'BAC': 'Financials',
+    'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials', 'AXP': 'Financials', 'BLK': 'Financials',
+    'SCHW': 'Financials', 'C': 'Financials', 'CB': 'Financials', 'SPGI': 'Financials', 'MMC': 'Financials',
+    'AON': 'Financials', 'MET': 'Financials', 'PNC': 'Financials', 'USB': 'Financials', 'TROW': 'Financials',
+    'AIG': 'Financials', 'ICE': 'Financials', 'MCO': 'Financials', 'TRV': 'Financials', 'CME': 'Financials',
+    'PYPL': 'Financials', 'COF': 'Financials', 'BK': 'Financials', 'PRU': 'Financials',
 
     // HEALTH CARE (SP100)
-    'LLY': 'Health Care', 'UNH': 'Health Care', 'JNJ': 'Health Care', 'ABBV': 'Health Care',
-    'MRK': 'Health Care', 'TMO': 'Health Care', 'ABT': 'Health Care', 'PFE': 'Health Care',
-    'AMGN': 'Health Care', 'GILD': 'Health Care', 'DHR': 'Health Care', 'ISRG': 'Health Care',
-    'SYK': 'Health Care', 'BMY': 'Health Care', 'VRTX': 'Health Care', 'REGN': 'Health Care',
-    'CI': 'Health Care', 'HUM': 'Health Care', 'ZTS': 'Health Care', 'BSX': 'Health Care',
-    'ELV': 'Health Care', 'CVS': 'Health Care', 'BDX': 'Health Care', 'MCK': 'Health Care',
+    'LLY': 'Health Care', 'UNH': 'Health Care', 'JNJ': 'Health Care', 'ABBV': 'Health Care', 'MRK': 'Health Care',
+    'TMO': 'Health Care', 'ABT': 'Health Care', 'PFE': 'Health Care', 'DHR': 'Health Care', 'AMGN': 'Health Care',
+    'ISRG': 'Health Care', 'SYK': 'Health Care', 'BMY': 'Health Care', 'VRTX': 'Health Care', 'REGN': 'Health Care',
+    'GILD': 'Health Care', 'ELV': 'Health Care', 'ZTS': 'Health Care', 'CI': 'Health Care', 'BSX': 'Health Care',
+    'BDX': 'Health Care', 'HUM': 'Health Care', 'CVS': 'Health Care', 'MCK': 'Health Care', 'EW': 'Health Care',
+    'MTD': 'Health Care', 'COR': 'Health Care', 'IDXX': 'Health Care',
+
+    // CONSUMER DISCRETIONARY (SP100)
+    'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary', 'MCD': 'Consumer Discretionary',
+    'NKE': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary',
+    'TJX': 'Consumer Discretionary', 'ABNB': 'Consumer Discretionary', 'DG': 'Consumer Discretionary', 'MAR': 'Consumer Discretionary',
+    'AZO': 'Consumer Discretionary', 'GM': 'Consumer Discretionary', 'F': 'Consumer Discretionary',
+    'DHI': 'Consumer Discretionary', 'YUM': 'Consumer Discretionary', 'CMG': 'Consumer Discretionary',
+
+    // COMMUNICATION SERVICES (SP100)
+    'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services', 'DIS': 'Communication Services',
+    'TMUS': 'Communication Services', 'VZ': 'Communication Services', 'CMCSA': 'Communication Services', 'T': 'Communication Services',
+    'CHTR': 'Communication Services', 'ATVI': 'Communication Services', 'EA': 'Communication Services', 'WBD': 'Communication Services',
 
     // INDUSTRIALS (SP100)
-    'GE': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'UNP': 'Industrials',
-    'HON': 'Industrials', 'LMT': 'Industrials', 'BA': 'Industrials', 'RTX': 'Industrials',
-    'DE': 'Industrials', 'MMM': 'Industrials', 'FDX': 'Industrials', 'NSC': 'Industrials',
-    'NOC': 'Industrials', 'GD': 'Industrials', 'WM': 'Industrials', 'ITW': 'Industrials',
-    'EMR': 'Industrials', 'ETN': 'Industrials', 'PH': 'Industrials', 'TDG': 'Industrials',
-    'ADP': 'Industrials', 'CPRT': 'Industrials',
-
-    // ENERGY (SP100)
-    'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy',
-    'MPC': 'Energy', 'PSX': 'Energy', 'VLO': 'Energy', 'PXD': 'Energy', 'OXY': 'Energy',
-    'HES': 'Energy', 'DVN': 'Energy',
+    'GE': 'Industrials', 'CAT': 'Industrials', 'UNP': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials',
+    'LMT': 'Industrials', 'BA': 'Industrials', 'RTX': 'Industrials', 'DE': 'Industrials', 'FDX': 'Industrials',
+    'NOC': 'Industrials', 'GD': 'Industrials', 'NSC': 'Industrials', 'WM': 'Industrials', 'MMM': 'Industrials',
+    'ETN': 'Industrials', 'ADP': 'Industrials', 'CSX': 'Industrials', 'CPRT': 'Industrials', 'TDG': 'Industrials', 'EMR': 'Industrials',
+    'PH': 'Industrials', 'PCAR': 'Industrials',
 
     // CONSUMER STAPLES (SP100)
-    'PG': 'Consumer Staples', 'KO': 'Consumer Staples', 'PEP': 'Consumer Staples',
-    'WMT': 'Consumer Staples', 'COST': 'Consumer Staples', 'PM': 'Consumer Staples',
-    'MO': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'EL': 'Consumer Staples',
-    'CL': 'Consumer Staples', 'KDP': 'Consumer Staples', 'KMB': 'Consumer Staples',
-    'GIS': 'Consumer Staples', 'ADM': 'Consumer Staples', 'STZ': 'Consumer Staples',
+    'PG': 'Consumer Staples', 'KO': 'Consumer Staples', 'PEP': 'Consumer Staples', 'WMT': 'Consumer Staples',
+    'COST': 'Consumer Staples', 'PM': 'Consumer Staples', 'MO': 'Consumer Staples', 'MDLZ': 'Consumer Staples',
+    'EL': 'Consumer Staples', 'CL': 'Consumer Staples', 'KDP': 'Consumer Staples', 'KMB': 'Consumer Staples',
+    'GIS': 'Consumer Staples', 'ADM': 'Consumer Staples', 'STZ': 'Consumer Staples', 'SYY': 'Consumer Staples',
 
-    // MATERIALS & UTILITIES & REAL ESTATE
-    'LIN': 'Materials', 'APD': 'Materials', 'SHW': 'Materials', 'FCX': 'Materials', 'NEM': 'Materials',
-    'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities', 'EXC': 'Utilities',
-    'AEP': 'Utilities', 'SRE': 'Utilities',
+    // ENERGY (SP100)
+    'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy', 'MPC': 'Energy',
+    'PSX': 'Energy', 'VLO': 'Energy', 'PXD': 'Energy', 'OXY': 'Energy', 'HES': 'Energy', 'DVN': 'Energy',
+
+    // UTILITIES & REAL ESTATE & MATERIALS
+    'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities', 'EXC': 'Utilities', 'AEP': 'Utilities',
     'PLD': 'Real Estate', 'AMT': 'Real Estate', 'CCI': 'Real Estate', 'EQIX': 'Real Estate', 'PSA': 'Real Estate',
+    'LIN': 'Materials', 'APD': 'Materials', 'SHW': 'Materials', 'FCX': 'Materials', 'NEM': 'Materials',
 
-    // Egypt Sectors
-    'COMI.CA': 'Banking & Finance', 'FWRY.CA': 'Fintech & Tech', 'ETEL.CA': 'Telecom',
-    'TMGH.CA': 'Real Estate', 'HELI.CA': 'Real Estate', 'MNHD.CA': 'Real Estate', 'PHDC.CA': 'Real Estate',
-    'ABUK.CA': 'Chemicals & Materials', 'SKPC.CA': 'Chemicals & Materials', 'MICH.CA': 'Chemicals & Materials', 'MFOT.CA': 'Chemicals & Materials',
-    'SWDY.CA': 'Industrials', 'ORAS.CA': 'Construction', 'ESRS.CA': 'Materials', 'CCAP.CA': 'Diversified',
-    'JUFO.CA': 'Consumer Staples', 'DOMT.CA': 'Consumer Staples', 'OBRI.CA': 'Consumer Staples', 'EFID.CA': 'Consumer Staples',
-
-    // ADX Sectors
-    'IHC.AD': 'Direct Investment', 'MULTIPLY.AD': 'Direct Investment',
-    'FAB.AD': 'Financials', 'ADCB.AD': 'Financials',
-    'ETISALAT.AD': 'Telecommunication', 'ALYAHSAT.AD': 'Space & Satellite',
-    'ADNOCDIST.AD': 'Energy', 'ADNOCLS.AD': 'Energy', 'ADNOCDRILL.AD': 'Energy', 'DANA.AD': 'Energy',
-    'BOROUGE.AD': 'Materials', 'FERTIGLOBE.AD': 'Materials',
-    'ALDAR.AD': 'Real Estate', 'ADPORTS.AD': 'Logistics',
+    // Regional
+    'COMI.CA': 'Finance', 'FWRY.CA': 'Fintech', 'TMGH.CA': 'Real Estate', 'ETEL.CA': 'Telecom',
+    'IHC.AD': 'Energy', 'FAB.AD': 'Finance', 'ETISALAT.AD': 'Telecom',
 };
 
 const NAME_MAP: Record<string, string> = {
@@ -129,11 +112,36 @@ const NAME_MAP: Record<string, string> = {
     'SLB': 'Schlumberger', 'PLD': 'Prologis Inc.', 'COP': 'ConocoPhillips', 'UNP': 'Union Pacific', 'HON': 'Honeywell',
     'MMM': '3M Company', 'LMT': 'Lockheed Martin', 'SYK': 'Stryker Corp.', 'BLK': 'BlackRock Inc.', 'BKNG': 'Booking Holdings',
     'GS': 'Goldman Sachs', 'MDLZ': 'Mondelez Intl', 'DE': 'Deere & Co.', 'TJX': 'TJX Companies', 'C': 'Citigroup Inc.',
+    'AXP': 'American Express', 'ISRG': 'Intuitive Surgical', 'AMT': 'American Tower', 'RTX': 'Raytheon Tech', 'REGN': 'Regeneron Pharma',
+    'ZTS': 'Zoetis Inc.', 'MO': 'Altria Group', 'CB': 'Chubb Limited', 'ADI': 'Analog Devices', 'BSX': 'Boston Scientific',
+    'MTD': 'Mettler-Toledo', 'EL': 'Estée Lauder', 'EMR': 'Emerson Electric', 'EW': 'Edwards Lifesciences', 'CI': 'Cigna Group',
+    'HUM': 'Humana Inc.', 'WM': 'Waste Management', 'PNC': 'PNC Financial', 'VRTX': 'Vertex Pharma', 'ITW': 'Illinois Tool Works',
+    'NOC': 'Northrop Grumman', 'DG': 'Dollar General', 'SO': 'Southern Co.', 'D': 'Dominion Energy', 'DUK': 'Duke Energy',
+    'USB': 'US Bancorp', 'T': 'AT&T Inc.', 'GPN': 'Global Payments', 'FIS': 'Fidelity National', 'FDX': 'FedEx Corp.',
+    'NEE': 'NextEra Energy', 'PM': 'Philip Morris', 'UPS': 'United Parcel Service', 'MMC': 'Marsh & McLennan', 'ADP': 'ADP Inc.',
+    'PYPL': 'PayPal Holdings', 'AIG': 'AIG Inc.', 'SCHW': 'Charles Schwab', 'ADSK': 'Autodesk Inc.', 'FTNT': 'Fortinet Inc.',
+    'APD': 'Air Products', 'SHW': 'Sherwin-Williams', 'FCX': 'Freeport-McMoRan', 'NEM': 'Newmont Corp.',
 };
 
 interface InstitutionalScreenerProps {
     onSelectSymbol: (symbol: string) => void;
 }
+
+const SECTOR_PRIORITY: Record<string, number> = {
+    'Information Technology': 1,
+    'Communication Services': 2,
+    'Consumer Discretionary': 3,
+    'Financials': 4,
+    'Health Care': 5,
+    'Industrials': 6,
+    'Consumer Staples': 7,
+    'Energy': 8,
+    'Utilities': 9,
+    'Real Estate': 10,
+    'Materials': 11,
+    'Finance': 12,
+    'Telecom': 13,
+};
 
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
     const { timeframe, setTimeframe, selectedMarket } = useMarket();
@@ -291,11 +299,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                 return acc;
                             }, {} as Record<string, Stock[]>)
                         )
-                            .sort((a, b) => {
-                                const avgA = a[1].reduce((sum, s) => sum + s.changePercent, 0) / a[1].length;
-                                const avgB = b[1].reduce((sum, s) => sum + s.changePercent, 0) / b[1].length;
-                                return avgB - avgA;
-                            })
+                            .sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99))
                             .map(([sector, sectorStocks], index) => {
                                 const sectorAvgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
                                 const upCount = sectorStocks.filter(s => s.changePercent > 0).length;
@@ -410,7 +414,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                                 { NAME_MAP[stock.symbol] || (stock.name.toLowerCase().includes('unavailable') ? stock.symbol : stock.name) }
                                                             </div>
                                                             <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                                                                {`(${stock.symbol})`}
+                                                                {stock.symbol}
                                                             </div>
                                                         </div>
                                                     </div>
