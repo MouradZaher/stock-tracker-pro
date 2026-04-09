@@ -746,7 +746,17 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 
                 const quotes = response.data?.quoteResponse?.result || [];
                 for (const quote of quotes) {
-                    const originalSymbol = reverseSymbolMap.get(quote.symbol) || symbols.find(s => s === quote.symbol.split('.')[0]) || quote.symbol;
+                    const apiSymbol = quote.symbol.toUpperCase();
+                    // Strategy 1: Direct Reverse Map
+                    let originalSymbol = reverseSymbolMap.get(apiSymbol) || reverseSymbolMap.get(quote.symbol);
+                    
+                    // Strategy 2: Case-Insensitive Search in symbols list
+                    if (!originalSymbol) {
+                        originalSymbol = symbols.find(s => s.toUpperCase() === apiSymbol || s.toUpperCase() === apiSymbol.split('.')[0]);
+                    }
+
+                    // Strategy 3: Default to API symbol
+                    if (!originalSymbol) originalSymbol = quote.symbol;
 
                     if (quote.price > 0) {
                         const finalPrice = quote.price;

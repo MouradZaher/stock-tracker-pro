@@ -147,14 +147,17 @@ const SECTOR_PRIORITY: Record<string, number> = {
 };
 
 const getDisplayName = (symbol: string, apiName: string): string => {
-    const s = symbol.toUpperCase();
-    const baseName = NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? symbol : apiName.split('(')[0].split('[')[0].trim());
-    return baseName.replace(/[()]/g, '').trim(); 
+    if (!symbol) return '';
+    // Normalize: strip .US, .O, .AD, .CA, -B, .B and whitespace
+    const s = symbol.toUpperCase().split('.')[0].split(':')[0].split('-')[0].trim();
+    const name = NAME_MAP[symbol.toUpperCase().trim()] || NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? s : apiName.split('(')[0].split('[')[0].split('-')[0].trim());
+    return name.replace(/[()]/g, '').trim(); 
 };
 
 const getSector = (symbol: string): string => {
-    const s = symbol.toUpperCase();
-    return SECTOR_MAP[s] || 'Miscellaneous';
+    if (!symbol) return 'Miscellaneous';
+    const s = symbol.toUpperCase().split('.')[0].split(':')[0].split('-')[0].trim();
+    return SECTOR_MAP[symbol.toUpperCase().trim()] || SECTOR_MAP[s] || 'Miscellaneous';
 };
 
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
