@@ -161,20 +161,34 @@ export const parsers = {
         const quote = data?.quoteResponse?.result?.[0];
         if (!quote) return null;
 
-        // Determine the most relevant price based on market state
-        let price = quote.regularMarketPrice || 0;
+        // Extract prices and timestamps for comparison
+        const regPrice = quote.regularMarketPrice || 0;
+        const regTime = quote.regularMarketTime || 0;
+        
+        const prePrice = quote.preMarketPrice || 0;
+        const preTime = quote.preMarketTime || 0;
+        
+        const postPrice = quote.postMarketPrice || 0;
+        const postTime = quote.postMarketTime || 0;
+
+        // Determine the most recent data point based on timestamps
+        // This ensures the feed matches TradingView's "Latest Tick" logic
+        let price = regPrice;
         let change = quote.regularMarketChange || 0;
         let changePercent = quote.regularMarketChangePercent || 0;
 
-        const state = quote.marketState;
-        if ((state === 'PRE' || state === 'PREPRE') && quote.preMarketPrice) {
-            price = quote.preMarketPrice;
-            change = quote.preMarketChange ?? change;
-            changePercent = quote.preMarketChangePercent ?? changePercent;
-        } else if ((state === 'POST' || state === 'CLOSED') && quote.postMarketPrice) {
-            price = quote.postMarketPrice;
-            change = quote.postMarketChange ?? change;
-            changePercent = quote.postMarketChangePercent ?? changePercent;
+        const maxTime = Math.max(regTime, preTime, postTime);
+
+        if (maxTime > 0) {
+            if (maxTime === preTime && prePrice > 0) {
+                price = prePrice;
+                change = quote.preMarketChange ?? change;
+                changePercent = quote.preMarketChangePercent ?? changePercent;
+            } else if (maxTime === postTime && postPrice > 0) {
+                price = postPrice;
+                change = quote.postMarketChange ?? change;
+                changePercent = quote.postMarketChangePercent ?? changePercent;
+            }
         }
 
         return {

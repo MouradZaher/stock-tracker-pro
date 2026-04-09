@@ -718,53 +718,56 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 
     // Try batch request first via proxy
     try {
-        // Map symbols to their suffix-aware versions for the proxy call
-        const mappedSymbols = symbols.map(s => getSearchSymbol(s));
+        // Split symbols into batches of 50 to ensure API stability and bypass length limits
+        const batchSize = 50;
+        for (let i = 0; i < mappedSymbols.length; i += batchSize) {
+            const batch = mappedSymbols.slice(i, i + batchSize);
+            const symbolsString = batch.join(',');
+            
+            try {
+                const response = await api.get('/multi-quote', {
+                    params: { symbols: symbolsString },
+                    timeout: 10000
+                });
 
-        const symbolsString = mappedSymbols.join(',');
-        const response = await api.get('/multi-quote', {
-            params: { symbols: symbolsString },
-            timeout: 15000
-        });
+                const quotes = response.data?.quoteResponse?.result || [];
+                for (const quote of quotes) {
+                    const sym = quote.symbol.split('.')[0];
+                    const originalSymbol = symbols.find(s => s === sym || s === quote.symbol) || sym;
 
-        const quotes = response.data?.quoteResponse?.result || [];
-        for (const quote of quotes) {
-            // Match back to the original symbol (strip suffix)
-            const sym = quote.symbol.split('.')[0];
-            const originalSymbol = symbols.find(s => s === sym || s === quote.symbol) || sym;
+                    if (quote.price > 0) {
+                        const finalPrice = quote.price;
 
-            if (quote.price > 0) {
-                // Real-time jitter disabled per user request for "not simulation"
-                const finalPrice = quote.price;
-
-                const stock: Stock = {
-                    symbol: originalSymbol,
-                    name: quote.name || originalSymbol,
-                    price: finalPrice,
-                    change: quote.change || 0,
-                    changePercent: quote.changePercent || 0,
-                    previousClose: quote.previousClose || 0,
-                    open: quote.open || 0,
-                    high: quote.high || 0,
-                    low: quote.low || 0,
-                    volume: quote.volume || 0,
-                    avgVolume: quote.avgVolume || 0,
-                    marketCap: quote.marketCap || 0,
-                    peRatio: quote.peRatio || 0,
-                    eps: quote.eps || 0,
-                    dividendYield: quote.dividendYield || 0,
-                    pegRatio: quote.pegRatio || 0,
-                    fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
-                    fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
-                    totalValue: quote.price * (quote.volume || 0),
-                    totalBuy: null,
-                    totalSell: null,
-                    lastUpdated: new Date(),
-                    isFallback: quote.provider === 'price_map' || response.data?._provider === 'price_map',
-                };
-                stockMap.set(originalSymbol, stock);
-                setCachedData(`last_good_${originalSymbol}`, quote);
-                setCachedData(`quote_${originalSymbol}`, quote);
+                        const stock: Stock = {
+                            symbol: originalSymbol,
+                            name: quote.name || originalSymbol,
+                            price: finalPrice,
+                            change: quote.change || 0,
+                            changePercent: quote.changePercent || 0,
+                            previousClose: quote.previousClose || 0,
+                            open: quote.open || 0,
+                            high: quote.high || 0,
+                            low: quote.low || 0,
+                            volume: quote.volume || 0,
+                            avgVolume: quote.avgVolume || 0,
+                            marketCap: quote.marketCap || 0,
+                            peRatio: quote.peRatio || 0,
+                            eps: quote.eps || 0,
+                            dividendYield: quote.dividendYield || 0,
+                            pegRatio: quote.pegRatio || 0,
+                            fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh || 0,
+                            fiftyTwoWeekLow: quote.fiftyTwoWeekLow || 0,
+                            totalValue: quote.price * (quote.volume || 0),
+                            totalBuy: null,
+                            totalSell: null,
+                            lastUpdated: new Date(),
+                            isFallback: quote.provider === 'price_map' || response.data?._provider === 'price_map',
+                        };
+                        stockMap.set(originalSymbol, stock);
+                    }
+                }
+            } catch (err) {
+                console.error(`Batch ${i/batchSize + 1} failed:`, err);
             }
         }
 

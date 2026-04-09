@@ -17,13 +17,13 @@ export const formatCurrency = (value: number, currency: string = 'USD'): string 
 export const formatCurrencyForMarket = (value: number, currency: string): string => {
     if (!currency || currency === 'USD') return formatCurrency(value);
     try {
-        // EGP and AED use Latin numerals with 2 decimal places
+        // Adjust precision based on price magnitude (Institutional standard)
+        const precision = value < 1 ? 4 : 2;
         const formatted = new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-            // currencyDisplay: 'symbol' gives '£', 'د.إ' — we override with plain code below
+            minimumFractionDigits: precision,
+            maximumFractionDigits: precision,
             currencyDisplay: 'code',
         }).format(value);
         // "EGP 1,234.56" is already correct — just trim extra spaces

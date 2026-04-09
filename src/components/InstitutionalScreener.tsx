@@ -133,7 +133,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
         };
 
         fetchStocks();
-        const interval = setInterval(fetchStocks, 3000); 
+        const interval = setInterval(fetchStocks, 2000); 
         return () => {
             isMounted = false;
             clearInterval(interval);
