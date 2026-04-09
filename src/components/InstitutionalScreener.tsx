@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getMultipleQuotes } from '../services/stockDataService';
 import type { Stock } from '../types';
-import { formatCurrency, formatCurrencyForMarket, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
+import { formatCurrency, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
 import { TrendingUp, TrendingDown, Activity, Eye, Info, ChevronDown } from 'lucide-react';
 import CompanyLogo from './CompanyLogo';
 import { useMarket } from '../contexts/MarketContext';
@@ -146,11 +146,30 @@ const SECTOR_PRIORITY: Record<string, number> = {
     'Investment': 16,
 };
 
+const formatCurrencyForMarket = (value: number, currency: string): string => {
+    if (!currency || currency === 'USD') return formatCurrency(value);
+    try {
+        const precision = value < 1 ? 4 : 2;
+        const formatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency,
+            minimumFractionDigits: precision,
+            maximumFractionDigits: precision,
+            currencyDisplay: 'code',
+        }).format(value);
+        return formatted.trim();
+    } catch {
+        const abs = Math.abs(value);
+        const sign = value < 0 ? '-' : '';
+        const num = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return `${sign}${currency} ${num}`;
+    }
+};
+
 const getDisplayName = (symbol: string, apiName: string): string => {
     if (!symbol) return '';
     const s = symbol.split('.')[0].split(':')[0].split('-')[0].trim().toUpperCase();
     const name = NAME_MAP[symbol.toUpperCase().trim()] || NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? s : apiName.split('(')[0].split('[')[0].split('-')[0].trim());
-    // DEFINITIVE GUARD: Strip all parentheses from the final output
     return name.replace(/\(/g, '').replace(/\)/g, '').trim(); 
 };
 

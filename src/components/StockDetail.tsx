@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, TrendingUp, TrendingDown, Clock, Info, ExternalLink, Activity, PieChart, Shield, Target, Plus, Bell, Trash2, Save, X, Edit, Layers, Globe, Sparkles, Users, Briefcase, DollarSign, Zap } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, Info, ExternalLink, Activity, PieChart, Shield, Target, Plus, Bell, Trash2, Save, X, Edit, Layers, Globe, Sparkles, Users, Briefcase, DollarSign, Zap, CheckCircle } from 'lucide-react';
 
 import { getStockData } from '../services/stockDataService';
 import { REFRESH_INTERVALS } from '../services/api';
@@ -8,6 +8,26 @@ import { formatCurrency, formatPercent, formatNumber, formatNumberPlain, formatT
 import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
 import { useWatchlist } from '../hooks/useWatchlist';
+
+const formatCurrencyForMarket = (value: number, currency: string): string => {
+    if (!currency || currency === 'USD') return formatCurrency(value);
+    try {
+        const precision = value < 1 ? 4 : 2;
+        const formatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency,
+            minimumFractionDigits: precision,
+            maximumFractionDigits: precision,
+            currencyDisplay: 'code',
+        }).format(value);
+        return formatted.trim();
+    } catch {
+        const abs = Math.abs(value);
+        const sign = value < 0 ? '-' : '';
+        const num = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return `${sign}${currency} ${num}`;
+    }
+};
 import { usePortfolioStore } from '../hooks/usePortfolio';
 import { useAuth } from '../contexts/AuthContext';
 import { Star } from 'lucide-react';
