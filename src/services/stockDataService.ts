@@ -726,6 +726,9 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
     // Try batch request first via proxy
     try {
         // Split symbols into batches of 50 to ensure API stability and bypass length limits
+        const reverseSymbolMap = new Map<string, string>();
+        symbols.forEach(s => reverseSymbolMap.set(getSearchSymbol(s), s));
+
         const batchSize = 50;
         for (let i = 0; i < mappedSymbols.length; i += batchSize) {
             const batch = mappedSymbols.slice(i, i + batchSize);
@@ -739,8 +742,7 @@ export const getMultipleQuotes = async (symbols: string[]): Promise<Map<string, 
 
                 const quotes = response.data?.quoteResponse?.result || [];
                 for (const quote of quotes) {
-                    const sym = quote.symbol.split('.')[0];
-                    const originalSymbol = symbols.find(s => s === sym || s === quote.symbol) || sym;
+                    const originalSymbol = reverseSymbolMap.get(quote.symbol) || symbols.find(s => s === quote.symbol.split('.')[0]) || quote.symbol;
 
                     if (quote.price > 0) {
                         const finalPrice = quote.price;
