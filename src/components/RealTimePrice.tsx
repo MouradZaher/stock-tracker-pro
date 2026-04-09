@@ -24,14 +24,15 @@ const RealTimePrice: React.FC<RealTimePriceProps> = ({
             className={`${className} ${flashClass} group relative cursor-help`}
             style={{
                 ...style,
-                transition: 'all 0.5s ease',
-                padding: '2px 8px',
-                borderRadius: '6px',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                padding: '2px 6px',
+                borderRadius: '4px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono', monospace"
+                fontWeight: 950,
+                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '-0.02em'
             }}
         >
             {showCurrency ? formatCurrency(price) : price.toFixed(2)}

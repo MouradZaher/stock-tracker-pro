@@ -56,7 +56,7 @@ const TopBar: React.FC<TopBarProps> = ({ onSelectSymbol }) => {
 
     // Robust Merge: Iterate through desired symbols. Try API first, then Fallback.
     const tickerItems = SYMBOLS.map(sym => {
-        const displayName = getDisplayName(sym);
+        const displayName = getDisplayName(sym).replace(/[()]/g, '');
 
         // 1. Try Live API Data
         if (quotes && quotes.has(sym)) {

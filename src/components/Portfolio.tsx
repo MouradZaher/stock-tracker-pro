@@ -365,8 +365,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                                 <CompanyLogo symbol={pos.symbol} size={32} />
                                                                 <div>
-                                                                    <div style={{ fontWeight: 800 }}>{pos.symbol}</div>
-                                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{pos.name}</div>
+                                                                    <div style={{ fontWeight: 800 }}>{pos.symbol.replace(/[()]/g, '')}</div>
+                                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{pos.name.replace(/[()]/g, '')}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
