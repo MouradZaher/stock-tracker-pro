@@ -39,9 +39,9 @@ const SECTOR_MAP: Record<string, string> = {
     'IBM': 'Information Technology', 'QCOM': 'Information Technology', 'ADI': 'Information Technology',
     'MU': 'Information Technology', 'LRCX': 'Information Technology', 'PANW': 'Information Technology',
     'AMAT': 'Information Technology', 'KLAC': 'Information Technology', 'ADBE': 'Information Technology',
-    'ISRG': 'Information Technology', 'CDNS': 'Information Technology', 'SNPS': 'Information Technology',
+    'CDNS': 'Information Technology', 'SNPS': 'Information Technology',
     'ROP': 'Information Technology', 'ACN': 'Information Technology',
-    
+
     // CONSUMER DISCRETIONARY (SP100)
     'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
     'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
@@ -49,13 +49,13 @@ const SECTOR_MAP: Record<string, string> = {
     'DG': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'F': 'Consumer Discretionary',
     'GM': 'Consumer Discretionary', 'MAR': 'Consumer Discretionary', 'ORLY': 'Consumer Discretionary',
     'AZO': 'Consumer Discretionary', 'LVS': 'Consumer Discretionary', 'DHI': 'Consumer Discretionary',
-    
+
     // COMMUNICATION SERVICES (SP100)
     'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services',
     'DIS': 'Communication Services', 'VZ': 'Communication Services', 'CMCSA': 'Communication Services',
     'T': 'Communication Services', 'CHTR': 'Communication Services', 'TMUS': 'Communication Services',
     'ATVI': 'Communication Services', 'EA': 'Communication Services', 'WBD': 'Communication Services',
-    
+
     // FINANCIALS (SP100)
     'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK-B': 'Financials',
     'BAC': 'Financials', 'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials',
@@ -63,7 +63,7 @@ const SECTOR_MAP: Record<string, string> = {
     'SPGI': 'Financials', 'CME': 'Financials', 'CB': 'Financials', 'PNC': 'Financials',
     'USB': 'Financials', 'TROW': 'Financials', 'AIG': 'Financials', 'MET': 'Financials',
     'MMC': 'Financials', 'AON': 'Financials', 'ICE': 'Financials', 'MCO': 'Financials',
-    
+
     // HEALTH CARE (SP100)
     'LLY': 'Health Care', 'UNH': 'Health Care', 'JNJ': 'Health Care', 'ABBV': 'Health Care',
     'MRK': 'Health Care', 'TMO': 'Health Care', 'ABT': 'Health Care', 'PFE': 'Health Care',
@@ -71,7 +71,7 @@ const SECTOR_MAP: Record<string, string> = {
     'SYK': 'Health Care', 'BMY': 'Health Care', 'VRTX': 'Health Care', 'REGN': 'Health Care',
     'CI': 'Health Care', 'HUM': 'Health Care', 'ZTS': 'Health Care', 'BSX': 'Health Care',
     'ELV': 'Health Care', 'CVS': 'Health Care', 'BDX': 'Health Care', 'MCK': 'Health Care',
-    
+
     // INDUSTRIALS (SP100)
     'GE': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'UNP': 'Industrials',
     'HON': 'Industrials', 'LMT': 'Industrials', 'BA': 'Industrials', 'RTX': 'Industrials',
@@ -79,19 +79,19 @@ const SECTOR_MAP: Record<string, string> = {
     'NOC': 'Industrials', 'GD': 'Industrials', 'WM': 'Industrials', 'ITW': 'Industrials',
     'EMR': 'Industrials', 'ETN': 'Industrials', 'PH': 'Industrials', 'TDG': 'Industrials',
     'ADP': 'Industrials', 'CPRT': 'Industrials',
-    
+
     // ENERGY (SP100)
     'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy',
     'MPC': 'Energy', 'PSX': 'Energy', 'VLO': 'Energy', 'PXD': 'Energy', 'OXY': 'Energy',
     'HES': 'Energy', 'DVN': 'Energy',
-    
+
     // CONSUMER STAPLES (SP100)
     'PG': 'Consumer Staples', 'KO': 'Consumer Staples', 'PEP': 'Consumer Staples',
     'WMT': 'Consumer Staples', 'COST': 'Consumer Staples', 'PM': 'Consumer Staples',
     'MO': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'EL': 'Consumer Staples',
     'CL': 'Consumer Staples', 'KDP': 'Consumer Staples', 'KMB': 'Consumer Staples',
     'GIS': 'Consumer Staples', 'ADM': 'Consumer Staples', 'STZ': 'Consumer Staples',
-    
+
     // MATERIALS & UTILITIES & REAL ESTATE
     'LIN': 'Materials', 'APD': 'Materials', 'SHW': 'Materials', 'FCX': 'Materials', 'NEM': 'Materials',
     'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities', 'EXC': 'Utilities',
@@ -104,7 +104,7 @@ const SECTOR_MAP: Record<string, string> = {
     'ABUK.CA': 'Chemicals & Materials', 'SKPC.CA': 'Chemicals & Materials', 'MICH.CA': 'Chemicals & Materials', 'MFOT.CA': 'Chemicals & Materials',
     'SWDY.CA': 'Industrials', 'ORAS.CA': 'Construction', 'ESRS.CA': 'Materials', 'CCAP.CA': 'Diversified',
     'JUFO.CA': 'Consumer Staples', 'DOMT.CA': 'Consumer Staples', 'OBRI.CA': 'Consumer Staples', 'EFID.CA': 'Consumer Staples',
-    
+
     // ADX Sectors
     'IHC.AD': 'Direct Investment', 'MULTIPLY.AD': 'Direct Investment',
     'FAB.AD': 'Financials', 'ADCB.AD': 'Financials',
@@ -128,28 +128,28 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
     // High-frequency polling to ensure live data sync
     useEffect(() => {
         let isMounted = true;
-        
+
         // Resolve symbols based on selected market
-        const marketSymbols = selectedMarket.id === 'egypt' 
-            ? EGX30_SYMBOLS 
-            : selectedMarket.id === 'abudhabi' 
-                ? ADX15_SYMBOLS 
+        const marketSymbols = selectedMarket.id === 'egypt'
+            ? EGX30_SYMBOLS
+            : selectedMarket.id === 'abudhabi'
+                ? ADX15_SYMBOLS
                 : SP100_SYMBOLS;
 
         const fetchStocks = async () => {
             try {
                 const map = await getMultipleQuotes(marketSymbols);
                 if (!isMounted) return;
-                
+
                 const loadedStocks: Stock[] = [];
                 marketSymbols.forEach(sym => {
                     if (map.has(sym)) loadedStocks.push(map.get(sym)!);
                 });
-                
+
                 // Detection of price changes for animations
                 const newFlashes: Record<string, 'up' | 'down' | null> = {};
                 const newPrevPrices: Record<string, number> = { ...prevPrices };
-                
+
                 loadedStocks.forEach(stock => {
                     const prevPrice = prevPrices[stock.symbol];
                     if (prevPrice !== undefined && stock.price !== prevPrice) {
@@ -163,7 +163,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                 if (Object.keys(newFlashes).length > 0) {
                     setFlashStates(prev => ({ ...prev, ...newFlashes }));
                     setPrevPrices(newPrevPrices);
-                    
+
                     setTimeout(() => {
                         setFlashStates(prev => {
                             const cleared = { ...prev };
@@ -175,7 +175,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
 
                 // Sort by relative strength (change %) for matrix visibility
                 loadedStocks.sort((a, b) => (b.changePercent || 0) - (a.changePercent || 0));
-                
+
                 setStocks(loadedStocks);
             } catch (err) {
                 console.error(`Failed to load ${selectedMarket.id} Screener:`, err);
@@ -185,7 +185,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
         };
 
         fetchStocks();
-        const interval = setInterval(fetchStocks, 2000); 
+        const interval = setInterval(fetchStocks, 2000);
         return () => {
             isMounted = false;
             clearInterval(interval);
@@ -206,16 +206,16 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
                 <div style={{ minWidth: '1250px', display: 'flex', flexDirection: 'column' }}>
                     {/* Table Header Overlay */}
-                    <div style={{ 
-                        display: 'flex', 
-                        borderBottom: '1px solid var(--glass-border)', 
-                        padding: '0.6rem 0', 
-                        background: 'rgba(10,10,18,0.95)', 
+                    <div style={{
+                        display: 'flex',
+                        borderBottom: '1px solid var(--glass-border)',
+                        padding: '0.6rem 0',
+                        background: 'rgba(10,10,18,0.95)',
                         backdropFilter: 'blur(10px)',
-                        fontWeight: 900, 
-                        fontSize: '0.62rem', 
-                        color: 'var(--color-text-tertiary)', 
-                        textTransform: 'uppercase', 
+                        fontWeight: 900,
+                        fontSize: '0.62rem',
+                        color: 'var(--color-text-tertiary)',
+                        textTransform: 'uppercase',
                         letterSpacing: '0.12em',
                         position: 'sticky',
                         top: 0,
@@ -230,14 +230,14 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                         </div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', position: 'relative' }}>
-                            <select 
-                                value={timeframe} 
+                            <select
+                                value={timeframe}
                                 onChange={(e) => setTimeframe(e.target.value)}
                                 style={{
                                     appearance: 'none',
                                     background: 'transparent',
                                     border: 'none',
-                                    color: 'var(--color-accent)', 
+                                    color: 'var(--color-accent)',
                                     fontSize: '0.62rem',
                                     fontWeight: 900,
                                     padding: '0 14px 0 0',
@@ -274,35 +274,35 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                 return acc;
                             }, {} as Record<string, Stock[]>)
                         )
-                        .sort((a, b) => {
-                            const avgA = a[1].reduce((sum, s) => sum + s.changePercent, 0) / a[1].length;
-                            const avgB = b[1].reduce((sum, s) => sum + s.changePercent, 0) / b[1].length;
-                            return avgB - avgA;
-                        })
-                        .map(([sector, sectorStocks], index) => {
-                            const sectorAvgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
-                            const upCount = sectorStocks.filter(s => s.changePercent > 0).length;
-                            const downCount = sectorStocks.length - upCount;
-                            const isPositiveSector = sectorAvgChange >= 0;
-                            
-                            // Sort stocks inside each sector by highest returns as requested
-                            const sortedSectorStocks = [...sectorStocks].sort((a, b) => b.changePercent - a.changePercent);
+                            .sort((a, b) => {
+                                const avgA = a[1].reduce((sum, s) => sum + s.changePercent, 0) / a[1].length;
+                                const avgB = b[1].reduce((sum, s) => sum + s.changePercent, 0) / b[1].length;
+                                return avgB - avgA;
+                            })
+                            .map(([sector, sectorStocks], index) => {
+                                const sectorAvgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
+                                const upCount = sectorStocks.filter(s => s.changePercent > 0).length;
+                                const downCount = sectorStocks.length - upCount;
+                                const isPositiveSector = sectorAvgChange >= 0;
 
-                            return (
-                                <React.Fragment key={sector}>
-                                    {/* Sector Header Row */}
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        padding: '12px 1.5rem', 
-                                        background: 'rgba(255,255,255,0.03)', 
-                                        borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                        position: 'sticky',
-                                        top: '40px', 
-                                        zIndex: 80,
-                                        backdropFilter: 'blur(10px)'
-                                    }}>
-                                            <div style={{ 
+                                // Sort stocks inside each sector by highest returns as requested
+                                const sortedSectorStocks = [...sectorStocks].sort((a, b) => b.changePercent - a.changePercent);
+
+                                return (
+                                    <React.Fragment key={sector}>
+                                        {/* Sector Header Row */}
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            padding: '12px 1.5rem',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                            position: 'sticky',
+                                            top: '40px',
+                                            zIndex: 80,
+                                            backdropFilter: 'blur(10px)'
+                                        }}>
+                                            <div style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -320,9 +320,9 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                             <span style={{ fontSize: '0.75rem', fontWeight: 950, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                                                 {sector}
                                             </span>
-                                            <span style={{ 
-                                                fontSize: '0.62rem', 
-                                                fontWeight: 800, 
+                                            <span style={{
+                                                fontSize: '0.62rem',
+                                                fontWeight: 800,
                                                 color: isPositiveSector ? 'var(--color-success)' : 'var(--color-error)',
                                                 background: isPositiveSector ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                                                 padding: '2px 6px',
@@ -340,155 +340,155 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                             </span>
                                         </div>
 
-                                    {sortedSectorStocks.map((stock) => {
-                                        const displayChange = stock.changePercent;
-                                        const displayVolume = stock.volume;
-                                        const isPositive = displayChange >= 0;
-                                        const flash = flashStates[stock.symbol];
-                                        
-                                        const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow) 
-                                            ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)
-                                            : 0.5;
-                                        
-                                        // Handle null states for missing data to match professional terminals
-                                        const hasData = stock.price > 0 && stock.fiftyTwoWeekHigh > 0;
-                                        
-                                        // Realistically derive RSI from range position + current momentum if data exists
-                                        const rsiReal = hasData ? (rangePos * 60) + 20 + (stock.changePercent * 2.5) : null;
-                                        const rsi = rsiReal !== null ? Math.max(15, Math.min(85, rsiReal)) : null;
-                                        
-                                        // Realistically derive Momentum from trend + relative position
-                                        const momentum = hasData ? 50 + (stock.changePercent * 6) + (rangePos * 20 - 10) : null;
-                                        
-                                        return (
-                                            <div 
-                                                key={stock.symbol} 
-                                                className={`screener-row ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`} 
-                                                onClick={() => onSelectSymbol(stock.symbol)} 
-                                                style={{
-                                                    display: 'flex',
-                                                    height: '52px',
-                                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                                    alignItems: 'center',
-                                                    cursor: 'pointer',
-                                                    transition: 'background 0.2s',
-                                                }}
-                                            >
-                                                <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <div style={{ position: 'relative' }}>
-                                                        <CompanyLogo symbol={stock.symbol} size={32} />
-                                                        <div style={{ 
-                                                            position: 'absolute', 
-                                                            bottom: -2, 
-                                                            right: -2, 
-                                                            width: 8, 
-                                                            height: 8, 
-                                                            borderRadius: '50%', 
-                                                            background: isPositive ? 'var(--color-success)' : 'var(--color-error)',
-                                                            border: '2px solid var(--color-bg)'
-                                                        }} />
-                                                    </div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
-                                                        <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                                                            { (stock.name === stock.symbol || stock.name.toLowerCase().includes('unavailable')) ? stock.symbol : stock.name }
+                                        {sortedSectorStocks.map((stock) => {
+                                            const displayChange = stock.changePercent;
+                                            const displayVolume = stock.volume;
+                                            const isPositive = displayChange >= 0;
+                                            const flash = flashStates[stock.symbol];
+
+                                            const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow)
+                                                ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)
+                                                : 0.5;
+
+                                            // Handle null states for missing data to match professional terminals
+                                            const hasData = stock.price > 0 && stock.fiftyTwoWeekHigh > 0;
+
+                                            // Realistically derive RSI from range position + current momentum if data exists
+                                            const rsiReal = hasData ? (rangePos * 60) + 20 + (stock.changePercent * 2.5) : null;
+                                            const rsi = rsiReal !== null ? Math.max(15, Math.min(85, rsiReal)) : null;
+
+                                            // Realistically derive Momentum from trend + relative position
+                                            const momentum = hasData ? 50 + (stock.changePercent * 6) + (rangePos * 20 - 10) : null;
+
+                                            return (
+                                                <div
+                                                    key={stock.symbol}
+                                                    className={`screener-row ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`}
+                                                    onClick={() => onSelectSymbol(stock.symbol)}
+                                                    style={{
+                                                        display: 'flex',
+                                                        height: '52px',
+                                                        borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                                        alignItems: 'center',
+                                                        cursor: 'pointer',
+                                                        transition: 'background 0.2s',
+                                                    }}
+                                                >
+                                                    <div style={{ flex: '0 0 320px', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <div style={{ position: 'relative' }}>
+                                                            <CompanyLogo symbol={stock.symbol} size={32} />
+                                                            <div style={{
+                                                                position: 'absolute',
+                                                                bottom: -2,
+                                                                right: -2,
+                                                                width: 8,
+                                                                height: 8,
+                                                                borderRadius: '50%',
+                                                                background: isPositive ? 'var(--color-success)' : 'var(--color-error)',
+                                                                border: '2px solid var(--color-bg)'
+                                                            }} />
                                                         </div>
-                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                                                            {`(${stock.symbol})`}
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div style={{ 
-                                                    flex: '0 0 110px', 
-                                                    padding: '0 0.5rem', 
-                                                    textAlign: 'right'
-                                                }}>
-                                                    <span style={{
-                                                        fontWeight: 800,
-                                                        fontFamily: "'JetBrains Mono', monospace",
-                                                        fontSize: '1rem',
-                                                        color: flashStates[stock.symbol] === 'up' ? 'var(--color-success)' : flashStates[stock.symbol] === 'down' ? 'var(--color-error)' : 'white',
-                                                        transition: 'color 0.2s ease'
-                                                    }}>
-                                                        {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
-                                                    </span>
-                                                </div>
-
-                                                <div className={getChangeClass(displayChange)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-                                                    {isPositive ? <TrendingUp size={12} strokeWidth={3} /> : <TrendingDown size={12} strokeWidth={3} />}
-                                                    {formatPercent(displayChange)}
-                                                </div>
-
-                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                                                    { stock.volume > 0 ? formatNumberPlain(stock.volume) : '--' }
-                                                </div>
-
-                                                <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.8rem' }}>
-                                                    {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '--'}
-                                                </div>
-
-                                                <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
-                                                        <div style={{ 
-                                                            position: 'absolute', 
-                                                            height: '9px', 
-                                                            width: '2px', 
-                                                            background: 'var(--color-accent)', 
-                                                            top: '-3px', 
-                                                            left: `${Math.max(2, Math.min(98, ((stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)) * 100))}%`, 
-                                                            boxShadow: '0 0 8px var(--color-accent)',
-                                                            zIndex: 2
-                                                        }} />
-                                                    </div>
-                                                </div>
-
-                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                    {momentum !== null ? (
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-                                                            <span style={{ fontSize: '0.72rem', fontWeight: 950, color: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)', fontFamily: "'JetBrains Mono', monospace" }}>
-                                                                {momentum.toFixed(1)}
-                                                            </span>
-                                                            <div style={{ width: '30px', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '1px', overflow: 'hidden' }}>
-                                                                <div style={{ width: `${momentum}%`, height: '100%', background: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                                                            <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                                                {(stock.name === stock.symbol || stock.name.toLowerCase().includes('unavailable')) ? stock.symbol : stock.name}
+                                                            </div>
+                                                            <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                                {`(${stock.symbol})`}
                                                             </div>
                                                         </div>
-                                                    ) : '--'}
-                                                </div>
+                                                    </div>
 
-                                                <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                    {rsi !== null ? (
-                                                        <div style={{ 
-                                                            display: 'inline-block',
-                                                            padding: '2px 8px', 
-                                                            borderRadius: '4px', 
-                                                            fontSize: '0.65rem', 
-                                                            fontWeight: 950, 
-                                                            background: rsi > 70 ? 'rgba(239, 68, 68, 0.15)' : rsi < 30 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.04)', 
-                                                            color: rsi > 70 ? 'var(--color-error)' : rsi < 30 ? 'var(--color-success)' : 'var(--color-text-primary)',
-                                                            border: `1px solid ${rsi > 70 ? 'rgba(239, 68, 68, 0.2)' : rsi < 30 ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`,
-                                                            fontFamily: "'JetBrains Mono', monospace"
+                                                    <div style={{
+                                                        flex: '0 0 110px',
+                                                        padding: '0 0.5rem',
+                                                        textAlign: 'right'
+                                                    }}>
+                                                        <span style={{
+                                                            fontWeight: 800,
+                                                            fontFamily: "'JetBrains Mono', monospace",
+                                                            fontSize: '1rem',
+                                                            color: flashStates[stock.symbol] === 'up' ? 'var(--color-success)' : flashStates[stock.symbol] === 'down' ? 'var(--color-error)' : 'white',
+                                                            transition: 'color 0.2s ease'
                                                         }}>
-                                                            {rsi.toFixed(1)}
-                                                        </div>
-                                                    ) : '--'}
-                                                </div>
+                                                            {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
+                                                        </span>
+                                                    </div>
 
-                                                <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <button 
-                                                        className="btn-icon glass-button highlight-on-hover"
-                                                        onClick={(e) => { e.stopPropagation(); onSelectSymbol(stock.symbol); }}
-                                                        style={{ padding: '6px', borderRadius: '6px', color: 'var(--color-accent)' }}
-                                                        title="Deep Analysis"
-                                                    >
-                                                        <Eye size={15} strokeWidth={2.5} />
-                                                    </button>
+                                                    <div className={getChangeClass(displayChange)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                                                        {isPositive ? <TrendingUp size={12} strokeWidth={3} /> : <TrendingDown size={12} strokeWidth={3} />}
+                                                        {formatPercent(displayChange)}
+                                                    </div>
+
+                                                    <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                        {stock.volume > 0 ? formatNumberPlain(stock.volume) : '--'}
+                                                    </div>
+
+                                                    <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.8rem' }}>
+                                                        {(stock.pegRatio && stock.pegRatio > 0) ? stock.pegRatio.toFixed(2) : '--'}
+                                                    </div>
+
+                                                    <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
+                                                            <div style={{
+                                                                position: 'absolute',
+                                                                height: '9px',
+                                                                width: '2px',
+                                                                background: 'var(--color-accent)',
+                                                                top: '-3px',
+                                                                left: `${Math.max(2, Math.min(98, ((stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow)) * 100))}%`,
+                                                                boxShadow: '0 0 8px var(--color-accent)',
+                                                                zIndex: 2
+                                                            }} />
+                                                        </div>
+                                                    </div>
+
+                                                    <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                        {momentum !== null ? (
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+                                                                <span style={{ fontSize: '0.72rem', fontWeight: 950, color: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                                    {momentum.toFixed(1)}
+                                                                </span>
+                                                                <div style={{ width: '30px', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '1px', overflow: 'hidden' }}>
+                                                                    <div style={{ width: `${momentum}%`, height: '100%', background: momentum > 60 ? 'var(--color-success)' : momentum < 40 ? 'var(--color-error)' : 'var(--color-warning)' }} />
+                                                                </div>
+                                                            </div>
+                                                        ) : '--'}
+                                                    </div>
+
+                                                    <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                        {rsi !== null ? (
+                                                            <div style={{
+                                                                display: 'inline-block',
+                                                                padding: '2px 8px',
+                                                                borderRadius: '4px',
+                                                                fontSize: '0.65rem',
+                                                                fontWeight: 950,
+                                                                background: rsi > 70 ? 'rgba(239, 68, 68, 0.15)' : rsi < 30 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.04)',
+                                                                color: rsi > 70 ? 'var(--color-error)' : rsi < 30 ? 'var(--color-success)' : 'var(--color-text-primary)',
+                                                                border: `1px solid ${rsi > 70 ? 'rgba(239, 68, 68, 0.2)' : rsi < 30 ? 'rgba(16, 185, 129, 0.2)' : 'transparent'}`,
+                                                                fontFamily: "'JetBrains Mono', monospace"
+                                                            }}>
+                                                                {rsi.toFixed(1)}
+                                                            </div>
+                                                        ) : '--'}
+                                                    </div>
+
+                                                    <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <button
+                                                            className="btn-icon glass-button highlight-on-hover"
+                                                            onClick={(e) => { e.stopPropagation(); onSelectSymbol(stock.symbol); }}
+                                                            style={{ padding: '6px', borderRadius: '6px', color: 'var(--color-accent)' }}
+                                                            title="Deep Analysis"
+                                                        >
+                                                            <Eye size={15} strokeWidth={2.5} />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
-                                </React.Fragment>
-                            );
-                        })}
+                                            );
+                                        })}
+                                    </React.Fragment>
+                                );
+                            })}
                     </div>
                 </div>
             </div>
