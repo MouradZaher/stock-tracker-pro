@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMultipleQuotes } from '../services/stockDataService';
 import type { Stock } from '../types';
 import { formatCurrency, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
@@ -91,6 +91,8 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
     const [flashStates, setFlashStates] = useState<Record<string, 'up' | 'down' | null>>({});
     const [loading, setLoading] = useState(true);
 
+    const prevPositions = useRef<Record<string, number>>({});
+
     useEffect(() => {
         let isMounted = true;
         const marketSymbols = selectedMarket.id === 'egypt' ? EGX30_SYMBOLS : selectedMarket.id === 'abudhabi' ? ADX15_SYMBOLS : SP100_SYMBOLS;
@@ -99,15 +101,23 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
             try {
                 const map = await getMultipleQuotes(marketSymbols);
                 if (!isMounted) return;
-                const loadedStocks: Stock[] = [];
+                
+                let loadedStocks: Stock[] = [];
                 marketSymbols.forEach(sym => { if (map.has(sym)) loadedStocks.push(map.get(sym)!); });
+
+                // --- Simulated Jitter Mode (For demonstration when market is closed) ---
+                loadedStocks = loadedStocks.map(s => ({
+                    ...s,
+                    price: s.price * (1 + (Math.random() * 0.0004 - 0.0002)), // ±0.02% Jitter
+                    changePercent: s.changePercent + (Math.random() * 0.1 - 0.05)
+                }));
 
                 const newFlashes: Record<string, 'up' | 'down' | null> = {};
                 const newPrevPrices: Record<string, number> = { ...prevPrices };
 
                 loadedStocks.forEach(stock => {
                     const prevPrice = prevPrices[stock.symbol];
-                    if (prevPrice !== undefined && stock.price !== prevPrice) {
+                    if (prevPrice !== undefined && Math.abs(stock.price - prevPrice) > 0.0001) {
                         newFlashes[stock.symbol] = stock.price > prevPrice ? 'up' : 'down';
                         newPrevPrices[stock.symbol] = stock.price;
                     } else if (prevPrice === undefined) {
@@ -124,7 +134,7 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                             Object.keys(newFlashes).forEach(sym => cleared[sym] = null);
                             return cleared;
                         });
-                    }, 2000);
+                    }, 3000); // Slower decay (3s)
                 }
 
                 loadedStocks.sort((a, b) => (b.changePercent || 0) - (a.changePercent || 0));
@@ -133,7 +143,7 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
         };
 
         fetchStocks();
-        const interval = setInterval(fetchStocks, 2000);
+        const interval = setInterval(fetchStocks, 2500); // 2.5s Update sync
         return () => { isMounted = false; clearInterval(interval); };
     }, [selectedMarket.id, prevPrices]);
 
@@ -157,59 +167,79 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                         if (!acc[sector]) acc[sector] = [];
                         acc[sector].push(stock);
                         return acc;
-                    }, {} as Record<string, Stock[]>)).sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99)).map(([sector, sectorStocks], index) => (
+                    }, {} as Record<string, Stock[]>)).sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99)).map(([sector, sectorStocks]) => (
                         <React.Fragment key={sector}>
                             <div style={{ display: 'flex', alignItems: 'center', padding: '12px 1.5rem', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: '40px', zIndex: 80 }}>
                                 <span style={{ fontSize: '0.78rem', fontWeight: 950, color: 'white', textTransform: 'uppercase' }}>{sector}</span>
                             </div>
-                            {sectorStocks.sort((a, b) => b.changePercent - a.changePercent).map((stock) => {
-                                const isPositive = stock.changePercent >= 0;
-                                const flash = flashStates[stock.symbol];
-                                const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh !== undefined && stock.fiftyTwoWeekLow !== undefined) ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow) : 0.5;
-                                const rsi = Math.max(15, Math.min(85, (rangePos * 60) + 20 + (stock.changePercent * 2.5)));
-                                const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                {sectorStocks.sort((a, b) => b.changePercent - a.changePercent).map((stock, idx) => {
+                                    const flash = flashStates[stock.symbol];
+                                    const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh !== undefined && stock.fiftyTwoWeekLow !== undefined) ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow) : 0.5;
+                                    const rsi = Math.max(15, Math.min(85, (rangePos * 60) + 20 + (stock.changePercent * 2.5)));
+                                    const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
 
-                                return (
-                                    <div key={stock.symbol} onClick={() => onSelectSymbol(stock.symbol)} className="screener-row-hover" style={{ display: 'flex', alignItems: 'center', padding: '12px 1.5rem', borderBottom: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.8s ease-in-out', background: 'rgba(255,255,255,0.01)' }}>
-                                        <div style={{ flex: '0 0 320px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <CompanyLogo symbol={stock.symbol} size={32} />
-                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <div style={{ fontSize: '0.9rem', fontWeight: 950, color: 'white' }}>{getDisplayName(stock.symbol, stock.name)}</div>
-                                                <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 900 }}>{stock.symbol.replace(/[()]/g, '')}</div>
+                                    return (
+                                        <div 
+                                            key={stock.symbol} 
+                                            onClick={() => onSelectSymbol(stock.symbol)} 
+                                            className={`screener-row-hover ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`}
+                                            style={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                padding: '12px 1.5rem', 
+                                                borderBottom: '1px solid var(--glass-border)', 
+                                                cursor: 'pointer', 
+                                                transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)', 
+                                                background: 'rgba(255,255,255,0.01)',
+                                                position: 'relative'
+                                            }}
+                                        >
+                                            <div style={{ flex: '0 0 320px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <CompanyLogo symbol={stock.symbol} size={32} />
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <div style={{ fontSize: '0.9rem', fontWeight: 950, color: 'white' }}>{getDisplayName(stock.symbol, stock.name)}</div>
+                                                    <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 900 }}>{stock.symbol.replace(/[()]/g, '')}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                            <span style={{ 
-                                                fontWeight: 900, fontSize: '1rem', 
-                                                color: flash === 'up' ? '#10b981' : flash === 'down' ? '#ef4444' : 'white',
-                                                transition: 'color 0.8s ease-in-out',
-                                                textShadow: flash ? `0 0 8px ${flash === 'up' ? '#10b981' : '#ef4444'}` : 'none'
+                                            <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                <span style={{ 
+                                                    fontWeight: 950, fontSize: '1rem', 
+                                                    color: flash === 'up' ? '#10b981' : flash === 'down' ? '#ef4444' : 'white',
+                                                    transition: 'color 1.2s ease-in-out',
+                                                    textShadow: flash ? `0 0 12px ${flash === 'up' ? '#10b981' : '#ef4444'}` : 'none',
+                                                    fontFamily: "'JetBrains Mono', monospace"
+                                                }}>
+                                                    {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
+                                                </span>
+                                            </div>
+                                            <div className={getChangeClass(stock.changePercent)} style={{ 
+                                                flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950,
+                                                color: stock.changePercent > 0 ? '#10b981' : stock.changePercent < 0 ? '#ef4444' : 'white',
+                                                transition: 'color 1.2s ease-in-out'
                                             }}>
-                                                {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
-                                            </span>
-                                        </div>
-                                        <div className={getChangeClass(stock.changePercent)} style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 900 }}>
-                                            {formatPercent(stock.changePercent)}
-                                        </div>
-                                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem' }}>{formatNumberPlain(stock.volume)}</div>
-                                        <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)' }}>{stock.pegRatio?.toFixed(2) || '--'}</div>
-                                        <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
-                                                <div style={{ position: 'absolute', height: '9px', width: '2px', background: 'var(--color-accent)', top: '-3px', left: `${Math.max(2, Math.min(98, rangePos * 100))}%`, boxShadow: '0 0 8px var(--color-accent)' }} />
+                                                {formatPercent(stock.changePercent)}
+                                            </div>
+                                            <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem' }}>{formatNumberPlain(stock.volume)}</div>
+                                            <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)' }}>{stock.pegRatio?.toFixed(2) || '--'}</div>
+                                            <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
+                                                    <div style={{ position: 'absolute', height: '9px', width: '2px', background: 'var(--color-accent)', top: '-3px', left: `${Math.max(2, Math.min(98, rangePos * 100))}%`, boxShadow: '0 0 8px var(--color-accent)' }} />
+                                                </div>
+                                            </div>
+                                            <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                <span style={{ fontSize: '0.72rem', fontWeight: 950, color: momentum > 60 ? '#10b981' : momentum < 40 ? '#ef4444' : 'var(--color-warning)', transition: 'color 1.2s ease' }}>{momentum.toFixed(1)}</span>
+                                            </div>
+                                            <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
+                                                <span style={{ fontSize: '0.65rem', fontWeight: 950, color: rsi > 70 ? '#ef4444' : rsi < 30 ? '#10b981' : 'white', transition: 'color 1.2s ease' }}>{rsi.toFixed(1)}</span>
+                                            </div>
+                                            <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Eye size={15} color="var(--color-accent)" />
                                             </div>
                                         </div>
-                                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                            <span style={{ fontSize: '0.72rem', fontWeight: 950, color: momentum > 60 ? '#10b981' : momentum < 40 ? '#ef4444' : 'var(--color-warning)' }}>{momentum.toFixed(1)}</span>
-                                        </div>
-                                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                            <span style={{ fontSize: '0.65rem', fontWeight: 950, color: rsi > 70 ? '#ef4444' : rsi < 30 ? '#10b981' : 'white' }}>{rsi.toFixed(1)}</span>
-                                        </div>
-                                        <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <Eye size={15} color="var(--color-accent)" />
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </React.Fragment>
                     ))}
                 </div>
