@@ -227,9 +227,14 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                             const avgB = b[1].reduce((sum, s) => sum + s.changePercent, 0) / b[1].length;
                             return avgB - avgA;
                         })
-                        .map(([sector, sectorStocks]) => {
+                        .map(([sector, sectorStocks], index) => {
                             const sectorAvgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
+                            const upCount = sectorStocks.filter(s => s.changePercent > 0).length;
+                            const downCount = sectorStocks.length - upCount;
                             const isPositiveSector = sectorAvgChange >= 0;
+                            
+                            // Sort stocks inside each sector by highest returns as requested
+                            const sortedSectorStocks = [...sectorStocks].sort((a, b) => b.changePercent - a.changePercent);
 
                             return (
                                 <React.Fragment key={sector}>
@@ -245,14 +250,21 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                         zIndex: 80,
                                         backdropFilter: 'blur(10px)'
                                     }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             <div style={{ 
-                                                width: '4px', 
-                                                height: '20px', 
-                                                background: isPositiveSector ? 'var(--color-success)' : 'var(--color-error)',
-                                                borderRadius: '2px',
-                                                boxShadow: `0 0 10px ${isPositiveSector ? 'var(--color-success)' : 'var(--color-error)'}`
-                                            }} />
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                width: '24px',
+                                                height: '24px',
+                                                borderRadius: '50%',
+                                                background: index === 0 ? 'var(--color-accent)' : index < 3 ? 'var(--color-success-light)' : 'rgba(255,255,255,0.05)',
+                                                color: 'white',
+                                                fontSize: '0.65rem',
+                                                fontWeight: 900,
+                                                border: '1px solid rgba(255,255,255,0.1)'
+                                            }}>
+                                                {index + 1}
+                                            </div>
                                             <span style={{ fontSize: '0.75rem', fontWeight: 950, color: 'white', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                                                 {sector}
                                             </span>
@@ -263,9 +275,13 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                 background: isPositiveSector ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                                                 padding: '2px 6px',
                                                 borderRadius: '4px',
-                                                marginLeft: '8px'
+                                                marginLeft: '8px',
+                                                border: `1px solid ${isPositiveSector ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
                                             }}>
                                                 AVG: {formatPercent(sectorAvgChange)}
+                                            </span>
+                                            <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 800, marginLeft: '4px' }}>
+                                                [{upCount} <TrendingUp size={8} style={{ display: 'inline' }} /> / {downCount} <TrendingDown size={8} style={{ display: 'inline' }} />]
                                             </span>
                                             <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>
                                                 ({sectorStocks.length} Assets)
@@ -273,7 +289,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                         </div>
                                     </div>
 
-                                    {sectorStocks.map((stock) => {
+                                    {sortedSectorStocks.map((stock) => {
                                         const displayChange = stock.changePercent;
                                         const displayVolume = stock.volume;
                                         const isPositive = displayChange >= 0;
