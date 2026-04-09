@@ -190,8 +190,10 @@ export const getSearchSymbol = (symbol: string): string => {
     if (!symbol) return '';
     if (symbol.includes(':')) return symbol.split(':').pop() || symbol;
 
-    if (symbol === 'BRK-B') return 'BRK-B'; // Yahoo B-shares fallback
-    if (symbol === 'BF-B') return 'BF-B';
+    // Standardize Class B shares for Yahoo Finance (.B instead of -B)
+    if (symbol.endsWith('-B')) return symbol.replace('-B', '.B');
+    if (symbol.endsWith('.CA')) return symbol;
+    if (symbol.endsWith('.AD')) return symbol;
 
     const market = getMarketForSymbol(symbol);
 

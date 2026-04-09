@@ -141,17 +141,19 @@ const SECTOR_PRIORITY: Record<string, number> = {
     'Materials': 11,
     'Finance': 12,
     'Telecom': 13,
+    'Banking': 14,
+    'Insurance': 15,
+    'Investment': 16,
 };
 
 const getDisplayName = (symbol: string, apiName: string): string => {
-    const cleanSym = symbol.toUpperCase().split('.')[0].replace('-', '.');
-    // Try original, then cleaned
-    return NAME_MAP[symbol] || NAME_MAP[cleanSym] || (apiName.toLowerCase().includes('unavailable') ? symbol : apiName.split('(')[0].trim());
+    const s = symbol.toUpperCase();
+    return NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? symbol : apiName.split('(')[0].split('[')[0].trim());
 };
 
 const getSector = (symbol: string): string => {
-    const cleanSym = symbol.toUpperCase().split('.')[0].replace('-', '.');
-    return SECTOR_MAP[symbol] || SECTOR_MAP[cleanSym] || 'Miscellaneous';
+    const s = symbol.toUpperCase();
+    return SECTOR_MAP[s] || 'Miscellaneous';
 };
 
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
