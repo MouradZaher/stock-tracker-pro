@@ -148,15 +148,15 @@ const SECTOR_PRIORITY: Record<string, number> = {
 
 const getDisplayName = (symbol: string, apiName: string): string => {
     if (!symbol) return '';
-    // Normalize: strip .US, .O, .AD, .CA, -B, .B and whitespace
-    const s = symbol.toUpperCase().split('.')[0].split(':')[0].split('-')[0].trim();
+    const s = symbol.split('.')[0].split(':')[0].split('-')[0].trim().toUpperCase();
     const name = NAME_MAP[symbol.toUpperCase().trim()] || NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? s : apiName.split('(')[0].split('[')[0].split('-')[0].trim());
-    return name.replace(/[()]/g, '').trim(); 
+    // DEFINITIVE GUARD: Strip all parentheses from the final output
+    return name.replace(/\(/g, '').replace(/\)/g, '').trim(); 
 };
 
 const getSector = (symbol: string): string => {
     if (!symbol) return 'Miscellaneous';
-    const s = symbol.toUpperCase().split('.')[0].split(':')[0].split('-')[0].trim();
+    const s = symbol.split('.')[0].split(':')[0].split('-')[0].trim().toUpperCase();
     return SECTOR_MAP[symbol.toUpperCase().trim()] || SECTOR_MAP[s] || 'Miscellaneous';
 };
 
@@ -455,7 +455,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                                 textTransform: 'uppercase',
                                                                 marginTop: '2px'
                                                             }}>
-                                                                {stock.symbol.toUpperCase().replace(/[()]/g, '')}
+                                                                {stock.symbol.toUpperCase().replace(/\(/g, '').replace(/\)/g, '')}
                                                             </div>
                                                         </div>
                                                     </div>
