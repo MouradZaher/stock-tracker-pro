@@ -187,9 +187,11 @@ const fetchFromFMP = async (symbol: string): Promise<StockQuote | null> => {
 
 // Get search symbol with correct regional suffix
 export const getSearchSymbol = (symbol: string): string => {
-    if (!symbol || symbol.includes('.')) return symbol;
+    if (!symbol) return '';
+    if (symbol.includes(':')) return symbol.split(':').pop() || symbol;
 
-    if (symbol === 'BRK-B') return 'BRK.B';
+    if (symbol === 'BRK-B') return 'BRK-B'; // Yahoo B-shares fallback
+    if (symbol === 'BF-B') return 'BF-B';
 
     const market = getMarketForSymbol(symbol);
 

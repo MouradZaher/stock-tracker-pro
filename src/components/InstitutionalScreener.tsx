@@ -143,6 +143,17 @@ const SECTOR_PRIORITY: Record<string, number> = {
     'Telecom': 13,
 };
 
+const getDisplayName = (symbol: string, apiName: string): string => {
+    const cleanSym = symbol.toUpperCase().split('.')[0].replace('-', '.');
+    // Try original, then cleaned
+    return NAME_MAP[symbol] || NAME_MAP[cleanSym] || (apiName.toLowerCase().includes('unavailable') ? symbol : apiName.split('(')[0].trim());
+};
+
+const getSector = (symbol: string): string => {
+    const cleanSym = symbol.toUpperCase().split('.')[0].replace('-', '.');
+    return SECTOR_MAP[symbol] || SECTOR_MAP[cleanSym] || 'Miscellaneous';
+};
+
 const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectSymbol }) => {
     const { timeframe, setTimeframe, selectedMarket } = useMarket();
     const [stocks, setStocks] = useState<Stock[]>([]);
@@ -293,7 +304,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         {Object.entries(
                             stocks.reduce((acc, stock) => {
-                                const sector = SECTOR_MAP[stock.symbol] || 'Miscellaneous';
+                                const sector = getSector(stock.symbol);
                                 if (!acc[sector]) acc[sector] = [];
                                 acc[sector].push(stock);
                                 return acc;
@@ -409,12 +420,12 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                                 border: '2px solid var(--color-bg)'
                                                             }} />
                                                         </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
-                                                            <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                                                                { NAME_MAP[stock.symbol] || (stock.name.toLowerCase().includes('unavailable') ? stock.symbol : stock.name) }
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
+                                                            <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', lineHeight: 1.2 }}>
+                                                                { getDisplayName(stock.symbol, stock.name) }
                                                             </div>
-                                                            <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                                                                {stock.symbol}
+                                                            <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.1em', fontFamily: "'JetBrains Mono', monospace", opacity: 0.8 }}>
+                                                                {stock.symbol.toUpperCase()}
                                                             </div>
                                                         </div>
                                                     </div>
