@@ -114,6 +114,23 @@ const SECTOR_MAP: Record<string, string> = {
     'ALDAR.AD': 'Real Estate', 'ADPORTS.AD': 'Logistics',
 };
 
+const NAME_MAP: Record<string, string> = {
+    'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft Corp.', 'NVDA': 'NVIDIA Corp.', 'AMZN': 'Amazon.com', 'META': 'Meta Platforms',
+    'GOOGL': 'Alphabet Inc.', 'BRK-B': 'Berkshire Hathaway', 'LLY': 'Eli Lilly & Co.', 'AVGO': 'Broadcom Inc.', 'JPM': 'JPMorgan Chase',
+    'TSLA': 'Tesla Inc.', 'UNH': 'UnitedHealth Group', 'XOM': 'Exxon Mobil Corp.', 'V': 'Visa Inc.', 'PG': 'Procter & Gamble',
+    'JNJ': 'Johnson & Johnson', 'MA': 'Mastercard Inc.', 'MRK': 'Merck & Co.', 'HD': 'Home Depot', 'COST': 'Costco Wholesale',
+    'ABBV': 'AbbVie Inc.', 'CVX': 'Chevron Corp.', 'CRM': 'Salesforce Inc.', 'AMD': 'Advanced Micro Devices', 'KO': 'Coca-Cola Co.',
+    'BAC': 'Bank of America', 'PEP': 'PepsiCo Inc.', 'WMT': 'Walmart Inc.', 'LIN': 'Linde plc', 'TMO': 'Thermo Fisher',
+    'MCD': 'McDonald\'s Corp.', 'DIS': 'Disney', 'NKE': 'Nike Inc.', 'CSCO': 'Cisco Systems', 'ABNB': 'Airbnb Inc.',
+    'INTU': 'Intuit Inc.', 'ORCL': 'Oracle Corp.', 'CMCSA': 'Comcast Corp.', 'NFLX': 'Netflix Inc.', 'VZ': 'Verizon',
+    'PFE': 'Pfizer Inc.', 'QCOM': 'Qualcomm Inc.', 'DHR': 'Danaher Corp.', 'ABT': 'Abbott Labs', 'TXN': 'Texas Instruments',
+    'NOW': 'ServiceNow Inc.', 'GE': 'General Electric', 'AMGN': 'Amgen Inc.', 'IBM': 'IBM Corp.', 'CAT': 'Caterpillar Inc.',
+    'WFC': 'Wells Fargo', 'GILD': 'Gilead Sciences', 'INTC': 'Intel Corp.', 'BA': 'Boeing Co.', 'SPGI': 'S&P Global Inc.',
+    'SLB': 'Schlumberger', 'PLD': 'Prologis Inc.', 'COP': 'ConocoPhillips', 'UNP': 'Union Pacific', 'HON': 'Honeywell',
+    'MMM': '3M Company', 'LMT': 'Lockheed Martin', 'SYK': 'Stryker Corp.', 'BLK': 'BlackRock Inc.', 'BKNG': 'Booking Holdings',
+    'GS': 'Goldman Sachs', 'MDLZ': 'Mondelez Intl', 'DE': 'Deere & Co.', 'TJX': 'TJX Companies', 'C': 'Citigroup Inc.',
+};
+
 interface InstitutionalScreenerProps {
     onSelectSymbol: (symbol: string) => void;
 }
@@ -390,7 +407,7 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                         </div>
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
                                                             <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                                                                {(stock.name === stock.symbol || stock.name.toLowerCase().includes('unavailable')) ? stock.symbol : stock.name}
+                                                                { NAME_MAP[stock.symbol] || (stock.name.toLowerCase().includes('unavailable') ? stock.symbol : stock.name) }
                                                             </div>
                                                             <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
                                                                 {`(${stock.symbol})`}

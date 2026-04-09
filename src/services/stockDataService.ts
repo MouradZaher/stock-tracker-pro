@@ -212,6 +212,9 @@ export const getSearchSymbol = (symbol: string): string => {
     if (market === 'egypt') return `${symbol}.CA`;
     if (market === 'abudhabi') return `${symbol}.AD`;
 
+    // For major US stocks, ensure they don't collide with European exchanges like Warsaw (WSE)
+    // Yahoo Finance defaults to US for bare symbols if the request is from a US-based proxy,
+    // but we can be explicit if needed. For now, we'll keep them bare but handle name mapping in UI.
     return symbol;
 };
 
