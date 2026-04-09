@@ -7,15 +7,21 @@ interface CompanyLogoProps {
 }
 
 const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className = '' }) => {
-    const [error, setError] = useState(false);
+    const [fallbackLevel, setFallbackLevel] = useState(0);
     
-    // Clean symbol (remove ^ for indices, etc) to ensure valid URL and abbreviation
-    const cleanSymbol = symbol.replace(/[^a-zA-Z0-9]/g, '');
+    // Clean symbol and trim whitespace
+    const cleanSymbol = symbol.trim().replace(/[^a-zA-Z0-9]/g, '');
 
     // List of indices that definitely don't have FMP stock-images
     const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
 
-    if (error || !cleanSymbol || isIndex) {
+    const logoSources = [
+        `https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`,
+        `https://logo.clearbit.com/${cleanSymbol.toLowerCase()}.com`,
+        `https://raw.githubusercontent.com/twelvedata/p/master/logos/${cleanSymbol}.png`
+    ];
+
+    if (!cleanSymbol || isIndex || fallbackLevel >= logoSources.length) {
         // Special styling for major indices
         let indexColor = 'var(--color-bg-elevated)';
         let indexLabel = cleanSymbol.substring(0, 2).toUpperCase();
@@ -42,8 +48,7 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
                     flexShrink: 0,
                     border: '1px solid rgba(255,255,255,0.2)',
                     boxShadow: 'inset 0 0 10px rgba(0,0,0,0.3)',
-                    overflow: 'hidden',
-                    textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                    overflow: 'hidden'
                 }}
             >
                 {indexLabel}
@@ -53,16 +58,16 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
 
     return (
         <img
-            src={`https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`}
+            src={logoSources[fallbackLevel]}
             alt={`${symbol} logo`}
-            onError={() => setError(true)}
+            onError={() => setFallbackLevel(prev => prev + 1)}
             className={`company-logo ${className}`}
             style={{
                 width: size,
                 height: size,
                 borderRadius: '50%',
                 objectFit: 'cover',
-                background: 'white', // Ensure dark/transparent logos look crisp
+                background: 'white', 
                 padding: '2px',
                 flexShrink: 0,
                 border: '1px solid rgba(255,255,255,0.1)',

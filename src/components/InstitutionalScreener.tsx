@@ -388,12 +388,12 @@ const InstitutionalScreener: React.FC<InstitutionalScreenerProps> = ({ onSelectS
                                                             border: '2px solid var(--color-bg)'
                                                         }} />
                                                     </div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
-                                                        <div style={{ fontSize: '0.85rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                                                        <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                                                             { (stock.name === stock.symbol || stock.name.toLowerCase().includes('unavailable')) ? stock.symbol : stock.name }
                                                         </div>
-                                                        <div style={{ fontSize: '0.62rem', color: 'var(--color-text-tertiary)', fontWeight: 800, letterSpacing: '0.04em' }}>
-                                                            {stock.name.toLowerCase().includes('unavailable') ? 'REAL-TIME SYNCING...' : `(${stock.symbol})`}
+                                                        <div style={{ fontSize: '0.65rem', color: 'var(--color-accent)', fontWeight: 800, letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
+                                                            {`(${stock.symbol})`}
                                                         </div>
                                                     </div>
                                                 </div>
