@@ -9,6 +9,11 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
+import MacroPulseHeader from './components/MacroPulseHeader';
+import OmniSearch from './components/OmniSearch';
+import WorldMonitorTabs from './components/WorldMonitorTabs';
+import InstitutionalAdvisory from './components/InstitutionalAdvisory';
+import { Layout as LayoutIcon, Search as SearchIcon, Brain as BrainIcon, Shield as ShieldIcon, User as UserIcon } from 'lucide-react';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -67,6 +72,7 @@ function AppContent() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
   
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(true);
 
@@ -144,6 +150,8 @@ function AppContent() {
         setIsAdminOpen={setIsAdminOpen}
         onOpenTutorial={() => setIsTutorialOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        isOmniSearchOpen={isOmniSearchOpen}
+        setIsOmniSearchOpen={setIsOmniSearchOpen}
       />
     </BrowserRouter>
   );
@@ -158,6 +166,8 @@ interface MainLayoutProps {
   setIsAdminOpen: (open: boolean) => void;
   onOpenTutorial: () => void;
   onOpenSettings: () => void;
+  isOmniSearchOpen: boolean;
+  setIsOmniSearchOpen: (open: boolean) => void;
 }
 
 /**
@@ -185,7 +195,9 @@ function MainLayout({
   isAdminOpen,
   setIsAdminOpen,
   onOpenTutorial,
-  onOpenSettings
+  onOpenSettings,
+  isOmniSearchOpen,
+  setIsOmniSearchOpen
 }: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -231,33 +243,34 @@ function MainLayout({
   }, [location.search, navigate]);
 
   return (
-    <div className="app">
+    <div className="app" style={{ background: '#000000', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <ErrorBoundary>
-        <TopBar onSelectSymbol={handleSelectSymbol} />
-        <div className="main-wrapper">
-          <Header
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            onLogout={logout}
-            showAdmin={role === 'admin'}
-            onAdminClick={() => setIsAdminOpen(true)}
-            onOpenTutorial={onOpenTutorial}
-            onOpenSettings={onOpenSettings}
-          />
+        <MacroPulseHeader />
+        <OmniSearch 
+            isOpen={isOmniSearchOpen} 
+            onClose={() => setIsOmniSearchOpen(false)} 
+            onSelectSymbol={handleSelectSymbol} 
+        />
+        
+        <WorldMonitorTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
+        <div className="main-wrapper" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          
+          {/* LEFT TOOLSTRIP (SIDEBAR) */}
+          <aside style={{ width: '48px', borderRight: '1px solid #111', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem 0', gap: '1.5rem', background: '#000' }}>
+            <div onClick={() => setIsOmniSearchOpen(true)} style={{ cursor: 'pointer', color: '#333' }}><SearchIcon size={18} /></div>
+            <div style={{ color: 'var(--color-accent)' }}><BrainIcon size={18} /></div>
+            <div style={{ color: '#333' }}><ShieldIcon size={18} /></div>
+            <div style={{ marginTop: 'auto', color: '#333', cursor: 'pointer' }} onClick={onOpenSettings}><UserIcon size={18} /></div>
+          </aside>
 
-
-          <AdminDashboard
-            isOpen={isAdminOpen}
-            onClose={() => setIsAdminOpen(false)}
-          />
-          <main className="main-content">
-
-            <div className="content-route-shell">
+          {/* MAIN DATA MONITOR */}
+          <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minWidth: 0, padding: 0 }}>
+            <div className="content-route-shell" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home/*" element={
-                <div className="tab-content home-tab-content">
+                <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Dashboard onSelectSymbol={handleSelectSymbol} />
                 </div>
               } />
@@ -265,12 +278,12 @@ function MainLayout({
                 <StockDetailRoute onBack={() => navigate('/home')} />
               } />
               <Route path="/watchlist" element={
-                <div className="tab-content no-page-scroll-tab">
+                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
                   <WatchlistPage onSelectSymbol={handleSelectSymbol} />
                 </div>
               } />
               <Route path="/portfolio" element={
-                <div className="tab-content no-page-scroll-tab">
+                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <Portfolio onSelectSymbol={handleSelectSymbol} />
@@ -279,7 +292,7 @@ function MainLayout({
                 </div>
               } />
               <Route path="/recommendations" element={
-                <div className="tab-content no-page-scroll-tab" style={{ padding: 0 }}>
+                <div className="tab-content" style={{ padding: 0, height: '100%' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <AIRecommendations onSelectStock={handleSelectSymbol} />
@@ -288,12 +301,12 @@ function MainLayout({
                 </div>
               } />
               <Route path="/pulse" element={
-                <div className="tab-content no-page-scroll-tab">
+                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
                   <MarketPulsePage onSelectStock={handleSelectSymbol} />
                 </div>
               } />
               <Route path="/pricing" element={
-                <div className="tab-content" style={{ overflow: 'hidden' }}>
+                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
@@ -305,10 +318,13 @@ function MainLayout({
             </Routes>
             </div>
           </main>
+
+          {/* RIGHT ADVISORY ENGINE */}
+          <aside style={{ width: '300px', borderLeft: '1px solid #111', padding: '1.25rem', background: '#000', display: 'flex', flexDirection: 'column' }}>
+             <InstitutionalAdvisory />
+          </aside>
         </div>
       </ErrorBoundary>
-      <div className="noise-overlay" />
-      <MobileNav activeTab={activeTab} setActiveTab={handleTabChange} />
     </div>
   );
 }

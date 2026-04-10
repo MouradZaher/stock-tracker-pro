@@ -194,14 +194,6 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
     }, [selectedMarket.id, prevPrices]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden', background: 'var(--color-bg)' }}>
-            <div style={{ display: 'flex', gap: '8px', padding: '1rem 1.5rem', background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid var(--glass-border)', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Group Controls:</span>
-                <button 
-                    onClick={collapseAll}
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', fontSize: '0.6rem', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 800 }}
-                >
-                    MINIMIZE ALL
                 </button>
                 <button 
                     onClick={expandAll}
