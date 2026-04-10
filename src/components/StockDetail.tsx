@@ -20,6 +20,7 @@ import PriceAlertsModal from './PriceAlertsModal';
 import TradeAnalysisPanel from './TradeAnalysisPanel';
 import RealTimePrice from './RealTimePrice';
 import { aiStrategyService } from '../services/aiStrategyService';
+import { getFullCompanyName } from '../data/companyNames';
 
 // Institutional helper inlined to ensure 100% bundle reliability
 const formatCurrencyForMarket = (value: number, currency: string): string => {
@@ -155,6 +156,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
     const { stock, profile } = data;
     const inWatchlist = isInWatchlist(stock.symbol, selectedMarket.id);
     const portfolioPosition = positions.find(p => p.symbol === stock.symbol);
+    const tickerName = getFullCompanyName(stock?.symbol || symbol, stock?.name);
 
     const toggleWatchlist = () => {
         if (inWatchlist) {
