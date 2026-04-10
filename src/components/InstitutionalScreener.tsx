@@ -215,8 +215,8 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
             </div>
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
                 <div style={{ minWidth: '1100px', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.4rem 0', background: 'rgba(10,10,18,0.95)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.58rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
-                        <div style={{ flex: '0 0 260px', padding: '0 1rem' }}>Company & Asset</div>
+                    <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.5rem 0', background: 'rgba(10,10,18,0.98)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
+                        <div style={{ flex: '0 0 280px', padding: '0 1rem' }}>Company & Asset</div>
                         <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
                         <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right' }}>% Change</div>
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Volume</div>
@@ -237,7 +237,23 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                         return (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99);
                     }).map(([sector, sectorStocks]) => {
                         const isCollapsed = collapsedSectors.has(sector);
-                        const avgChange = sectorStocks.reduce((a, b) => a + b.changePercent, 0) / sectorStocks.length;
+                        
+                        // --- SECTOR AGGREGATION ENGINE ---
+                        const avgPrice = sectorStocks.reduce((sum, s) => sum + s.price, 0) / sectorStocks.length;
+                        const avgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
+                        const totalVol = sectorStocks.reduce((sum, s) => sum + (s.volume || 0), 0);
+                        const avgPeg = sectorStocks.reduce((sum, s) => sum + (s.pegRatio || 0), 0) / sectorStocks.length;
+                        
+                        // Heuristically derived range pos for sector
+                        const avgRangePos = sectorStocks.reduce((sum, s) => {
+                            const p = (s.fiftyTwoWeekHigh !== s.fiftyTwoWeekLow && s.fiftyTwoWeekHigh !== undefined && s.fiftyTwoWeekLow !== undefined) 
+                                ? (s.price - s.fiftyTwoWeekLow) / (s.fiftyTwoWeekHigh - s.fiftyTwoWeekLow) 
+                                : 0.5;
+                            return sum + p;
+                        }, 0) / sectorStocks.length;
+
+                        const avgRsi = Math.max(15, Math.min(85, (avgRangePos * 60) + 20 + (avgChange * 2.5)));
+                        const avgMomentum = 50 + (avgChange * 6) + (avgRangePos * 20 - 10);
                         
                         return (
                             <React.Fragment key={sector}>
@@ -246,24 +262,61 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                     style={{ 
                                         display: 'flex', 
                                         alignItems: 'center', 
-                                        justifyContent: 'space-between',
-                                        padding: '6px 1rem', 
-                                        background: isCollapsed ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', 
-                                        borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                                        padding: '8px 0', 
+                                        background: isCollapsed ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)', 
+                                        borderBottom: '1px solid rgba(255,255,255,0.1)', 
                                         zIndex: 80,
                                         cursor: 'pointer',
                                         transition: 'background 0.3s ease'
                                     }}
                                 >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <ChevronDown size={12} style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--color-accent)' }} />
-                                        <span style={{ fontSize: '0.68rem', fontWeight: 950, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{sector}</span>
-                                        <span style={{ fontSize: '0.55rem', fontWeight: 800, color: 'var(--color-text-tertiary)', background: 'rgba(255,255,255,0.05)', padding: '1px 4px', borderRadius: '3px' }}>{sectorStocks.length}</span>
+                                    {/* Column 0: Sector ID + Meta */}
+                                    <div style={{ flex: '0 0 280px', padding: '0 1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <ChevronDown size={14} style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--color-accent)' }} />
+                                        <span style={{ fontSize: '0.78rem', fontWeight: 950, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{sector}</span>
+                                        <span style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--color-text-tertiary)', background: 'rgba(255,255,255,0.05)', padding: '1px 5px', borderRadius: '3px' }}>{sectorStocks.length}</span>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span style={{ fontSize: '0.6rem', fontWeight: 900, color: getChangeClass(avgChange) === 'text-success' ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                            AVG: {formatPercent(avgChange)}
-                                        </span>
+                                    
+                                    {/* Column 1: Avg Price */}
+                                    <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-tertiary)' }}>
+                                        {formatCurrencyForMarket(avgPrice, selectedMarket.currency)}
+                                    </div>
+
+                                    {/* Column 2: Avg % Change */}
+                                    <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', fontSize: '0.82rem', fontWeight: 900, color: getChangeClass(avgChange) === 'text-success' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                        {formatPercent(avgChange)}
+                                    </div>
+
+                                    {/* Column 3: Total Volume */}
+                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-tertiary)' }}>
+                                        {formatNumberPlain(totalVol)}
+                                    </div>
+
+                                    {/* Column 4: Avg PEG */}
+                                    <div style={{ flex: '0 0 80px', padding: '0 0.5rem', textAlign: 'right', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-indigo-400)' }}>
+                                        {avgPeg.toFixed(2)}
+                                    </div>
+
+                                    {/* Column 5: Range Summary */}
+                                    <div style={{ flex: '0 0 140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ width: '100%', height: '2px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', position: 'relative' }}>
+                                            <div style={{ position: 'absolute', left: `${avgRangePos * 100}%`, top: '-4px', width: '2px', height: '10px', background: 'var(--color-accent)' }} />
+                                        </div>
+                                    </div>
+
+                                    {/* Column 6: Avg Momentum */}
+                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontSize: '0.78rem', fontWeight: 800, color: avgMomentum > 50 ? 'var(--color-warning)' : 'var(--color-text-tertiary)' }}>
+                                        {avgMomentum.toFixed(1)}
+                                    </div>
+
+                                    {/* Column 7: Avg RSI */}
+                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontSize: '0.78rem', fontWeight: 800, color: avgRsi > 70 ? 'var(--color-error)' : avgRsi < 30 ? 'var(--color-success)' : 'var(--color-text-tertiary)' }}>
+                                        {avgRsi.toFixed(1)}
+                                    </div>
+
+                                    {/* Column 8: Toggle */}
+                                    <div style={{ flex: '0 0 60px', padding: '0 1rem', textAlign: 'center', opacity: 0.5 }}>
+                                        <Activity size={12} />
                                     </div>
                                 </div>
                                 {!isCollapsed && (
@@ -290,11 +343,11 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                                     position: 'relative'
                                                 }}
                                             >
-                                                <div style={{ flex: '0 0 260px', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                    <CompanyLogo symbol={stock.symbol} size={22} />
+                                                <div style={{ flex: '0 0 280px', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <CompanyLogo symbol={stock.symbol} size={24} />
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <div style={{ fontSize: '0.78rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getDisplayName(stock.symbol, stock.name)}</div>
-                                                        <div style={{ fontSize: '0.55rem', color: 'var(--color-accent)', fontWeight: 800 }}>{stock.symbol.replace(/[()]/g, '')}</div>
+                                                        <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getDisplayName(stock.symbol, stock.name)}</div>
+                                                        <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 800 }}>{stock.symbol.replace(/[()]/g, '')}</div>
                                                     </div>
                                                 </div>
                                                 <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
