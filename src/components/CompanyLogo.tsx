@@ -21,18 +21,23 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
 
     const logoSources = [];
     
-    // 1. If mapped, try Clearbit Domain (Highest quality for International)
+    // 1. HIGH-FIDELITY: Google Favicon API (Most reliable for corporate domains)
+    if (mappedDomain) {
+        logoSources.push(`https://www.google.com/s2/favicons?sz=128&domain=${mappedDomain}`);
+    }
+
+    // 2. Clearbit Mapped Domain
     if (mappedDomain) {
         logoSources.push(`https://logo.clearbit.com/${mappedDomain}`);
     }
 
-    // 2. Try FMP (Great for US Stocks)
+    // 3. Financial Modeling Prep (Great for US Stocks)
     logoSources.push(`https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`);
 
-    // 3. Try Clearbit Symbol (Fallback for US)
+    // 4. Clearbit Fallback (Ticker-based)
     logoSources.push(`https://logo.clearbit.com/${cleanSymbol.toLowerCase()}.com`);
 
-    // 4. Try TwelveData (Broad coverage)
+    // 5. TwelveData (Global coverage)
     logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${cleanSymbol}.png`);
 
     if (!cleanSymbol || isIndex || fallbackLevel >= logoSources.length) {
