@@ -106,6 +106,7 @@ export const COMPANY_NAMES: Record<string, string> = {
     'GPN': 'Global Payments Inc.',
     'FIS': 'Fiserv Inc.',
     'FDX': 'FedEx Corp.',
+    'UPS': 'United Parcel Service',
 
     // --- EGX 30 (Egypt) ---
     'MFOT.CA': 'Misr Fertilizers (MOPCO)',

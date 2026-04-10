@@ -106,6 +106,7 @@ export const LOGO_DOMAINS: Record<string, string> = {
     'GPN': 'globalpayments.com',
     'FIS': 'fiserv.com',
     'FDX': 'fedex.com',
+    'UPS': 'ups.com',
 
     // --- EGX 30 (Egypt) ---
     'MFOT.CA': 'mopco.eg',
