@@ -33,8 +33,6 @@ const ADX15_SYMBOLS = [
     'ALYAHSAT.AD', 'ADNOCLS.AD', 'ADNOCDRILL.AD', 'MULTIPLY.AD', 'BAYANAT.AD', 'FERTIGLOBE.AD', 'DANA.AD'
 ];
 
-const GLOBAL_SYMBOLS = ['GLD', 'SLV', 'COPX'];
-
 const SECTOR_MAP: Record<string, string> = {
     // --- Commodities & Metals ---
     'GLD': COMMODITIES_SECTOR, 'SLV': COMMODITIES_SECTOR, 'COPX': COMMODITIES_SECTOR,
@@ -143,8 +141,7 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
 
     useEffect(() => {
         let isMounted = true;
-        const marketSymbols = selectedMarket.id === 'egypt' ? EGX30_SYMBOLS : selectedMarket.id === 'abudhabi' ? ADX15_SYMBOLS : SP100_SYMBOLS;
-        const allSymbols = Array.from(new Set([...marketSymbols, ...GLOBAL_SYMBOLS]));
+        const allSymbols = selectedMarket.id === 'egypt' ? EGX30_SYMBOLS : selectedMarket.id === 'abudhabi' ? ADX15_SYMBOLS : SP100_SYMBOLS;
 
         const fetchStocks = async () => {
             try {
