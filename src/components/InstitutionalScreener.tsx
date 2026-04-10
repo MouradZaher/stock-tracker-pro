@@ -6,6 +6,8 @@ import { TrendingUp, TrendingDown, Activity, Eye, Info, ChevronDown } from 'luci
 import CompanyLogo from './CompanyLogo';
 import { useMarket } from '../contexts/MarketContext';
 
+const COMMODITIES_SECTOR = 'Commodities & Metals';
+
 const SP100_SYMBOLS = [
     'AAPL', 'MSFT', 'NVDA', 'AMZN', 'META', 'GOOGL', 'BRK-B', 'LLY', 'AVGO', 'JPM',
     'TSLA', 'UNH', 'XOM', 'V', 'PG', 'JNJ', 'MA', 'MRK', 'HD', 'COST',
@@ -35,7 +37,7 @@ const GLOBAL_SYMBOLS = ['GLD', 'SLV', 'COPX'];
 
 const SECTOR_MAP: Record<string, string> = {
     // --- Commodities & Metals ---
-    'GLD': 'Commodities & Metals', 'SLV': 'Commodities & Metals', 'COPX': 'Commodities & Metals',
+    'GLD': COMMODITIES_SECTOR, 'SLV': COMMODITIES_SECTOR, 'COPX': COMMODITIES_SECTOR,
     
     // --- S&P 100 ---
     'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology', 'AVGO': 'Information Technology',
@@ -84,7 +86,7 @@ const SECTOR_MAP: Record<string, string> = {
 import { getFullCompanyName } from '../data/companyNames';
 
 const SECTOR_PRIORITY: Record<string, number> = {
-    'Commodities & Metals': 0,
+    [COMMODITIES_SECTOR]: 0,
     'Information Technology': 1, 'Communication Services': 2, 'Financials': 3, 'Aerospace & Transport': 4,
     'Health Care': 5, 'Consumer Discretionary': 6, 'Industrials': 7, 'Consumer Staples': 8, 'Energy': 9,
     'Utilities': 10, 'Real Estate': 11, 'Materials': 12, 'Miscellaneous': 13
@@ -142,7 +144,7 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
     useEffect(() => {
         let isMounted = true;
         const marketSymbols = selectedMarket.id === 'egypt' ? EGX30_SYMBOLS : selectedMarket.id === 'abudhabi' ? ADX15_SYMBOLS : SP100_SYMBOLS;
-        const allSymbols = [...marketSymbols, ...GLOBAL_SYMBOLS];
+        const allSymbols = Array.from(new Set([...marketSymbols, ...GLOBAL_SYMBOLS]));
 
         const fetchStocks = async () => {
             try {
@@ -242,10 +244,8 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                         alignItems: 'center', 
                                         justifyContent: 'space-between',
                                         padding: '6px 1rem', 
-                                        background: isCollapsed ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)', 
+                                        background: isCollapsed ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', 
                                         borderBottom: '1px solid rgba(255,255,255,0.05)', 
-                                        position: 'sticky', 
-                                        top: '28px', 
                                         zIndex: 80,
                                         cursor: 'pointer',
                                         transition: 'background 0.3s ease'
