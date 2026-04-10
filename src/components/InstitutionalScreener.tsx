@@ -16,7 +16,8 @@ const SP100_SYMBOLS = [
     'MMM', 'LMT', 'SYK', 'BLK', 'BKNG', 'GS', 'MDLZ', 'DE', 'TJX', 'C',
     'AXP', 'ISRG', 'AMT', 'RTX', 'REGN', 'ZTS', 'MO', 'CB', 'ADI', 'BSX',
     'MTD', 'EL', 'EMR', 'EW', 'CI', 'HUM', 'WM', 'PNC', 'VRTX', 'ITW',
-    'NOC', 'DG', 'SO', 'D', 'DUK', 'USB', 'T', 'GPN', 'FIS', 'FDX', 'UPS'
+    'NOC', 'DG', 'SO', 'D', 'DUK', 'USB', 'T', 'GPN', 'FIS', 'FDX', 'UPS',
+    'GLD', 'SLV', 'COPX'
 ];
 
 const EGX30_SYMBOLS = [
@@ -31,6 +32,9 @@ const ADX15_SYMBOLS = [
 ];
 
 const SECTOR_MAP: Record<string, string> = {
+    // --- Commodities & Metals ---
+    'GLD': 'Commodities & Metals', 'SLV': 'Commodities & Metals', 'COPX': 'Commodities & Metals',
+    
     // --- S&P 100 ---
     'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology', 'AVGO': 'Information Technology',
     'ORCL': 'Information Technology', 'ADBE': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
@@ -78,6 +82,7 @@ const SECTOR_MAP: Record<string, string> = {
 import { getFullCompanyName } from '../data/companyNames';
 
 const SECTOR_PRIORITY: Record<string, number> = {
+    'Commodities & Metals': 0,
     'Information Technology': 1, 'Communication Services': 2, 'Financials': 3, 'Aerospace & Transport': 4,
     'Health Care': 5, 'Consumer Discretionary': 6, 'Industrials': 7, 'Consumer Staples': 8, 'Energy': 9,
     'Utilities': 10, 'Real Estate': 11, 'Materials': 12, 'Miscellaneous': 13
