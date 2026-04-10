@@ -46,11 +46,7 @@ const SECTOR_MAP: Record<string, string> = {
     'NEE': 'Utilities', 'SO': 'Utilities', 'PLD': 'Real Estate', 'AMT': 'Real Estate', 'LIN': 'Materials'
 };
 
-const NAME_MAP: Record<string, string> = {
-    'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft Corp.', 'NVDA': 'NVIDIA Corp.', 'AMZN': 'Amazon.com', 'META': 'Meta Platforms',
-    'GOOGL': 'Alphabet Inc.', 'BRK-B': 'Berkshire Hathaway', 'LLY': 'Eli Lilly & Co.', 'AVGO': 'Broadcom Inc.', 'JPM': 'JPMorgan Chase',
-    'TSLA': 'Tesla Inc.', 'UNH': 'UnitedHealth Group', 'XOM': 'Exxon Mobil Corp.', 'V': 'Visa Inc.', 'PG': 'Procter & Gamble',
-};
+import { getFullCompanyName } from '../data/companyNames';
 
 const SECTOR_PRIORITY: Record<string, number> = {
     'Information Technology': 1, 'Communication Services': 2, 'Consumer Discretionary': 3, 'Financials': 4,
@@ -72,10 +68,7 @@ const formatCurrencyForMarket = (value: number, currency: string): string => {
 };
 
 const getDisplayName = (symbol: string, apiName: string): string => {
-    if (!symbol) return '';
-    const s = symbol.split('.')[0].split(':')[0].split('-')[0].trim().toUpperCase();
-    const name = NAME_MAP[symbol.toUpperCase().trim()] || NAME_MAP[s] || (apiName.toLowerCase().includes('unavailable') ? s : apiName.split('(')[0].split('[')[0].split('-')[0].trim());
-    return name.replace(/[()]/g, '').trim(); 
+    return getFullCompanyName(symbol, apiName);
 };
 
 const getSector = (symbol: string): string => {

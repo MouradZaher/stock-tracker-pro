@@ -185,7 +185,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                         </button>
                         <button className="btn-icon" onClick={() => setShowAlerts(true)} title="Set Price Alert" style={{ color: 'var(--color-accent)' }}><Bell size={22} /></button>
                     </div>
-                    <div className="stock-name" style={{ fontSize: '1.25rem', fontWeight: 600 }}>{stock.name.replace(/[()]/g, '')}</div>
+                    <div className="stock-name" style={{ fontSize: '1.25rem', fontWeight: 600 }}>{tickerName.replace(/[()]/g, '')}</div>
 
                     <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem' }}>
                         {profile?.ceo && (

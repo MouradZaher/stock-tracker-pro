@@ -21,6 +21,7 @@ import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 import CompanyLogo from './CompanyLogo';
 import RiskReturnChart from './RiskReturnChart';
 import SubNavbar from './SubNavbar';
+import { getFullCompanyName } from '../data/companyNames';
 
 // --- NEW: Scenario Hedging Component ---
 const ScenarioHedging: React.FC<{ positions: any[] }> = ({ positions }) => {
@@ -366,7 +367,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                                 <CompanyLogo symbol={pos.symbol} size={32} />
                                                                 <div>
                                                                     <div style={{ fontWeight: 800 }}>{pos.symbol.replace(/[()]/g, '')}</div>
-                                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{pos.name.replace(/[()]/g, '')}</div>
+                                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{getFullCompanyName(pos.symbol, pos.name)}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
