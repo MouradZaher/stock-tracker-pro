@@ -194,14 +194,43 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
     }, [selectedMarket.id, prevPrices]);
 
     return (
-                </button>
-                <button 
-                    onClick={expandAll}
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', fontSize: '0.6rem', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 800 }}
-                >
-                    EXPAND ALL
-                </button>
-            </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0', background: 'transparent', height: '100%', overflow: 'hidden' }}>
+            <div style={{ 
+                flex: 1, 
+                display: 'flex', 
+                flexDirection: 'column', 
+                background: 'transparent',
+                border: '1px solid #111',
+                overflow: 'hidden',
+                position: 'relative'
+            }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    padding: '6px 1rem', 
+                    background: '#050505', 
+                    borderBottom: '1px solid #111',
+                    fontSize: '0.6rem', 
+                    fontWeight: 900, 
+                    color: '#444', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    gap: '8px'
+                }}>
+                    <span>GROUP:</span>
+                    <button 
+                        onClick={collapseAll}
+                        style={{ background: '#0a0a0a', border: '1px solid #222', color: '#666', fontSize: '0.55rem', padding: '3px 8px', cursor: 'pointer', fontWeight: 800 }}
+                    >
+                        MINIMIZE
+                    </button>
+                    <button 
+                        onClick={expandAll}
+                        style={{ background: '#0a0a0a', border: '1px solid #222', color: '#666', fontSize: '0.55rem', padding: '3px 8px', cursor: 'pointer', fontWeight: 800 }}
+                    >
+                        EXPAND
+                    </button>
+                </div>
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
                 <div style={{ minWidth: '1100px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.5rem 0', background: 'rgba(10,10,18,0.98)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -393,6 +422,7 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                     })}
                 </div>
             </div>
+        </div>
         </div>
     );
 };
