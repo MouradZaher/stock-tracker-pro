@@ -5,6 +5,79 @@
    This file imports the modular design system architecture.
 */
 
+/* Last Build: Fri Apr 10 21:50:00 EET 2026 */
+
+/* 
+   ============================================================
+   VISION 2026 - MOMENTUM ENGINE & ADAPTIVE UI
+   ============================================================ 
+*/
+
+:root {
+  --color-accent-rgb: 79, 70, 229; /* Sync with --color-accent #4f46e5 */
+}
+
+/* Winner Momentum Pulse - High Gains highlight */
+.winner-pulse-glow {
+  position: relative;
+  animation: winner-pulse-ambient 4s ease-in-out infinite;
+}
+
+.winner-pulse-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.15), transparent);
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@keyframes winner-pulse-ambient {
+  0%, 100% { 
+    box-shadow: inset 4px 0 0 -2px rgba(16, 185, 129, 0.2); 
+    background-color: rgba(16, 185, 129, 0.02);
+  }
+  50% { 
+    box-shadow: inset 8px 0 0 -2px rgba(16, 185, 129, 0.5); 
+    background-color: rgba(16, 185, 129, 0.05);
+  }
+}
+
+/* Institutional Minimalist Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Omni Search Diagnostic Overlays */
+.omni-search-backdrop {
+  animation: backdrop-blur-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes backdrop-blur-in {
+  from { backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
+  to { backdrop-filter: blur(8px); background: rgba(0,0,0,0.6); }
+}
+
+/* Responsive sidebar depth */
+.main-content-layout-sync {
+  transition: padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Core Design Tokens & System */
 @import './styles/variables.css';
 @import './styles/base.css';
