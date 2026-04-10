@@ -231,7 +231,11 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                         if (!acc[sector]) acc[sector] = [];
                         acc[sector].push(stock);
                         return acc;
-                    }, {} as Record<string, Stock[]>)).sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99)).map(([sector, sectorStocks]) => {
+                    }, {} as Record<string, Stock[]>)).sort((a, b) => {
+                        if (a[0] === COMMODITIES_SECTOR) return -1;
+                        if (b[0] === COMMODITIES_SECTOR) return 1;
+                        return (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99);
+                    }).map(([sector, sectorStocks]) => {
                         const isCollapsed = collapsedSectors.has(sector);
                         const avgChange = sectorStocks.reduce((a, b) => a + b.changePercent, 0) / sectorStocks.length;
                         
