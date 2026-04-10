@@ -226,21 +226,29 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                         <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>RSI</div>
                         <div style={{ flex: '0 0 60px', padding: '0 1rem', textAlign: 'center' }}>Analyze</div>
                     </div>
-                    {Object.entries(stocks.reduce((acc, stock) => {
-                        const sector = getSector(stock.symbol);
-                        if (!acc[sector]) acc[sector] = [];
-                        acc[sector].push(stock);
-                        return acc;
-                    }, {} as Record<string, Stock[]>)).sort((a, b) => {
-                        if (a[0] === COMMODITIES_SECTOR) return -1;
-                        if (b[0] === COMMODITIES_SECTOR) return 1;
-                        return (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99);
-                    }).map(([sector, sectorStocks]) => {
+                    {(() => {
+                        const grouped = stocks.reduce((acc, stock) => {
+                            const sector = getSector(stock.symbol);
+                            if (!acc[sector]) acc[sector] = [];
+                            acc[sector].push(stock);
+                            return acc;
+                        }, {} as Record<string, Stock[]>);
+
+                        return Object.entries(grouped)
+                            .map(([sector, sectorStocks]) => {
+                                const avgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
+                                return { sector, sectorStocks, avgChange };
+                            })
+                            .sort((a, b) => {
+                                if (a.sector === COMMODITIES_SECTOR) return -1;
+                                if (b.sector === COMMODITIES_SECTOR) return 1;
+                                return b.avgChange - a.avgChange;
+                            });
+                    })().map(({ sector, sectorStocks, avgChange }) => {
                         const isCollapsed = collapsedSectors.has(sector);
                         
                         // --- SECTOR AGGREGATION ENGINE ---
                         const avgPrice = sectorStocks.reduce((sum, s) => sum + s.price, 0) / sectorStocks.length;
-                        const avgChange = sectorStocks.reduce((sum, s) => sum + s.changePercent, 0) / sectorStocks.length;
                         const totalVol = sectorStocks.reduce((sum, s) => sum + (s.volume || 0), 0);
                         const avgPeg = sectorStocks.reduce((sum, s) => sum + (s.pegRatio || 0), 0) / sectorStocks.length;
                         
