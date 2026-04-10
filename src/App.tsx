@@ -9,9 +9,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
-import MacroPulseHeader from './components/MacroPulseHeader';
-import OmniSearch from './components/OmniSearch';
-import AIInsightsSidebar from './components/AIInsightsSidebar';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -190,16 +187,8 @@ function MainLayout({
   onOpenTutorial,
   onOpenSettings
 }: MainLayoutProps) {
-  const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
-  const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleOpenOmni = () => setIsOmniSearchOpen(true);
-    window.addEventListener('open-omni-search', handleOpenOmni);
-    return () => window.removeEventListener('open-omni-search', handleOpenOmni);
-  }, []);
 
   const activeTab = useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -244,40 +233,17 @@ function MainLayout({
   return (
     <div className="app">
       <ErrorBoundary>
-        <MacroPulseHeader />
-        <OmniSearch 
-            isOpen={isOmniSearchOpen} 
-            onClose={() => setIsOmniSearchOpen(false)} 
-            onSelectSymbol={handleSelectSymbol} 
-        />
         <TopBar onSelectSymbol={handleSelectSymbol} />
-        <div style={{ position: 'fixed', right: '1.5rem', bottom: '5rem', zIndex: 1000, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <button 
-                onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-                style={{ 
-                    padding: '10px', 
-                    background: 'rgba(var(--color-accent-rgb), 0.2)', 
-                    border: '1px solid var(--color-accent)', 
-                    borderRadius: '50%', 
-                    color: 'var(--color-accent)',
-                    cursor: 'pointer',
-                    boxShadow: '0 0 15px rgba(var(--color-accent-rgb), 0.3)'
-                }}
-            >
-                <Brain size={20} />
-            </button>
-        </div>
-        <div className="main-wrapper" style={{ display: 'flex' }}>
-           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <Header
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                onLogout={logout}
-                showAdmin={role === 'admin'}
-                onAdminClick={() => setIsAdminOpen(true)}
-                onOpenTutorial={onOpenTutorial}
-                onOpenSettings={onOpenSettings}
-              />
+        <div className="main-wrapper">
+          <Header
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onLogout={logout}
+            showAdmin={role === 'admin'}
+            onAdminClick={() => setIsAdminOpen(true)}
+            onOpenTutorial={onOpenTutorial}
+            onOpenSettings={onOpenSettings}
+          />
 
 
 
@@ -339,11 +305,6 @@ function MainLayout({
             </Routes>
             </div>
           </main>
-          </div>
-          <AIInsightsSidebar 
-            isOpen={isAISidebarOpen} 
-            onClose={() => setIsAISidebarOpen(false)} 
-          />
         </div>
       </ErrorBoundary>
       <div className="noise-overlay" />

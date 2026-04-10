@@ -4,7 +4,6 @@ import type { Stock } from '../types';
 import { formatCurrency, formatPercent, formatNumberPlain, getChangeClass } from '../utils/formatters';
 import { TrendingUp, TrendingDown, Activity, Eye, Info, ChevronDown } from 'lucide-react';
 import CompanyLogo from './CompanyLogo';
-import MiniSparkline from './MiniSparkline';
 import { useMarket } from '../contexts/MarketContext';
 
 const COMMODITIES_SECTOR = 'Commodities & Metals';
@@ -303,9 +302,10 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                         {avgPeg.toFixed(2)}
                                     </div>
 
+                                    {/* Column 5: Range Summary */}
                                     <div style={{ flex: '0 0 140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <div style={{ width: '80px', opacity: 0.6 }}>
-                                            <MiniSparkline symbol={sectorStocks[0].symbol} width={80} height={20} color="var(--color-accent)" />
+                                        <div style={{ width: '100%', height: '2px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', position: 'relative' }}>
+                                            <div style={{ position: 'absolute', left: `${avgRangePos * 100}%`, top: '-4px', width: '2px', height: '10px', background: 'var(--color-accent)' }} />
                                         </div>
                                     </div>
 
@@ -332,74 +332,66 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                     const rsi = Math.max(15, Math.min(85, (rangePos * 60) + 20 + (stock.changePercent * 2.5)));
                                     const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
 
-                                            const isWinner = stock.changePercent >= 2.0;
-
-                                            return (
-                                                <div 
-                                                    key={stock.symbol} 
-                                                    onClick={() => onSelectSymbol(stock.symbol)} 
-                                                    className={`screener-row-hover ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''} ${isWinner ? 'winner-pulse-glow' : ''}`}
-                                                    style={{ 
-                                                        display: 'flex', 
-                                                        alignItems: 'center', 
-                                                        padding: '6px 1rem', 
-                                                        borderBottom: '1px solid var(--glass-border)', 
-                                                        cursor: 'pointer', 
-                                                        transition: 'all 0.3s ease', 
-                                                        background: idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)',
-                                                        position: 'relative',
-                                                        backdropFilter: 'blur(10px)'
-                                                    }}
-                                                >
-                                                    <div style={{ flex: '0 0 280px', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        <CompanyLogo symbol={stock.symbol} size={24} />
-                                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                            <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getDisplayName(stock.symbol, stock.name)}</div>
-                                                            <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 800 }}>{stock.symbol.replace(/[()]/g, '')}</div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        <span style={{ 
-                                                            fontWeight: 950, fontSize: '0.88rem', 
-                                                            color: flash === 'up' ? '#10b981' : flash === 'down' ? '#ef4444' : 'white',
-                                                            transition: 'color 1.2s ease-in-out',
-                                                            fontFamily: "'JetBrains Mono', monospace"
-                                                        }}>
-                                                            {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
-                                                        </span>
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        <div style={{ fontSize: '0.9rem', fontWeight: 950, color: getChangeClass(stock.changePercent) === 'text-success' ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                            {formatPercent(stock.changePercent)}
-                                                        </div>
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.68rem', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        {formatNumberPlain(stock.volume)}
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 80px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-indigo-400)', fontSize: '0.72rem', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        {stock.pegRatio?.toFixed(2) || '--'}
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        <MiniSparkline symbol={stock.symbol} width={80} height={24} />
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        <span style={{ fontSize: '0.78rem', fontWeight: 950, color: momentum > 60 ? '#10b981' : momentum < 40 ? '#ef4444' : 'var(--color-warning)' }}>{momentum.toFixed(1)}</span>
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-                                                        <span style={{ fontSize: '0.78rem', fontWeight: 950, color: rsi > 70 ? '#ef4444' : rsi < 30 ? '#10b981' : 'white' }}>{rsi.toFixed(1)}</span>
-                                                    </div>
-
-                                                    <div style={{ flex: '0 0 60px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Eye size={13} color="var(--color-accent)" />
+                                    return (
+                                            <div 
+                                                key={stock.symbol} 
+                                                onClick={() => onSelectSymbol(stock.symbol)} 
+                                                className={`screener-row-hover ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`}
+                                                style={{ 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    padding: '5px 1rem', 
+                                                    borderBottom: '1px solid var(--glass-border)', 
+                                                    cursor: 'pointer', 
+                                                    transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)', 
+                                                    background: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
+                                                    position: 'relative'
+                                                }}
+                                            >
+                                                <div style={{ flex: '0 0 280px', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <CompanyLogo symbol={stock.symbol} size={24} />
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <div style={{ fontSize: '0.88rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getDisplayName(stock.symbol, stock.name)}</div>
+                                                        <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 800 }}>{stock.symbol.replace(/[()]/g, '')}</div>
                                                     </div>
                                                 </div>
+                                                <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <span style={{ 
+                                                        fontWeight: 950, fontSize: '0.88rem', 
+                                                    color: flash === 'up' ? '#10b981' : flash === 'down' ? '#ef4444' : 'white',
+                                                    transition: 'color 1.2s ease-in-out',
+                                                    textShadow: flash ? `0 0 12px ${flash === 'up' ? '#10b981' : '#ef4444'}` : 'none',
+                                                    fontFamily: "'JetBrains Mono', monospace"
+                                                }}>
+                                                    {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
+                                                </span>
+                                            </div>
+                                                <div className={getChangeClass(stock.changePercent)} style={{ 
+                                                    flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950,
+                                                    color: stock.changePercent > 0 ? '#10b981' : stock.changePercent < 0 ? '#ef4444' : 'white',
+                                                    transition: 'color 1.2s ease-in-out',
+                                                    fontSize: '0.78rem',
+                                                    borderRight: '1px solid rgba(255,255,255,0.03)'
+                                                }}>
+                                                    {formatPercent(stock.changePercent)}
+                                                </div>
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.68rem', borderRight: '1px solid rgba(255,255,255,0.03)' }}>{formatNumberPlain(stock.volume)}</div>
+                                                <div style={{ flex: '0 0 80px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.72rem', borderRight: '1px solid rgba(255,255,255,0.03)' }}>{stock.pegRatio?.toFixed(2) || '--'}</div>
+                                                <div style={{ flex: '0 0 140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <div style={{ width: '100%', height: '2px', background: 'rgba(255,255,255,0.06)', borderRadius: '1px', position: 'relative' }}>
+                                                        <div style={{ position: 'absolute', height: '6px', width: '2px', background: 'var(--color-accent)', top: '-2px', left: `${Math.max(2, Math.min(98, rangePos * 100))}%`, boxShadow: '0 0 8px var(--color-accent)' }} />
+                                                    </div>
+                                                </div>
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: 950, color: momentum > 60 ? '#10b981' : momentum < 40 ? '#ef4444' : 'var(--color-warning)', transition: 'color 1.2s ease' }}>{momentum.toFixed(1)}</span>
+                                                </div>
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: 950, color: rsi > 70 ? '#ef4444' : rsi < 30 ? '#10b981' : 'white', transition: 'color 1.2s ease' }}>{rsi.toFixed(1)}</span>
+                                                </div>
+                                                <div style={{ flex: '0 0 60px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Eye size={13} color="var(--color-accent)" />
+                                                </div>
+                                        </div>
                                             );
                                         })}
                                     </div>
