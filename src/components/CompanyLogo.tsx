@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LOGO_DOMAINS } from '../data/logoMapping';
 
 interface CompanyLogoProps {
     symbol: string;
@@ -9,17 +10,30 @@ interface CompanyLogoProps {
 const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className = '' }) => {
     const [fallbackLevel, setFallbackLevel] = useState(0);
     
-    // Clean symbol and trim whitespace
+    // Clean symbol for API sources (FMP, TwelveData)
     const cleanSymbol = symbol.trim().replace(/[^a-zA-Z0-9]/g, '');
+    
+    // Check for high-fidelity mapping first
+    const mappedDomain = LOGO_DOMAINS[symbol.toUpperCase().trim()];
 
     // List of indices that definitely don't have FMP stock-images
     const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
 
-    const logoSources = [
-        `https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`,
-        `https://logo.clearbit.com/${cleanSymbol.toLowerCase()}.com`,
-        `https://raw.githubusercontent.com/twelvedata/p/master/logos/${cleanSymbol}.png`
-    ];
+    const logoSources = [];
+    
+    // 1. If mapped, try Clearbit Domain (Highest quality for International)
+    if (mappedDomain) {
+        logoSources.push(`https://logo.clearbit.com/${mappedDomain}`);
+    }
+
+    // 2. Try FMP (Great for US Stocks)
+    logoSources.push(`https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`);
+
+    // 3. Try Clearbit Symbol (Fallback for US)
+    logoSources.push(`https://logo.clearbit.com/${cleanSymbol.toLowerCase()}.com`);
+
+    // 4. Try TwelveData (Broad coverage)
+    logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${cleanSymbol}.png`);
 
     if (!cleanSymbol || isIndex || fallbackLevel >= logoSources.length) {
         // Special styling for major indices
