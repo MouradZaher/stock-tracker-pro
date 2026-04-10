@@ -31,27 +31,55 @@ const ADX15_SYMBOLS = [
 ];
 
 const SECTOR_MAP: Record<string, string> = {
+    // --- S&P 100 ---
     'AAPL': 'Information Technology', 'MSFT': 'Information Technology', 'NVDA': 'Information Technology', 'AVGO': 'Information Technology',
     'ORCL': 'Information Technology', 'ADBE': 'Information Technology', 'CRM': 'Information Technology', 'AMD': 'Information Technology',
     'CSCO': 'Information Technology', 'ACN': 'Information Technology', 'TXN': 'Information Technology', 'INTU': 'Information Technology',
     'QCOM': 'Information Technology', 'IBM': 'Information Technology', 'NOW': 'Information Technology', 'INTC': 'Information Technology',
+    'AMAT': 'Information Technology', 'LRCX': 'Information Technology', 'ADI': 'Information Technology', 'MU': 'Information Technology',
     'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK-B': 'Financials', 'BAC': 'Financials',
     'WFC': 'Financials', 'GS': 'Financials', 'MS': 'Financials', 'AXP': 'Financials', 'BLK': 'Financials',
+    'C': 'Financials', 'PNC': 'Financials', 'USB': 'Financials', 'CB': 'Financials', 'SPGI': 'Financials', 'SCHW': 'Financials',
     'LLY': 'Health Care', 'UNH': 'Health Care', 'JNJ': 'Health Care', 'ABBV': 'Health Care', 'MRK': 'Health Care',
+    'TMO': 'Health Care', 'DHR': 'Health Care', 'ABT': 'Health Care', 'AMGN': 'Health Care', 'PFE': 'Health Care',
+    'GILD': 'Health Care', 'ISRG': 'Health Care', 'REGN': 'Health Care', 'ZTS': 'Health Care', 'BSX': 'Health Care', 'VRTX': 'Health Care',
     'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary', 'MCD': 'Consumer Discretionary',
-    'META': 'Communication Services', 'GOOGL': 'Communication Services', 'NFLX': 'Communication Services', 'DIS': 'Communication Services',
+    'NKE': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary', 'TJX': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
+    'META': 'Communication Services', 'GOOGL': 'Communication Services', 'GOOG': 'Communication Services', 'NFLX': 'Communication Services', 
+    'DIS': 'Communication Services', 'TMUS': 'Communication Services', 'VZ': 'Communication Services', 'T': 'Communication Services', 'CMCSA': 'Communication Services',
     'GE': 'Industrials', 'CAT': 'Industrials', 'UNP': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials',
+    'BA': 'Industrials', 'LMT': 'Industrials', 'RTX': 'Industrials', 'DE': 'Industrials', 'FDX': 'Industrials', 'NOC': 'Industrials',
     'PG': 'Consumer Staples', 'KO': 'Consumer Staples', 'PEP': 'Consumer Staples', 'WMT': 'Consumer Staples',
-    'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy',
-    'NEE': 'Utilities', 'SO': 'Utilities', 'PLD': 'Real Estate', 'AMT': 'Real Estate', 'LIN': 'Materials'
+    'COST': 'Consumer Staples', 'PM': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'MO': 'Consumer Staples', 'CL': 'Consumer Staples',
+    'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy', 'MPC': 'Energy',
+    'NEE': 'Utilities', 'SO': 'Utilities', 'DUK': 'Utilities', 'D': 'Utilities', 'AEP': 'Utilities',
+    'PLD': 'Real Estate', 'AMT': 'Real Estate', 'CCI': 'Real Estate', 'EQIX': 'Real Estate',
+    'LIN': 'Materials', 'APD': 'Materials', 'SHW': 'Materials', 'FCX': 'Materials',
+
+    // --- EGX 30 (Egypt) ---
+    'COMI.CA': 'Financials', 'FWRY.CA': 'Information Technology', 'ETEL.CA': 'Communication Services',
+    'TMGH.CA': 'Real Estate', 'HELI.CA': 'Real Estate', 'PHDC.CA': 'Real Estate', 'MNHD.CA': 'Real Estate',
+    'SWDY.CA': 'Industrials', 'ORAS.CA': 'Industrials', 'CCAP.CA': 'Industrials', 'AUTO.CA': 'Consumer Discretionary',
+    'MFOT.CA': 'Materials', 'ABUK.CA': 'Materials', 'ESRS.CA': 'Materials', 'SKPC.CA': 'Materials', 'MICH.CA': 'Materials', 'EGCH.CA': 'Materials',
+    'EKHO.CA': 'Financials', 'EKHOA.CA': 'Financials', 'BINV.CA': 'Financials',
+    'AMOC.CA': 'Energy', 'EFID.CA': 'Consumer Staples', 'JUFO.CA': 'Consumer Staples', 'DOMT.CA': 'Consumer Staples',
+    'ISPH.CA': 'Health Care', 'RMDA.CA': 'Health Care', 'CIRA.CA': 'Consumer Discretionary',
+    'ALCN.CA': 'Industrials', 'OBRI.CA': 'Real Estate', 'SAUD.CA': 'Financials',
+
+    // --- ADX 15 (Abu Dhabi) ---
+    'IHC.AD': 'Financials', 'FAB.AD': 'Financials', 'ADCB.AD': 'Financials', 'MULTIPLY.AD': 'Financials',
+    'ETISALAT.AD': 'Communication Services', 'ALYAHSAT.AD': 'Communication Services',
+    'ADNOCDIST.AD': 'Energy', 'ADNOCDRILL.AD': 'Energy', 'DANA.AD': 'Energy',
+    'ALDAR.AD': 'Real Estate', 'BOROUGE.AD': 'Materials', 'FERTIGLOBE.AD': 'Materials',
+    'ADPORTS.AD': 'Industrials', 'ADNOCLS.AD': 'Industrials', 'BAYANAT.AD': 'Information Technology'
 };
 
 import { getFullCompanyName } from '../data/companyNames';
 
 const SECTOR_PRIORITY: Record<string, number> = {
-    'Information Technology': 1, 'Communication Services': 2, 'Consumer Discretionary': 3, 'Financials': 4,
-    'Health Care': 5, 'Industrials': 6, 'Consumer Staples': 7, 'Energy': 8, 'Utilities': 9, 'Real Estate': 10,
-    'Materials': 11, 'Finance': 12, 'Telecom': 13, 'Banking': 14, 'Insurance': 15, 'Investment': 16,
+    'Information Technology': 1, 'Communication Services': 2, 'Financials': 3, 'Health Care': 4,
+    'Consumer Discretionary': 5, 'Industrials': 6, 'Consumer Staples': 7, 'Energy': 8, 'Utilities': 9,
+    'Real Estate': 10, 'Materials': 11, 'Miscellaneous': 12
 };
 
 const formatCurrencyForMarket = (value: number, currency: string): string => {
@@ -83,8 +111,25 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
     const [prevPrices, setPrevPrices] = useState<Record<string, number>>({});
     const [flashStates, setFlashStates] = useState<Record<string, 'up' | 'down' | null>>({});
     const [loading, setLoading] = useState(true);
+    const [collapsedSectors, setCollapsedSectors] = useState<Set<string>>(new Set());
 
     const prevPositions = useRef<Record<string, number>>({});
+
+    const toggleSector = (sector: string) => {
+        setCollapsedSectors(prev => {
+            const next = new Set(prev);
+            if (next.has(sector)) next.delete(sector);
+            else next.add(sector);
+            return next;
+        });
+    };
+
+    const collapseAll = () => {
+        const allSectors = new Set(stocks.map(s => getSector(s.symbol)));
+        setCollapsedSectors(allSectors);
+    };
+
+    const expandAll = () => setCollapsedSectors(new Set());
 
     useEffect(() => {
         let isMounted = true;
@@ -142,6 +187,21 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', overflow: 'hidden', background: 'var(--color-bg)' }}>
+            <div style={{ display: 'flex', gap: '8px', padding: '1rem 1.5rem', background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid var(--glass-border)', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Group Controls:</span>
+                <button 
+                    onClick={collapseAll}
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', fontSize: '0.6rem', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 800 }}
+                >
+                    MINIMIZE ALL
+                </button>
+                <button 
+                    onClick={expandAll}
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', fontSize: '0.6rem', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 800 }}
+                >
+                    EXPAND ALL
+                </button>
+            </div>
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
                 <div style={{ minWidth: '1250px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.6rem 0', background: 'rgba(10,10,18,0.95)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.62rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -160,15 +220,44 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                         if (!acc[sector]) acc[sector] = [];
                         acc[sector].push(stock);
                         return acc;
-                    }, {} as Record<string, Stock[]>)).sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99)).map(([sector, sectorStocks]) => (
-                        <React.Fragment key={sector}>
-                            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 1.5rem', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: '40px', zIndex: 80 }}>
-                                <span style={{ fontSize: '0.78rem', fontWeight: 950, color: 'white', textTransform: 'uppercase' }}>{sector}</span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                {sectorStocks.sort((a, b) => b.changePercent - a.changePercent).map((stock, idx) => {
-                                    const flash = flashStates[stock.symbol];
-                                    const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh !== undefined && stock.fiftyTwoWeekLow !== undefined) ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow) : 0.5;
+                    }, {} as Record<string, Stock[]>)).sort((a, b) => (SECTOR_PRIORITY[a[0]] || 99) - (SECTOR_PRIORITY[b[0]] || 99)).map(([sector, sectorStocks]) => {
+                        const isCollapsed = collapsedSectors.has(sector);
+                        const avgChange = sectorStocks.reduce((a, b) => a + b.changePercent, 0) / sectorStocks.length;
+                        
+                        return (
+                            <React.Fragment key={sector}>
+                                <div 
+                                    onClick={() => toggleSector(sector)}
+                                    style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'space-between',
+                                        padding: '12px 1.5rem', 
+                                        background: isCollapsed ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)', 
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                                        position: 'sticky', 
+                                        top: '40px', 
+                                        zIndex: 80,
+                                        cursor: 'pointer',
+                                        transition: 'background 0.3s ease'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <ChevronDown size={14} style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--color-accent)' }} />
+                                        <span style={{ fontSize: '0.78rem', fontWeight: 950, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{sector}</span>
+                                        <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--color-text-tertiary)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{sectorStocks.length} ASSETS</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <span style={{ fontSize: '0.65rem', fontWeight: 900, color: getChangeClass(avgChange) === 'text-success' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                            AVG: {formatPercent(avgChange)}
+                                        </span>
+                                    </div>
+                                </div>
+                                {!isCollapsed && (
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        {sectorStocks.sort((a, b) => b.changePercent - a.changePercent).map((stock, idx) => {
+                                            const flash = flashStates[stock.symbol];
+                                            const rangePos = (stock.fiftyTwoWeekHigh !== stock.fiftyTwoWeekLow && stock.fiftyTwoWeekHigh !== undefined && stock.fiftyTwoWeekLow !== undefined) ? (stock.price - stock.fiftyTwoWeekLow) / (stock.fiftyTwoWeekHigh - stock.fiftyTwoWeekLow) : 0.5;
                                     const rsi = Math.max(15, Math.min(85, (rangePos * 60) + 20 + (stock.changePercent * 2.5)));
                                     const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
 
@@ -230,11 +319,13 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                                 <Eye size={15} color="var(--color-accent)" />
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </React.Fragment>
-                    ))}
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
                 </div>
             </div>
         </div>
