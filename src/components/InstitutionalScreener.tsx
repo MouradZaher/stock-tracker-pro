@@ -47,8 +47,9 @@ const SECTOR_MAP: Record<string, string> = {
     'NKE': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary', 'TJX': 'Consumer Discretionary', 'LOW': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary',
     'META': 'Communication Services', 'GOOGL': 'Communication Services', 'GOOG': 'Communication Services', 'NFLX': 'Communication Services', 
     'DIS': 'Communication Services', 'TMUS': 'Communication Services', 'VZ': 'Communication Services', 'T': 'Communication Services', 'CMCSA': 'Communication Services',
-    'GE': 'Industrials', 'CAT': 'Industrials', 'UNP': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials',
-    'BA': 'Industrials', 'LMT': 'Industrials', 'RTX': 'Industrials', 'DE': 'Industrials', 'FDX': 'Industrials', 'NOC': 'Industrials',
+    'GE': 'Industrials', 'CAT': 'Industrials', 'DE': 'Industrials', 'HON': 'Industrials',
+    'BA': 'Aerospace & Transport', 'LMT': 'Aerospace & Transport', 'RTX': 'Aerospace & Transport', 'NOC': 'Aerospace & Transport',
+    'UNP': 'Aerospace & Transport', 'UPS': 'Aerospace & Transport', 'FDX': 'Aerospace & Transport',
     'PG': 'Consumer Staples', 'KO': 'Consumer Staples', 'PEP': 'Consumer Staples', 'WMT': 'Consumer Staples',
     'COST': 'Consumer Staples', 'PM': 'Consumer Staples', 'MDLZ': 'Consumer Staples', 'MO': 'Consumer Staples', 'CL': 'Consumer Staples',
     'XOM': 'Energy', 'CVX': 'Energy', 'COP': 'Energy', 'SLB': 'Energy', 'EOG': 'Energy', 'MPC': 'Energy',
@@ -77,9 +78,9 @@ const SECTOR_MAP: Record<string, string> = {
 import { getFullCompanyName } from '../data/companyNames';
 
 const SECTOR_PRIORITY: Record<string, number> = {
-    'Information Technology': 1, 'Communication Services': 2, 'Financials': 3, 'Health Care': 4,
-    'Consumer Discretionary': 5, 'Industrials': 6, 'Consumer Staples': 7, 'Energy': 8, 'Utilities': 9,
-    'Real Estate': 10, 'Materials': 11, 'Miscellaneous': 12
+    'Information Technology': 1, 'Communication Services': 2, 'Financials': 3, 'Aerospace & Transport': 4,
+    'Health Care': 5, 'Consumer Discretionary': 6, 'Industrials': 7, 'Consumer Staples': 8, 'Energy': 9,
+    'Utilities': 10, 'Real Estate': 11, 'Materials': 12, 'Miscellaneous': 13
 };
 
 const formatCurrencyForMarket = (value: number, currency: string): string => {
@@ -203,17 +204,17 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                 </button>
             </div>
             <div className="screener-wrapper custom-scrollbar" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', position: 'relative' }}>
-                <div style={{ minWidth: '1250px', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.6rem 0', background: 'rgba(10,10,18,0.95)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.62rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
-                        <div style={{ flex: '0 0 320px', padding: '0 1.5rem' }}>Company & Asset</div>
-                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
-                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>% Change</div>
-                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Volume</div>
-                        <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right' }}>PEG</div>
-                        <div style={{ flex: '0 0 160px', padding: '0 1rem', textAlign: 'center' }}>Range</div>
-                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>Momentum</div>
-                        <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>RSI</div>
-                        <div style={{ flex: '0 0 70px', padding: '0 1rem', textAlign: 'center' }}>Analyze</div>
+                <div style={{ minWidth: '1100px', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', borderBottom: '1px solid var(--glass-border)', padding: '0.4rem 0', background: 'rgba(10,10,18,0.95)', backdropFilter: 'blur(10px)', fontWeight: 900, fontSize: '0.58rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.12em', position: 'sticky', top: 0, zIndex: 100 }}>
+                        <div style={{ flex: '0 0 260px', padding: '0 1rem' }}>Company & Asset</div>
+                        <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right' }}>Price</div>
+                        <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right' }}>% Change</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Volume</div>
+                        <div style={{ flex: '0 0 80px', padding: '0 0.5rem', textAlign: 'right' }}>PEG</div>
+                        <div style={{ flex: '0 0 140px', padding: '0 1rem', textAlign: 'center' }}>Range</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>Momentum</div>
+                        <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>RSI</div>
+                        <div style={{ flex: '0 0 60px', padding: '0 1rem', textAlign: 'center' }}>Analyze</div>
                     </div>
                     {Object.entries(stocks.reduce((acc, stock) => {
                         const sector = getSector(stock.symbol);
@@ -232,23 +233,23 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                         display: 'flex', 
                                         alignItems: 'center', 
                                         justifyContent: 'space-between',
-                                        padding: '12px 1.5rem', 
+                                        padding: '6px 1rem', 
                                         background: isCollapsed ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)', 
                                         borderBottom: '1px solid rgba(255,255,255,0.05)', 
                                         position: 'sticky', 
-                                        top: '40px', 
+                                        top: '28px', 
                                         zIndex: 80,
                                         cursor: 'pointer',
                                         transition: 'background 0.3s ease'
                                     }}
                                 >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <ChevronDown size={14} style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--color-accent)' }} />
-                                        <span style={{ fontSize: '0.78rem', fontWeight: 950, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{sector}</span>
-                                        <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--color-text-tertiary)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{sectorStocks.length} ASSETS</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <ChevronDown size={12} style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--color-accent)' }} />
+                                        <span style={{ fontSize: '0.68rem', fontWeight: 950, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{sector}</span>
+                                        <span style={{ fontSize: '0.55rem', fontWeight: 800, color: 'var(--color-text-tertiary)', background: 'rgba(255,255,255,0.05)', padding: '1px 4px', borderRadius: '3px' }}>{sectorStocks.length}</span>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <span style={{ fontSize: '0.65rem', fontWeight: 900, color: getChangeClass(avgChange) === 'text-success' ? 'var(--color-success)' : 'var(--color-error)' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ fontSize: '0.6rem', fontWeight: 900, color: getChangeClass(avgChange) === 'text-success' ? 'var(--color-success)' : 'var(--color-error)' }}>
                                             AVG: {formatPercent(avgChange)}
                                         </span>
                                     </div>
@@ -262,31 +263,31 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                     const momentum = 50 + (stock.changePercent * 6) + (rangePos * 20 - 10);
 
                                     return (
-                                        <div 
-                                            key={stock.symbol} 
-                                            onClick={() => onSelectSymbol(stock.symbol)} 
-                                            className={`screener-row-hover ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`}
-                                            style={{ 
-                                                display: 'flex', 
-                                                alignItems: 'center', 
-                                                padding: '12px 1.5rem', 
-                                                borderBottom: '1px solid var(--glass-border)', 
-                                                cursor: 'pointer', 
-                                                transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)', 
-                                                background: 'rgba(255,255,255,0.01)',
-                                                position: 'relative'
-                                            }}
-                                        >
-                                            <div style={{ flex: '0 0 320px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <CompanyLogo symbol={stock.symbol} size={32} />
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <div style={{ fontSize: '0.9rem', fontWeight: 950, color: 'white' }}>{getDisplayName(stock.symbol, stock.name)}</div>
-                                                    <div style={{ fontSize: '0.62rem', color: 'var(--color-accent)', fontWeight: 900 }}>{stock.symbol.replace(/[()]/g, '')}</div>
+                                            <div 
+                                                key={stock.symbol} 
+                                                onClick={() => onSelectSymbol(stock.symbol)} 
+                                                className={`screener-row-hover ${flash === 'up' ? 'flash-up' : flash === 'down' ? 'flash-down' : ''}`}
+                                                style={{ 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    padding: '5px 1rem', 
+                                                    borderBottom: '1px solid var(--glass-border)', 
+                                                    cursor: 'pointer', 
+                                                    transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)', 
+                                                    background: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
+                                                    position: 'relative'
+                                                }}
+                                            >
+                                                <div style={{ flex: '0 0 260px', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <CompanyLogo symbol={stock.symbol} size={22} />
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <div style={{ fontSize: '0.78rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getDisplayName(stock.symbol, stock.name)}</div>
+                                                        <div style={{ fontSize: '0.55rem', color: 'var(--color-accent)', fontWeight: 800 }}>{stock.symbol.replace(/[()]/g, '')}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                <span style={{ 
-                                                    fontWeight: 950, fontSize: '1rem', 
+                                                <div style={{ flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <span style={{ 
+                                                        fontWeight: 950, fontSize: '0.88rem', 
                                                     color: flash === 'up' ? '#10b981' : flash === 'down' ? '#ef4444' : 'white',
                                                     transition: 'color 1.2s ease-in-out',
                                                     textShadow: flash ? `0 0 12px ${flash === 'up' ? '#10b981' : '#ef4444'}` : 'none',
@@ -295,29 +296,31 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
                                                     {formatCurrencyForMarket(stock.price, selectedMarket.currency)}
                                                 </span>
                                             </div>
-                                            <div className={getChangeClass(stock.changePercent)} style={{ 
-                                                flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950,
-                                                color: stock.changePercent > 0 ? '#10b981' : stock.changePercent < 0 ? '#ef4444' : 'white',
-                                                transition: 'color 1.2s ease-in-out'
-                                            }}>
-                                                {formatPercent(stock.changePercent)}
-                                            </div>
-                                            <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.78rem' }}>{formatNumberPlain(stock.volume)}</div>
-                                            <div style={{ flex: '0 0 90px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)' }}>{stock.pegRatio?.toFixed(2) || '--'}</div>
-                                            <div style={{ flex: '0 0 160px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '1.5px', position: 'relative' }}>
-                                                    <div style={{ position: 'absolute', height: '9px', width: '2px', background: 'var(--color-accent)', top: '-3px', left: `${Math.max(2, Math.min(98, rangePos * 100))}%`, boxShadow: '0 0 8px var(--color-accent)' }} />
+                                                <div className={getChangeClass(stock.changePercent)} style={{ 
+                                                    flex: '0 0 95px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 950,
+                                                    color: stock.changePercent > 0 ? '#10b981' : stock.changePercent < 0 ? '#ef4444' : 'white',
+                                                    transition: 'color 1.2s ease-in-out',
+                                                    fontSize: '0.78rem',
+                                                    borderRight: '1px solid rgba(255,255,255,0.03)'
+                                                }}>
+                                                    {formatPercent(stock.changePercent)}
                                                 </div>
-                                            </div>
-                                            <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                <span style={{ fontSize: '0.72rem', fontWeight: 950, color: momentum > 60 ? '#10b981' : momentum < 40 ? '#ef4444' : 'var(--color-warning)', transition: 'color 1.2s ease' }}>{momentum.toFixed(1)}</span>
-                                            </div>
-                                            <div style={{ flex: '0 0 130px', padding: '0 0.5rem', textAlign: 'right' }}>
-                                                <span style={{ fontSize: '0.65rem', fontWeight: 950, color: rsi > 70 ? '#ef4444' : rsi < 30 ? '#10b981' : 'white', transition: 'color 1.2s ease' }}>{rsi.toFixed(1)}</span>
-                                            </div>
-                                            <div style={{ flex: '0 0 70px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Eye size={15} color="var(--color-accent)" />
-                                            </div>
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', color: 'var(--color-text-secondary)', fontWeight: 800, fontSize: '0.68rem', borderRight: '1px solid rgba(255,255,255,0.03)' }}>{formatNumberPlain(stock.volume)}</div>
+                                                <div style={{ flex: '0 0 80px', padding: '0 0.5rem', textAlign: 'right', fontWeight: 800, color: 'var(--color-warning)', fontSize: '0.72rem', borderRight: '1px solid rgba(255,255,255,0.03)' }}>{stock.pegRatio?.toFixed(2) || '--'}</div>
+                                                <div style={{ flex: '0 0 140px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <div style={{ width: '100%', height: '2px', background: 'rgba(255,255,255,0.06)', borderRadius: '1px', position: 'relative' }}>
+                                                        <div style={{ position: 'absolute', height: '6px', width: '2px', background: 'var(--color-accent)', top: '-2px', left: `${Math.max(2, Math.min(98, rangePos * 100))}%`, boxShadow: '0 0 8px var(--color-accent)' }} />
+                                                    </div>
+                                                </div>
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: 950, color: momentum > 60 ? '#10b981' : momentum < 40 ? '#ef4444' : 'var(--color-warning)', transition: 'color 1.2s ease' }}>{momentum.toFixed(1)}</span>
+                                                </div>
+                                                <div style={{ flex: '0 0 110px', padding: '0 0.5rem', textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: 950, color: rsi > 70 ? '#ef4444' : rsi < 30 ? '#10b981' : 'white', transition: 'color 1.2s ease' }}>{rsi.toFixed(1)}</span>
+                                                </div>
+                                                <div style={{ flex: '0 0 60px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Eye size={13} color="var(--color-accent)" />
+                                                </div>
                                         </div>
                                             );
                                         })}
