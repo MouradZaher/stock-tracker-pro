@@ -31,6 +31,8 @@ const ADX15_SYMBOLS = [
     'ALYAHSAT.AD', 'ADNOCLS.AD', 'ADNOCDRILL.AD', 'MULTIPLY.AD', 'BAYANAT.AD', 'FERTIGLOBE.AD', 'DANA.AD'
 ];
 
+const GLOBAL_SYMBOLS = ['GLD', 'SLV', 'COPX'];
+
 const SECTOR_MAP: Record<string, string> = {
     // --- Commodities & Metals ---
     'GLD': 'Commodities & Metals', 'SLV': 'Commodities & Metals', 'COPX': 'Commodities & Metals',
@@ -140,14 +142,15 @@ const InstitutionalScreener: React.FC<{ onSelectSymbol: (symbol: string) => void
     useEffect(() => {
         let isMounted = true;
         const marketSymbols = selectedMarket.id === 'egypt' ? EGX30_SYMBOLS : selectedMarket.id === 'abudhabi' ? ADX15_SYMBOLS : SP100_SYMBOLS;
+        const allSymbols = [...marketSymbols, ...GLOBAL_SYMBOLS];
 
         const fetchStocks = async () => {
             try {
-                const map = await getMultipleQuotes(marketSymbols);
+                const map = await getMultipleQuotes(allSymbols);
                 if (!isMounted) return;
                 
                 let loadedStocks: Stock[] = [];
-                marketSymbols.forEach(sym => { if (map.has(sym)) loadedStocks.push(map.get(sym)!); });
+                allSymbols.forEach(sym => { if (map.has(sym)) loadedStocks.push(map.get(sym)!); });
 
                 // --- Simulated Jitter Mode (For demonstration when market is closed) ---
                 loadedStocks = loadedStocks.map(s => ({
