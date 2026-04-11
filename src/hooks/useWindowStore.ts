@@ -188,8 +188,8 @@ export const useWindowStore = create<WindowStore>()(
                 const topBarHeight = 0; // Content fills full vertical space
                 const bottomNavHeight = 0;
                 
-                const availW = window.innerWidth - sidebarWidth - SIDE_WIDTH;
-                const availH = window.innerHeight - topBarHeight - bottomNavHeight;
+                const availW = Math.max(800, window.innerWidth - sidebarWidth - SIDE_WIDTH);
+                const availH = Math.max(600, window.innerHeight - topBarHeight - bottomNavHeight);
                 
                 const halfW = availW / 2;
                 const halfH = availH / 2;

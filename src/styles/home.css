@@ -27,7 +27,8 @@
 .heatmap-wrapper {
   position: absolute;
   inset: 0;
-  min-height: 0;
+  min-width: 350px;
+  min-height: 300px;
   border-radius: 0;
   overflow: hidden;
   z-index: 50;
