@@ -4,6 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useMarket } from '../contexts/MarketContext';
 import { socialFeedService } from '../services/SocialFeedService';
 import HeatmapMobileFallback from './HeatmapMobileFallback';
+import InstitutionalHeatmapGrid from './InstitutionalHeatmapGrid';
 
 const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -191,20 +192,25 @@ const StockHeatmap: React.FC = () => {
                             <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>INITIALIZING {effectiveMarket.hasHeatmapSupport ? 'HEATMAP' : 'MARKET MATRIX'}...</span>
                         </div>
                     )}
-                    <div
-                        className="tradingview-widget-container"
-                        ref={containerRef}
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            overflow: 'hidden',
-                            touchAction: 'pan-x pan-y',
-                            pointerEvents: 'auto',
-                        }}
-                    />
+
+                    {effectiveMarket.hasHeatmapSupport ? (
+                        <div
+                            className="tradingview-widget-container"
+                            ref={containerRef}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                overflow: 'hidden',
+                                touchAction: 'pan-x pan-y',
+                                pointerEvents: 'auto',
+                            }}
+                        />
+                    ) : (
+                        <InstitutionalHeatmapGrid />
+                    )}
                 </>
             )}
         </div>
