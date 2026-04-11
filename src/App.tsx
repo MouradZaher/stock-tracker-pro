@@ -68,7 +68,7 @@ function AppContent() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
-  
+
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(true);
 
   // Auto-sync portfolio prices on login/refresh to replace $150 placeholders
@@ -118,13 +118,13 @@ function AppContent() {
   return (
     <BrowserRouter>
       {isTutorialOpen && (
-        <TutorialModal 
+        <TutorialModal
           onClose={() => setIsTutorialOpen(false)}
           onOpenAI={handleOpenAI}
         />
       )}
       {isSettingsOpen && (
-        <SettingsModal 
+        <SettingsModal
           onClose={() => setIsSettingsOpen(false)}
           onClearData={() => {
             localStorage.clear();
@@ -202,11 +202,11 @@ function MainLayout({
     const searchParams = new URLSearchParams(location.search);
     const fromTab = searchParams.get('from');
     const path = location.pathname;
-    
+
     if (path.startsWith('/stock/')) {
       return (fromTab || 'home') as TabType;
     }
-    
+
     const tabName = path.substring(1) || 'home';
     const validTabs: TabType[] = ['home', 'watchlist', 'portfolio', 'recommendations', 'pulse', 'pricing', 'admin'];
     return (validTabs.includes(tabName as TabType) ? tabName : 'home') as TabType;
@@ -243,18 +243,18 @@ function MainLayout({
   return (
     <div className="app" style={{ background: '#000000', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <ErrorBoundary>
-        <OmniSearch 
-            isOpen={isOmniSearchOpen} 
-            onClose={() => setIsOmniSearchOpen(false)} 
-            onSelectSymbol={handleSelectSymbol} 
+        <OmniSearch
+          isOpen={isOmniSearchOpen}
+          onClose={() => setIsOmniSearchOpen(false)}
+          onSelectSymbol={handleSelectSymbol}
         />
-        
+
         <Suspense fallback={null}>
           <AdminDashboard isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
         </Suspense>
 
         <div className="main-wrapper" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-          
+
           {/* LEFT TOOLSTRIP (SIDEBAR) */}
           <LeftToolstrip
             onOpenOmniSearch={() => setIsOmniSearchOpen(true)}
@@ -268,38 +268,38 @@ function MainLayout({
           {/* MAIN DATA MONITOR */}
           <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minWidth: 0, padding: 0 }}>
             <div className="content-route-shell" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <Routes>
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/home/*" element={
-                <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <Dashboard onSelectSymbol={handleSelectSymbol} />
-                </div>
-              } />
-              <Route path="/stock/:symbol" element={
-                <StockDetailRoute onBack={() => navigate('/portfolio')} />
-              } />
-              <Route path="/watchlist" element={<Navigate to="/home" replace />} />
-              <Route path="/portfolio" element={<Navigate to="/home" replace />} />
-              <Route path="/recommendations" element={<Navigate to="/home" replace />} />
-              <Route path="/pulse" element={
-                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
-                  {/* Keep /pulse for direct symbol deep-linking, but workspace is preferred */}
-                  <MarketPulsePage onSelectStock={handleSelectSymbol} />
-                </div>
-              } />
-              <Route path="/pricing" element={
-                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<PageSkeleton />}>
-                      <PricingPage />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-              } />
-              <Route path="/tv" element={<Navigate to="/home" replace />} />
-              <Route path="/calendar" element={<Navigate to="/home" replace />} />
-              <Route path="*" element={<Navigate to={{ pathname: '/home', search: location.search }} replace />} />
-            </Routes>
+              <Routes>
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/home/*" element={
+                  <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Dashboard onSelectSymbol={handleSelectSymbol} />
+                  </div>
+                } />
+                <Route path="/stock/:symbol" element={
+                  <StockDetailRoute onBack={() => navigate('/portfolio')} />
+                } />
+                <Route path="/watchlist" element={<Navigate to="/home" replace />} />
+                <Route path="/portfolio" element={<Navigate to="/home" replace />} />
+                <Route path="/recommendations" element={<Navigate to="/home" replace />} />
+                <Route path="/pulse" element={
+                  <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
+                    {/* Keep /pulse for direct symbol deep-linking, but workspace is preferred */}
+                    <MarketPulsePage onSelectStock={handleSelectSymbol} />
+                  </div>
+                } />
+                <Route path="/pricing" element={
+                  <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
+                    <ErrorBoundary>
+                      <Suspense fallback={<PageSkeleton />}>
+                        <PricingPage />
+                      </Suspense>
+                    </ErrorBoundary>
+                  </div>
+                } />
+                <Route path="/tv" element={<Navigate to="/home" replace />} />
+                <Route path="/calendar" element={<Navigate to="/home" replace />} />
+                <Route path="*" element={<Navigate to={{ pathname: '/home', search: location.search }} replace />} />
+              </Routes>
             </div>
           </main>
         </div>
