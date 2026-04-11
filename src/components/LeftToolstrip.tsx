@@ -4,7 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Search, Brain, Shield, Bell, HelpCircle, Settings,
     Sun, Moon, LogOut, MessageSquare, Star, ChevronDown,
-    LayoutGrid, Activity, Globe, Zap, Command, Tv, Calendar
+    LayoutGrid, Activity, Globe, Zap, Command, Tv, Calendar,
+    PieChart, Eye
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -38,6 +39,11 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
 
     const isOnHome = location.pathname.startsWith('/home');
     const isOnTV = location.pathname === '/tv';
+    const isOnCalendar = location.pathname === '/calendar';
+    const isOnPortfolio = location.pathname === '/portfolio';
+    const isOnWatchlist = location.pathname === '/watchlist';
+    const isOnPulse = location.pathname === '/pulse';
+    const isOnPricing = location.pathname === '/pricing';
 
     const iconStyle = (id: string, color?: string, isActive?: boolean): React.CSSProperties => ({
         cursor: 'pointer',
@@ -82,6 +88,20 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             background: '#000',
             flexShrink: 0,
         }}>
+            
+            {/* ─── SEARCH / PULSE HUB ─── */}
+            <div
+                style={iconStyle('search', undefined, isOnPulse)}
+                onMouseEnter={() => setHoveredIcon('search')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/pulse'); soundService.playTap(); }}
+                title="Intelligence Hub (Search)"
+            >
+                <Search size={16} />
+                {hoveredIcon === 'search' && <div style={tooltipStyle}>INTELLIGENCE ⌘K</div>}
+            </div>
+
+            <div style={{ width: '24px', height: '1px', background: '#111', margin: '4px 0' }} />
 
             {/* ─── HOME (Heatmap/Screener Toggle) ─── */}
             <div
@@ -93,7 +113,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 title="Monitor View"
             >
                 {homeView === 'heatmap' ? <LayoutGrid size={16} /> : <Activity size={16} />}
-                {/* Pulsing dot to indicate active view */}
                 <div style={{
                     position: 'absolute', bottom: '2px', right: '2px',
                     width: '6px', height: '6px', borderRadius: '50%',
@@ -104,12 +123,38 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'home' && <div style={tooltipStyle}>{homeView === 'heatmap' ? 'HEATMAP' : 'SCREENER'}</div>}
             </div>
 
+            {/* ─── PORTFOLIO ─── */}
+            <div
+                style={iconStyle('portfolio', '#10b981', isOnPortfolio)}
+                onMouseEnter={() => setHoveredIcon('portfolio')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/portfolio'); soundService.playTap(); }}
+                title="Portfolio Holdings"
+            >
+                <PieChart size={16} />
+                {hoveredIcon === 'portfolio' && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
+            </div>
+
+            {/* ─── WATCHLIST ─── */}
+            <div
+                style={iconStyle('watchlist', '#3b82f6', isOnWatchlist)}
+                onMouseEnter={() => setHoveredIcon('watchlist')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/watchlist'); soundService.playTap(); }}
+                title="Active Watchlist"
+            >
+                <Eye size={16} />
+                {hoveredIcon === 'watchlist' && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
+            </div>
+
+            <div style={{ width: '24px', height: '1px', background: '#111', margin: '4px 0' }} />
+
             {/* Home View Flyout */}
             {isHomeMenuOpen && ReactDOM.createPortal(
                 <>
                     <div onClick={() => setIsHomeMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
                     <div style={{
-                        position: 'fixed', top: '128px', left: '56px', zIndex: 9999,
+                        position: 'fixed', top: '78px', left: '56px', zIndex: 9999,
                         background: '#0a0a0a', border: '1px solid #222',
                         padding: '0.5rem', minWidth: '180px',
                     }}>
@@ -140,30 +185,22 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                                 {homeView === v.id && <div style={{ marginLeft: 'auto', width: '5px', height: '5px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 6px var(--color-accent)' }} />}
                             </button>
                         ))}
-                        <div style={{ borderTop: '1px solid #222', margin: '0.35rem 0' }} />
-                        <div style={{ padding: '0.25rem 0.75rem', fontSize: '0.5rem', color: '#333' }}>
-                            ★ SET DEFAULT VIEW
-                        </div>
-                        <div style={{ display: 'flex', gap: '4px', padding: '0 0.75rem 0.25rem' }}>
-                            {['heatmap', 'screener'].map(v => (
-                                <button key={v} onClick={() => {
-                                    setFavoriteHomeView(v as any);
-                                    soundService.playTap();
-                                }} style={{
-                                    fontSize: '0.5rem', fontWeight: 800, padding: '2px 6px',
-                                    background: favoriteHomeView === v ? 'rgba(250, 204, 21, 0.1)' : 'transparent',
-                                    border: favoriteHomeView === v ? '1px solid rgba(250, 204, 21, 0.3)' : '1px solid #222',
-                                    color: favoriteHomeView === v ? '#facc15' : '#444',
-                                    cursor: 'pointer',
-                                }}>
-                                    {v.toUpperCase()}
-                                </button>
-                            ))}
-                        </div>
                     </div>
                 </>,
                 document.body
             )}
+
+            {/* ─── CORPORATE ACTIONS CALENDAR ─── */}
+            <div
+                style={iconStyle('calendar', '#f59e0b', isOnCalendar)}
+                onMouseEnter={() => setHoveredIcon('calendar')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/calendar'); soundService.playTap(); }}
+                title="Corporate Actions Calendar"
+            >
+                <Calendar size={16} />
+                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+            </div>
 
             {/* ─── TV / LIVE STREAMS ─── */}
             <div
@@ -174,7 +211,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 title="Live TV Streams"
             >
                 <Tv size={16} />
-                {/* Live pulse dot */}
                 <div style={{
                     position: 'absolute', top: '3px', right: '3px',
                     width: '5px', height: '5px', borderRadius: '50%',
@@ -185,40 +221,29 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
             </div>
 
-            {/* ─── CORPORATE ACTIONS CALENDAR ─── */}
+            {/* ─── PRO UPGRADE ─── */}
             <div
-                style={iconStyle('calendar', '#f59e0b', location.pathname === '/calendar')}
-                onMouseEnter={() => setHoveredIcon('calendar')}
+                style={iconStyle('pricing', '#facc15', isOnPricing)}
+                onMouseEnter={() => setHoveredIcon('pricing')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/calendar'); soundService.playTap(); }}
-                title="Corporate Actions Calendar"
+                onClick={() => { navigate('/pricing'); soundService.playTap(); }}
+                title="Upgrade to Pro"
             >
-                <Calendar size={16} />
-                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+                <Star size={16} fill={isOnPricing ? "#facc15" : "none"} />
+                {hoveredIcon === 'pricing' && <div style={{ ...tooltipStyle, color: '#facc15' }}>UPGRADE PRO</div>}
             </div>
 
-            {/* ─── SEARCH (Ctrl+K) ─── */}
-            <div
-                style={iconStyle('search')}
-                onMouseEnter={() => setHoveredIcon('search')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={onOpenOmniSearch}
-                title="Search (Ctrl+K)"
-            >
-                <Search size={16} />
-                {hoveredIcon === 'search' && <div style={tooltipStyle}>SEARCH ⌘K</div>}
-            </div>
 
             {/* ─── MARKET SELECTOR ─── */}
             <div
                 ref={marketBtnRef}
-                style={{ ...iconStyle('market'), border: `1px solid ${selectedMarket.color}33` }}
+                style={{ ...iconStyle('market'), border: `1px solid ${selectedMarket.color}33`, marginTop: '8px' }}
                 onMouseEnter={() => setHoveredIcon('market')}
                 onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => { setIsMarketOpen(!isMarketOpen); soundService.playTap(); }}
                 title={`Market: ${selectedMarket.shortName}`}
             >
-                <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '16px', height: '11px', objectFit: 'cover', borderRadius: '1px' }} />
+                <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '14px', height: '10px', objectFit: 'cover', borderRadius: '1px' }} />
                 {hoveredIcon === 'market' && <div style={tooltipStyle}>{selectedMarket.name.toUpperCase()}</div>}
             </div>
 
@@ -227,7 +252,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 <>
                     <div onClick={() => setIsMarketOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
                     <div style={{
-                        position: 'fixed', top: '210px', left: '56px', zIndex: 9999,
+                        position: 'fixed', bottom: '150px', left: '56px', zIndex: 9999,
                         background: '#0a0a0a', border: '1px solid #222',
                         padding: '0.5rem', minWidth: '220px',
                     }}>
@@ -237,7 +262,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                         {MARKETS.map(m => (
                             <button key={m.id} onClick={() => {
                                 setMarket(m.id as MarketId);
-                                navigate(`/home/${homeView}`);
+                                navigate(location.pathname);
                                 setIsMarketOpen(false);
                                 soundService.playTap();
                             }} style={{
@@ -252,15 +277,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                                     <div style={{ fontWeight: 800, fontSize: '0.7rem', color: selectedMarket.id === m.id ? m.color : 'white' }}>{m.name}</div>
                                     <div style={{ fontSize: '0.55rem', color: '#555' }}>{m.indexName}</div>
                                 </div>
-                                <button onClick={(e) => {
-                                    e.stopPropagation();
-                                    setFavoriteMarket(m.id as MarketId);
-                                    setMarket(m.id as MarketId);
-                                    setIsMarketOpen(false);
-                                    soundService.playTap();
-                                }} style={{ marginLeft: 'auto', border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px' }}>
-                                    <Star size={12} color={favoriteMarketId === m.id ? '#facc15' : '#333'} fill={favoriteMarketId === m.id ? '#facc15' : 'none'} />
-                                </button>
                             </button>
                         ))}
                     </div>
@@ -289,18 +305,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                     }} />
                 )}
                 {hoveredIcon === 'bell' && <div style={tooltipStyle}>SIGNALS</div>}
-            </div>
-
-            {/* ─── HELP ─── */}
-            <div
-                style={iconStyle('help')}
-                onMouseEnter={() => setHoveredIcon('help')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={onOpenTutorial}
-                title="Help & Support"
-            >
-                <HelpCircle size={16} />
-                {hoveredIcon === 'help' && <div style={tooltipStyle}>HELP</div>}
             </div>
 
             {/* ─── THEME TOGGLE ─── */}

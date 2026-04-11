@@ -247,15 +247,12 @@ function MainLayout({
   return (
     <div className="app" style={{ background: '#000000', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <ErrorBoundary>
-        <MacroPulseHeader />
         <OmniSearch 
             isOpen={isOmniSearchOpen} 
             onClose={() => setIsOmniSearchOpen(false)} 
             onSelectSymbol={handleSelectSymbol} 
         />
         
-        <WorldMonitorTabs activeTab={activeTab} onTabChange={handleTabChange} />
-
         <div className="main-wrapper" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           
           {/* LEFT TOOLSTRIP (SIDEBAR) */}
@@ -272,22 +269,22 @@ function MainLayout({
           <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minWidth: 0, padding: 0 }}>
             <div className="content-route-shell" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <Routes>
-              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/" element={<Navigate to="/portfolio" replace />} />
               <Route path="/home/*" element={
                 <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Dashboard onSelectSymbol={handleSelectSymbol} />
                 </div>
               } />
               <Route path="/stock/:symbol" element={
-                <StockDetailRoute onBack={() => navigate('/home')} />
+                <StockDetailRoute onBack={() => navigate('/portfolio')} />
               } />
               <Route path="/watchlist" element={
-                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
+                <div className="tab-content" style={{ padding: '0.5rem', height: '100%' }}>
                   <WatchlistPage onSelectSymbol={handleSelectSymbol} />
                 </div>
               } />
               <Route path="/portfolio" element={
-                <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
+                <div className="tab-content" style={{ padding: '0.5rem', height: '100%' }}>
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <Portfolio onSelectSymbol={handleSelectSymbol} />
@@ -336,7 +333,7 @@ function MainLayout({
                   </ErrorBoundary>
                 </div>
               } />
-              <Route path="*" element={<Navigate to={{ pathname: '/home', search: location.search }} replace />} />
+              <Route path="*" element={<Navigate to={{ pathname: '/portfolio', search: location.search }} replace />} />
             </Routes>
             </div>
           </main>
