@@ -89,7 +89,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             
             {/* ─── TERMINAL LOGO (TOP / HOME / HEATMAP TICKET) ─── */}
             <div 
-                ref={homeBtnRef}
                 style={{ 
                     cursor: 'pointer',
                     marginBottom: '1rem', 
@@ -118,7 +117,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             
             {/* ─── MARKET SELECTOR (TOP) ─── */}
             <div
-                ref={marketBtnRef}
                 style={{ ...iconStyle('market'), border: `1px solid ${selectedMarket.color}33`, marginBottom: '4px' }}
                 onMouseEnter={() => setHoveredIcon('market')}
                 onMouseLeave={() => setHoveredIcon(null)}
