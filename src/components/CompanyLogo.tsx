@@ -29,6 +29,8 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     // List of indices that definitely don't have FMP stock-images
     const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
 
+    const logoSources: string[] = [];
+
     // 0. MANUAL OVERRIDES (Highest reliability for known issues)
     if (overrideUrl) {
         logoSources.push(overrideUrl);
