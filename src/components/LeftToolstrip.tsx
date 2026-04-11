@@ -38,13 +38,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
     const location = useLocation();
 
     const [isMarketOpen, setIsMarketOpen] = useState(false);
-    const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
     const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
-    const marketBtnRef = useRef<HTMLDivElement>(null);
-    const homeBtnRef = useRef<HTMLDivElement>(null);
-
-    const isWindowOpen = (id: WindowId) => windows[id]?.isOpen && !windows[id]?.isMinimized;
-    const isWindowMinimized = (id: WindowId) => windows[id]?.isMinimized;
 
     const iconStyle = (id: string, color?: string, isActive?: boolean, isMinimized?: boolean): React.CSSProperties => ({
         cursor: 'pointer',

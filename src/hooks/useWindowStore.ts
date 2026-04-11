@@ -37,6 +37,8 @@ interface WindowStore {
     updateScale: (id: WindowId, scale: number) => void;
     snapToLayout: (id: WindowId, layout: 'TL' | 'TR' | 'BL' | 'BR' | 'SIDE' | 'FULL') => void;
     resetToInstitutionalLayout: () => void;
+    isWindowOpen: (id: WindowId) => boolean;
+    isWindowMinimized: (id: WindowId) => boolean;
 }
 
 const DEFAULT_WIDTH = 800;
@@ -229,7 +231,14 @@ export const useWindowStore = create<WindowStore>()(
                     snapToLayout('tv', 'BL');
                     snapToLayout('portfolio', 'BR');
                     snapToLayout('advisor', 'SIDE');
-                }, 10);
+                });
+            },
+            isWindowOpen: (id) => {
+                const win = get().windows[id];
+                return !!(win?.isOpen && !win?.isMinimized);
+            },
+            isWindowMinimized: (id) => {
+                return !!get().windows[id]?.isMinimized;
             }
         }),
         {
