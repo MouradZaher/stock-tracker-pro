@@ -623,7 +623,7 @@ const getProfileFromYahoo = async (symbol: string): Promise<CompanyProfile | nul
     }
 };
 
-// Search symbols from local data
+// Search symbols with global fallback
 export const searchSymbols = async (query: string, marketId?: string): Promise<Record<string, unknown>[]> => {
     if (!query || query.length < 1) return [];
     const allSymbols = getAllSymbols();
@@ -639,7 +639,7 @@ export const searchSymbols = async (query: string, marketId?: string): Promise<R
         filteredMatches = matches.filter(s => getMarketForSymbol(s.symbol) === marketId);
     }
 
-    // Deduplicate
+    // Deduplicate local matches
     const uniqueMap = new Map();
     filteredMatches.forEach(item => {
         if (!uniqueMap.has(item.symbol)) {
@@ -647,7 +647,37 @@ export const searchSymbols = async (query: string, marketId?: string): Promise<R
         }
     });
 
-    return Array.from(uniqueMap.values()).slice(0, 20);
+    let results = Array.from(uniqueMap.values());
+
+    // GLOBAL FALLBACK: If local matches are sparse (< 3) and no specific market is enforced,
+    // or if the query looks like a specific ticker not in our list, query the global registry.
+    if (results.length < 3) {
+        try {
+            const externalResponse = await api.get('/quote', { 
+                params: { 
+                    symbols: query,
+                    search: 'true' 
+                } 
+            });
+            const externalMatches = externalResponse.data?.quotes || [];
+            
+            externalMatches.forEach((m: any) => {
+                const sym = m.symbol || m.ticker;
+                if (!uniqueMap.has(sym)) {
+                    uniqueMap.set(sym, {
+                        symbol: sym,
+                        name: m.longname || m.shortname || m.name || sym,
+                        isGlobal: true
+                    });
+                }
+            });
+            results = Array.from(uniqueMap.values());
+        } catch (e) {
+            console.warn("Global search fallback failed:", e);
+        }
+    }
+
+    return results.slice(0, 20);
 };
 
 /**

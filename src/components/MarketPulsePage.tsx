@@ -154,7 +154,12 @@ const MarketPulsePage: React.FC = () => {
                                 >
                                     <CompanyLogo symbol={item.symbol} size={32} />
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ color: 'white', fontSize: '1rem', fontWeight: 900 }}>{item.symbol}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ color: 'white', fontSize: '1rem', fontWeight: 900 }}>{item.symbol}</div>
+                                            {item.isGlobal && (
+                                                <div style={{ padding: '2px 5px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '4px', fontSize: '0.45rem', fontWeight: 900, color: '#3b82f6', letterSpacing: '0.05em' }}>GLOBAL REGISTRY</div>
+                                            )}
+                                        </div>
                                         <div style={{ color: '#444', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>{item.name}</div>
                                     </div>
                                     <ArrowRight size={16} color="#222" />

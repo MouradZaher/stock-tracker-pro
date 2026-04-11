@@ -97,7 +97,12 @@ const OmniSearch: React.FC<OmniSearchProps> = ({ isOpen, onClose, onSelectSymbol
                             >
                                 <CompanyLogo symbol={item.symbol} size={24} />
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ color: 'white', fontSize: '0.75rem', fontWeight: 900 }}>{item.symbol}</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <div style={{ color: 'white', fontSize: '0.75rem', fontWeight: 900 }}>{item.symbol}</div>
+                                        {item.isGlobal && (
+                                            <div style={{ padding: '1px 4px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '3px', fontSize: '0.4rem', fontWeight: 900, color: '#3b82f6' }}>GLOBAL</div>
+                                        )}
+                                    </div>
                                     <div style={{ color: '#555', fontSize: '0.6rem' }}>{item.name}</div>
                                 </div>
                                 <ArrowRight size={12} color="#333" />
