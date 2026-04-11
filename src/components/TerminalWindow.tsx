@@ -204,6 +204,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', paddingRight: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', border: '1px solid #222' }}>
                         <button 
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale - 0.1); }}
                             className="window-control-btn zoom-out-btn"
                             style={{ ...controlButtonStyle, width: '28px' }}
@@ -214,6 +216,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                             {Math.round(currentScale * 100)}%
                         </span>
                         <button 
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale + 0.1); }}
                             className="window-control-btn zoom-in-btn"
                             style={{ ...controlButtonStyle, width: '28px' }}
@@ -224,6 +228,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
 
                     <div style={{ width: '1px', background: '#222', height: '14px' }} />
                     <button 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); toggleMinimize(id); }}
                         className="window-control-btn"
                         style={controlButtonStyle}
@@ -231,6 +237,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                         <Minus size={13} />
                     </button>
                     <button 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); toggleMaximize(id); }}
                         className="window-control-btn"
                         style={controlButtonStyle}
@@ -238,6 +246,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                         {isMaximized ? <Minimize2 size={12} /> : <Square size={11} />}
                     </button>
                     <button 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
                         className="window-control-btn close-btn"
                         style={closeButtonStyle}
