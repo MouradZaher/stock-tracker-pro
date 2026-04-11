@@ -100,7 +100,9 @@ const StockHeatmap: React.FC = () => {
                                 "title": effectiveMarket.name.toUpperCase() + " LEADERS",
                                 "symbols": [
                                     { "s": effectiveMarket.indexSymbol, "d": effectiveMarket.indexName },
-                                    { "s": `EGX:${effectiveMarket.indexSymbol}` }, // Attempted symbols for TV
+                                    { "s": effectiveMarket.id === 'egypt' ? 'EGX:COMI' : effectiveMarket.id === 'abudhabi' ? 'ADX:FAB' : 'BINANCE:BTCUSDT' },
+                                    { "s": effectiveMarket.id === 'egypt' ? 'EGX:SWDY' : effectiveMarket.id === 'abudhabi' ? 'ADX:ETISALAT' : 'BINANCE:ETHUSDT' },
+                                    { "s": effectiveMarket.id === 'egypt' ? 'EGX:FWRY' : effectiveMarket.id === 'abudhabi' ? 'ADX:IHC' : 'AMEX:SPY' }
                                 ]
                             }
                         ]
