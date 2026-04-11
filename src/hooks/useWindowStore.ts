@@ -36,6 +36,7 @@ interface WindowStore {
     updateSize: (id: WindowId, w: number, h: number) => void;
     updateScale: (id: WindowId, scale: number) => void;
     snapToLayout: (id: WindowId, layout: 'TL' | 'TR' | 'BL' | 'BR' | 'SIDE' | 'FULL') => void;
+    resetToInstitutionalLayout: () => void;
 }
 
 const DEFAULT_WIDTH = 800;
@@ -208,6 +209,27 @@ export const useWindowStore = create<WindowStore>()(
                         [id]: { ...win, ...next, isMaximized: false }
                     }
                 });
+            },
+            resetToInstitutionalLayout: () => {
+                const { openWindow, snapToLayout, windows } = get();
+                
+                // 1. Force open all required windows
+                openWindow('heatmap', 'Institutional Heatmap');
+                openWindow('screener', 'Data Matrix Screener');
+                openWindow('tv', 'Intelligence Stream');
+                openWindow('portfolio', 'Active Portfolio');
+                openWindow('advisor', 'Oracle Portfolio Audit');
+                
+                // 2. Snap them into the high-density grid
+                // Use a short timeout to ensure the DOM is ready for measurement if needed, 
+                // but snapToLayout uses window dimensions so it's usually safe immediately.
+                setTimeout(() => {
+                    snapToLayout('heatmap', 'TL');
+                    snapToLayout('screener', 'TR');
+                    snapToLayout('tv', 'BL');
+                    snapToLayout('portfolio', 'BR');
+                    snapToLayout('advisor', 'SIDE');
+                }, 10);
             }
         }),
         {

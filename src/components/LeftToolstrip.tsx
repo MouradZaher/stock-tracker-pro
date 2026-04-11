@@ -30,7 +30,10 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
     const { theme, toggleTheme } = useTheme();
     const { selectedMarket, setMarket, homeView, setHomeView, favoriteHomeView, setFavoriteHomeView } = useMarket();
     const { unreadCount, markAllAsRead } = useNotifications();
-    const { windows, openWindow, bringToFront, toggleMinimize } = useWindowStore();
+    const { 
+        isWindowOpen, isWindowMinimized, openWindow, 
+        resetToInstitutionalLayout 
+    } = useWindowStore();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -101,7 +104,11 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                     justifyContent: 'center',
                     position: 'relative'
                 }}
-                onClick={() => { setIsHomeMenuOpen(!isHomeMenuOpen); soundService.playTap(); }}
+                onClick={() => { 
+                    resetToInstitutionalLayout();
+                    navigate('/home');
+                    soundService.playTap(); 
+                }}
             >
                 <Zap 
                     size={22} 
@@ -373,45 +380,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 document.body
             )}
 
-            {/* Home Flyout Portal */}
-            {isHomeMenuOpen && ReactDOM.createPortal(
-                <>
-                    <div onClick={() => setIsHomeMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
-                    <div style={{
-                        position: 'fixed', top: '12px', left: '56px', zIndex: 9999,
-                        background: '#0a0a0a', border: '1px solid #222',
-                        padding: '0.5rem', minWidth: '180px', boxShadow: '0 8px 30px rgba(0,0,0,0.8)'
-                    }}>
-                        <div style={{ padding: '0.35rem 0.75rem 0.25rem', fontSize: '0.55rem', color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900 }}>
-                            MONITOR VIEW
-                        </div>
-                        {[
-                            { id: 'heatmap', label: 'HEATMAP', Icon: LayoutGrid, desc: 'Institutional Heatmap' },
-                            { id: 'screener', label: 'SCREENER', Icon: Activity, desc: 'Data Matrix Screener' }
-                        ].map(v => (
-                            <button key={v.id} onClick={() => {
-                                openWindow(v.id as WindowId, v.label === 'HEATMAP' ? 'Institutional Heatmap' : 'Data Matrix Screener');
-                                setIsHomeMenuOpen(false);
-                                soundService.playTap();
-                            }} style={{
-                                display: 'flex', alignItems: 'center', gap: '0.6rem',
-                                padding: '0.55rem 0.75rem', width: '100%',
-                                background: isWindowOpen(v.id as WindowId) ? 'rgba(74, 222, 128, 0.08)' : 'transparent',
-                                border: isWindowOpen(v.id as WindowId) ? '1px solid rgba(74, 222, 128, 0.2)' : '1px solid transparent',
-                                cursor: 'pointer', textAlign: 'left', color: 'inherit', font: 'inherit',
-                            }}>
-                                <v.Icon size={14} color={isWindowOpen(v.id as WindowId) ? 'var(--color-accent)' : '#555'} />
-                                <div>
-                                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: isWindowOpen(v.id as WindowId) ? 'var(--color-accent)' : 'white' }}>{v.label}</div>
-                                    <div style={{ fontSize: '0.5rem', color: '#444' }}>{v.desc}</div>
-                                </div>
-                                {isWindowOpen(v.id as WindowId) && <div style={{ marginLeft: 'auto', width: '5px', height: '5px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 6px var(--color-accent)' }} />}
-                            </button>
-                        ))}
-                    </div>
-                </>,
-                document.body
-            )}
+            {/* Home Flyout Portal Removed in favor of direct Logo Reset */}
 
             <style>{`
                 @keyframes homePulse {
