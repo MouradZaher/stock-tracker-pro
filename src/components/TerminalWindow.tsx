@@ -110,9 +110,9 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     if (!windowState?.isOpen) return null;
     if (windowState.isMinimized) return null;
 
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: React.PointerEvent | any) => {
         bringToFront(id);
-        if (e.button !== 0 || isMaximized) return;
+        if ((e.button !== undefined && e.button !== 0) || isMaximized) return;
         
         const PORTABLE_W = 400;
         const PORTABLE_H = 300;
@@ -173,17 +173,6 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
         >
             {/* Header / Draggable Area - STRICT WINDOWS STYLE */}
             <div
-                onMouseDown={handleMouseDown}
-                onTouchStart={(e) => {
-                    const touch = e.touches[0];
-                    handleMouseDown({ 
-                        button: 0, 
-                        clientX: touch.clientX, 
-                        clientY: touch.clientY,
-                        stopPropagation: () => e.stopPropagation(),
-                        preventDefault: () => e.preventDefault()
-                    } as any);
-                }}
                 style={{
                     height: '28px',
                     background: isFocused ? '#111' : '#0a0a0a',
@@ -191,66 +180,89 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    cursor: isMaximized ? 'default' : 'grab',
                     userSelect: 'none',
-                    padding: '0 0 0 10px',
-                    touchAction: 'none'
+                    padding: '0',
+                    touchAction: 'none',
+                    overflow: 'hidden'
                 }}
             >
-                <span style={{ fontSize: '12px', color: '#888', fontWeight: 500 }}>
-                    {title}
-                </span>
+                {/* 1. DRAGGABLE TITLE AREA (90% of header) */}
+                <div 
+                    onPointerDown={handleMouseDown}
+                    style={{
+                        flex: 1,
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        paddingLeft: '10px',
+                        cursor: isMaximized ? 'default' : 'grab',
+                    }}
+                >
+                    <span style={{ fontSize: '11px', color: '#888', fontWeight: 600, letterSpacing: '0.02em' }}>
+                        {title.toUpperCase()}
+                    </span>
+                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', paddingRight: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', border: '1px solid #222' }}>
+                {/* 2. STATIC CONTROL AREA (Right-aligned, strictly non-draggable) */}
+                <div 
+                    onPointerDown={(e) => e.stopPropagation()}
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px', 
+                        paddingRight: '6px',
+                        height: '100%',
+                        background: isFocused ? '#111' : '#0a0a0a', // Solid background to prevent drag bleeding
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '4px', border: '1px solid #1a1a1a', marginRight: '4px' }}>
                         <button 
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onTouchStart={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale - 0.1); }}
-                            className="window-control-btn zoom-out-btn"
-                            style={{ ...controlButtonStyle, width: '28px' }}
+                            className="window-control-btn"
+                            style={{ ...controlButtonStyle, width: '24px', height: '20px' }}
+                            title="Zoom Out"
                         >
-                            <ZoomOut size={12} />
+                            <ZoomOut size={11} />
                         </button>
-                        <span style={{ fontSize: '0.55rem', fontWeight: 900, color: '#666', width: '28px', textAlign: 'center' }}>
+                        <span style={{ fontSize: '0.55rem', fontWeight: 900, color: '#444', width: '26px', textAlign: 'center' }}>
                             {Math.round(currentScale * 100)}%
                         </span>
                         <button 
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onTouchStart={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale + 0.1); }}
-                            className="window-control-btn zoom-in-btn"
-                            style={{ ...controlButtonStyle, width: '28px' }}
+                            className="window-control-btn"
+                            style={{ ...controlButtonStyle, width: '24px', height: '20px' }}
+                            title="Zoom In"
                         >
-                            <ZoomIn size={12} />
+                            <ZoomIn size={11} />
                         </button>
                     </div>
 
-                    <div style={{ width: '1px', background: '#222', height: '14px' }} />
                     <button 
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); toggleMinimize(id); }}
                         className="window-control-btn"
                         style={controlButtonStyle}
+                        title="Minimize"
                     >
                         <Minus size={13} />
                     </button>
                     <button 
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); toggleMaximize(id); }}
                         className="window-control-btn"
                         style={controlButtonStyle}
+                        title={isMaximized ? "Restore" : "Maximize"}
                     >
                         {isMaximized ? <Minimize2 size={12} /> : <Square size={11} />}
                     </button>
                     <button 
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
                         className="window-control-btn close-btn"
                         style={closeButtonStyle}
+                        title="Close"
                     >
                         <X size={14} />
                     </button>

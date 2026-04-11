@@ -141,6 +141,28 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             </div>
 
             <div
+                style={iconStyle('heatmap', 'var(--color-accent)', isWindowOpen('heatmap'), isWindowMinimized('heatmap'))}
+                onMouseEnter={() => setHoveredIcon('heatmap')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { openWindow('heatmap', 'Institutional Heatmap'); navigate('/home'); soundService.playTap(); }}
+            >
+                <LayoutGrid size={16} />
+                {hoveredIcon === 'heatmap' && !isWindowOpen('heatmap') && <div style={tooltipStyle}>HEATMAP</div>}
+                {isWindowOpen('heatmap') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
+            </div>
+
+            <div
+                style={iconStyle('screener', 'var(--color-accent)', isWindowOpen('screener'), isWindowMinimized('screener'))}
+                onMouseEnter={() => setHoveredIcon('screener')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { openWindow('screener', 'Data Matrix Screener'); navigate('/home'); soundService.playTap(); }}
+            >
+                <Activity size={16} />
+                {hoveredIcon === 'screener' && !isWindowOpen('screener') && <div style={tooltipStyle}>SCREENER</div>}
+                {isWindowOpen('screener') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
+            </div>
+
+            <div
                 style={iconStyle('recommendations', 'var(--color-accent)', isWindowOpen('recommendations'), isWindowMinimized('recommendations'))}
                 onMouseEnter={() => setHoveredIcon('recommendations')}
                 onMouseLeave={() => setHoveredIcon(null)}
