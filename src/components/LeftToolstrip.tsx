@@ -26,7 +26,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
     onAdminClick, onLogout, showAdmin
 }) => {
     const { theme, toggleTheme } = useTheme();
-    const { selectedMarket, setMarket, favoriteMarketId, setFavoriteMarket, homeView, setHomeView, favoriteHomeView, setFavoriteHomeView } = useMarket();
+    const { selectedMarket, setMarket, homeView, setHomeView, favoriteHomeView, setFavoriteHomeView } = useMarket();
     const { unreadCount, markAllAsRead } = useNotifications();
     const navigate = useNavigate();
     const location = useLocation();
@@ -76,6 +76,8 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
         pointerEvents: 'none',
     };
 
+    const separator = <div style={{ width: '24px', height: '1px', background: '#111', margin: '6px 0' }} />;
+
     return (
         <aside style={{
             width: '48px',
@@ -89,7 +91,20 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             flexShrink: 0,
         }}>
             
-            {/* ─── SEARCH / PULSE HUB ─── */}
+            {/* ─── MARKET SELECTOR (TOP) ─── */}
+            <div
+                ref={marketBtnRef}
+                style={{ ...iconStyle('market'), border: `1px solid ${selectedMarket.color}33`, marginBottom: '4px' }}
+                onMouseEnter={() => setHoveredIcon('market')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { setIsMarketOpen(!isMarketOpen); soundService.playTap(); }}
+                title={`Active Market: ${selectedMarket.name}`}
+            >
+                <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '16px', height: '12px', objectFit: 'cover', borderRadius: '1px' }} />
+                {hoveredIcon === 'market' && <div style={tooltipStyle}>{selectedMarket.name.toUpperCase()}</div>}
+            </div>
+
+            {/* ─── SEARCH / INTELLIGENCE HUB ─── */}
             <div
                 style={iconStyle('search', undefined, isOnPulse)}
                 onMouseEnter={() => setHoveredIcon('search')}
@@ -101,29 +116,21 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'search' && <div style={tooltipStyle}>INTELLIGENCE ⌘K</div>}
             </div>
 
-            <div style={{ width: '24px', height: '1px', background: '#111', margin: '4px 0' }} />
+            {separator}
 
-            {/* ─── HOME (Heatmap/Screener Toggle) ─── */}
+            {/* ─── CORE MONITOR VIEWS ─── */}
             <div
                 ref={homeBtnRef}
                 style={{ ...iconStyle('home', undefined, isOnHome), position: 'relative' }}
                 onMouseEnter={() => setHoveredIcon('home')}
                 onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => { setIsHomeMenuOpen(!isHomeMenuOpen); soundService.playTap(); }}
-                title="Monitor View"
+                title="Monitor (Heatmap/Screener)"
             >
                 {homeView === 'heatmap' ? <LayoutGrid size={16} /> : <Activity size={16} />}
-                <div style={{
-                    position: 'absolute', bottom: '2px', right: '2px',
-                    width: '6px', height: '6px', borderRadius: '50%',
-                    background: isOnHome ? 'var(--color-accent)' : '#333',
-                    boxShadow: isOnHome ? '0 0 6px var(--color-accent)' : 'none',
-                    animation: isOnHome ? 'homePulse 2s infinite' : 'none',
-                }} />
                 {hoveredIcon === 'home' && <div style={tooltipStyle}>{homeView === 'heatmap' ? 'HEATMAP' : 'SCREENER'}</div>}
             </div>
 
-            {/* ─── PORTFOLIO ─── */}
             <div
                 style={iconStyle('portfolio', '#10b981', isOnPortfolio)}
                 onMouseEnter={() => setHoveredIcon('portfolio')}
@@ -135,7 +142,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'portfolio' && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
             </div>
 
-            {/* ─── WATCHLIST ─── */}
             <div
                 style={iconStyle('watchlist', '#3b82f6', isOnWatchlist)}
                 onMouseEnter={() => setHoveredIcon('watchlist')}
@@ -147,16 +153,186 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'watchlist' && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
             </div>
 
-            <div style={{ width: '24px', height: '1px', background: '#111', margin: '4px 0' }} />
+            {separator}
 
-            {/* Home View Flyout */}
+            {/* ─── INTELLIGENCE FEEDS ─── */}
+            <div
+                style={iconStyle('calendar', '#f59e0b', isOnCalendar)}
+                onMouseEnter={() => setHoveredIcon('calendar')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/calendar'); soundService.playTap(); }}
+                title="Corporate Actions Calendar"
+            >
+                <Calendar size={16} />
+                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+            </div>
+
+            <div
+                style={{ ...iconStyle('tv', '#ef4444', isOnTV), position: 'relative' }}
+                onMouseEnter={() => setHoveredIcon('tv')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/tv'); soundService.playTap(); }}
+                title="Live TV / News Streams"
+            >
+                <Tv size={16} />
+                <div style={{
+                    position: 'absolute', top: '3px', right: '3px',
+                    width: '5px', height: '5px', borderRadius: '50%',
+                    background: '#ef4444',
+                    boxShadow: '0 0 6px #ef4444',
+                    animation: 'homePulse 1.5s infinite',
+                }} />
+                {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
+            </div>
+
+            <div
+                style={iconStyle('bell')}
+                onMouseEnter={() => setHoveredIcon('bell')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { markAllAsRead(); soundService.playTap(); window.dispatchEvent(new CustomEvent('open-notifications')); }}
+                title="Notifications / Signals"
+            >
+                <Bell size={16} />
+                {unreadCount > 0 && (
+                    <span style={{
+                        position: 'absolute', top: '2px', right: '2px',
+                        width: '8px', height: '8px', borderRadius: '50%',
+                        background: '#ef4444', border: '2px solid #000',
+                    }} />
+                )}
+                {hoveredIcon === 'bell' && <div style={tooltipStyle}>SIGNALS</div>}
+            </div>
+
+            {separator}
+
+            {/* ─── PRO UPGRADE (ALONE) ─── */}
+            <div
+                style={iconStyle('pricing', '#facc15', isOnPricing)}
+                onMouseEnter={() => setHoveredIcon('pricing')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/pricing'); soundService.playTap(); }}
+                title="Upgrade to Pro"
+            >
+                <Star size={16} fill={isOnPricing ? "#facc15" : "none"} />
+                {hoveredIcon === 'pricing' && <div style={{ ...tooltipStyle, color: '#facc15' }}>UPGRADE PRO</div>}
+            </div>
+
+            {separator}
+
+            {/* ─── SPACER ─── */}
+            <div style={{ flex: 1 }} />
+
+            {/* ─── SYSTEM / TOOLS (BOTTOM) ─── */}
+            
+            {/* Admin Panel (Restricted) */}
+            {showAdmin && (
+                <div
+                    style={iconStyle('admin', 'var(--color-accent)')}
+                    onMouseEnter={() => setHoveredIcon('admin')}
+                    onMouseLeave={() => setHoveredIcon(null)}
+                    onClick={onAdminClick}
+                    title="Administrative Terminal"
+                >
+                    <Shield size={16} />
+                    {hoveredIcon === 'admin' && <div style={tooltipStyle}>ADMIN</div>}
+                </div>
+            )}
+
+            {/* Settings */}
+            <div
+                style={iconStyle('settings')}
+                onMouseEnter={() => setHoveredIcon('settings')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={onOpenSettings}
+                title="Global Settings"
+            >
+                <Settings size={16} />
+                {hoveredIcon === 'settings' && <div style={tooltipStyle}>SETTINGS</div>}
+            </div>
+
+            {/* Theme Toggle */}
+            <div
+                style={iconStyle('theme', theme === 'dark' ? '#facc15' : '#3b82f6')}
+                onMouseEnter={() => setHoveredIcon('theme')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { toggleTheme(); soundService.playTap(); }}
+                title={`Theme: ${theme}`}
+            >
+                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                {hoveredIcon === 'theme' && <div style={tooltipStyle}>THEME</div>}
+            </div>
+
+            {/* Contact Support */}
+            <a
+                href="mailto:support@stocktrackerpro.com"
+                style={{ ...iconStyle('contact'), textDecoration: 'none' }}
+                onMouseEnter={() => setHoveredIcon('contact')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                title="Contact Support"
+            >
+                <MessageSquare size={14} />
+                {hoveredIcon === 'contact' && <div style={tooltipStyle}>CONTACT</div>}
+            </a>
+
+            {/* Logout */}
+            <div
+                style={{ ...iconStyle('logout', '#ef4444'), marginBottom: '0.25rem' }}
+                onMouseEnter={() => setHoveredIcon('logout')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { onLogout(); soundService.playTap(); }}
+                title="Sign Out"
+            >
+                <LogOut size={16} />
+                {hoveredIcon === 'logout' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>SIGN OUT</div>}
+            </div>
+
+            {/* ─── PORTALS ─── */}
+            
+            {/* Market Dropdown Portal */}
+            {isMarketOpen && ReactDOM.createPortal(
+                <>
+                    <div onClick={() => setIsMarketOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
+                    <div style={{
+                        position: 'fixed', top: '24px', left: '56px', zIndex: 9999,
+                        background: '#0a0a0a', border: '1px solid #222',
+                        padding: '0.5rem', minWidth: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.8)'
+                    }}>
+                        <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.55rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900 }}>
+                            SELECT ACTIVE MARKET
+                        </div>
+                        {MARKETS.map(m => (
+                            <button key={m.id} onClick={() => {
+                                setMarket(m.id as MarketId);
+                                navigate(location.pathname);
+                                setIsMarketOpen(false);
+                                soundService.playTap();
+                            }} style={{
+                                display: 'flex', alignItems: 'center', gap: '0.75rem',
+                                padding: '0.6rem 0.75rem', width: '100%',
+                                background: selectedMarket.id === m.id ? `${m.color}15` : 'transparent',
+                                border: selectedMarket.id === m.id ? `1px solid ${m.color}33` : '1px solid transparent',
+                                cursor: 'pointer', textAlign: 'left', color: 'inherit', font: 'inherit',
+                            }}>
+                                <img src={m.flagUrl} alt={m.shortName} style={{ width: '22px', height: '15px', objectFit: 'cover', borderRadius: '2px' }} />
+                                <div>
+                                    <div style={{ fontWeight: 800, fontSize: '0.7rem', color: selectedMarket.id === m.id ? m.color : 'white' }}>{m.name}</div>
+                                    <div style={{ fontSize: '0.55rem', color: '#555' }}>{m.indexName}</div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </>,
+                document.body
+            )}
+
+            {/* Home Flyout Portal */}
             {isHomeMenuOpen && ReactDOM.createPortal(
                 <>
                     <div onClick={() => setIsHomeMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
                     <div style={{
-                        position: 'fixed', top: '78px', left: '56px', zIndex: 9999,
+                        position: 'fixed', top: '100px', left: '56px', zIndex: 9999,
                         background: '#0a0a0a', border: '1px solid #222',
-                        padding: '0.5rem', minWidth: '180px',
+                        padding: '0.5rem', minWidth: '180px', boxShadow: '0 8px 30px rgba(0,0,0,0.8)'
                     }}>
                         <div style={{ padding: '0.35rem 0.75rem 0.25rem', fontSize: '0.55rem', color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900 }}>
                             MONITOR VIEW
@@ -189,188 +365,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 </>,
                 document.body
             )}
-
-            {/* ─── CORPORATE ACTIONS CALENDAR ─── */}
-            <div
-                style={iconStyle('calendar', '#f59e0b', isOnCalendar)}
-                onMouseEnter={() => setHoveredIcon('calendar')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/calendar'); soundService.playTap(); }}
-                title="Corporate Actions Calendar"
-            >
-                <Calendar size={16} />
-                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
-            </div>
-
-            {/* ─── TV / LIVE STREAMS ─── */}
-            <div
-                style={{ ...iconStyle('tv', '#ef4444', isOnTV), position: 'relative' }}
-                onMouseEnter={() => setHoveredIcon('tv')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/tv'); soundService.playTap(); }}
-                title="Live TV Streams"
-            >
-                <Tv size={16} />
-                <div style={{
-                    position: 'absolute', top: '3px', right: '3px',
-                    width: '5px', height: '5px', borderRadius: '50%',
-                    background: '#ef4444',
-                    boxShadow: '0 0 6px #ef4444',
-                    animation: 'homePulse 1.5s infinite',
-                }} />
-                {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
-            </div>
-
-            {/* ─── PRO UPGRADE ─── */}
-            <div
-                style={iconStyle('pricing', '#facc15', isOnPricing)}
-                onMouseEnter={() => setHoveredIcon('pricing')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/pricing'); soundService.playTap(); }}
-                title="Upgrade to Pro"
-            >
-                <Star size={16} fill={isOnPricing ? "#facc15" : "none"} />
-                {hoveredIcon === 'pricing' && <div style={{ ...tooltipStyle, color: '#facc15' }}>UPGRADE PRO</div>}
-            </div>
-
-
-            {/* ─── MARKET SELECTOR ─── */}
-            <div
-                ref={marketBtnRef}
-                style={{ ...iconStyle('market'), border: `1px solid ${selectedMarket.color}33`, marginTop: '8px' }}
-                onMouseEnter={() => setHoveredIcon('market')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { setIsMarketOpen(!isMarketOpen); soundService.playTap(); }}
-                title={`Market: ${selectedMarket.shortName}`}
-            >
-                <img src={selectedMarket.flagUrl} alt={selectedMarket.shortName} style={{ width: '14px', height: '10px', objectFit: 'cover', borderRadius: '1px' }} />
-                {hoveredIcon === 'market' && <div style={tooltipStyle}>{selectedMarket.name.toUpperCase()}</div>}
-            </div>
-
-            {/* Market Dropdown Portal */}
-            {isMarketOpen && ReactDOM.createPortal(
-                <>
-                    <div onClick={() => setIsMarketOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
-                    <div style={{
-                        position: 'fixed', bottom: '150px', left: '56px', zIndex: 9999,
-                        background: '#0a0a0a', border: '1px solid #222',
-                        padding: '0.5rem', minWidth: '220px',
-                    }}>
-                        <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.55rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900 }}>
-                            SELECT MARKET
-                        </div>
-                        {MARKETS.map(m => (
-                            <button key={m.id} onClick={() => {
-                                setMarket(m.id as MarketId);
-                                navigate(location.pathname);
-                                setIsMarketOpen(false);
-                                soundService.playTap();
-                            }} style={{
-                                display: 'flex', alignItems: 'center', gap: '0.75rem',
-                                padding: '0.6rem 0.75rem', width: '100%',
-                                background: selectedMarket.id === m.id ? `${m.color}15` : 'transparent',
-                                border: selectedMarket.id === m.id ? `1px solid ${m.color}33` : '1px solid transparent',
-                                cursor: 'pointer', textAlign: 'left', color: 'inherit', font: 'inherit',
-                            }}>
-                                <img src={m.flagUrl} alt={m.shortName} style={{ width: '22px', height: '15px', objectFit: 'cover', borderRadius: '2px' }} />
-                                <div>
-                                    <div style={{ fontWeight: 800, fontSize: '0.7rem', color: selectedMarket.id === m.id ? m.color : 'white' }}>{m.name}</div>
-                                    <div style={{ fontSize: '0.55rem', color: '#555' }}>{m.indexName}</div>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                </>,
-                document.body
-            )}
-
-            <div style={{ width: '24px', height: '1px', background: '#111', margin: '4px 0' }} />
-
-            {/* ─── NOTIFICATIONS ─── */}
-            <div
-                style={iconStyle('bell')}
-                onMouseEnter={() => setHoveredIcon('bell')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { markAllAsRead(); soundService.playTap();
-                    window.dispatchEvent(new CustomEvent('open-notifications'));
-                }}
-                title="Notifications"
-            >
-                <Bell size={16} />
-                {unreadCount > 0 && (
-                    <span style={{
-                        position: 'absolute', top: '2px', right: '2px',
-                        width: '8px', height: '8px', borderRadius: '50%',
-                        background: '#ef4444', border: '2px solid #000',
-                    }} />
-                )}
-                {hoveredIcon === 'bell' && <div style={tooltipStyle}>SIGNALS</div>}
-            </div>
-
-            {/* ─── THEME TOGGLE ─── */}
-            <div
-                style={iconStyle('theme', theme === 'dark' ? '#facc15' : '#3b82f6')}
-                onMouseEnter={() => setHoveredIcon('theme')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { toggleTheme(); soundService.playTap(); }}
-                title={`Theme: ${theme}`}
-            >
-                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-                {hoveredIcon === 'theme' && <div style={tooltipStyle}>THEME</div>}
-            </div>
-
-            {/* ─── SETTINGS ─── */}
-            <div
-                style={iconStyle('settings')}
-                onMouseEnter={() => setHoveredIcon('settings')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={onOpenSettings}
-                title="Settings"
-            >
-                <Settings size={16} />
-                {hoveredIcon === 'settings' && <div style={tooltipStyle}>SETTINGS</div>}
-            </div>
-
-            {/* ─── ADMIN (conditionally) ─── */}
-            {showAdmin && (
-                <div
-                    style={iconStyle('admin', 'var(--color-accent)')}
-                    onMouseEnter={() => setHoveredIcon('admin')}
-                    onMouseLeave={() => setHoveredIcon(null)}
-                    onClick={onAdminClick}
-                    title="Admin Dashboard"
-                >
-                    <Shield size={16} />
-                    {hoveredIcon === 'admin' && <div style={tooltipStyle}>ADMIN</div>}
-                </div>
-            )}
-
-            {/* ─── SPACER ─── */}
-            <div style={{ flex: 1 }} />
-
-            {/* ─── CONTACT ─── */}
-            <a
-                href="mailto:support@stocktrackerpro.com"
-                style={{ ...iconStyle('contact'), textDecoration: 'none' }}
-                onMouseEnter={() => setHoveredIcon('contact')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                title="Contact Support"
-            >
-                <MessageSquare size={14} />
-                {hoveredIcon === 'contact' && <div style={tooltipStyle}>CONTACT</div>}
-            </a>
-
-            {/* ─── LOGOUT ─── */}
-            <div
-                style={{ ...iconStyle('logout', '#ef4444'), marginBottom: '0.25rem' }}
-                onMouseEnter={() => setHoveredIcon('logout')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { onLogout(); soundService.playTap(); }}
-                title="Sign Out"
-            >
-                <LogOut size={16} />
-                {hoveredIcon === 'logout' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>SIGN OUT</div>}
-            </div>
 
             <style>{`
                 @keyframes homePulse {
