@@ -9,6 +9,16 @@ interface CompanyLogoProps {
 
 const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className = '' }) => {
     const [fallbackLevel, setFallbackLevel] = useState(0);
+
+    // High-priority overrides for institutions that lack standard favicons or use plain text sites
+    const LOGO_OVERRIDES: Record<string, string> = {
+        'BRK-B': 'https://financialmodelingprep.com/image-stock/BRKB.png',
+        'BRK.B': 'https://financialmodelingprep.com/image-stock/BRKB.png',
+        'COP': 'https://financialmodelingprep.com/image-stock/COP.png',
+        'DHR': 'https://financialmodelingprep.com/image-stock/DHR.png'
+    };
+
+    const overrideUrl = LOGO_OVERRIDES[symbol.toUpperCase().trim()];
     
     // Clean symbol for API sources (FMP, TwelveData)
     const cleanSymbol = symbol.trim().replace(/[^a-zA-Z0-9]/g, '');
@@ -19,8 +29,11 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     // List of indices that definitely don't have FMP stock-images
     const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
 
-    const logoSources = [];
-    
+    // 0. MANUAL OVERRIDES (Highest reliability for known issues)
+    if (overrideUrl) {
+        logoSources.push(overrideUrl);
+    }
+
     // 1. HIGH-FIDELITY: Google Favicon API (Most reliable for corporate domains)
     if (mappedDomain) {
         logoSources.push(`https://www.google.com/s2/favicons?sz=128&domain=${mappedDomain}`);

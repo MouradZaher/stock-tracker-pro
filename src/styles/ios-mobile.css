@@ -801,3 +801,38 @@
         font-size: 1.15rem !important;
     }
 }
+
+/* --- PRO TERMINAL WINDOWING (RESizable + ZOOMable) --- */
+@media (max-width: 768px) {
+    .window-control-btn {
+        width: 38px !important;
+        height: 100% !important;
+    }
+    
+    .zoom-in-btn, .zoom-out-btn {
+        width: 32px !important;
+    }
+
+    /* Resizers: Larger hit areas for touch */
+    [style*="cursor: ew-resize"],
+    [style*="cursor: ns-resize"],
+    [style*="cursor: nwse-resize"] {
+        pointer-events: auto !important;
+        touch-action: none !important;
+    }
+
+    [style*="cursor: nwse-resize"] {
+        width: 20px !important;
+        height: 20px !important;
+        background: linear-gradient(135deg, transparent 12px, var(--color-accent) 12px) !important;
+    }
+
+    /* Mobile Taskbar Optimization */
+    [style*="zIndex: 20000"] {
+        bottom: calc(var(--mobile-nav-height) + 12px) !important;
+        transform: translateX(-50%) scale(0.9) !important;
+        width: 90vw !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+}

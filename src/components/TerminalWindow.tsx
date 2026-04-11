@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { X, Minus, Square, Minimize2 } from 'lucide-react';
+import { X, Minus, Square, Minimize2, ZoomIn, ZoomOut, SearchX } from 'lucide-react';
 import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
 
 interface TerminalWindowProps {
@@ -16,16 +16,17 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
 }) => {
     const { 
         windows, activeWindow, bringToFront, closeWindow, 
-        toggleMinimize, toggleMaximize, updatePosition, updateSize 
+        toggleMinimize, toggleMaximize, updatePosition, updateSize, updateScale 
     } = useWindowStore();
     
     const windowState = windows[id];
     const isFocused = activeWindow === id;
     const isMaximized = windowState?.isMaximized;
+    const currentScale = windowState?.scale || 1.0;
     
     const windowRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [isResizing, setIsResizing] = useState(false);
+    const [isResizing, setIsResizing] = useState<false | 'both' | 'h' | 'v'>(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
@@ -36,8 +37,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 updatePosition(id, Math.max(0, nx), Math.max(0, ny));
             }
             if (isResizing && !isMaximized && windowState) {
-                const nw = e.clientX - windowState.x;
-                const nh = e.clientY - windowState.y;
+                const nw = isResizing === 'v' ? windowState.w : e.clientX - windowState.x;
+                const nh = isResizing === 'h' ? windowState.h : e.clientY - windowState.y;
                 updateSize(id, Math.max(minW, nw), Math.max(minH, nh));
             }
         };
@@ -71,12 +72,12 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
         });
     };
 
-    const handleResizeStart = (e: React.MouseEvent) => {
+    const handleResizeStart = (e: React.MouseEvent, mode: 'both' | 'h' | 'v' = 'both') => {
         e.stopPropagation();
         e.preventDefault();
         bringToFront(id);
         if (isMaximized) return;
-        setIsResizing(true);
+        setIsResizing(mode);
     };
 
     return (
@@ -98,11 +99,23 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 overflow: 'hidden',
                 boxShadow: isFocused && !isMaximized ? '0 20px 50px rgba(0,0,0,0.9)' : '0 8px 30px rgba(0,0,0,0.6)',
                 transition: isDragging || isResizing ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                transformOrigin: 'top left',
+                transform: isMaximized ? 'none' : `scale(${currentScale})`
             }}
         >
             {/* Header / Draggable Area - STRICT WINDOWS STYLE */}
             <div
                 onMouseDown={handleMouseDown}
+                onTouchStart={(e) => {
+                    const touch = e.touches[0];
+                    handleMouseDown({ 
+                        button: 0, 
+                        clientX: touch.clientX, 
+                        clientY: touch.clientY,
+                        stopPropagation: () => e.stopPropagation(),
+                        preventDefault: () => e.preventDefault()
+                    } as any);
+                }}
                 style={{
                     height: '28px',
                     background: isFocused ? '#111' : '#0a0a0a',
@@ -112,26 +125,36 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                     justifyContent: 'space-between',
                     cursor: isMaximized ? 'default' : 'grab',
                     userSelect: 'none',
-                    padding: '0 0 0 10px'
+                    padding: '0 0 0 10px',
+                    touchAction: 'none'
                 }}
             >
-                {/* TITLE LEFT */}
-                <span style={{ 
-                    fontSize: '0.62rem', 
-                    fontWeight: 900, 
-                    color: isFocused ? '#fff' : '#555', 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.1em',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    pointerEvents: 'none'
-                }}>
+                <span style={{ fontSize: '12px', color: '#888', fontWeight: 500 }}>
                     {title}
                 </span>
-                
-                {/* CONTROLS RIGHT */}
-                <div style={{ display: 'flex', height: '100%', alignItems: 'stretch' }}>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', paddingRight: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', border: '1px solid #222' }}>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale - 0.1); }}
+                            className="window-control-btn zoom-out-btn"
+                            style={{ ...controlButtonStyle, width: '28px' }}
+                        >
+                            <ZoomOut size={12} />
+                        </button>
+                        <span style={{ fontSize: '0.55rem', fontWeight: 900, color: '#666', width: '28px', textAlign: 'center' }}>
+                            {Math.round(currentScale * 100)}%
+                        </span>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale + 0.1); }}
+                            className="window-control-btn zoom-in-btn"
+                            style={{ ...controlButtonStyle, width: '28px' }}
+                        >
+                            <ZoomIn size={12} />
+                        </button>
+                    </div>
+
+                    <div style={{ width: '1px', background: '#222', height: '14px' }} />
                     <button 
                         onClick={(e) => { e.stopPropagation(); toggleMinimize(id); }}
                         className="window-control-btn"
@@ -148,7 +171,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
-                        className="window-control-btn close"
+                        className="window-control-btn close-btn"
                         style={closeButtonStyle}
                     >
                         <X size={14} />
@@ -161,21 +184,35 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 {children}
             </div>
 
-            {/* Resize Handle (Bottom Right) */}
+            {/* Resize Handles */}
             {!isMaximized && (
-                <div
-                    onMouseDown={handleResizeStart}
-                    style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        right: 0,
-                        width: '10px',
-                        height: '10px',
-                        cursor: 'nwse-resize',
-                        zIndex: 10,
-                        background: 'linear-gradient(135deg, transparent 6px, #333 6px)'
-                    }}
-                />
+                <>
+                    {/* Corner */}
+                    <div
+                        onMouseDown={(e) => handleResizeStart(e, 'both')}
+                        style={{
+                            position: 'absolute', bottom: 0, right: 0,
+                            width: '12px', height: '12px', cursor: 'nwse-resize',
+                            zIndex: 10, background: 'linear-gradient(135deg, transparent 8px, #333 8px)'
+                        }}
+                    />
+                    {/* Right Edge */}
+                    <div
+                        onMouseDown={(e) => handleResizeStart(e, 'h')}
+                        style={{
+                            position: 'absolute', right: 0, top: 0, bottom: 0,
+                            width: '4px', cursor: 'ew-resize', zIndex: 9
+                        }}
+                    />
+                    {/* Bottom Edge */}
+                    <div
+                        onMouseDown={(e) => handleResizeStart(e, 'v')}
+                        style={{
+                            position: 'absolute', bottom: 0, left: 0, right: 0,
+                            height: '4px', cursor: 'ns-resize', zIndex: 9
+                        }}
+                    />
+                </>
             )}
         </div>
     );
@@ -198,3 +235,19 @@ const closeButtonStyle: React.CSSProperties = {
 };
 
 export default TerminalWindow;
+
+// Global styles for window controls injected to head for simplicity and performance
+if (typeof document !== 'undefined') {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .window-control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #fff !important;
+        }
+        .window-control-btn.close-btn:hover {
+            background-color: #e81123 !important;
+            color: #fff !important;
+        }
+    `;
+    document.head.appendChild(style);
+}

@@ -21,18 +21,27 @@ const ModularWorkspace: React.FC = () => {
     useEffect(() => {
         if (!isInitialized) {
             const currentWindows = useWindowStore.getState().windows;
+            const isMobile = window.innerWidth <= 768;
             
+            // Adjust initial sizes for mobile
+            const heatmapW = isMobile ? 360 : 960;
+            const heatmapH = isMobile ? 500 : 680;
+            const screenerW = isMobile ? 360 : 1024;
+            const screenerH = isMobile ? 450 : 600;
+
             if (!currentWindows['heatmap']) {
-                openWindow('heatmap', 'Institutional Heatmap', 40, 40, 960, 680);
+                openWindow('heatmap', 'Institutional Heatmap', 20, 20, heatmapW, heatmapH);
+                if (isMobile) useWindowStore.getState().updateScale('heatmap', 0.85);
             }
             if (!currentWindows['screener']) {
-                openWindow('screener', 'Data Matrix Screener', 320, 120, 1024, 600);
+                openWindow('screener', 'Data Matrix Screener', 40, 80, screenerW, screenerH);
+                if (isMobile) useWindowStore.getState().updateScale('screener', 0.85);
             }
             if (!currentWindows['advisor']) {
-                openWindow('advisor', 'Oracle Portfolio Audit', 600, 40, 320, 680);
+                openWindow('advisor', 'Oracle Portfolio Audit', 20, 140, 320, 500);
             }
             if (!currentWindows['recommendations']) {
-                openWindow('recommendations', 'Institutional Intelligence', 80, 80, 800, 600);
+                openWindow('recommendations', 'Institutional Intelligence', 30, 200, 320, 500);
             }
             setIsInitialized(true);
         }

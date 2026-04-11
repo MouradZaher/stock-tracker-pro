@@ -16,6 +16,7 @@ interface WindowState {
     w: number;
     h: number;
     zIndex: number;
+    scale: number;
 }
 
 interface WindowStore {
@@ -30,6 +31,7 @@ interface WindowStore {
     bringToFront: (id: WindowId) => void;
     updatePosition: (id: WindowId, x: number, y: number) => void;
     updateSize: (id: WindowId, w: number, h: number) => void;
+    updateScale: (id: WindowId, scale: number) => void;
 }
 
 const DEFAULT_WIDTH = 800;
@@ -56,7 +58,8 @@ export const useWindowStore = create<WindowStore>()(
                             isMinimized: false,
                             isMaximized: false,
                             prevLayout: null,
-                            zIndex: nextZ
+                            zIndex: nextZ,
+                            scale: 1.0
                         }
                     },
                     activeWindow: id,
@@ -148,6 +151,17 @@ export const useWindowStore = create<WindowStore>()(
                     windows: {
                         ...windows,
                         [id]: { ...windows[id], w, h }
+                    }
+                });
+            },
+
+            updateScale: (id, scale) => {
+                const { windows } = get();
+                if (!windows[id]) return;
+                set({
+                    windows: {
+                        ...windows,
+                        [id]: { ...windows[id], scale: Math.max(0.5, Math.min(2.0, scale)) }
                     }
                 });
             }
