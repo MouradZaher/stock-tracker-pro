@@ -91,9 +91,9 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             flexShrink: 0,
         }}>
             
-            {/* ─── TERMINAL LOGO (TOP / HOME) ─── */}
+            {/* ─── TERMINAL LOGO (TOP / HOME / HEATMAP TICKET) ─── */}
             <div 
-                onClick={() => { navigate('/home'); soundService.playTap(); }}
+                ref={homeBtnRef}
                 style={{ 
                     cursor: 'pointer',
                     marginBottom: '1rem', 
@@ -102,6 +102,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                     justifyContent: 'center',
                     position: 'relative'
                 }}
+                onClick={() => { setIsHomeMenuOpen(!isHomeMenuOpen); soundService.playTap(); }}
             >
                 <Zap 
                     size={22} 
@@ -342,7 +343,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 <>
                     <div onClick={() => setIsHomeMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
                     <div style={{
-                        position: 'fixed', top: '100px', left: '56px', zIndex: 9999,
+                        position: 'fixed', top: '12px', left: '56px', zIndex: 9999,
                         background: '#0a0a0a', border: '1px solid #222',
                         padding: '0.5rem', minWidth: '180px', boxShadow: '0 8px 30px rgba(0,0,0,0.8)'
                     }}>
