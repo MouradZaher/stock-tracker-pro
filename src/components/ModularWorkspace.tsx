@@ -28,7 +28,7 @@ const ModularWorkspace: React.FC = () => {
                 openWindow('screener', 'Data Matrix Screener', 320, 120, 1024, 600);
             }
             if (!windows['advisor']?.isOpen) {
-                openWindow('advisor', 'Oracle Portfolio Audit', 1600, 40, 320, 800);
+                openWindow('advisor', 'Oracle Portfolio Audit', 600, 40, 320, 680);
             }
             if (!windows['recommendations']?.isOpen) {
                 openWindow('recommendations', 'Institutional Intelligence', 80, 80, 800, 600);
@@ -126,7 +126,13 @@ const ModularWorkspace: React.FC = () => {
                 {minimizedWindows.map(w => (
                     <button
                         key={w.id}
-                        onClick={() => toggleMinimize(w.id)}
+                        onClick={() => {
+                            if (w.isMinimized) {
+                                bringToFront(w.id);
+                            } else {
+                                toggleMinimize(w.id);
+                            }
+                        }}
                         style={{
                             padding: '6px 12px',
                             background: 'rgba(255,255,255,0.03)',

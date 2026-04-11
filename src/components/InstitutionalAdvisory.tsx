@@ -27,10 +27,7 @@ const InstitutionalAdvisory: React.FC = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', overflowY: 'auto', paddingRight: '4px' }} className="custom-scrollbar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', marginBottom: '0.5rem' }}>
-                <Brain size={16} />
-                <span style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Oracle Portfolio Audit</span>
-            </div>
+            {/* ADVISORY NODE - ACTIVE MONITORING */}
 
             <div style={{ background: '#0a0a0a', border: '1px solid #111', padding: '1rem', borderRadius: '4px' }}>
                 <div style={{ fontSize: '0.6rem', color: '#444', marginBottom: '8px' }}>CONCENTRATION RISK</div>
