@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Search, Brain, Shield, Bell, HelpCircle, Settings,
     Sun, Moon, LogOut, MessageSquare, Star, ChevronDown,
-    LayoutGrid, Activity, Globe, Zap, Command, Tv
+    LayoutGrid, Activity, Globe, Zap, Command, Tv, Calendar
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
