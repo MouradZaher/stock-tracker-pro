@@ -28,35 +28,14 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     const [isResizing, setIsResizing] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-    if (!windowState?.isOpen) return null;
-    if (windowState.isMinimized) return null;
-
-    const handleMouseDown = (e: React.MouseEvent) => {
-        bringToFront(id);
-        if (e.button !== 0 || isMaximized) return;
-        setIsDragging(true);
-        setDragOffset({
-            x: e.clientX - windowState.x,
-            y: e.clientY - windowState.y
-        });
-    };
-
-    const handleResizeStart = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        bringToFront(id);
-        if (isMaximized) return;
-        setIsResizing(true);
-    };
-
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            if (isDragging && !isMaximized) {
+            if (isDragging && !isMaximized && windowState) {
                 const nx = e.clientX - dragOffset.x;
                 const ny = e.clientY - dragOffset.y;
                 updatePosition(id, Math.max(0, nx), Math.max(0, ny));
             }
-            if (isResizing && !isMaximized) {
+            if (isResizing && !isMaximized && windowState) {
                 const nw = e.clientX - windowState.x;
                 const nh = e.clientY - windowState.y;
                 updateSize(id, Math.max(minW, nw), Math.max(minH, nh));
@@ -77,7 +56,28 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isDragging, isResizing, dragOffset, id, updatePosition, updateSize, windowState.x, windowState.y, minW, minH, isMaximized]);
+    }, [isDragging, isResizing, dragOffset, id, updatePosition, updateSize, windowState?.x, windowState?.y, minW, minH, isMaximized]);
+
+    if (!windowState?.isOpen) return null;
+    if (windowState.isMinimized) return null;
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        bringToFront(id);
+        if (e.button !== 0 || isMaximized) return;
+        setIsDragging(true);
+        setDragOffset({
+            x: e.clientX - windowState.x,
+            y: e.clientY - windowState.y
+        });
+    };
+
+    const handleResizeStart = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        bringToFront(id);
+        if (isMaximized) return;
+        setIsResizing(true);
+    };
 
     return (
         <div

@@ -17,25 +17,26 @@ const ModularWorkspace: React.FC = () => {
     const { windows, openWindow, bringToFront, toggleMinimize } = useWindowStore();
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Initial tool spawn
+    // Initial tool spawn - One time on mount
     useEffect(() => {
         if (!isInitialized) {
-            // Check if heatmap is already open
-            if (!windows['heatmap']?.isOpen) {
+            const currentWindows = useWindowStore.getState().windows;
+            
+            if (!currentWindows['heatmap']) {
                 openWindow('heatmap', 'Institutional Heatmap', 40, 40, 960, 680);
             }
-            if (!windows['screener']?.isOpen) {
+            if (!currentWindows['screener']) {
                 openWindow('screener', 'Data Matrix Screener', 320, 120, 1024, 600);
             }
-            if (!windows['advisor']?.isOpen) {
+            if (!currentWindows['advisor']) {
                 openWindow('advisor', 'Oracle Portfolio Audit', 600, 40, 320, 680);
             }
-            if (!windows['recommendations']?.isOpen) {
+            if (!currentWindows['recommendations']) {
                 openWindow('recommendations', 'Institutional Intelligence', 80, 80, 800, 600);
             }
             setIsInitialized(true);
         }
-    }, [isInitialized, openWindow, windows]);
+    }, [isInitialized, openWindow]);
 
     const minimizedWindows = Object.values(windows).filter(w => w.isOpen && w.isMinimized);
 

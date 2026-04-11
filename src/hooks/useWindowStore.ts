@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type WindowId = 'heatmap' | 'screener' | 'portfolio' | 'watchlist' | 'tv' | 'calendar' | 'pulse';
+export type WindowId = 'heatmap' | 'screener' | 'portfolio' | 'watchlist' | 'tv' | 'calendar' | 'pulse' | 'advisor' | 'recommendations' | 'admin';
 
 interface WindowState {
     id: WindowId;
