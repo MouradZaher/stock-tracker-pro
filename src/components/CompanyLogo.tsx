@@ -15,7 +15,10 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
         'BRK-B': 'https://financialmodelingprep.com/image-stock/BRKB.png',
         'BRK.B': 'https://financialmodelingprep.com/image-stock/BRKB.png',
         'COP': 'https://financialmodelingprep.com/image-stock/COP.png',
-        'DHR': 'https://financialmodelingprep.com/image-stock/DHR.png'
+        'DHR': 'https://financialmodelingprep.com/image-stock/DHR.png',
+        'YAHSAT': 'https://yahsat.com/favicon.ico',
+        'BAYANAT': 'https://bayanat.ai/favicon.ico',
+        'SKY': 'https://www.sky.com/assets/favicon.ico'
     };
 
     const overrideUrl = LOGO_OVERRIDES[symbol.toUpperCase().trim()];
