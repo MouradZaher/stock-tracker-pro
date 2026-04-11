@@ -91,14 +91,18 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             flexShrink: 0,
         }}>
             
-            {/* ─── TERMINAL LOGO (TOP) ─── */}
-            <div style={{ 
-                marginBottom: '1rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                position: 'relative'
-            }}>
+            {/* ─── TERMINAL LOGO (TOP / HOME) ─── */}
+            <div 
+                onClick={() => { navigate('/home'); soundService.playTap(); }}
+                style={{ 
+                    cursor: 'pointer',
+                    marginBottom: '1rem', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    position: 'relative'
+                }}
+            >
                 <Zap 
                     size={22} 
                     color="var(--color-accent)" 
@@ -139,18 +143,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             {separator}
 
             {/* ─── CORE MONITOR VIEWS ─── */}
-            <div
-                ref={homeBtnRef}
-                style={{ ...iconStyle('home', undefined, isOnHome), position: 'relative' }}
-                onMouseEnter={() => setHoveredIcon('home')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { setIsHomeMenuOpen(!isHomeMenuOpen); soundService.playTap(); }}
-                title="Monitor (Heatmap/Screener)"
-            >
-                {homeView === 'heatmap' ? <LayoutGrid size={16} /> : <Activity size={16} />}
-                {hoveredIcon === 'home' && <div style={tooltipStyle}>{homeView === 'heatmap' ? 'HEATMAP' : 'SCREENER'}</div>}
-            </div>
-
             <div
                 style={iconStyle('portfolio', '#10b981', isOnPortfolio)}
                 onMouseEnter={() => setHoveredIcon('portfolio')}
