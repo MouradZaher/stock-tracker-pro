@@ -271,7 +271,7 @@ function MainLayout({
           <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minWidth: 0, padding: 0 }}>
             <div className="content-route-shell" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <Routes>
-              <Route path="/" element={<Navigate to="/portfolio" replace />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home/*" element={
                 <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Dashboard onSelectSymbol={handleSelectSymbol} />

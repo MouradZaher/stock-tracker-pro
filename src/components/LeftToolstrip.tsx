@@ -12,6 +12,8 @@ import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { soundService } from '../services/soundService';
 
+import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
+
 interface LeftToolstripProps {
     onOpenOmniSearch: () => void;
     onOpenSettings: () => void;
@@ -28,6 +30,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
     const { theme, toggleTheme } = useTheme();
     const { selectedMarket, setMarket, homeView, setHomeView, favoriteHomeView, setFavoriteHomeView } = useMarket();
     const { unreadCount, markAllAsRead } = useNotifications();
+    const { windows, openWindow, bringToFront, toggleMinimize } = useWindowStore();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -37,17 +40,12 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
     const marketBtnRef = useRef<HTMLDivElement>(null);
     const homeBtnRef = useRef<HTMLDivElement>(null);
 
-    const isOnHome = location.pathname.startsWith('/home');
-    const isOnTV = location.pathname === '/tv';
-    const isOnCalendar = location.pathname === '/calendar';
-    const isOnPortfolio = location.pathname === '/portfolio';
-    const isOnWatchlist = location.pathname === '/watchlist';
-    const isOnPulse = location.pathname === '/pulse';
-    const isOnPricing = location.pathname === '/pricing';
+    const isWindowOpen = (id: WindowId) => windows[id]?.isOpen && !windows[id]?.isMinimized;
+    const isWindowMinimized = (id: WindowId) => windows[id]?.isMinimized;
 
-    const iconStyle = (id: string, color?: string, isActive?: boolean): React.CSSProperties => ({
+    const iconStyle = (id: string, color?: string, isActive?: boolean, isMinimized?: boolean): React.CSSProperties => ({
         cursor: 'pointer',
-        color: isActive ? (color || 'var(--color-accent)') : hoveredIcon === id ? (color || 'var(--color-accent)') : '#444',
+        color: isActive ? (color || 'var(--color-accent)') : isMinimized ? '#222' : hoveredIcon === id ? (color || 'var(--color-accent)') : '#444',
         transition: 'all 0.2s ease',
         position: 'relative',
         display: 'flex',
@@ -58,6 +56,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
         borderRadius: '6px',
         background: isActive ? 'rgba(74, 222, 128, 0.08)' : hoveredIcon === id ? 'rgba(255,255,255,0.04)' : 'transparent',
         border: isActive ? '1px solid rgba(74, 222, 128, 0.2)' : '1px solid transparent',
+        boxShadow: isActive ? '0 0 10px rgba(74, 222, 128, 0.1)' : 'none'
     });
 
     const tooltipStyle: React.CSSProperties = {
@@ -131,71 +130,64 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
 
             {/* ─── SEARCH / INTELLIGENCE HUB ─── */}
             <div
-                style={iconStyle('search', undefined, isOnPulse)}
-                onMouseEnter={() => setHoveredIcon('search')}
+                style={iconStyle('pulse', undefined, isWindowOpen('pulse'), isWindowMinimized('pulse'))}
+                onMouseEnter={() => setHoveredIcon('pulse')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/pulse'); soundService.playTap(); }}
-                title="Search Hub"
+                onClick={() => { openWindow('pulse', 'Search Matrix'); soundService.playTap(); }}
             >
                 <Search size={16} />
-                {hoveredIcon === 'search' && <div style={tooltipStyle}>SEARCH ⌘K</div>}
+                {hoveredIcon === 'pulse' && !isWindowOpen('pulse') && <div style={tooltipStyle}>SEARCH ⌘K</div>}
+                {isWindowOpen('pulse') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
             </div>
 
             {separator}
 
             {/* ─── CORE MONITOR VIEWS ─── */}
             <div
-                style={iconStyle('portfolio', '#10b981', isOnPortfolio)}
+                style={iconStyle('portfolio', '#10b981', isWindowOpen('portfolio'), isWindowMinimized('portfolio'))}
                 onMouseEnter={() => setHoveredIcon('portfolio')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/portfolio'); soundService.playTap(); }}
-                title="Portfolio Holdings"
+                onClick={() => { openWindow('portfolio', 'Institutional Portfolio'); soundService.playTap(); }}
             >
                 <PieChart size={16} />
-                {hoveredIcon === 'portfolio' && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
+                {hoveredIcon === 'portfolio' && !isWindowOpen('portfolio') && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
+                {isWindowOpen('portfolio') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#10b981', borderRadius: '1px' }} />}
             </div>
 
             <div
-                style={iconStyle('watchlist', '#3b82f6', isOnWatchlist)}
+                style={iconStyle('watchlist', '#3b82f6', isWindowOpen('watchlist'), isWindowMinimized('watchlist'))}
                 onMouseEnter={() => setHoveredIcon('watchlist')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/watchlist'); soundService.playTap(); }}
-                title="Active Watchlist"
+                onClick={() => { openWindow('watchlist', 'Active Watchlist'); soundService.playTap(); }}
             >
                 <Eye size={16} />
-                {hoveredIcon === 'watchlist' && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
+                {hoveredIcon === 'watchlist' && !isWindowOpen('watchlist') && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
+                {isWindowOpen('watchlist') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#3b82f6', borderRadius: '1px' }} />}
             </div>
 
             {separator}
 
             {/* ─── INTELLIGENCE FEEDS ─── */}
             <div
-                style={iconStyle('calendar', '#f59e0b', isOnCalendar)}
+                style={iconStyle('calendar', '#f59e0b', isWindowOpen('calendar'), isWindowMinimized('calendar'))}
                 onMouseEnter={() => setHoveredIcon('calendar')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/calendar'); soundService.playTap(); }}
-                title="Corporate Actions Calendar"
+                onClick={() => { openWindow('calendar', 'Institutional Calendar'); soundService.playTap(); }}
             >
                 <Calendar size={16} />
-                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+                {hoveredIcon === 'calendar' && !isWindowOpen('calendar') && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+                {isWindowOpen('calendar') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#f59e0b', borderRadius: '1px' }} />}
             </div>
 
             <div
-                style={{ ...iconStyle('tv', '#ef4444', isOnTV), position: 'relative' }}
+                style={{ ...iconStyle('tv', '#ef4444', isWindowOpen('tv'), isWindowMinimized('tv')), position: 'relative' }}
                 onMouseEnter={() => setHoveredIcon('tv')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { navigate('/tv'); soundService.playTap(); }}
-                title="Live TV / News Streams"
+                onClick={() => { openWindow('tv', 'Intelligence Stream'); soundService.playTap(); }}
             >
                 <Tv size={16} />
-                <div style={{
-                    position: 'absolute', top: '3px', right: '3px',
-                    width: '5px', height: '5px', borderRadius: '50%',
-                    background: '#ef4444',
-                    boxShadow: '0 0 6px #ef4444',
-                    animation: 'homePulse 1.5s infinite',
-                }} />
-                {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
+                {isWindowOpen('tv') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#ef4444', borderRadius: '1px' }} />}
+                {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
             </div>
 
             <div
@@ -351,27 +343,26 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                             MONITOR VIEW
                         </div>
                         {[
-                            { id: 'heatmap', label: 'HEATMAP', Icon: LayoutGrid, desc: 'S&P 100 Sector Grid' },
-                            { id: 'screener', label: 'SCREENER', Icon: Activity, desc: 'Institutional Data Matrix' }
+                            { id: 'heatmap', label: 'HEATMAP', Icon: LayoutGrid, desc: 'Institutional Heatmap' },
+                            { id: 'screener', label: 'SCREENER', Icon: Activity, desc: 'Data Matrix Screener' }
                         ].map(v => (
                             <button key={v.id} onClick={() => {
-                                setHomeView(v.id as any);
-                                navigate(`/home/${v.id}`);
+                                openWindow(v.id as WindowId, v.label === 'HEATMAP' ? 'Institutional Heatmap' : 'Data Matrix Screener');
                                 setIsHomeMenuOpen(false);
                                 soundService.playTap();
                             }} style={{
                                 display: 'flex', alignItems: 'center', gap: '0.6rem',
                                 padding: '0.55rem 0.75rem', width: '100%',
-                                background: homeView === v.id ? 'rgba(74, 222, 128, 0.08)' : 'transparent',
-                                border: homeView === v.id ? '1px solid rgba(74, 222, 128, 0.2)' : '1px solid transparent',
+                                background: isWindowOpen(v.id as WindowId) ? 'rgba(74, 222, 128, 0.08)' : 'transparent',
+                                border: isWindowOpen(v.id as WindowId) ? '1px solid rgba(74, 222, 128, 0.2)' : '1px solid transparent',
                                 cursor: 'pointer', textAlign: 'left', color: 'inherit', font: 'inherit',
                             }}>
-                                <v.Icon size={14} color={homeView === v.id ? 'var(--color-accent)' : '#555'} />
+                                <v.Icon size={14} color={isWindowOpen(v.id as WindowId) ? 'var(--color-accent)' : '#555'} />
                                 <div>
-                                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: homeView === v.id ? 'var(--color-accent)' : 'white' }}>{v.label}</div>
+                                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: isWindowOpen(v.id as WindowId) ? 'var(--color-accent)' : 'white' }}>{v.label}</div>
                                     <div style={{ fontSize: '0.5rem', color: '#444' }}>{v.desc}</div>
                                 </div>
-                                {homeView === v.id && <div style={{ marginLeft: 'auto', width: '5px', height: '5px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 6px var(--color-accent)' }} />}
+                                {isWindowOpen(v.id as WindowId) && <div style={{ marginLeft: 'auto', width: '5px', height: '5px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 6px var(--color-accent)' }} />}
                             </button>
                         ))}
                     </div>
