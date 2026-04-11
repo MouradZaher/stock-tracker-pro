@@ -10,7 +10,8 @@ import CorporateActionsCalendar from './CorporateActionsCalendar';
 import MarketPulsePage from './MarketPulsePage';
 import AIRecommendations from './AIRecommendations';
 import InstitutionalAdvisory from './InstitutionalAdvisory';
-import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, Brain, ShieldCheck } from 'lucide-react';
+import AdminDashboard from './AdminDashboard';
+import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, Brain, ShieldCheck, Shield } from 'lucide-react';
 
 const ModularWorkspace: React.FC = () => {
     const { windows, openWindow, bringToFront, toggleMinimize } = useWindowStore();
@@ -95,6 +96,11 @@ const ModularWorkspace: React.FC = () => {
                 {/* 9. Advisory Window */}
                 <TerminalWindow id="advisor" title="Oracle Portfolio Audit" minW={300} minH={400}>
                     <InstitutionalAdvisory />
+                </TerminalWindow>
+
+                {/* 10. Admin Window */}
+                <TerminalWindow id="admin" title="Administrative Terminal" minW={800} minH={500}>
+                    <AdminDashboard isOpen={true} onClose={() => {}} />
                 </TerminalWindow>
 
             </div>

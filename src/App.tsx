@@ -50,6 +50,7 @@ import './index.css';
 import './styles/ios-mobile.css';
 import Dashboard from './components/Dashboard';
 import { Brain, Eye, PieChart, Activity } from 'lucide-react';
+import { useWindowStore } from './hooks/useWindowStore';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -201,6 +202,7 @@ function MainLayout({
 }: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { openWindow } = useWindowStore();
 
   const activeTab = useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -223,7 +225,9 @@ function MainLayout({
 
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
-    navigate(`/pulse?symbol=${symbol}`);
+    // Open the pulse (Search Detail) window if not already open
+    openWindow('pulse', 'Global Asset Identification');
+    navigate(`/home?symbol=${symbol}`);
     setIsOmniSearchOpen(false);
   };
 
@@ -280,31 +284,12 @@ function MainLayout({
               <Route path="/stock/:symbol" element={
                 <StockDetailRoute onBack={() => navigate('/portfolio')} />
               } />
-              <Route path="/watchlist" element={
-                <div className="tab-content" style={{ padding: '0.5rem', height: '100%' }}>
-                  <WatchlistPage onSelectSymbol={handleSelectSymbol} />
-                </div>
-              } />
-              <Route path="/portfolio" element={
-                <div className="tab-content" style={{ padding: '0.5rem', height: '100%' }}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<PageSkeleton />}>
-                      <Portfolio onSelectSymbol={handleSelectSymbol} />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-              } />
-              <Route path="/recommendations" element={
-                <div className="tab-content" style={{ padding: 0, height: '100%' }}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AIRecommendations onSelectStock={handleSelectSymbol} />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-              } />
+              <Route path="/watchlist" element={<Navigate to="/home" replace />} />
+              <Route path="/portfolio" element={<Navigate to="/home" replace />} />
+              <Route path="/recommendations" element={<Navigate to="/home" replace />} />
               <Route path="/pulse" element={
                 <div className="tab-content" style={{ padding: '1rem', height: '100%' }}>
+                  {/* Keep /pulse for direct symbol deep-linking, but workspace is preferred */}
                   <MarketPulsePage onSelectStock={handleSelectSymbol} />
                 </div>
               } />
@@ -317,29 +302,11 @@ function MainLayout({
                   </ErrorBoundary>
                 </div>
               } />
-              <Route path="/tv" element={
-                <div className="tab-content" style={{ padding: '1rem', height: '100%', overflowY: 'auto' }}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<PageSkeleton />}>
-                      <LiveIntelligenceStreams />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-              } />
-              <Route path="/calendar" element={
-                <div className="tab-content" style={{ padding: 0, height: '100%', overflow: 'hidden' }}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<PageSkeleton />}>
-                      <CorporateActionsCalendar />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-              } />
-              <Route path="*" element={<Navigate to={{ pathname: '/portfolio', search: location.search }} replace />} />
+              <Route path="/tv" element={<Navigate to="/home" replace />} />
+              <Route path="/calendar" element={<Navigate to="/home" replace />} />
+              <Route path="*" element={<Navigate to={{ pathname: '/home', search: location.search }} replace />} />
             </Routes>
             </div>
-          </main>
-
           </main>
         </div>
       </ErrorBoundary>
