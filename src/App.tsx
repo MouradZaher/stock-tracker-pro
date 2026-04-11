@@ -29,7 +29,6 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
-import MobileNav from './components/MobileNav';
 import ThemeMoodManager from './components/ThemeMoodManager';
 import { usePiPStore } from './services/usePiPStore';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
