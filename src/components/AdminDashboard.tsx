@@ -69,7 +69,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                 .order('created_at', { ascending: false });
 
             if (data) {
-                // Fetch portfolio values for each user
                 const profilesWithValues = await Promise.all((data as Profile[]).map(async (profile) => {
                     try {
                         const positions = await fetchUserPortfolios(profile.id);
@@ -129,20 +128,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
         }
 
         try {
-            // 1. Delete Portfolios (manual cascade for safety/clarity)
             await supabase.from('portfolios').delete().eq('user_id', profile.id);
-
-            // 2. Delete Watchlist
             await supabase.from('watchlists').delete().eq('user_id', profile.id);
-
-            // 3. Delete Profile
             const { error } = await supabase
                 .from('profiles')
                 .delete()
                 .eq('id', profile.id);
 
             if (error) throw error;
-
             toast.success(`User ${email} and all associated data purged.`);
             setProfiles(prev => prev.filter(p => p.id !== profile.id));
         } catch (err) {
@@ -164,210 +157,134 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     }
 
     return (
-        <div className="admin-overlay glass-blur" onClick={onClose}>
-            <div className="admin-modal glass-effect" onClick={e => e.stopPropagation()} style={{
-                maxWidth: '900px',
-                width: '95%',
-                maxHeight: '90vh',
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px solid var(--glass-border-bright)'
+        <div className="admin-overlay" style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
+            zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        }} onClick={onClose}>
+            <div className="admin-modal" onClick={e => e.stopPropagation()} style={{
+                maxWidth: '960px', width: '100%', maxHeight: '85vh',
+                background: '#000000', border: '1px solid #222',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(74, 222, 128, 0.05)'
             }}>
-                <div className="admin-header" style={{
-                    padding: '1.5rem',
-                    borderBottom: '1px solid var(--glass-border)',
-                    background: 'rgba(255,255,255,0.02)'
+                {/* Header */}
+                <div style={{
+                    padding: '1.25rem 1.5rem', borderBottom: '1px solid #111',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#050505'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div className="icon-badge" style={{
-                            background: 'var(--gradient-primary)',
-                            padding: '10px',
-                            borderRadius: '12px',
-                            boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)'
-                        }}>
-                            <Shield size={24} color="white" />
+                        <div style={{ padding: '8px', background: 'rgba(74, 222, 128, 0.1)', borderRadius: '8px', border: '1px solid rgba(74, 222, 128, 0.2)' }}>
+                            <Shield size={20} color="var(--color-accent)" />
                         </div>
                         <div>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>Admin Dashboard</h2>
-                            <p className="admin-subtitle" style={{ fontSize: '0.8rem', opacity: 0.7, margin: 0 }}>System Management & Oversight</p>
+                            <h2 style={{ fontSize: '1rem', fontWeight: 900, margin: 0, color: 'white', letterSpacing: '-0.01em', fontStyle: 'italic' }}>ADMINISTRATIVE TERMINAL</h2>
+                            <div style={{ fontSize: '0.6rem', color: '#555', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginTop: '2px' }}>
+                                Access Level: <span style={{ color: 'var(--color-accent)' }}>ROOT_AUTHORITY</span>
+                            </div>
                         </div>
                     </div>
-                    <button className="btn btn-icon glass-button" onClick={onClose} style={{ borderRadius: '50%' }}>
-                        <X size={20} />
+                    <button onClick={onClose} style={{ 
+                        background: 'transparent', border: '1px solid #222', color: '#555', 
+                        cursor: 'pointer', borderRadius: '6px', padding: '4px', display: 'flex' 
+                    }}>
+                        <X size={18} />
                     </button>
                 </div>
 
-                <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--spacing-md)' }}>
-                    {/* System Pulse Grid - High Tech Version */}
-                    <div className="admin-status-grid">
-                        <div className="glass-card" style={{
-                            padding: '1.25rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.75rem',
-                            borderLeft: `4px solid ${systemStatus.api.status === 'online' ? 'var(--color-success)' : 'var(--color-error)'}`,
-                            background: 'rgba(255,255,255,0.01)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Market Bridge</div>
-                                <Server size={14} color={systemStatus.api.status === 'online' ? 'var(--color-success)' : 'var(--color-error)'} />
+                <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    
+                    {/* System Health Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                        {[
+                            { label: 'MARKET BRIDGE', status: systemStatus.api.status, val: `${systemStatus.api.latency}ms`, icon: Server, sub: 'YF-REST-v8' },
+                            { label: 'NEURAL CORE', status: systemStatus.db.status, val: 'SYNCED', icon: Database, sub: 'SUPA-SGP-1' },
+                            { label: 'ACTIVE OPERATIVES', status: 'online', val: profiles.length.toString(), icon: Users, sub: 'IDENTIFIED' },
+                            { label: 'TOTAL AUM', status: 'online', val: formatCurrency(profiles.reduce((sum, p) => sum + (p.portfolioValue || 0), 0)), icon: Wallet, sub: 'AGGREGATED' }
+                        ].map((stat, i) => (
+                            <div key={i} style={{ 
+                                background: '#020202', border: '1px solid #111', padding: '1rem', borderRadius: '12px',
+                                borderLeft: `3px solid ${stat.status === 'online' ? 'var(--color-accent)' : StatStatusColor(stat.status)}`
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                                    <span style={{ fontSize: '0.6rem', fontWeight: 900, color: '#444', letterSpacing: '0.05em' }}>{stat.label}</span>
+                                    <stat.icon size={12} color="#333" />
+                                </div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>{stat.val}</div>
+                                <div style={{ fontSize: '0.55rem', color: '#333', fontWeight: 700, marginTop: '4px' }}>{stat.sub}</div>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{systemStatus.api.status === 'online' ? 'NOMINAL' : 'FAULT'}</div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>YF-API-v8</div>
-                            </div>
-                            <div style={{ height: '2px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                                <div className="shimmer" style={{ width: '40%', height: '100%', background: systemStatus.api.status === 'online' ? 'var(--color-success)' : 'var(--color-error)', opacity: 0.3 }} />
-                            </div>
-                        </div>
-
-                        <div className="glass-card" style={{
-                            padding: '1.25rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.75rem',
-                            borderLeft: `4px solid ${systemStatus.db.status === 'online' ? 'var(--color-success)' : 'var(--color-error)'}`,
-                            background: 'rgba(255,255,255,0.01)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Neural Core</div>
-                                <Database size={14} color={systemStatus.db.status === 'online' ? 'var(--color-success)' : 'var(--color-error)'} />
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{systemStatus.db.status === 'online' ? 'SYNCED' : 'ERR_TIMEOUT'}</div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>DB-SGP-1</div>
-                            </div>
-                            <div style={{ height: '2px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                                <div className="shimmer" style={{ width: '70%', height: '100%', background: systemStatus.db.status === 'online' ? 'var(--color-success)' : 'var(--color-error)', opacity: 0.3 }} />
-                            </div>
-                        </div>
-
-                        <div className="glass-card" style={{
-                            padding: '1.25rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.75rem',
-                            borderLeft: '4px solid var(--color-accent)',
-                            background: 'rgba(255,255,255,0.01)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Ping response</div>
-                                <Clock size={14} color="var(--color-accent)" />
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>{systemStatus.api.latency}ms</div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>GLOBAL</div>
-                            </div>
-                            <div style={{ height: '2px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                                <div style={{ width: '100%', height: '100%', background: 'var(--color-accent)', opacity: 0.1 }} />
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
-                    <div className="admin-stats-grid">
-                        <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: -5, right: -5, opacity: 0.05 }}><Users size={40} /></div>
-                            <div style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-accent)' }}>{profiles.length}</div>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '4px' }}>OPERATIVES</div>
+                    {/* Directory */}
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                            <Activity size={14} color="var(--color-accent)" />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Operative Directory</span>
                         </div>
-                        <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: -5, right: -5, opacity: 0.05 }}><CheckCircle size={40} /></div>
-                            <div style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-success)' }}>{profiles.filter(p => p.is_approved).length}</div>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '4px' }}>VERIFIED</div>
-                        </div>
-                        <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: -5, right: -5, opacity: 0.05 }}><Wallet size={40} /></div>
-                            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-warning)', marginTop: '4px' }}>{formatCurrency(profiles.reduce((sum, p) => sum + (p.portfolioValue || 0), 0))}</div>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '4px' }}>TOTAL AUM</div>
-                        </div>
-                    </div>
 
-                    <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)' }}>
-                        <Activity size={16} /> USER DIRECTORY
-                    </h3>
-
-                    {loading ? (
-                        <div style={{ textAlign: 'center', padding: '4rem' }}>
-                            <div className="spinner" style={{ margin: '0 auto 1.5rem', width: '30px', height: '30px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--color-accent)' }} />
-                            <p style={{ color: 'var(--color-text-tertiary)' }}>Syncing encrypted profiles...</p>
-                        </div>
-                    ) : (
-                        <div className="admin-content-container">
-                            {/* Desktop Table View */}
-                            <div className="desktop-only" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
-                                <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        {loading ? (
+                            <div style={{ padding: '4rem', textAlign: 'center' }}>
+                                <div style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%', margin: '0 auto 1rem', animation: 'pulse 1.5s infinite' }} />
+                                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#333' }}>SYNCHRONIZING SECURE TUNNEL...</span>
+                            </div>
+                        ) : (
+                            <div style={{ border: '1px solid #111', borderRadius: '12px', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead>
-                                        <tr style={{ background: 'rgba(255,255,255,0.03)', textAlign: 'left' }}>
-                                            <th style={{ padding: '1rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Identity</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Privilege</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Status</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>AUM</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', textAlign: 'right' }}>Authorization</th>
+                                        <tr style={{ background: '#050505', textAlign: 'left', borderBottom: '1px solid #111' }}>
+                                            <th style={thStyle}>IDENTITY</th>
+                                            <th style={thStyle}>CLEARANCE</th>
+                                            <th style={thStyle}>STATUS</th>
+                                            <th style={thStyle}>AUM</th>
+                                            <th style={{ ...thStyle, textAlign: 'right' }}>COMMAND</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {profiles.map(profile => (
-                                            <tr key={profile.id} style={{ borderTop: '1px solid var(--glass-border)', transition: 'background 0.2s' }}>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{profile.email || profile.username || 'Anonymous'}</div>
-                                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>ID: {profile.id.slice(0, 8)}...</div>
+                                            <tr key={profile.id} style={{ borderBottom: '1px solid #0a0a0a', background: '#010101' }}>
+                                                <td style={tdStyle}>
+                                                    <div style={{ fontWeight: 800, color: 'white', fontSize: '0.8rem' }}>{profile.email || 'ENCRYPTED_ID'}</div>
+                                                    <div style={{ fontSize: '0.55rem', color: '#333', fontWeight: 700 }}>HEX: {profile.id.slice(0, 12)}</div>
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <span style={{
-                                                        fontSize: '0.65rem',
-                                                        fontWeight: 800,
-                                                        padding: '4px 8px',
-                                                        borderRadius: '6px',
-                                                        background: profile.role === 'admin' ? 'var(--color-success-light)' : 'var(--color-accent-light)',
-                                                        color: profile.role === 'admin' ? 'var(--color-success)' : 'var(--color-accent)'
+                                                <td style={tdStyle}>
+                                                    <span style={{ 
+                                                        fontSize: '0.55rem', fontWeight: 900, padding: '2px 6px', border: `1px solid ${profile.role === 'admin' ? 'var(--color-accent)' : '#222'}`,
+                                                        color: profile.role === 'admin' ? 'var(--color-accent)' : '#555', borderRadius: '4px'
                                                     }}>
                                                         {profile.role.toUpperCase()}
                                                     </span>
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 600, color: profile.is_approved ? 'var(--color-success)' : 'var(--color-error)' }}>
-                                                        {profile.is_approved ? <Check size={14} /> : <Clock size={14} />}
-                                                        {profile.is_approved ? 'Authorized' : 'Pending'}
+                                                <td style={tdStyle}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', fontWeight: 800, color: profile.is_approved ? 'var(--color-accent)' : '#ef4444' }}>
+                                                        <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 6px currentColor' }} />
+                                                        {profile.is_approved ? 'VERIFIED' : 'RESTRICTED'}
                                                     </div>
                                                 </td>
-                                                <td style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: 700 }}>
+                                                <td style={{ ...tdStyle, color: 'white', fontWeight: 800, fontSize: '0.8rem' }}>
                                                     {formatCurrency(profile.portfolioValue || 0)}
                                                 </td>
-                                                <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                        <button
-                                                            onClick={() => setInspectingUser({ id: profile.id, email: profile.email || profile.username })}
-                                                            className="btn btn-icon glass-button"
-                                                            title="Inspect"
+                                                <td style={{ ...tdStyle, textAlign: 'right' }}>
+                                                    <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                                                        <button 
+                                                            onClick={() => setInspectingUser({ id: profile.id, email: profile.email || 'Encrypted' })}
+                                                            style={actionBtnStyle('#888')} title="Audit Portfolio"
                                                         >
-                                                            <Eye size={14} />
+                                                            <Eye size={12} />
                                                         </button>
-                                                        {!profile.is_approved && (
-                                                            <button
-                                                                onClick={() => handleApprove(profile.id, profile.email || profile.username)}
-                                                                className="btn btn-icon glass-button"
-                                                                style={{ color: 'var(--color-success)' }}
-                                                            >
-                                                                <Check size={14} />
-                                                            </button>
-                                                        )}
-                                                        {profile.is_approved && profile.role !== 'admin' && (
-                                                            <button
-                                                                onClick={() => handleReject(profile.id, profile.email || profile.username)}
-                                                                className="btn btn-icon glass-button"
-                                                                style={{ color: 'var(--color-error)' }}
-                                                            >
-                                                                <X size={14} />
+                                                        {profile.is_approved ? (
+                                                            profile.role !== 'admin' && (
+                                                                <button onClick={() => handleReject(profile.id, profile.email || '')} style={actionBtnStyle('#ef4444')} title="Revoke Access">
+                                                                    <XCircle size={12} />
+                                                                </button>
+                                                            )
+                                                        ) : (
+                                                            <button onClick={() => handleApprove(profile.id, profile.email || '')} style={actionBtnStyle('var(--color-accent)')} title="Authorize">
+                                                                <Check size={12} />
                                                             </button>
                                                         )}
                                                         {profile.role !== 'admin' && (
-                                                            <button
-                                                                onClick={() => handleDeleteUser(profile)}
-                                                                className="btn btn-icon glass-button hover-danger"
-                                                                style={{ color: 'rgba(239, 68, 68, 0.6)' }}
-                                                                title="Purge User"
-                                                            >
-                                                                <Trash2 size={14} />
+                                                            <button onClick={() => handleDeleteUser(profile)} style={actionBtnStyle('#441111')} title="Purge Data">
+                                                                <Trash2 size={12} />
                                                             </button>
                                                         )}
                                                     </div>
@@ -377,115 +294,49 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                     </tbody>
                                 </table>
                             </div>
-
-                            {/* Mobile Card View - iOS Optimized */}
-                            <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {profiles.map(profile => (
-                                    <div key={profile.id} className="glass-card" style={{ padding: '1.25rem', position: 'relative', overflow: 'hidden' }}>
-                                        {profile.role === 'admin' && (
-                                            <div style={{ position: 'absolute', top: 0, right: 0, width: '40px', height: '40px', background: 'var(--color-success-light)', borderRadius: '0 0 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Shield size={14} color="var(--color-success)" />
-                                            </div>
-                                        )}
-
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <div style={{ fontWeight: 800, fontSize: '1rem', marginBottom: '0.25rem' }}>{profile.email || profile.username || 'Encrypted User'}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <span>Joined {new Date(profile.created_at).toLocaleDateString()}</span>
-                                                <span style={{ fontSize: '1.2rem', lineHeight: 0.5 }}>·</span>
-                                                <span style={{ fontWeight: 700, color: 'var(--color-accent)' }}>{formatCurrency(profile.portfolioValue || 0)}</span>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                            <button
-                                                onClick={() => setInspectingUser({ id: profile.id, email: profile.email || profile.username })}
-                                                className="btn glass-button"
-                                                style={{ flex: 1, padding: '10px', fontSize: '0.8rem', fontWeight: 700, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                                            >
-                                                <Eye size={16} /> Audit
-                                            </button>
-
-                                            {!profile.is_approved ? (
-                                                <button
-                                                    onClick={() => handleApprove(profile.id, profile.email || profile.username)}
-                                                    className="btn btn-primary"
-                                                    style={{ flex: 1.5, padding: '10px', fontSize: '0.8rem', fontWeight: 700, borderRadius: '12px', background: 'var(--color-success)' }}
-                                                >
-                                                    Authorize
-                                                </button>
-                                            ) : (
-                                                <div style={{
-                                                    flex: 1.5,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    gap: '6px',
-                                                    fontSize: '0.8rem',
-                                                    fontWeight: 700,
-                                                    color: 'var(--color-success)',
-                                                    background: 'var(--color-success-light)',
-                                                    borderRadius: '12px'
-                                                }}>
-                                                    <CheckCircle size={16} /> SECURE
-                                                </div>
-                                            )}
-
-                                            {profile.role !== 'admin' && (
-                                                <button
-                                                    onClick={() => handleDeleteUser(profile)}
-                                                    className="btn glass-button"
-                                                    style={{
-                                                        width: '44px',
-                                                        padding: '0',
-                                                        borderRadius: '12px',
-                                                        color: '#EF4444',
-                                                        borderColor: 'rgba(239, 68, 68, 0.2)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
-                <div className="admin-footer" style={{
-                    padding: '1.25rem 1.5rem',
-                    borderTop: '1px solid var(--glass-border)',
-                    background: 'rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '1rem'
-                }}>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontFamily: 'monospace' }}>
-                        v4.0.2 / SECURE_TUNNEL_ESTABLISHED
-                    </div>
-                    <button className="btn btn-secondary glass-button" style={{
-                        borderRadius: '10px',
-                        fontSize: '0.75rem',
-                        gap: '8px',
-                        padding: '8px 16px',
-                        fontWeight: 700,
-                        letterSpacing: '0.05em'
-                    }} onClick={() => {
-                        signOut();
-                        onClose();
+                {/* Footer */}
+                <div style={{ padding: '0.75rem 1.5rem', background: '#050505', borderTop: '1px solid #111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '0.5rem', color: '#222', fontWeight: 900, letterSpacing: '0.1em' }}>KERNEL_V4.0.2 // SECURE_HANDSHAKE_VALIDATED</div>
+                    <button onClick={() => { signOut(); onClose(); }} style={{
+                        background: 'transparent', border: '1px solid #441111', color: '#ef4444', 
+                        fontSize: '0.55rem', fontWeight: 900, padding: '4px 10px', borderRadius: '4px', cursor: 'pointer'
                     }}>
-                        <LogOut size={14} /> TERMINATE SESSION
+                        TERMINATE ALL SESSIONS
                     </button>
                 </div>
             </div>
+            <style>{`
+                .admin-overlay { animation: adminFadeIn 0.2s ease-out; }
+                @keyframes adminFadeIn { from { opacity: 0; } to { opacity: 1; } }
+            `}</style>
         </div>
     );
 };
+
+const StatStatusColor = (status: string) => {
+    switch (status) {
+        case 'online': return 'var(--color-accent)';
+        case 'offline': return '#ef4444';
+        default: return '#555';
+    }
+};
+
+const thStyle: React.CSSProperties = {
+    padding: '0.75rem 1rem', fontSize: '0.55rem', fontWeight: 900, color: '#444', letterSpacing: '0.1em'
+};
+
+const tdStyle: React.CSSProperties = {
+    padding: '0.75rem 1rem', verticalAlign: 'middle'
+};
+
+const actionBtnStyle = (color: string): React.CSSProperties => ({
+    width: '24px', height: '24px', background: 'transparent', border: `1px solid ${color}33`,
+    color: color, borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', 
+    justifyContent: 'center', transition: 'all 0.2s'
+});
 
 export default AdminDashboard;

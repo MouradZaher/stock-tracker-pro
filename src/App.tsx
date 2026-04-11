@@ -28,6 +28,7 @@ const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioInte
 const PricingPage = lazy(() => import('./components/PricingPage'));
 const LiveIntelligenceStreams = lazy(() => import('./components/LiveIntelligenceStreams'));
 const CorporateActionsCalendar = lazy(() => import('./components/CorporateActionsCalendar'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 
 import AIChatWidget from './components/AIChatWidget';
@@ -253,6 +254,10 @@ function MainLayout({
             onSelectSymbol={handleSelectSymbol} 
         />
         
+        <Suspense fallback={null}>
+          <AdminDashboard isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
+        </Suspense>
+
         <div className="main-wrapper" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           
           {/* LEFT TOOLSTRIP (SIDEBAR) */}
