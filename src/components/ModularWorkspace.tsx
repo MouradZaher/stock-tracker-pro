@@ -13,39 +13,46 @@ import InstitutionalAdvisory from './InstitutionalAdvisory';
 import AdminDashboard from './AdminDashboard';
 import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, Brain, ShieldCheck, Shield } from 'lucide-react';
 
-const ModularWorkspace: React.FC = () => {
-    const { windows, openWindow, bringToFront, toggleMinimize } = useWindowStore();
+interface ModularWorkspaceProps {
+    onSelectSymbol?: (symbol: string) => void;
+}
+
+const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) => {
+    const { windows, openWindow, bringToFront, toggleMinimize, isDraggingId, snapToLayout } = useWindowStore();
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Initial tool spawn - One time on mount
     useEffect(() => {
         if (!isInitialized) {
             const currentWindows = useWindowStore.getState().windows;
-            const isMobile = window.innerWidth <= 768;
             
-            // Adjust initial sizes for mobile
-            const heatmapW = isMobile ? 360 : 960;
-            const heatmapH = isMobile ? 500 : 680;
-            const screenerW = isMobile ? 360 : 1024;
-            const screenerH = isMobile ? 450 : 600;
-
+            // Adjust initial sizes for mobile vs desktop grid
             if (!currentWindows['heatmap']) {
-                openWindow('heatmap', 'Institutional Heatmap', 20, 20, heatmapW, heatmapH);
-                if (isMobile) useWindowStore.getState().updateScale('heatmap', 0.85);
+                openWindow('heatmap', 'Institutional Heatmap');
+                if (!isMobile) snapToLayout('heatmap', 'TL');
             }
             if (!currentWindows['screener']) {
-                openWindow('screener', 'Data Matrix Screener', 40, 80, screenerW, screenerH);
-                if (isMobile) useWindowStore.getState().updateScale('screener', 0.85);
+                openWindow('screener', 'Data Matrix Screener');
+                if (!isMobile) snapToLayout('screener', 'BL');
             }
             if (!currentWindows['advisor']) {
-                openWindow('advisor', 'Oracle Portfolio Audit', 20, 140, 320, 500);
+                openWindow('advisor', 'Oracle Portfolio Audit');
+                if (!isMobile) snapToLayout('advisor', 'SIDE');
             }
             if (!currentWindows['recommendations']) {
-                openWindow('recommendations', 'Institutional Intelligence', 30, 200, 320, 500);
+                openWindow('recommendations', 'Institutional Intelligence');
+                if (!isMobile) snapToLayout('recommendations', 'TR');
             }
             setIsInitialized(true);
         }
-    }, [isInitialized, openWindow]);
+    }, [isInitialized, openWindow, isMobile, snapToLayout]);
 
     const minimizedWindows = Object.values(windows).filter(w => w.isOpen && w.isMinimized);
 
@@ -60,46 +67,59 @@ const ModularWorkspace: React.FC = () => {
             backgroundSize: '40px 40px'
         }}>
             
+            {/* GRID BACKGROUND / DROP ZONES */}
+            <div style={{ position: 'absolute', inset: 0, opacity: isDraggingId ? 1 : 0, transition: 'opacity 0.2s', pointerEvents: 'none', zIndex: 1 }}>
+                <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '350px', background: 'rgba(74, 222, 128, 0.05)', borderLeft: '1px solid rgba(74, 222, 128, 0.2)' }} />
+                <div style={{ position: 'absolute', top: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', borderBottom: '1px solid #111', display: 'flex' }}>
+                    <div style={{ flex: 1, borderRight: '1px solid #111' }} />
+                    <div style={{ flex: 1 }} />
+                </div>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', display: 'flex' }}>
+                    <div style={{ flex: 1, borderRight: '1px solid #111' }} />
+                    <div style={{ flex: 1 }} />
+                </div>
+            </div>
+            
             {/* THE WORKSPACE (DESKTOP) */}
-            <div style={{ position: 'absolute', inset: 0, padding: '20px' }}>
+            <div style={{ position: 'absolute', inset: 0, padding: isMobile ? '0' : '20px' }}>
                 
                 {/* 1. Heatmap Window */}
-                <TerminalWindow id="heatmap" title="Institutional Heatmap" minW={600} minH={500}>
+                <TerminalWindow id="heatmap" title="Institutional Heatmap" minW={350} minH={300}>
                     <StockHeatmap />
                 </TerminalWindow>
 
                 {/* 2. Screener Window */}
-                <TerminalWindow id="screener" title="Data Matrix Screener" minW={800} minH={400}>
-                    <InstitutionalScreener />
+                <TerminalWindow id="screener" title="Data Matrix Screener" minW={350} minH={300}>
+                    <InstitutionalScreener onSelectSymbol={onSelectSymbol || (() => {})} />
                 </TerminalWindow>
 
                 {/* 3. Portfolio Window */}
-                <TerminalWindow id="portfolio" title="Active Portfolio" minW={800} minH={500}>
+                <TerminalWindow id="portfolio" title="Active Portfolio" minW={350} minH={300}>
                     <Portfolio />
                 </TerminalWindow>
 
                 {/* 4. Watchlist Window */}
-                <TerminalWindow id="watchlist" title="Global Watchlist" minW={600} minH={400}>
-                    <WatchlistPage />
+                <TerminalWindow id="watchlist" title="Global Watchlist" minW={350} minH={300}>
+                    <WatchlistPage onSelectSymbol={onSelectSymbol || (() => {})} />
                 </TerminalWindow>
 
                 {/* 5. TV / Streams Window */}
-                <TerminalWindow id="tv" title="Intelligence Streams" minW={400} minH={300}>
+                <TerminalWindow id="tv" title="Intelligence Streams" minW={300} minH={250}>
                     <LiveIntelligenceStreams />
                 </TerminalWindow>
 
                 {/* 6. Calendar Window */}
-                <TerminalWindow id="calendar" title="Corporate Actions" minW={400} minH={300}>
+                <TerminalWindow id="calendar" title="Corporate Actions" minW={300} minH={250}>
                     <CorporateActionsCalendar />
                 </TerminalWindow>
 
                 {/* 7. Search Window */}
-                <TerminalWindow id="pulse" title="Global Asset Identification" minW={600} minH={400}>
-                    <MarketPulsePage />
+                <TerminalWindow id="pulse" title="Global Asset Identification" minW={350} minH={300}>
+                    <MarketPulsePage onSelectStock={onSelectSymbol} />
                 </TerminalWindow>
 
                 {/* 8. Recommendations Window */}
-                <TerminalWindow id="recommendations" title="Institutional Intelligence" minW={600} minH={400}>
+                <TerminalWindow id="recommendations" title="Institutional Intelligence" minW={350} minH={350}>
                     <AIRecommendations />
                 </TerminalWindow>
 
@@ -109,7 +129,7 @@ const ModularWorkspace: React.FC = () => {
                 </TerminalWindow>
 
                 {/* 10. Admin Window */}
-                <TerminalWindow id="admin" title="Administrative Terminal" minW={800} minH={500}>
+                <TerminalWindow id="admin" title="Administrative Terminal" minW={600} minH={400}>
                     <AdminDashboard isOpen={true} onClose={() => {}} />
                 </TerminalWindow>
 

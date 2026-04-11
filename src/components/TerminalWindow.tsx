@@ -16,7 +16,8 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
 }) => {
     const { 
         windows, activeWindow, bringToFront, closeWindow, 
-        toggleMinimize, toggleMaximize, updatePosition, updateSize, updateScale 
+        toggleMinimize, toggleMaximize, updatePosition, updateSize, updateScale,
+        snapToLayout, setDraggingId 
     } = useWindowStore();
     
     const windowState = windows[id];
@@ -43,9 +44,25 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             }
         };
 
-        const handleMouseUp = () => {
+        const handleMouseUp = (e: MouseEvent) => {
+            if (isDragging && windowState) {
+                // Snap detection logic
+                const PADDING = 100; // Snap threshold
+                const rightBoundary = window.innerWidth - 350 - 64 - 100;
+                
+                if (e.clientX > rightBoundary) {
+                    snapToLayout(id, 'SIDE');
+                } else if (e.clientY < 150) {
+                    if (e.clientX < (window.innerWidth / 2)) snapToLayout(id, 'TL');
+                    else snapToLayout(id, 'TR');
+                } else if (e.clientY > (window.innerHeight - 200)) {
+                    if (e.clientX < (window.innerWidth / 2)) snapToLayout(id, 'BL');
+                    else snapToLayout(id, 'BR');
+                }
+            }
             setIsDragging(false);
             setIsResizing(false);
+            setDraggingId(null);
         };
 
         if (isDragging || isResizing) {
@@ -70,6 +87,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             x: e.clientX - windowState.x,
             y: e.clientY - windowState.y
         });
+        setDraggingId(id);
     };
 
     const handleResizeStart = (e: React.MouseEvent, mode: 'both' | 'h' | 'v' = 'both') => {

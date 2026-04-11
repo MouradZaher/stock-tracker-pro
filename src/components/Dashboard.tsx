@@ -8,7 +8,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onSelectSymbol }) => {
     return (
         <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-            <ModularWorkspace />
+            <ModularWorkspace onSelectSymbol={onSelectSymbol} />
         </div>
     );
 };

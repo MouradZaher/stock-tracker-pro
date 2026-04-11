@@ -23,7 +23,9 @@ interface WindowStore {
     windows: Record<WindowId, WindowState>;
     activeWindow: WindowId | null;
     maxZIndex: number;
+    isDraggingId: WindowId | null;
     
+    setDraggingId: (id: WindowId | null) => void;
     openWindow: (id: WindowId, title: string, x?: number, y?: number, w?: number, h?: number) => void;
     closeWindow: (id: WindowId) => void;
     toggleMinimize: (id: WindowId) => void;
@@ -32,6 +34,7 @@ interface WindowStore {
     updatePosition: (id: WindowId, x: number, y: number) => void;
     updateSize: (id: WindowId, w: number, h: number) => void;
     updateScale: (id: WindowId, scale: number) => void;
+    snapToLayout: (id: WindowId, layout: 'TL' | 'TR' | 'BL' | 'BR' | 'SIDE' | 'FULL') => void;
 }
 
 const DEFAULT_WIDTH = 800;
@@ -43,6 +46,9 @@ export const useWindowStore = create<WindowStore>()(
             windows: {} as Record<WindowId, WindowState>,
             activeWindow: null,
             maxZIndex: 100,
+            isDraggingId: null,
+
+            setDraggingId: (id) => set({ isDraggingId: id }),
 
             openWindow: (id, title, x = 100, y = 100, w = DEFAULT_WIDTH, h = DEFAULT_HEIGHT) => {
                 const { windows, maxZIndex } = get();
@@ -162,6 +168,39 @@ export const useWindowStore = create<WindowStore>()(
                     windows: {
                         ...windows,
                         [id]: { ...windows[id], scale: Math.max(0.5, Math.min(2.0, scale)) }
+                    }
+                });
+            },
+
+            snapToLayout: (id, layout) => {
+                const { windows } = get();
+                const win = windows[id];
+                if (!win) return;
+
+                const SIDE_WIDTH = 350;
+                const PADDING = 20;
+                const topBarHeight = 28 + 48; // topbar + header roughly
+                const availW = window.innerWidth - 64 - PADDING * 2 - SIDE_WIDTH; // 64 is sidebar
+                const availH = window.innerHeight - topBarHeight - 60 - PADDING * 2; // 60 is nav
+                
+                const halfW = availW / 2;
+                const halfH = availH / 2;
+
+                let next = { x: win.x, y: win.y, w: win.w, h: win.h };
+
+                switch (layout) {
+                    case 'TL': next = { x: PADDING, y: PADDING, w: halfW - 10, h: halfH - 10 }; break;
+                    case 'TR': next = { x: PADDING + halfW + 10, y: PADDING, w: halfW - 10, h: halfH - 10 }; break;
+                    case 'BL': next = { x: PADDING, y: PADDING + halfH + 10, w: halfW - 10, h: halfH - 10 }; break;
+                    case 'BR': next = { x: PADDING + halfW + 10, y: PADDING + halfH + 10, w: halfW - 10, h: halfH - 10 }; break;
+                    case 'SIDE': next = { x: window.innerWidth - 64 - SIDE_WIDTH - PADDING, y: PADDING, w: SIDE_WIDTH, h: availH + PADDING }; break;
+                    case 'FULL': next = { x: PADDING, y: PADDING, w: availW + SIDE_WIDTH, h: availH + PADDING }; break;
+                }
+
+                set({
+                    windows: {
+                        ...windows,
+                        [id]: { ...win, ...next, isMaximized: false }
                     }
                 });
             }
