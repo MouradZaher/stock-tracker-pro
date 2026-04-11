@@ -13,7 +13,7 @@ import MacroPulseHeader from './components/MacroPulseHeader';
 import OmniSearch from './components/OmniSearch';
 import WorldMonitorTabs from './components/WorldMonitorTabs';
 import InstitutionalAdvisory from './components/InstitutionalAdvisory';
-import { Layout as LayoutIcon, Search as SearchIcon, Brain as BrainIcon, Shield as ShieldIcon, User as UserIcon } from 'lucide-react';
+import LeftToolstrip from './components/LeftToolstrip';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -257,12 +257,14 @@ function MainLayout({
         <div className="main-wrapper" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           
           {/* LEFT TOOLSTRIP (SIDEBAR) */}
-          <aside style={{ width: '48px', borderRight: '1px solid #111', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem 0', gap: '1.5rem', background: '#000' }}>
-            <div onClick={() => setIsOmniSearchOpen(true)} style={{ cursor: 'pointer', color: '#333' }}><SearchIcon size={18} /></div>
-            <div style={{ color: 'var(--color-accent)' }}><BrainIcon size={18} /></div>
-            <div style={{ color: '#333' }}><ShieldIcon size={18} /></div>
-            <div style={{ marginTop: 'auto', color: '#333', cursor: 'pointer' }} onClick={onOpenSettings}><UserIcon size={18} /></div>
-          </aside>
+          <LeftToolstrip
+            onOpenOmniSearch={() => setIsOmniSearchOpen(true)}
+            onOpenSettings={onOpenSettings}
+            onOpenTutorial={onOpenTutorial}
+            onAdminClick={() => setIsAdminOpen(true)}
+            onLogout={logout}
+            showAdmin={role === 'admin'}
+          />
 
           {/* MAIN DATA MONITOR */}
           <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minWidth: 0, padding: 0 }}>
