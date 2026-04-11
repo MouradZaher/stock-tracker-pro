@@ -154,7 +154,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                 onClose={() => setInspectingUser(null)}
             />
         );
-       return (
+    }
+
+    return (
         <div className="admin-modal" style={{
             width: '100%', height: '100%',
             background: '#000000',

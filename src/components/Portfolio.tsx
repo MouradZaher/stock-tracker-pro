@@ -20,7 +20,6 @@ import RealTimePrice from './RealTimePrice';
 import PortfolioIntelligencePanel from './PortfolioIntelligencePanel';
 import CompanyLogo from './CompanyLogo';
 import RiskReturnChart from './RiskReturnChart';
-import SubNavbar from './SubNavbar';
 import { getFullCompanyName } from '../data/companyNames';
 
 interface PortfolioProps {

@@ -19,7 +19,7 @@ import FamousHoldings from './FamousHoldings';
 import RealTimePrice from './RealTimePrice';
 import MiniSparkline from './MiniSparkline';
 
-import SubNavbar from './SubNavbar';
+
 
 interface WatchlistPageProps {
     onSelectSymbol: (symbol: string) => void;
@@ -209,15 +209,38 @@ const WatchlistPage: React.FC<WatchlistPageProps> = ({ onSelectSymbol }) => {
             overflow: 'hidden'
         }}>
             {/* Unified Sub-Navbar */}
-            <SubNavbar 
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                tabs={[
-                    { id: 'watchlist', label: 'My Watchlist', icon: Star, color: 'var(--color-warning)' },
-                    { id: 'indices', label: 'Indices', icon: Activity, color: 'var(--color-accent)' },
-                    { id: 'famous-portfolios', label: 'Famous Portfolios', icon: Search, color: 'var(--color-success)' }
-                ]}
-            />
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '0.5rem 0', flexShrink: 0, borderBottom: '1px solid #111' }}>
+                <div style={{ display: 'flex', gap: '2px', padding: '2px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '6px' }}>
+                    {[
+                        { id: 'watchlist', label: 'MY WATCHLIST' },
+                        { id: 'indices', label: 'INDICES' },
+                        { id: 'famous-portfolios', label: 'FAMOUS PORTFOLIOS' }
+                    ].map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as any)}
+                                style={{
+                                    height: '28px',
+                                    padding: '0 1rem',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.6rem',
+                                    fontWeight: 900,
+                                    letterSpacing: '0.08em',
+                                    background: isActive ? 'var(--color-accent)' : 'transparent',
+                                    color: isActive ? '#fff' : '#666',
+                                    transition: 'all 0.15s',
+                                }}
+                            >
+                                {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
                 {activeTab === 'watchlist' && (

@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { soundService } from '../services/soundService';
 import toast from 'react-hot-toast';
 
-import TopBar from '../components/TopBar';
+
 import './LandingPage.css';
 import './PreviewStyles.css';
 
@@ -160,7 +160,6 @@ const PinLoginPage: React.FC = () => {
 
     return (
         <div className="landing-page">
-            <TopBar />
             
             {/* Premium Texture Overlay */}
             <div className="noise-overlay" style={{ opacity: 0.1, mixBlendMode: 'overlay' }}></div>

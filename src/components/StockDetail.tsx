@@ -12,7 +12,6 @@ import { useMarket } from '../contexts/MarketContext';
 import { getStockData } from '../services/stockDataService';
 import { REFRESH_INTERVALS } from '../services/api';
 import { formatCurrency, formatPercent, formatNumber, formatNumberPlain, formatTimeAgo, getChangeClass } from '../utils/formatters';
-import TradingViewChart from './TradingViewChart';
 import MarketStatus from './MarketStatus';
 import toast from 'react-hot-toast';
 import CompanyLogo from './CompanyLogo';
@@ -247,8 +246,6 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
                     </div>
                 </div>
             )}
-
-            <TradingViewChart symbol={symbol} />
 
             <div className="section">
                 <h3 className="section-title"><TrendingUp size={20} color="var(--color-success)" /> Relative Sector Strength</h3>
