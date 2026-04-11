@@ -82,19 +82,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             background: '#000',
             flexShrink: 0,
         }}>
-            {/* ─── LOGO ─── */}
-            <div style={{
-                width: '32px', height: '32px', borderRadius: '8px',
-                background: 'linear-gradient(135deg, var(--color-accent), #22c55e)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '0.5rem', cursor: 'pointer',
-                boxShadow: '0 0 12px rgba(74, 222, 128, 0.3)',
-            }}
-                onClick={() => navigate('/home')}
-                title="Home"
-            >
-                <Zap size={16} color="black" fill="black" />
-            </div>
 
             {/* ─── HOME (Heatmap/Screener Toggle) ─── */}
             <div
