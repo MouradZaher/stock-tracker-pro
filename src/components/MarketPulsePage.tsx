@@ -179,19 +179,21 @@ const MarketPulsePage: React.FC = () => {
                     )}
                 </div>
 
-                {/* Quick Shortcuts */}
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '3rem', opacity: 0.4 }}>
-                    {[
-                        { icon: Activity, label: 'MARKET SCAN' },
-                        { icon: PieChart, label: 'PORTFOLIO AUDIT' },
-                        { icon: Zap, label: 'QUANT SIGNALS' }
-                    ].map((item, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <item.icon size={12} />
-                            <span style={{ fontSize: '0.55rem', fontWeight: 900, letterSpacing: '0.05em' }}>{item.label}</span>
-                        </div>
-                    ))}
-                </div>
+                {/* Quick Shortcuts (Hidden when results are showing to prevent overlap) */}
+                {!results.length && (
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '3rem', opacity: 0.4 }}>
+                        {[
+                            { icon: Activity, label: 'MARKET SCAN' },
+                            { icon: PieChart, label: 'PORTFOLIO AUDIT' },
+                            { icon: Zap, label: 'QUANT SIGNALS' }
+                        ].map((item, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <item.icon size={12} />
+                                <span style={{ fontSize: '0.55rem', fontWeight: 900, letterSpacing: '0.05em' }}>{item.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
