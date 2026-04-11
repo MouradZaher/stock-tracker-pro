@@ -232,6 +232,7 @@ function MainLayout({
   // Listen for symbol query parameters (from legacy heatmap deep-linking)
   // Now redirects to the new persistent /stock/ route while preserving other params
   useEffect(() => {
+    if (location.pathname === '/pulse') return; // Allow /pulse to handle its own symbol params
     const params = new URLSearchParams(location.search);
     const symbolFromUrl = params.get('symbol');
     if (symbolFromUrl) {
@@ -239,7 +240,7 @@ function MainLayout({
       const search = params.toString();
       navigate(`/stock/${symbolFromUrl}${search ? `?${search}` : ''}`, { replace: true });
     }
-  }, [location.search, navigate]);
+  }, [location.search, navigate, location.pathname]);
 
   return (
     <div className="app" style={{ background: '#000000', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
