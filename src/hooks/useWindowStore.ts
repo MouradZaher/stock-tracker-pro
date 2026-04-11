@@ -24,8 +24,9 @@ interface WindowStore {
     activeWindow: WindowId | null;
     maxZIndex: number;
     isDraggingId: WindowId | null;
-    
+    snapTarget: 'TL' | 'TR' | 'BL' | 'BR' | 'SIDE' | null;
     setDraggingId: (id: WindowId | null) => void;
+    setSnapTarget: (target: 'TL' | 'TR' | 'BL' | 'BR' | 'SIDE' | null) => void;
     openWindow: (id: WindowId, title: string, x?: number, y?: number, w?: number, h?: number) => void;
     closeWindow: (id: WindowId) => void;
     toggleMinimize: (id: WindowId) => void;
@@ -47,7 +48,9 @@ export const useWindowStore = create<WindowStore>()(
             activeWindow: null,
             maxZIndex: 100,
             isDraggingId: null,
-
+            snapTarget: null,
+            
+            setSnapTarget: (target) => set({ snapTarget: target }),
             setDraggingId: (id) => set({ isDraggingId: id }),
 
             openWindow: (id, title, x = 100, y = 100, w = DEFAULT_WIDTH, h = DEFAULT_HEIGHT) => {

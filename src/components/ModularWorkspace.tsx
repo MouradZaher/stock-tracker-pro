@@ -18,7 +18,7 @@ interface ModularWorkspaceProps {
 }
 
 const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) => {
-    const { windows, openWindow, bringToFront, toggleMinimize, isDraggingId, snapToLayout } = useWindowStore();
+    const { windows, openWindow, bringToFront, toggleMinimize, isDraggingId, snapTarget, snapToLayout } = useWindowStore();
     const [isInitialized, setIsInitialized] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -66,6 +66,35 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             backgroundImage: 'radial-gradient(circle at 2px 2px, #080808 1px, transparent 0)',
             backgroundSize: '40px 40px'
         }}>
+            {/* SNAP GHOST / DROP ZONE PREVIEW */}
+            {isDraggingId && snapTarget && (
+                <div style={{
+                    position: 'absolute',
+                    zIndex: 2,
+                    pointerEvents: 'none',
+                    transition: 'all 0.1s ease-out',
+                    border: '2px solid rgba(74, 222, 128, 0.4)',
+                    background: 'rgba(74, 222, 128, 0.05)',
+                    boxShadow: '0 0 40px rgba(74, 222, 128, 0.1)',
+                    ...((() => {
+                        const sidebarWidth = 0; // Relative to ModularWorkspace
+                        const SIDE_WIDTH = 350;
+                        const availW = window.innerWidth - 48 - SIDE_WIDTH;
+                        const availH = window.innerHeight;
+                        const halfW = availW / 2;
+                        const halfH = availH / 2;
+
+                        switch (snapTarget) {
+                            case 'TL': return { left: 0, top: 0, width: halfW, height: halfH };
+                            case 'TR': return { left: halfW, top: 0, width: halfW, height: halfH };
+                            case 'BL': return { left: 0, top: halfH, width: halfW, height: halfH };
+                            case 'BR': return { left: halfW, top: halfH, width: halfW, height: halfH };
+                            case 'SIDE': return { right: 0, top: 0, width: SIDE_WIDTH, height: availH };
+                            default: return { display: 'none' };
+                        }
+                    })())
+                }} />
+            )}
             
             {/* GRID BACKGROUND / DROP ZONES */}
             <div style={{ position: 'absolute', inset: 0, opacity: isDraggingId ? 1 : 0, transition: 'opacity 0.2s', pointerEvents: 'none', zIndex: 1 }}>

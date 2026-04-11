@@ -17,7 +17,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     const { 
         windows, activeWindow, bringToFront, closeWindow, 
         toggleMinimize, toggleMaximize, updatePosition, updateSize, updateScale,
-        snapToLayout, setDraggingId 
+        snapToLayout, setDraggingId, setSnapTarget 
     } = useWindowStore();
     
     const windowState = windows[id];
@@ -33,16 +33,27 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (isDragging && !isMaximized && windowState) {
-                const sidebarWidth = 64;
-                const topBarsHeight = 28 + 48;
-                const bottomNavHeight = 60;
+                const sidebarWidth = 48;
                 
                 const availW = window.innerWidth - sidebarWidth;
-                const availH = window.innerHeight - topBarsHeight - bottomNavHeight;
+                const availH = window.innerHeight;
 
                 const nx = e.clientX - dragOffset.x;
                 const ny = e.clientY - dragOffset.y;
                 
+                // Live Snap Target Detection for Ghosting
+                const SIDE_PANEL_WIDTH = 350;
+                const gridAreaWidth = availW - SIDE_PANEL_WIDTH;
+                const relativeX = e.clientX - sidebarWidth;
+
+                if (relativeX > gridAreaWidth) {
+                    setSnapTarget('SIDE');
+                } else {
+                    const isLeft = relativeX < (gridAreaWidth / 2);
+                    const isTop = e.clientY < (window.innerHeight / 2);
+                    setSnapTarget(isTop ? (isLeft ? 'TL' : 'TR') : (isLeft ? 'BL' : 'BR'));
+                }
+
                 // Strict Containment: Clamp within ModularWorkspace bounds
                 const clampedX = Math.max(0, Math.min(availW - windowState.w, nx));
                 const clampedY = Math.max(0, Math.min(availH - windowState.h, ny));
@@ -59,7 +70,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
         const handleMouseUp = (e: MouseEvent) => {
             if (isDragging && windowState) {
                 // Aggressive Snap Logic: Full-screen quadrant detection
-                const sidebarWidth = 64;
+                const sidebarWidth = 48;
                 const SIDE_PANEL_WIDTH = 350;
                 const availAreaWidth = window.innerWidth - sidebarWidth;
                 const gridAreaWidth = availAreaWidth - SIDE_PANEL_WIDTH;
@@ -82,6 +93,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             setIsDragging(false);
             setIsResizing(false);
             setDraggingId(null);
+            setSnapTarget(null);
         };
 
         if (isDragging || isResizing) {
@@ -101,11 +113,30 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     const handleMouseDown = (e: React.MouseEvent) => {
         bringToFront(id);
         if (e.button !== 0 || isMaximized) return;
+        
+        const PORTABLE_W = 400;
+        const PORTABLE_H = 300;
+        
+        // Detect if window is currently docked/large
+        const isSnapped = windowState.w > 600 || windowState.h > 500;
+        
+        if (isSnapped) {
+            // Un-dock and shrink to portable size for easy mobility
+            updateSize(id, PORTABLE_W, PORTABLE_H);
+            setDragOffset({
+                x: PORTABLE_W / 2,
+                y: 15 // Hold by the handle
+            });
+            // Approximate new position centered under mouse
+            updatePosition(id, e.clientX - 48 - (PORTABLE_W / 2), e.clientY - 15);
+        } else {
+            setDragOffset({
+                x: e.clientX - windowState.x,
+                y: e.clientY - windowState.y
+            });
+        }
+        
         setIsDragging(true);
-        setDragOffset({
-            x: e.clientX - windowState.x,
-            y: e.clientY - windowState.y
-        });
         setDraggingId(id);
     };
 
