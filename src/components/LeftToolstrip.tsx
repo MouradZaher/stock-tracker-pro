@@ -212,13 +212,12 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
 
             {/* ─── PRO UPGRADE (ALONE) ─── */}
             <div
-                style={iconStyle('pricing', '#facc15', isOnPricing)}
+                style={iconStyle('pricing', '#facc15', location.pathname === '/pricing')}
                 onMouseEnter={() => setHoveredIcon('pricing')}
                 onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => { navigate('/pricing'); soundService.playTap(); }}
-                title="Upgrade to Pro"
             >
-                <Star size={16} fill={isOnPricing ? "#facc15" : "none"} />
+                <Star size={16} fill={location.pathname === '/pricing' ? "#facc15" : "none"} />
                 {hoveredIcon === 'pricing' && <div style={{ ...tooltipStyle, color: '#facc15' }}>UPGRADE PRO</div>}
             </div>
 
