@@ -29,6 +29,13 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     // List of indices that definitely don't have FMP stock-images
     const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
 
+    // Egyptian Market (EGX) symbols often lack high-fidelity US-based logos
+    const isEGX = [
+        'SKPC', 'OLFI', 'BFF', 'AZG', 'BIN', 'CI30', 'BMM', 'ABUK', 'COMI', 'HRHO', 
+        'SWDY', 'FWRY', 'EKHO', 'ETEL', 'MFOT', 'HELI', 'ISPH', 'AMOC', 'TMGH', 
+        'ALCN', 'MICH', 'SIDP', 'KIMA', 'GBAS', 'PORT', 'AMER', 'MNHD', 'OCDI'
+    ].includes(cleanSymbol.toUpperCase());
+
     const logoSources: string[] = [];
 
     // 0. MANUAL OVERRIDES (Highest reliability for known issues)
@@ -55,7 +62,7 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     // 5. TwelveData (Global coverage)
     logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${cleanSymbol}.png`);
 
-    if (!cleanSymbol || isIndex || fallbackLevel >= logoSources.length) {
+    if (!cleanSymbol || isIndex || isEGX || fallbackLevel >= logoSources.length) {
         // Special styling for major indices
         let indexColor = 'var(--color-bg-elevated)';
         let indexLabel = cleanSymbol.substring(0, 2).toUpperCase();
