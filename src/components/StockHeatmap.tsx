@@ -209,7 +209,10 @@ const StockHeatmap: React.FC = () => {
                             }}
                         />
                     ) : (
-                        <InstitutionalHeatmapGrid />
+                        <InstitutionalHeatmapGrid 
+                            blockSize={blockSize}
+                            blockColor={blockColor}
+                        />
                     )}
                 </>
             )}
