@@ -5,7 +5,7 @@ import {
     Search, Brain, Shield, Bell, HelpCircle, Settings,
     Sun, Moon, LogOut, MessageSquare, Star, ChevronDown,
     LayoutGrid, Activity, Globe, Zap, Command, Tv, Calendar,
-    PieChart, Eye
+    PieChart, Eye, ShieldCheck
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -133,11 +133,22 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('pulse', undefined, isWindowOpen('pulse'), isWindowMinimized('pulse'))}
                 onMouseEnter={() => setHoveredIcon('pulse')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('pulse', 'Search Matrix'); soundService.playTap(); }}
+                onClick={() => { openWindow('pulse', 'Search Matrix'); navigate('/home'); soundService.playTap(); }}
             >
                 <Search size={16} />
                 {hoveredIcon === 'pulse' && !isWindowOpen('pulse') && <div style={tooltipStyle}>SEARCH ⌘K</div>}
                 {isWindowOpen('pulse') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
+            </div>
+
+            <div
+                style={iconStyle('recommendations', 'var(--color-accent)', isWindowOpen('recommendations'), isWindowMinimized('recommendations'))}
+                onMouseEnter={() => setHoveredIcon('recommendations')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { openWindow('recommendations', 'Institutional Intelligence'); navigate('/home'); soundService.playTap(); }}
+            >
+                <Brain size={16} />
+                {hoveredIcon === 'recommendations' && !isWindowOpen('recommendations') && <div style={tooltipStyle}>INTELLIGENCE</div>}
+                {isWindowOpen('recommendations') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
             </div>
 
             {separator}
@@ -147,7 +158,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('portfolio', '#10b981', isWindowOpen('portfolio'), isWindowMinimized('portfolio'))}
                 onMouseEnter={() => setHoveredIcon('portfolio')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('portfolio', 'Institutional Portfolio'); soundService.playTap(); }}
+                onClick={() => { openWindow('portfolio', 'Institutional Portfolio'); navigate('/home'); soundService.playTap(); }}
             >
                 <PieChart size={16} />
                 {hoveredIcon === 'portfolio' && !isWindowOpen('portfolio') && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
@@ -158,7 +169,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('watchlist', '#3b82f6', isWindowOpen('watchlist'), isWindowMinimized('watchlist'))}
                 onMouseEnter={() => setHoveredIcon('watchlist')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('watchlist', 'Active Watchlist'); soundService.playTap(); }}
+                onClick={() => { openWindow('watchlist', 'Active Watchlist'); navigate('/home'); soundService.playTap(); }}
             >
                 <Eye size={16} />
                 {hoveredIcon === 'watchlist' && !isWindowOpen('watchlist') && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
@@ -172,7 +183,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('calendar', '#f59e0b', isWindowOpen('calendar'), isWindowMinimized('calendar'))}
                 onMouseEnter={() => setHoveredIcon('calendar')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('calendar', 'Institutional Calendar'); soundService.playTap(); }}
+                onClick={() => { openWindow('calendar', 'Institutional Calendar'); navigate('/home'); soundService.playTap(); }}
             >
                 <Calendar size={16} />
                 {hoveredIcon === 'calendar' && !isWindowOpen('calendar') && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
@@ -183,11 +194,22 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={{ ...iconStyle('tv', '#ef4444', isWindowOpen('tv'), isWindowMinimized('tv')), position: 'relative' }}
                 onMouseEnter={() => setHoveredIcon('tv')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('tv', 'Intelligence Stream'); soundService.playTap(); }}
+                onClick={() => { openWindow('tv', 'Intelligence Stream'); navigate('/home'); soundService.playTap(); }}
             >
                 <Tv size={16} />
                 {isWindowOpen('tv') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#ef4444', borderRadius: '1px' }} />}
                 {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
+            </div>
+
+            <div
+                style={iconStyle('advisor', '#888', isWindowOpen('advisor'), isWindowMinimized('advisor'))}
+                onMouseEnter={() => setHoveredIcon('advisor')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { openWindow('advisor', 'Oracle Portfolio Audit'); navigate('/home'); soundService.playTap(); }}
+            >
+                <ShieldCheck size={16} />
+                {hoveredIcon === 'advisor' && !isWindowOpen('advisor') && <div style={tooltipStyle}>ADVISORY</div>}
+                {isWindowOpen('advisor') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#888', borderRadius: '1px' }} />}
             </div>
 
             <div

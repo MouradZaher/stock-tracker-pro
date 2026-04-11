@@ -340,10 +340,7 @@ function MainLayout({
             </div>
           </main>
 
-          {/* RIGHT ADVISORY ENGINE */}
-          <aside style={{ width: '300px', borderLeft: '1px solid #111', padding: '1.25rem', background: '#000', display: 'flex', flexDirection: 'column' }}>
-             <InstitutionalAdvisory />
-          </aside>
+          </main>
         </div>
       </ErrorBoundary>
     </div>

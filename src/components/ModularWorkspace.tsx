@@ -8,7 +8,9 @@ import WatchlistPage from './WatchlistPage';
 import LiveIntelligenceStreams from './LiveIntelligenceStreams';
 import CorporateActionsCalendar from './CorporateActionsCalendar';
 import MarketPulsePage from './MarketPulsePage';
-import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search } from 'lucide-react';
+import AIRecommendations from './AIRecommendations';
+import InstitutionalAdvisory from './InstitutionalAdvisory';
+import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, Brain, ShieldCheck } from 'lucide-react';
 
 const ModularWorkspace: React.FC = () => {
     const { windows, openWindow, bringToFront, toggleMinimize } = useWindowStore();
@@ -23,6 +25,12 @@ const ModularWorkspace: React.FC = () => {
             }
             if (!windows['screener']?.isOpen) {
                 openWindow('screener', 'Data Matrix Screener', 320, 120, 1024, 600);
+            }
+            if (!windows['advisor']?.isOpen) {
+                openWindow('advisor', 'Oracle Portfolio Audit', 1600, 40, 320, 800);
+            }
+            if (!windows['recommendations']?.isOpen) {
+                openWindow('recommendations', 'Institutional Intelligence', 80, 80, 800, 600);
             }
             setIsInitialized(true);
         }
@@ -77,6 +85,16 @@ const ModularWorkspace: React.FC = () => {
                 {/* 7. Search Window */}
                 <TerminalWindow id="pulse" title="Global Asset Identification" minW={600} minH={400}>
                     <MarketPulsePage />
+                </TerminalWindow>
+
+                {/* 8. Recommendations Window */}
+                <TerminalWindow id="recommendations" title="Institutional Intelligence" minW={600} minH={400}>
+                    <AIRecommendations />
+                </TerminalWindow>
+
+                {/* 9. Advisory Window */}
+                <TerminalWindow id="advisor" title="Oracle Portfolio Audit" minW={300} minH={400}>
+                    <InstitutionalAdvisory />
                 </TerminalWindow>
 
             </div>
