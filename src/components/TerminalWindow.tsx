@@ -33,9 +33,21 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (isDragging && !isMaximized && windowState) {
+                const sidebarWidth = 64;
+                const topBarsHeight = 28 + 48;
+                const bottomNavHeight = 60;
+                
+                const availW = window.innerWidth - sidebarWidth;
+                const availH = window.innerHeight - topBarsHeight - bottomNavHeight;
+
                 const nx = e.clientX - dragOffset.x;
                 const ny = e.clientY - dragOffset.y;
-                updatePosition(id, Math.max(0, nx), Math.max(0, ny));
+                
+                // Strict Containment: Clamp within ModularWorkspace bounds
+                const clampedX = Math.max(0, Math.min(availW - windowState.w, nx));
+                const clampedY = Math.max(0, Math.min(availH - windowState.h, ny));
+                
+                updatePosition(id, clampedX, clampedY);
             }
             if (isResizing && !isMaximized && windowState) {
                 const nw = isResizing === 'v' ? windowState.w : e.clientX - windowState.x;
@@ -46,18 +58,25 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
 
         const handleMouseUp = (e: MouseEvent) => {
             if (isDragging && windowState) {
-                // Snap detection logic
-                const PADDING = 100; // Snap threshold
-                const rightBoundary = window.innerWidth - 350 - 64 - 100;
+                // Aggressive Snap Logic: Full-screen quadrant detection
+                const sidebarWidth = 64;
+                const SIDE_PANEL_WIDTH = 350;
+                const availAreaWidth = window.innerWidth - sidebarWidth;
+                const gridAreaWidth = availAreaWidth - SIDE_PANEL_WIDTH;
                 
-                if (e.clientX > rightBoundary) {
+                const relativeX = e.clientX - sidebarWidth;
+                
+                if (relativeX > gridAreaWidth) {
                     snapToLayout(id, 'SIDE');
-                } else if (e.clientY < 150) {
-                    if (e.clientX < (window.innerWidth / 2)) snapToLayout(id, 'TL');
-                    else snapToLayout(id, 'TR');
-                } else if (e.clientY > (window.innerHeight - 200)) {
-                    if (e.clientX < (window.innerWidth / 2)) snapToLayout(id, 'BL');
-                    else snapToLayout(id, 'BR');
+                } else {
+                    const isLeft = relativeX < (gridAreaWidth / 2);
+                    const isTop = e.clientY < (window.innerHeight / 2);
+                    
+                    if (isTop) {
+                        snapToLayout(id, isLeft ? 'TL' : 'TR');
+                    } else {
+                        snapToLayout(id, isLeft ? 'BL' : 'BR');
+                    }
                 }
             }
             setIsDragging(false);
