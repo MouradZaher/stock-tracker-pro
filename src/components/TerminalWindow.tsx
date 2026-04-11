@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, ReactNode } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { X, Minus, Square, Minimize2, Maximize2, Move } from 'lucide-react';
 import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
 
