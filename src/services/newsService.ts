@@ -42,7 +42,7 @@ export const getStockNews = async (symbol: string, limit: number = 5): Promise<N
 
         setCachedData(cacheKey, news);
         return news;
-
+    } catch (error) {
         if (error instanceof Error && error.message !== 'No news items found') {
             console.warn(`⚠️ Failed to fetch news for ${symbol}, falling back to mocks:`, error);
         }
