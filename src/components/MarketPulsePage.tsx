@@ -6,7 +6,11 @@ import CompanyLogo from './CompanyLogo';
 import StockDetail from './StockDetail';
 import { soundService } from '../services/soundService';
 
-const MarketPulsePage: React.FC = () => {
+interface MarketPulsePageProps {
+    onSelectStock?: (symbol: string) => void;
+}
+
+const MarketPulsePage: React.FC<MarketPulsePageProps> = ({ onSelectStock }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const [query, setQuery] = useState('');
@@ -37,7 +41,11 @@ const MarketPulsePage: React.FC = () => {
     const handleSelect = (s: string) => {
         setQuery('');
         setResults([]);
-        navigate(`/pulse?symbol=${s}`);
+        if (onSelectStock) {
+            onSelectStock(s);
+        } else {
+            navigate(`/pulse?symbol=${s}`);
+        }
         soundService.playTap();
     };
 
