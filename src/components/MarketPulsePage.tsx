@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FileText, Calendar as CalendarIcon, Move, RefreshCw, Radio } from 'lucide-react';
 import { useMarket } from '../contexts/MarketContext';
 import { usePiPStore } from '../services/usePiPStore';
