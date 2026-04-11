@@ -9,9 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
-import MacroPulseHeader from './components/MacroPulseHeader';
 import OmniSearch from './components/OmniSearch';
-import WorldMonitorTabs from './components/WorldMonitorTabs';
 import InstitutionalAdvisory from './components/InstitutionalAdvisory';
 import LeftToolstrip from './components/LeftToolstrip';
 
@@ -34,7 +32,6 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 import AIChatWidget from './components/AIChatWidget';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
-import AdminDashboard from './components/AdminDashboard';
 import MobileNav from './components/MobileNav';
 import ARIAVoiceAssistant from './components/ARIAVoiceAssistant';
 import ThemeMoodManager from './components/ThemeMoodManager';
