@@ -6,7 +6,6 @@ import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { TabType } from './types';
 import ErrorBoundary from './components/ErrorBoundary';
-import Header from './components/Header';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
 import OmniSearch from './components/OmniSearch';
@@ -15,7 +14,6 @@ import LeftToolstrip from './components/LeftToolstrip';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
-import TopBar from './components/TopBar';
 import { PageSkeleton } from './components/LoadingSkeleton';
 import { MarketProvider } from './contexts/MarketContext';
 
@@ -29,13 +27,10 @@ const CorporateActionsCalendar = lazy(() => import('./components/CorporateAction
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 
-import AIChatWidget from './components/AIChatWidget';
 import WatchlistPage from './components/WatchlistPage';
 import MarketPulsePage from './components/MarketPulsePage';
 import MobileNav from './components/MobileNav';
-import ARIAVoiceAssistant from './components/ARIAVoiceAssistant';
 import ThemeMoodManager from './components/ThemeMoodManager';
-import FloatingStream from './components/FloatingStream';
 import { usePiPStore } from './services/usePiPStore';
 import { PinAuthProvider, usePinAuth } from './contexts/PinAuthContext';
 import { AuthProvider } from './contexts/AuthContext';

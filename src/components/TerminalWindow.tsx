@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { X, Minus, Square, Minimize2, Maximize2, Move } from 'lucide-react';
+import { X, Minus, Square, Minimize2 } from 'lucide-react';
 import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
 
 interface TerminalWindowProps {
@@ -29,11 +29,11 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
     if (!windowState?.isOpen) return null;
-    if (windowState.isMinimized) return null; // Handled by bottom bar
+    if (windowState.isMinimized) return null;
 
     const handleMouseDown = (e: React.MouseEvent) => {
         bringToFront(id);
-        if (e.button !== 0 || isMaximized) return; // Left click only, no drag if maximized
+        if (e.button !== 0 || isMaximized) return;
         setIsDragging(true);
         setDragOffset({
             x: e.clientX - windowState.x,
@@ -91,67 +91,65 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 height: isMaximized ? '100%' : `${windowState.h}px`,
                 zIndex: isMaximized ? 10000 : windowState.zIndex,
                 background: '#000',
-                border: isMaximized ? 'none' : `1px solid ${isFocused ? '#222' : '#111'}`,
-                borderRadius: isMaximized ? '0' : '8px',
+                border: isMaximized ? 'none' : `1px solid ${isFocused ? '#333' : '#1a1a1a'}`,
+                borderRadius: isMaximized ? '0' : '4px',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
-                boxShadow: isFocused && !isMaximized ? '0 10px 40px rgba(0,0,0,0.8)' : '0 4px 15px rgba(0,0,0,0.4)',
-                transition: isDragging || isResizing ? 'none' : 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: isFocused && !isMaximized ? '0 20px 50px rgba(0,0,0,0.9)' : '0 8px 30px rgba(0,0,0,0.6)',
+                transition: isDragging || isResizing ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
         >
-            {/* Header / Draggable Area */}
+            {/* Header / Draggable Area - STRICT WINDOWS STYLE */}
             <div
                 onMouseDown={handleMouseDown}
                 style={{
-                    height: '32px',
-                    background: isFocused ? '#0f0f0f' : '#050505',
-                    borderBottom: '1px solid #111',
+                    height: '28px',
+                    background: isFocused ? '#111' : '#0a0a0a',
+                    borderBottom: '1px solid #1a1a1a',
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '0 4px 0 12px',
+                    justifyContent: 'space-between',
                     cursor: isMaximized ? 'default' : 'grab',
                     userSelect: 'none',
-                    justifyContent: 'space-between'
+                    padding: '0 0 0 10px'
                 }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                    <span style={{ 
-                        fontSize: '0.65rem', 
-                        fontWeight: 900, 
-                        color: isFocused ? '#fff' : '#444', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.05em',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden'
-                    }}>
-                        {title}
-                    </span>
-                </div>
+                {/* TITLE LEFT */}
+                <span style={{ 
+                    fontSize: '0.62rem', 
+                    fontWeight: 900, 
+                    color: isFocused ? '#fff' : '#555', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.1em',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    pointerEvents: 'none'
+                }}>
+                    {title}
+                </span>
                 
-                <div style={{ display: 'flex', height: '100%' }}>
+                {/* CONTROLS RIGHT */}
+                <div style={{ display: 'flex', height: '100%', alignItems: 'stretch' }}>
                     <button 
                         onClick={(e) => { e.stopPropagation(); toggleMinimize(id); }}
                         className="window-control-btn"
                         style={controlButtonStyle}
-                        title="Minimize"
                     >
-                        <Minus size={14} />
+                        <Minus size={13} />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); toggleMaximize(id); }}
                         className="window-control-btn"
                         style={controlButtonStyle}
-                        title={isMaximized ? "Restore" : "Maximize"}
                     >
-                        {isMaximized ? <Minimize2 size={12} /> : <Square size={12} />}
+                        {isMaximized ? <Minimize2 size={12} /> : <Square size={11} />}
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
                         className="window-control-btn close"
-                        style={{ ...controlButtonStyle, ...closeButtonStyle }}
-                        title="Close"
+                        style={closeButtonStyle}
                     >
                         <X size={14} />
                     </button>
@@ -159,7 +157,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             </div>
 
             {/* Window Content */}
-            <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#000' }}>
                 {children}
             </div>
 
@@ -171,11 +169,11 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                         position: 'absolute',
                         bottom: 0,
                         right: 0,
-                        width: '12px',
-                        height: '12px',
+                        width: '10px',
+                        height: '10px',
                         cursor: 'nwse-resize',
                         zIndex: 10,
-                        background: 'linear-gradient(135deg, transparent 50%, #222 50%)'
+                        background: 'linear-gradient(135deg, transparent 6px, #333 6px)'
                     }}
                 />
             )}
@@ -184,8 +182,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
 };
 
 const controlButtonStyle: React.CSSProperties = {
-    width: '40px',
-    height: '100%',
+    width: '36px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -193,12 +190,11 @@ const controlButtonStyle: React.CSSProperties = {
     border: 'none',
     color: '#666',
     cursor: 'pointer',
-    transition: 'all 0.15s ease'
+    transition: 'all 0.1s'
 };
 
 const closeButtonStyle: React.CSSProperties = {
-    // Standard Windows close button style
-    // Hover is handled by .style or pure CSS in index.css
+    ...controlButtonStyle,
 };
 
 export default TerminalWindow;
