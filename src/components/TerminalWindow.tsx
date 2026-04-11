@@ -199,6 +199,5 @@ const closeButtonStyle: React.CSSProperties = {
     // Standard Windows close button style
     // Hover is handled by .style or pure CSS in index.css
 };
-};
 
 export default TerminalWindow;
