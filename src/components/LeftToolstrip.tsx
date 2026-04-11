@@ -110,10 +110,10 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 onMouseEnter={() => setHoveredIcon('search')}
                 onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => { navigate('/pulse'); soundService.playTap(); }}
-                title="Intelligence Hub (Search)"
+                title="Search Hub"
             >
                 <Search size={16} />
-                {hoveredIcon === 'search' && <div style={tooltipStyle}>INTELLIGENCE ⌘K</div>}
+                {hoveredIcon === 'search' && <div style={tooltipStyle}>SEARCH ⌘K</div>}
             </div>
 
             {separator}

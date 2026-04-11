@@ -223,9 +223,8 @@ function MainLayout({
 
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
-    // Explicitly pass current tab as 'from' context
-    const currentTab = activeTab || 'home';
-    navigate(`/stock/${symbol}?from=${currentTab}`);
+    navigate(`/pulse?symbol=${symbol}`);
+    setIsOmniSearchOpen(false);
   };
 
 

@@ -124,11 +124,14 @@ const LiveStreamsPlayer: React.FC<{ streams: typeof MARKET_STREAMS }> = ({ strea
 const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
     const { setPiPActive, activeStream } = usePiPStore();
     const { effectiveMarket } = useMarket();
+    const location = useLocation();
     const newsContainerRef = useRef<HTMLDivElement>(null);
     const eventsContainerRef = useRef<HTMLDivElement>(null);
     const [activeTab, setActiveTab] = useState<'streams' | 'news' | 'events'>('streams');
-
     const [newsMode, setNewsMode] = useState<'company' | 'world'>('company');
+
+    const params = new URLSearchParams(location.search);
+    const symbol = params.get('symbol');
 
     // Reset PiP when directly viewing this page
     useEffect(() => {
@@ -159,12 +162,12 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
         script.type = 'text/javascript';
         script.async = true;
         
-        // Map market to specific symbols or headlines
-        const marketSymbols = effectiveMarket.id === 'us' ? [] : effectiveMarket.id === 'egypt' ? ["EGX:EGX30", "EGX:COMI", "EGX:EAST"] : ["ADX:ADI", "ADX:IHC", "ADX:FAB"];
+        // Map market or use search symbol
+        let marketSymbols = symbol ? [symbol] : (effectiveMarket.id === 'us' ? [] : effectiveMarket.id === 'egypt' ? ["EGX:EGX30", "EGX:COMI"] : ["ADX:ADI", "ADX:IHC"]);
         
         script.innerHTML = JSON.stringify({
-            "feedMode": newsMode === 'company' ? "all_symbols" : "headlines",
-            "symbols": newsMode === 'company' ? marketSymbols : [],
+            "feedMode": symbol ? "all_symbols" : (newsMode === 'company' ? "all_symbols" : "headlines"),
+            "symbols": marketSymbols,
             "isTransparent": true,
             "displayMode": "regular",
             "width": "100%",
@@ -174,7 +177,7 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
             "importanceFilter": "-1,0,1"
         });
         newsContainerRef.current.appendChild(script);
-    }, [effectiveMarket.id, newsMode]);
+    }, [effectiveMarket.id, newsMode, symbol]);
 
     // Load TradingView Events Calendar Widget
     useEffect(() => {
@@ -201,16 +204,26 @@ const MarketPulsePage: React.FC<MarketPulsePageProps> = () => {
             "locale": "en",
             "importanceFilter": "-1,0,1",
             "currencyFilter": curFilter,
+            "symbol": symbol || undefined,
             "eventTypes": "earnings,dividends,splits,mergers,spinoffs,holidays"
         });
         eventsContainerRef.current.appendChild(script);
-    }, [effectiveMarket.id]);
+    }, [effectiveMarket.id, symbol]);
 
     return (
         <div className="tab-content dashboard-viewport" style={{ 
             padding: 0,
-            gap: 0
+            gap: 0,
+            background: '#000'
         }}>
+            {/* SEARCH HEADER IF SYMBOL ACTIVE */}
+            {symbol && (
+                <div style={{ padding: '0.75rem 1.5rem', background: 'rgba(74, 222, 128, 0.05)', borderBottom: '1px solid rgba(74, 222, 128, 0.1)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>ACTIVE SEARCH:</div>
+                    <div style={{ fontSize: '1rem', fontWeight: 900, color: 'white' }}>{symbol}</div>
+                </div>
+            )}
+
             {/* Unified Sub-Navbar */}
             <SubNavbar 
                 activeTab={activeTab}
