@@ -34,19 +34,19 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             const currentWindows = useWindowStore.getState().windows;
             
             // Adjust initial sizes for mobile vs desktop grid
-            if (!currentWindows['heatmap']) {
+            if (!currentWindows['heatmap'] || !currentWindows['heatmap'].isOpen) {
                 openWindow('heatmap', 'Institutional Heatmap');
                 if (!isMobile) snapToLayout('heatmap', 'TL');
             }
-            if (!currentWindows['screener']) {
+            if (!currentWindows['screener'] || !currentWindows['screener'].isOpen) {
                 openWindow('screener', 'Data Matrix Screener');
                 if (!isMobile) snapToLayout('screener', 'BL');
             }
-            if (!currentWindows['advisor']) {
+            if (!currentWindows['advisor'] || !currentWindows['advisor'].isOpen) {
                 openWindow('advisor', 'Oracle Portfolio Audit');
                 if (!isMobile) snapToLayout('advisor', 'SIDE');
             }
-            if (!currentWindows['recommendations']) {
+            if (!currentWindows['recommendations'] || !currentWindows['recommendations'].isOpen) {
                 openWindow('recommendations', 'Institutional Intelligence');
                 if (!isMobile) snapToLayout('recommendations', 'TR');
             }
@@ -69,19 +69,19 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             
             {/* GRID BACKGROUND / DROP ZONES */}
             <div style={{ position: 'absolute', inset: 0, opacity: isDraggingId ? 1 : 0, transition: 'opacity 0.2s', pointerEvents: 'none', zIndex: 1 }}>
-                <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '350px', background: 'rgba(74, 222, 128, 0.05)', borderLeft: '1px solid rgba(74, 222, 128, 0.2)' }} />
-                <div style={{ position: 'absolute', top: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', borderBottom: '1px solid #111', display: 'flex' }}>
-                    <div style={{ flex: 1, borderRight: '1px solid #111' }} />
+                <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '350px', background: 'rgba(74, 222, 128, 0.03)', borderLeft: '1px solid rgba(74, 222, 128, 0.1)' }} />
+                <div style={{ position: 'absolute', top: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex' }}>
+                    <div style={{ flex: 1, borderRight: '1px solid rgba(255,255,255,0.05)' }} />
                     <div style={{ flex: 1 }} />
                 </div>
                 <div style={{ position: 'absolute', bottom: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', display: 'flex' }}>
-                    <div style={{ flex: 1, borderRight: '1px solid #111' }} />
+                    <div style={{ flex: 1, borderRight: '1px solid rgba(255,255,255,0.05)' }} />
                     <div style={{ flex: 1 }} />
                 </div>
             </div>
             
             {/* THE WORKSPACE (DESKTOP) */}
-            <div style={{ position: 'absolute', inset: 0, padding: isMobile ? '0' : '20px' }}>
+            <div style={{ position: 'absolute', inset: 0, padding: 0 }}>
                 
                 {/* 1. Heatmap Window */}
                 <TerminalWindow id="heatmap" title="Institutional Heatmap" minW={350} minH={300}>

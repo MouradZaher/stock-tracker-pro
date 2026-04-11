@@ -8,6 +8,7 @@ import HeatmapMobileFallback from './HeatmapMobileFallback';
 const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [error, setError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [retryKey, setRetryKey] = useState(0);
     const [sentiment, setSentiment] = useState<{ score: number; label: string; count: number } | null>(null);
     const { theme } = useTheme();
@@ -95,7 +96,10 @@ const StockHeatmap: React.FC = () => {
 
         // iOS needs extra time for layout to settle; desktop 200ms is fine
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-        const timer = setTimeout(initWidget, isIOS ? 700 : 200);
+        const timer = setTimeout(() => {
+            initWidget();
+            setIsLoading(false);
+        }, isIOS ? 700 : 400);
 
         return () => {
             clearTimeout(timer);
@@ -129,6 +133,22 @@ const StockHeatmap: React.FC = () => {
                 </div>
             ) : (
                 <>
+                    {isLoading && (
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: '#000',
+                            zIndex: 10,
+                            gap: '12px'
+                        }}>
+                            <Activity size={24} className="text-primary animate-pulse" />
+                            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>INITIALIZING MARKET MAP...</span>
+                        </div>
+                    )}
                     <div
                         className="tradingview-widget-container"
                         ref={containerRef}

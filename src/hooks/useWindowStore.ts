@@ -178,10 +178,12 @@ export const useWindowStore = create<WindowStore>()(
                 if (!win) return;
 
                 const SIDE_WIDTH = 350;
-                const PADDING = 20;
+                const sidebarWidth = 64;
                 const topBarHeight = 28 + 48; // topbar + header roughly
-                const availW = window.innerWidth - 64 - PADDING * 2 - SIDE_WIDTH; // 64 is sidebar
-                const availH = window.innerHeight - topBarHeight - 60 - PADDING * 2; // 60 is nav
+                const bottomNavHeight = 60;
+                
+                const availW = window.innerWidth - sidebarWidth - SIDE_WIDTH;
+                const availH = window.innerHeight - topBarHeight - bottomNavHeight;
                 
                 const halfW = availW / 2;
                 const halfH = availH / 2;
@@ -189,12 +191,12 @@ export const useWindowStore = create<WindowStore>()(
                 let next = { x: win.x, y: win.y, w: win.w, h: win.h };
 
                 switch (layout) {
-                    case 'TL': next = { x: PADDING, y: PADDING, w: halfW - 10, h: halfH - 10 }; break;
-                    case 'TR': next = { x: PADDING + halfW + 10, y: PADDING, w: halfW - 10, h: halfH - 10 }; break;
-                    case 'BL': next = { x: PADDING, y: PADDING + halfH + 10, w: halfW - 10, h: halfH - 10 }; break;
-                    case 'BR': next = { x: PADDING + halfW + 10, y: PADDING + halfH + 10, w: halfW - 10, h: halfH - 10 }; break;
-                    case 'SIDE': next = { x: window.innerWidth - 64 - SIDE_WIDTH - PADDING, y: PADDING, w: SIDE_WIDTH, h: availH + PADDING }; break;
-                    case 'FULL': next = { x: PADDING, y: PADDING, w: availW + SIDE_WIDTH, h: availH + PADDING }; break;
+                    case 'TL': next = { x: 0, y: 0, w: halfW, h: halfH }; break;
+                    case 'TR': next = { x: halfW, y: 0, w: halfW, h: halfH }; break;
+                    case 'BL': next = { x: 0, y: halfH, w: halfW, h: halfH }; break;
+                    case 'BR': next = { x: halfW, y: halfH, w: halfW, h: halfH }; break;
+                    case 'SIDE': next = { x: availW, y: 0, w: SIDE_WIDTH, h: availH }; break;
+                    case 'FULL': next = { x: 0, y: 0, w: availW + SIDE_WIDTH, h: availH }; break;
                 }
 
                 set({
