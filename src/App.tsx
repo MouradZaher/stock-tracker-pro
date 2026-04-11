@@ -26,6 +26,7 @@ const Portfolio = lazy(() => import('./components/Portfolio'));
 const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
 const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioIntelligencePanel'));
 const PricingPage = lazy(() => import('./components/PricingPage'));
+const LiveIntelligenceStreams = lazy(() => import('./components/LiveIntelligenceStreams'));
 
 
 import AIChatWidget from './components/AIChatWidget';
@@ -312,6 +313,15 @@ function MainLayout({
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <PricingPage />
+                    </Suspense>
+                  </ErrorBoundary>
+                </div>
+              } />
+              <Route path="/tv" element={
+                <div className="tab-content" style={{ padding: '1rem', height: '100%', overflowY: 'auto' }}>
+                  <ErrorBoundary>
+                    <Suspense fallback={<PageSkeleton />}>
+                      <LiveIntelligenceStreams />
                     </Suspense>
                   </ErrorBoundary>
                 </div>

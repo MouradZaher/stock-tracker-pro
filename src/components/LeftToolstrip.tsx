@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Search, Brain, Shield, Bell, HelpCircle, Settings,
     Sun, Moon, LogOut, MessageSquare, Star, ChevronDown,
-    LayoutGrid, Activity, Globe, Zap, Command
+    LayoutGrid, Activity, Globe, Zap, Command, Tv
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -28,15 +28,20 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
     const { selectedMarket, setMarket, favoriteMarketId, setFavoriteMarket, homeView, setHomeView, favoriteHomeView, setFavoriteHomeView } = useMarket();
     const { unreadCount, markAllAsRead } = useNotifications();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [isMarketOpen, setIsMarketOpen] = useState(false);
-    const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+    const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
     const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
     const marketBtnRef = useRef<HTMLDivElement>(null);
+    const homeBtnRef = useRef<HTMLDivElement>(null);
 
-    const iconStyle = (id: string, color?: string): React.CSSProperties => ({
+    const isOnHome = location.pathname.startsWith('/home');
+    const isOnTV = location.pathname === '/tv';
+
+    const iconStyle = (id: string, color?: string, isActive?: boolean): React.CSSProperties => ({
         cursor: 'pointer',
-        color: hoveredIcon === id ? (color || 'var(--color-accent)') : '#444',
+        color: isActive ? (color || 'var(--color-accent)') : hoveredIcon === id ? (color || 'var(--color-accent)') : '#444',
         transition: 'all 0.2s ease',
         position: 'relative',
         display: 'flex',
@@ -45,7 +50,8 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
         width: '36px',
         height: '36px',
         borderRadius: '6px',
-        background: hoveredIcon === id ? 'rgba(255,255,255,0.04)' : 'transparent',
+        background: isActive ? 'rgba(74, 222, 128, 0.08)' : hoveredIcon === id ? 'rgba(255,255,255,0.04)' : 'transparent',
+        border: isActive ? '1px solid rgba(74, 222, 128, 0.2)' : '1px solid transparent',
     });
 
     const tooltipStyle: React.CSSProperties = {
@@ -81,12 +87,115 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 width: '32px', height: '32px', borderRadius: '8px',
                 background: 'linear-gradient(135deg, var(--color-accent), #22c55e)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '0.75rem', cursor: 'pointer',
+                marginBottom: '0.5rem', cursor: 'pointer',
+                boxShadow: '0 0 12px rgba(74, 222, 128, 0.3)',
             }}
                 onClick={() => navigate('/home')}
                 title="Home"
             >
                 <Zap size={16} color="black" fill="black" />
+            </div>
+
+            {/* ─── HOME (Heatmap/Screener Toggle) ─── */}
+            <div
+                ref={homeBtnRef}
+                style={{ ...iconStyle('home', undefined, isOnHome), position: 'relative' }}
+                onMouseEnter={() => setHoveredIcon('home')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { setIsHomeMenuOpen(!isHomeMenuOpen); soundService.playTap(); }}
+                title="Monitor View"
+            >
+                {homeView === 'heatmap' ? <LayoutGrid size={16} /> : <Activity size={16} />}
+                {/* Pulsing dot to indicate active view */}
+                <div style={{
+                    position: 'absolute', bottom: '2px', right: '2px',
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: isOnHome ? 'var(--color-accent)' : '#333',
+                    boxShadow: isOnHome ? '0 0 6px var(--color-accent)' : 'none',
+                    animation: isOnHome ? 'homePulse 2s infinite' : 'none',
+                }} />
+                {hoveredIcon === 'home' && <div style={tooltipStyle}>{homeView === 'heatmap' ? 'HEATMAP' : 'SCREENER'}</div>}
+            </div>
+
+            {/* Home View Flyout */}
+            {isHomeMenuOpen && ReactDOM.createPortal(
+                <>
+                    <div onClick={() => setIsHomeMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
+                    <div style={{
+                        position: 'fixed', top: '128px', left: '56px', zIndex: 9999,
+                        background: '#0a0a0a', border: '1px solid #222',
+                        padding: '0.5rem', minWidth: '180px',
+                    }}>
+                        <div style={{ padding: '0.35rem 0.75rem 0.25rem', fontSize: '0.55rem', color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900 }}>
+                            MONITOR VIEW
+                        </div>
+                        {[
+                            { id: 'heatmap', label: 'HEATMAP', Icon: LayoutGrid, desc: 'S&P 100 Sector Grid' },
+                            { id: 'screener', label: 'SCREENER', Icon: Activity, desc: 'Institutional Data Matrix' }
+                        ].map(v => (
+                            <button key={v.id} onClick={() => {
+                                setHomeView(v.id as any);
+                                navigate(`/home/${v.id}`);
+                                setIsHomeMenuOpen(false);
+                                soundService.playTap();
+                            }} style={{
+                                display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                padding: '0.55rem 0.75rem', width: '100%',
+                                background: homeView === v.id ? 'rgba(74, 222, 128, 0.08)' : 'transparent',
+                                border: homeView === v.id ? '1px solid rgba(74, 222, 128, 0.2)' : '1px solid transparent',
+                                cursor: 'pointer', textAlign: 'left', color: 'inherit', font: 'inherit',
+                            }}>
+                                <v.Icon size={14} color={homeView === v.id ? 'var(--color-accent)' : '#555'} />
+                                <div>
+                                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: homeView === v.id ? 'var(--color-accent)' : 'white' }}>{v.label}</div>
+                                    <div style={{ fontSize: '0.5rem', color: '#444' }}>{v.desc}</div>
+                                </div>
+                                {homeView === v.id && <div style={{ marginLeft: 'auto', width: '5px', height: '5px', borderRadius: '50%', background: 'var(--color-accent)', boxShadow: '0 0 6px var(--color-accent)' }} />}
+                            </button>
+                        ))}
+                        <div style={{ borderTop: '1px solid #222', margin: '0.35rem 0' }} />
+                        <div style={{ padding: '0.25rem 0.75rem', fontSize: '0.5rem', color: '#333' }}>
+                            ★ SET DEFAULT VIEW
+                        </div>
+                        <div style={{ display: 'flex', gap: '4px', padding: '0 0.75rem 0.25rem' }}>
+                            {['heatmap', 'screener'].map(v => (
+                                <button key={v} onClick={() => {
+                                    setFavoriteHomeView(v as any);
+                                    soundService.playTap();
+                                }} style={{
+                                    fontSize: '0.5rem', fontWeight: 800, padding: '2px 6px',
+                                    background: favoriteHomeView === v ? 'rgba(250, 204, 21, 0.1)' : 'transparent',
+                                    border: favoriteHomeView === v ? '1px solid rgba(250, 204, 21, 0.3)' : '1px solid #222',
+                                    color: favoriteHomeView === v ? '#facc15' : '#444',
+                                    cursor: 'pointer',
+                                }}>
+                                    {v.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </>,
+                document.body
+            )}
+
+            {/* ─── TV / LIVE STREAMS ─── */}
+            <div
+                style={{ ...iconStyle('tv', '#ef4444', isOnTV), position: 'relative' }}
+                onMouseEnter={() => setHoveredIcon('tv')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/tv'); soundService.playTap(); }}
+                title="Live TV Streams"
+            >
+                <Tv size={16} />
+                {/* Live pulse dot */}
+                <div style={{
+                    position: 'absolute', top: '3px', right: '3px',
+                    width: '5px', height: '5px', borderRadius: '50%',
+                    background: '#ef4444',
+                    boxShadow: '0 0 6px #ef4444',
+                    animation: 'homePulse 1.5s infinite',
+                }} />
+                {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
             </div>
 
             {/* ─── SEARCH (Ctrl+K) ─── */}
@@ -119,7 +228,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 <>
                     <div onClick={() => setIsMarketOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
                     <div style={{
-                        position: 'fixed', top: '120px', left: '56px', zIndex: 9999,
+                        position: 'fixed', top: '210px', left: '56px', zIndex: 9999,
                         background: '#0a0a0a', border: '1px solid #222',
                         padding: '0.5rem', minWidth: '220px',
                     }}>
@@ -155,41 +264,6 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                                 </button>
                             </button>
                         ))}
-
-                        {/* View Toggle */}
-                        <div style={{ borderTop: '1px solid #222', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
-                            <div style={{ padding: '0.25rem 0.75rem', fontSize: '0.55rem', color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900, marginBottom: '4px' }}>
-                                DEFAULT VIEW
-                            </div>
-                            {[{ id: 'heatmap', label: 'HEATMAP', Icon: LayoutGrid }, { id: 'screener', label: 'SCREENER', Icon: Activity }].map(v => (
-                                <div key={v.id} style={{ display: 'flex', alignItems: 'center' }}>
-                                    <button onClick={() => {
-                                        setHomeView(v.id as any);
-                                        navigate(`/home/${v.id}`);
-                                        setIsMarketOpen(false);
-                                        soundService.playTap();
-                                    }} style={{
-                                        flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                        padding: '0.5rem 0.75rem',
-                                        background: homeView === v.id ? 'rgba(255,255,255,0.04)' : 'transparent',
-                                        border: '1px solid transparent', cursor: 'pointer', textAlign: 'left',
-                                        color: homeView === v.id ? 'white' : '#555', font: 'inherit',
-                                    }}>
-                                        <v.Icon size={12} />
-                                        <span style={{ fontSize: '0.65rem', fontWeight: 800 }}>{v.label}</span>
-                                        {homeView === v.id && <div style={{ marginLeft: 'auto', width: '4px', height: '4px', borderRadius: '50%', background: 'var(--color-accent)' }} />}
-                                    </button>
-                                    <button onClick={(e) => {
-                                        e.stopPropagation();
-                                        setFavoriteHomeView(v.id as any);
-                                        navigate(`/home/${v.id}`);
-                                        setIsMarketOpen(false);
-                                    }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '6px' }}>
-                                        <Star size={10} color={favoriteHomeView === v.id ? '#facc15' : '#333'} fill={favoriteHomeView === v.id ? '#facc15' : 'none'} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
                     </div>
                 </>,
                 document.body
@@ -294,6 +368,13 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 <LogOut size={16} />
                 {hoveredIcon === 'logout' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>SIGN OUT</div>}
             </div>
+
+            <style>{`
+                @keyframes homePulse {
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.4; transform: scale(1.4); }
+                }
+            `}</style>
         </aside>
     );
 };

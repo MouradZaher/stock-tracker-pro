@@ -7,8 +7,7 @@ interface WorldMonitorTabsProps {
 }
 
 const TABS: { id: TabType; label: string }[] = [
-    { id: 'home', label: 'MONITOR' },
-    { id: 'pulse', label: 'HEATMAP' },
+    { id: 'pulse', label: 'PULSE' },
     { id: 'recommendations', label: 'ORACLE AI' },
     { id: 'portfolio', label: 'PORTFOLIO' },
     { id: 'watchlist', label: 'WATCHLIST' },
