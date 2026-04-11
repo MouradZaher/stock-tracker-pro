@@ -15,6 +15,7 @@ export interface Market {
     currencyLocale: string;     // BCP47 locale for Intl.NumberFormat
     heatmapDataSource: string;  // TradingView heatmap dataSource id
     heatmapExchanges: string[]; // TradingView exchanges filter (empty = all)
+    hasHeatmapSupport: boolean;
     color: string;
 }
 
@@ -32,6 +33,7 @@ export const MARKETS: Market[] = [
         currencyLocale: 'en-US',
         heatmapDataSource: 'SPX500',
         heatmapExchanges: [],
+        hasHeatmapSupport: true,
         color: '#6366f1',
     },
     {
@@ -47,6 +49,7 @@ export const MARKETS: Market[] = [
         currencyLocale: 'ar-EG',
         heatmapDataSource: 'EGXEGX30',
         heatmapExchanges: [],
+        hasHeatmapSupport: false,
         color: '#f59e0b',
     },
     {
@@ -62,6 +65,7 @@ export const MARKETS: Market[] = [
         currencyLocale: 'ar-AE',
         heatmapDataSource: 'ADXFADX15',
         heatmapExchanges: [],
+        hasHeatmapSupport: false,
         color: '#10b981',
     },
 ];

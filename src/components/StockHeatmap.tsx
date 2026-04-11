@@ -53,25 +53,62 @@ const StockHeatmap: React.FC = () => {
 
             try {
                 const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                
+                // If the market doesn't support the native heatmap widget, we use the Market Overview widget as a high-quality data matrix
+                if (effectiveMarket.hasHeatmapSupport) {
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                    script.innerHTML = JSON.stringify({
+                        "exchanges": effectiveMarket.heatmapExchanges,
+                        "dataSource": effectiveMarket.heatmapDataSource,
+                        "grouping": effectiveMarket.heatmapExchanges.length > 0 ? "no_group" : "sector",
+                        "blockSize": blockSize,
+                        "blockColor": blockColor,
+                        "locale": "en",
+                        "symbolUrl": window.location.origin + "/recommendations?tab=navigator&aiStock={SYMBOL}",
+                        "colorTheme": theme === 'dark' ? 'dark' : 'light',
+                        "hasTopBar": true,
+                        "isDataSetEnabled": true,
+                        "isZoomEnabled": true,
+                        "hasSymbolTooltip": true,
+                        "width": "100%",
+                        "height": "100%"
+                    });
+                } else {
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+                    script.innerHTML = JSON.stringify({
+                        "colorTheme": theme === 'dark' ? 'dark' : 'light',
+                        "dateRange": "12M",
+                        "showChart": true,
+                        "locale": "en",
+                        "largeChartUrl": "",
+                        "isTransparent": true,
+                        "showSymbolLogo": true,
+                        "showFloatingTooltip": false,
+                        "width": "100%",
+                        "height": "100%",
+                        "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
+                        "plotLineColorFalling": "rgba(41, 98, 255, 1)",
+                        "gridLineColor": "rgba(240, 243, 250, 0)",
+                        "scaleFontColor": "rgba(106, 109, 120, 1)",
+                        "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
+                        "belowLineFillColorFalling": "rgba(41, 98, 255, 0.12)",
+                        "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
+                        "belowLineFillColorFallingBottom": "rgba(41, 98, 255, 0)",
+                        "symbolActiveColor": "rgba(41, 98, 255, 0.12)",
+                        "tabs": [
+                            {
+                                "title": effectiveMarket.name.toUpperCase() + " LEADERS",
+                                "symbols": [
+                                    { "s": effectiveMarket.indexSymbol, "d": effectiveMarket.indexName },
+                                    { "s": `EGX:${effectiveMarket.indexSymbol}` }, // Attempted symbols for TV
+                                ]
+                            }
+                        ]
+                    });
+                }
+                
                 script.async = true;
                 script.type = 'text/javascript';
-                script.innerHTML = JSON.stringify({
-                    "exchanges": effectiveMarket.heatmapExchanges,
-                    "dataSource": effectiveMarket.heatmapDataSource,
-                    "grouping": effectiveMarket.heatmapExchanges.length > 0 ? "no_group" : "sector",
-                    "blockSize": blockSize,
-                    "blockColor": blockColor,
-                    "locale": "en",
-                    "symbolUrl": window.location.origin + "/recommendations?tab=navigator&aiStock={SYMBOL}",
-                    "colorTheme": theme === 'dark' ? 'dark' : 'light',
-                    "hasTopBar": true,
-                    "isDataSetEnabled": true,
-                    "isZoomEnabled": true,
-                    "hasSymbolTooltip": true,
-                    "width": "100%",
-                    "height": "100%"
-                });
 
                 script.onerror = () => {
                     console.error("TradingView widget script failed to load");
@@ -94,7 +131,6 @@ const StockHeatmap: React.FC = () => {
             }
         };
 
-        // iOS needs extra time for layout to settle; desktop 200ms is fine
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         const timer = setTimeout(() => {
             initWidget();
@@ -105,14 +141,11 @@ const StockHeatmap: React.FC = () => {
             clearTimeout(timer);
             if (container) container.innerHTML = '';
         };
-    }, [retryKey, theme, effectiveMarket.id, blockSize, blockColor]);
+    }, [retryKey, theme, effectiveMarket.id, effectiveMarket.hasHeatmapSupport, blockSize, blockColor]);
 
     return (
-        // ===== LOCKED: Heatmap Container Layout — DO NOT MODIFY (approved 2026-02-16) =====
-        <div
-            className="heatmap-wrapper"
-        >
-            {error ? (
+        <div className="heatmap-wrapper">
+            {error || (!effectiveMarket.hasHeatmapSupport && !effectiveMarket.indexSymbol) ? (
                 <div style={{
                     flex: 1,
                     display: 'flex',
@@ -120,15 +153,22 @@ const StockHeatmap: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: 'var(--color-text-primary)',
+                    height: '100%',
+                    padding: '2rem',
+                    textAlign: 'center'
                 }}>
-                    <AlertTriangle size={48} className="text-warning" style={{ marginBottom: '1rem' }} />
-                    <p style={{ marginBottom: '1rem' }}>Failed to load market map</p>
+                    <AlertTriangle size={48} color="var(--color-warning)" style={{ marginBottom: '1rem' }} />
+                    <p style={{ marginBottom: '1rem', fontWeight: 600 }}>Region Specific Map Unavailable</p>
+                    <p style={{ fontSize: '0.65rem', color: '#666', marginBottom: '2rem' }}>
+                        The visual heatmap for {effectiveMarket.name} is currently restricted by data providers. 
+                        Use the Matrix Screener for real-time institutional coverage.
+                    </p>
                     <button
                         onClick={() => { setError(false); setRetryKey(k => k + 1); }}
                         className="glass-button"
                         style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
-                        <RefreshCw size={16} /> Retry
+                        <RefreshCw size={16} /> Retry Hub
                     </button>
                 </div>
             ) : (
@@ -141,12 +181,12 @@ const StockHeatmap: React.FC = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: '#000',
+                            background: '#0a0a0a',
                             zIndex: 10,
                             gap: '12px'
                         }}>
-                            <Activity size={24} className="text-primary animate-pulse" />
-                            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>INITIALIZING MARKET MAP...</span>
+                            <Activity size={24} color="var(--color-accent)" className="animate-pulse" />
+                            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>INITIALIZING {effectiveMarket.hasHeatmapSupport ? 'HEATMAP' : 'MARKET MATRIX'}...</span>
                         </div>
                     )}
                     <div

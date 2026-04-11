@@ -213,25 +213,35 @@ export const useWindowStore = create<WindowStore>()(
                 });
             },
             resetToInstitutionalLayout: () => {
-                const { openWindow, snapToLayout, windows } = get();
+                const { openWindow, snapToLayout } = get();
                 
-                // 1. Force open all required windows
-                openWindow('heatmap', 'Institutional Heatmap');
-                openWindow('screener', 'Data Matrix Screener');
-                openWindow('tv', 'Intelligence Stream');
-                openWindow('portfolio', 'Active Portfolio');
-                openWindow('advisor', 'Oracle Portfolio Audit');
+                // 1. Force state reset for the core operational hub
+                // This ensures we bypass any stale localStorage data for positions/sizes
+                const targetWindows: WindowId[] = ['heatmap', 'screener', 'tv', 'portfolio', 'advisor'];
+                
+                targetWindows.forEach(id => {
+                    // Update state to ensure it's open, centered (temporarily), and not minimized
+                    openWindow(id, id === 'tv' ? 'Intelligence Stream' : 
+                                   id === 'heatmap' ? 'Institutional Heatmap' : 
+                                   id === 'screener' ? 'Data Matrix Screener' : 
+                                   id === 'portfolio' ? 'Active Portfolio' : 
+                                   'Oracle Portfolio Audit');
+                });
                 
                 // 2. Snap them into the high-density grid
-                // Use a short timeout to ensure the DOM is ready for measurement if needed, 
-                // but snapToLayout uses window dimensions so it's usually safe immediately.
+                // Delay slightly to ensure the windows are registered in the state for the next tick
                 setTimeout(() => {
                     snapToLayout('heatmap', 'TL');
                     snapToLayout('screener', 'TR');
                     snapToLayout('tv', 'BL');
                     snapToLayout('portfolio', 'BR');
                     snapToLayout('advisor', 'SIDE');
-                });
+                    
+                    // Force a z-index synchronization
+                    set(state => ({
+                        activeWindow: 'heatmap'
+                    }));
+                }, 50);
             },
             isWindowOpen: (id) => {
                 const win = get().windows[id];
