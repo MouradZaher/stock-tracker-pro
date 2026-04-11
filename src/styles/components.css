@@ -104,3 +104,18 @@
 .animate-mood-pulse {
   animation: mood-pulse 3s infinite ease-in-out;
 }
+
+/* --- Terminal Window Controls --- */
+.window-control-btn {
+  transition: all 0.15s ease-out;
+}
+
+.window-control-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #fff !important;
+}
+
+.window-control-btn.close:hover {
+  background: #e81123 !important;
+  color: #fff !important;
+}

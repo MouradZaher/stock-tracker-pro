@@ -9,6 +9,8 @@ interface WindowState {
     description?: string;
     isOpen: boolean;
     isMinimized: boolean;
+    isMaximized: boolean;
+    prevLayout: { x: number, y: number, w: number, h: number } | null;
     x: number;
     y: number;
     w: number;
@@ -24,6 +26,7 @@ interface WindowStore {
     openWindow: (id: WindowId, title: string, x?: number, y?: number, w?: number, h?: number) => void;
     closeWindow: (id: WindowId) => void;
     toggleMinimize: (id: WindowId) => void;
+    toggleMaximize: (id: WindowId) => void;
     bringToFront: (id: WindowId) => void;
     updatePosition: (id: WindowId, x: number, y: number) => void;
     updateSize: (id: WindowId, w: number, h: number) => void;
@@ -51,6 +54,8 @@ export const useWindowStore = create<WindowStore>()(
                             title,
                             isOpen: true,
                             isMinimized: false,
+                            isMaximized: false,
+                            prevLayout: null,
                             zIndex: nextZ
                         }
                     },
@@ -79,6 +84,35 @@ export const useWindowStore = create<WindowStore>()(
                         [id]: { ...windows[id], isMinimized: !windows[id].isMinimized }
                     }
                 });
+            },
+
+            toggleMaximize: (id) => {
+                const { windows } = get();
+                const win = windows[id];
+                if (!win) return;
+
+                if (win.isMaximized) {
+                    // Restore
+                    const { x, y, w, h } = win.prevLayout || { x: 100, y: 100, w: DEFAULT_WIDTH, h: DEFAULT_HEIGHT };
+                    set({
+                        windows: {
+                            ...windows,
+                            [id]: { ...win, isMaximized: false, x, y, w, h, prevLayout: null }
+                        }
+                    });
+                } else {
+                    // Maximize
+                    set({
+                        windows: {
+                            ...windows,
+                            [id]: { 
+                                ...win, 
+                                isMaximized: true, 
+                                prevLayout: { x: win.x, y: win.y, w: win.w, h: win.h } 
+                            }
+                        }
+                    });
+                }
             },
 
             bringToFront: (id) => {
