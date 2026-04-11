@@ -178,9 +178,9 @@ export const useWindowStore = create<WindowStore>()(
                 if (!win) return;
 
                 const SIDE_WIDTH = 350;
-                const sidebarWidth = 64;
-                const topBarHeight = 28 + 48; // topbar + header roughly
-                const bottomNavHeight = 60;
+                const sidebarWidth = 48; // Matched to LeftToolstrip.tsx
+                const topBarHeight = 0; // Content fills full vertical space
+                const bottomNavHeight = 0;
                 
                 const availW = window.innerWidth - sidebarWidth - SIDE_WIDTH;
                 const availH = window.innerHeight - topBarHeight - bottomNavHeight;
