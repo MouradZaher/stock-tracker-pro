@@ -91,6 +91,26 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             flexShrink: 0,
         }}>
             
+            {/* ─── TERMINAL LOGO (TOP) ─── */}
+            <div style={{ 
+                marginBottom: '1rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                position: 'relative'
+            }}>
+                <Zap 
+                    size={22} 
+                    color="var(--color-accent)" 
+                    fill="var(--color-accent)" 
+                    className="logo-flash"
+                    style={{ 
+                        filter: 'drop-shadow(0 0 8px var(--color-accent))',
+                        opacity: 0.9
+                    }} 
+                />
+            </div>
+            
             {/* ─── MARKET SELECTOR (TOP) ─── */}
             <div
                 ref={marketBtnRef}
@@ -370,6 +390,13 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 @keyframes homePulse {
                     0%, 100% { opacity: 1; transform: scale(1); }
                     50% { opacity: 0.4; transform: scale(1.4); }
+                }
+                @keyframes logoFlash {
+                    0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px var(--color-accent)); }
+                    50% { opacity: 0.7; filter: drop-shadow(0 0 12px var(--color-accent)); }
+                }
+                .logo-flash {
+                    animation: logoFlash 2s infinite ease-in-out;
                 }
             `}</style>
         </aside>
