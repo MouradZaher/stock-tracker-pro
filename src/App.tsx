@@ -27,6 +27,7 @@ const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
 const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioIntelligencePanel'));
 const PricingPage = lazy(() => import('./components/PricingPage'));
 const LiveIntelligenceStreams = lazy(() => import('./components/LiveIntelligenceStreams'));
+const CorporateActionsCalendar = lazy(() => import('./components/CorporateActionsCalendar'));
 
 
 import AIChatWidget from './components/AIChatWidget';
@@ -322,6 +323,15 @@ function MainLayout({
                   <ErrorBoundary>
                     <Suspense fallback={<PageSkeleton />}>
                       <LiveIntelligenceStreams />
+                    </Suspense>
+                  </ErrorBoundary>
+                </div>
+              } />
+              <Route path="/calendar" element={
+                <div className="tab-content" style={{ padding: 0, height: '100%', overflow: 'hidden' }}>
+                  <ErrorBoundary>
+                    <Suspense fallback={<PageSkeleton />}>
+                      <CorporateActionsCalendar />
                     </Suspense>
                   </ErrorBoundary>
                 </div>

@@ -185,6 +185,18 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
             </div>
 
+            {/* ─── CORPORATE ACTIONS CALENDAR ─── */}
+            <div
+                style={iconStyle('calendar', '#f59e0b', location.pathname === '/calendar')}
+                onMouseEnter={() => setHoveredIcon('calendar')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { navigate('/calendar'); soundService.playTap(); }}
+                title="Corporate Actions Calendar"
+            >
+                <Calendar size={16} />
+                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+            </div>
+
             {/* ─── SEARCH (Ctrl+K) ─── */}
             <div
                 style={iconStyle('search')}
