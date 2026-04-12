@@ -11,6 +11,11 @@ interface InstitutionalHeatmapGridProps {
     blockColor?: 'change' | 'high_low_range';
 }
 
+interface EnrichedStock extends Stock {
+    sector: string;
+    weight: number;
+}
+
 interface Rect {
     x: number;
     y: number;
@@ -25,7 +30,7 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
     blockColor = 'change'
 }) => {
     const { effectiveMarket } = useMarket();
-    const [stocks, setStocks] = useState<Stock[]>([]);
+    const [stocks, setStocks] = useState<EnrichedStock[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [retryKey, setRetryKey] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +69,7 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
             try {
                 const stockMap = await getMultipleQuotes(symbols);
                 if (isMounted) {
-                    const enrichedStocks = Array.from(stockMap.values()).map(stock => {
+                    const enrichedStocks: EnrichedStock[] = Array.from(stockMap.values()).map(stock => {
                         const constituent = indexConstituents.find(c => c.symbol === stock.symbol);
                         return {
                             ...stock,
@@ -156,7 +161,7 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
         if (dimensions.width <= 0 || dimensions.height <= 0 || stocks.length === 0) return [];
 
         // 1. Group by sector
-        const sectors: Record<string, Stock[]> = {};
+        const sectors: Record<string, EnrichedStock[]> = {};
         stocks.forEach(s => {
             if (!sectors[s.sector]) sectors[s.sector] = [];
             sectors[s.sector].push(s);

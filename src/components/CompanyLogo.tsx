@@ -19,8 +19,14 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
         'YAHSAT': 'https://www.yahsat.com/favicon.ico',
         'ALYAHSAT': 'https://www.yahsat.com/favicon.ico',
         'BAYANAT': 'https://www.bayanat.ai/favicon.ico',
-        'FWRY': 'https://fawry.com/wp-content/uploads/2021/03/favicon.png',
+        'FWRY': 'https://fawry.com/favicon.ico',
         'COMI': 'https://www.cibeg.com/o/cib-theme/images/favicon.ico',
+        'KIMA': 'https://kimaegypt.com/favicon.ico',
+        'MOPCO': 'https://mopco-eg.com/favicon.ico',
+        'AMOC': 'https://amoc-eg.com/favicon.ico',
+        'TMGH': 'https://tmg.com.eg/favicon.ico',
+        'SIDP': 'https://sidpec.com/favicon.ico',
+        'ALCN': 'https://alex-containers.com/favicon.ico',
         'SKY': 'https://www.sky.com/assets/favicon.ico'
     };
 
@@ -41,7 +47,8 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     const isEGX = suffix === 'CA' || [
         'SKPC', 'OLFI', 'BFF', 'AZG', 'BIN', 'CI30', 'BMM', 'ABUK', 'COMI', 'HRHO', 
         'SWDY', 'FWRY', 'EKHO', 'ETEL', 'MFOT', 'HELI', 'ISPH', 'AMOC', 'TMGH', 
-        'ALCN', 'MICH', 'SIDP', 'KIMA', 'GBAS', 'PORT', 'AMER', 'MNHD', 'OCDI'
+        'ALCN', 'MICH', 'SIDP', 'KIMA', 'GBAS', 'PORT', 'AMER', 'MNHD', 'OCDI',
+        'BINV', 'EGCH', 'MOPC', 'TMG', 'ALEX', 'SIDI', 'MICH'
     ].includes(ticker);
 
     // Abu Dhabi Market (ADX)
@@ -51,34 +58,37 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     ].includes(ticker);
 
     const logoSources: string[] = [];
+    const isRegional = isEGX || isADX;
 
     // 0. MANUAL OVERRIDES (Highest reliability for known issues)
     if (overrideUrl) {
         logoSources.push(overrideUrl);
     }
 
-    // 1. HIGH-FIDELITY: Google Favicon API (Most reliable for corporate domains)
-    if (mappedDomain) {
-        logoSources.push(`https://www.google.com/s2/favicons?sz=128&domain=${mappedDomain}`);
+    // Only attempt external auto-discovery services for non-regional (mostly US) stocks
+    // Regional domains (EGX/ADX) frequently return 404s for gstatic/clearbit services
+    if (!isRegional) {
+        // 1. HIGH-FIDELITY: Google Favicon API (Most reliable for corporate domains)
+        if (mappedDomain) {
+            logoSources.push(`https://www.google.com/s2/favicons?sz=128&domain=${mappedDomain}`);
+        }
+
+        // 2. Clearbit Mapped Domain
+        if (mappedDomain) {
+            logoSources.push(`https://logo.clearbit.com/${mappedDomain}`);
+        }
+
+        // 3. Financial Modeling Prep (Great for US Stocks)
+        logoSources.push(`https://financialmodelingprep.com/image-stock/${ticker}.png`);
+
+        // 4. Clearbit Fallback (Ticker-based)
+        logoSources.push(`https://logo.clearbit.com/${ticker.toLowerCase()}.com`);
+
+        // 5. TwelveData (Global coverage)
+        logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${ticker}.png`);
     }
-
-    // 2. Clearbit Mapped Domain
-    if (mappedDomain) {
-        logoSources.push(`https://logo.clearbit.com/${mappedDomain}`);
-    }
-
-    // 3. Financial Modeling Prep (Great for US Stocks)
-    logoSources.push(`https://financialmodelingprep.com/image-stock/${ticker}.png`);
-
-    // 4. Clearbit Fallback (Ticker-based)
-    logoSources.push(`https://logo.clearbit.com/${ticker.toLowerCase()}.com`);
-
-    // 5. TwelveData (Global coverage)
-    logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${ticker}.png`);
 
     // Prevent network requests for regional stocks that are known to fail standard sources
-    const isRegional = isEGX || isADX;
-
     if (!ticker || isIndex || (isRegional && !mappedDomain && !overrideUrl) || fallbackLevel >= logoSources.length) {
         // Special styling for major indices
         let indexColor = 'var(--color-bg-elevated)';
