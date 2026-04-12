@@ -219,7 +219,7 @@ function MainLayout({
   const handleSelectSymbol = (symbol: string) => {
     setSelectedSymbol(symbol);
     // Open the pulse (Search Detail) window if not already open
-    openWindow('pulse', 'Global Asset Identification');
+    openWindow('pulse', 'Search');
     navigate(`/home?symbol=${symbol}`);
     setIsOmniSearchOpen(false);
   };

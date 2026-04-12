@@ -35,7 +35,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             
             // Adjust initial sizes for mobile vs desktop grid
             if (!currentWindows['heatmap'] || !currentWindows['heatmap'].isOpen) {
-                openWindow('heatmap', 'Institutional Heatmap');
+                openWindow('heatmap', 'Heatmap');
                 if (!isMobile) snapToLayout('heatmap', 'TL');
             }
             if (!currentWindows['screener'] || !currentWindows['screener'].isOpen) {
@@ -43,10 +43,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 if (!isMobile) snapToLayout('screener', 'BL');
             }
 
-            if (!currentWindows['recommendations'] || !currentWindows['recommendations'].isOpen) {
-                openWindow('recommendations', 'Institutional Intelligence');
-                if (!isMobile) snapToLayout('recommendations', 'TR');
-            }
+
             setIsInitialized(true);
         }
     }, [isInitialized, openWindow, isMobile, snapToLayout]);
@@ -110,7 +107,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             <div style={{ position: 'absolute', inset: 0, padding: 0 }}>
                 
                 {/* 1. Heatmap Window */}
-                <TerminalWindow id="heatmap" title="Institutional Heatmap" minW={350} minH={300}>
+                <TerminalWindow id="heatmap" title="Heatmap" minW={350} minH={300}>
                     <StockHeatmap />
                 </TerminalWindow>
 
@@ -130,7 +127,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 </TerminalWindow>
 
                 {/* 5. TV / Streams Window */}
-                <TerminalWindow id="tv" title="Intelligence Streams" minW={300} minH={250}>
+                <TerminalWindow id="tv" title="Live News" minW={300} minH={250}>
                     <LiveIntelligenceStreams />
                 </TerminalWindow>
 
@@ -140,7 +137,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 </TerminalWindow>
 
                 {/* 7. Search Window */}
-                <TerminalWindow id="pulse" title="Global Asset Identification" minW={350} minH={300}>
+                <TerminalWindow id="pulse" title="Search" minW={350} minH={300}>
                     <MarketPulsePage onSelectStock={onSelectSymbol} />
                 </TerminalWindow>
 

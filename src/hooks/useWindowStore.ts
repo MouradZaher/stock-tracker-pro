@@ -221,8 +221,8 @@ export const useWindowStore = create<WindowStore>()(
                 
                 targetWindows.forEach(id => {
                     // Update state to ensure it's open, centered (temporarily), and not minimized
-                    openWindow(id, id === 'tv' ? 'Intelligence Stream' : 
-                                   id === 'heatmap' ? 'Institutional Heatmap' : 
+                    openWindow(id, id === 'tv' ? 'Live News' : 
+                                   id === 'heatmap' ? 'Heatmap' : 
                                    id === 'screener' ? 'Data Matrix Screener' : 
                                    id === 'portfolio' ? 'Active Portfolio' : 
                                    'Oracle Portfolio Audit');

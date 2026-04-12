@@ -143,7 +143,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('heatmap', 'var(--color-accent)', isWindowOpen('heatmap'), isWindowMinimized('heatmap'))}
                 onMouseEnter={() => setHoveredIcon('heatmap')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('heatmap', 'Institutional Heatmap'); navigate('/home'); soundService.playTap(); }}
+                onClick={() => { openWindow('heatmap', 'Heatmap'); navigate('/home'); soundService.playTap(); }}
             >
                 <LayoutGrid size={16} />
                 {hoveredIcon === 'heatmap' && !isWindowOpen('heatmap') && <div style={tooltipStyle}>HEATMAP</div>}
@@ -161,16 +161,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {isWindowOpen('screener') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
             </div>
 
-            <div
-                style={iconStyle('recommendations', 'var(--color-accent)', isWindowOpen('recommendations'), isWindowMinimized('recommendations'))}
-                onMouseEnter={() => setHoveredIcon('recommendations')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('recommendations', 'Institutional Intelligence'); navigate('/home'); soundService.playTap(); }}
-            >
-                <Brain size={16} />
-                {hoveredIcon === 'recommendations' && !isWindowOpen('recommendations') && <div style={tooltipStyle}>INTELLIGENCE</div>}
-                {isWindowOpen('recommendations') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
-            </div>
+
 
             {separator}
 
@@ -215,11 +206,11 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={{ ...iconStyle('tv', '#ef4444', isWindowOpen('tv'), isWindowMinimized('tv')), position: 'relative' }}
                 onMouseEnter={() => setHoveredIcon('tv')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('tv', 'Intelligence Stream'); navigate('/home'); soundService.playTap(); }}
+                onClick={() => { openWindow('tv', 'Live News'); navigate('/home'); soundService.playTap(); }}
             >
                 <Tv size={16} />
                 {isWindowOpen('tv') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#ef4444', borderRadius: '1px' }} />}
-                {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
+                {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE NEWS</div>}
             </div>
 
 
