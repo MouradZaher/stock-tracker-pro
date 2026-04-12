@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
+import { useLocation, useNavigate } from 'react-router-dom';
 import TerminalWindow from './TerminalWindow';
 import StockHeatmap from './StockHeatmap';
 import InstitutionalScreener from './InstitutionalScreener';
@@ -24,11 +24,30 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
     const [isInitialized, setIsInitialized] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+    const location = useLocation();
+    const navigate = useNavigate();
+
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 768);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // WATCH FOR TRADINGVIEW WIDGET SYMBOL SYNC
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const widgetSymbol = params.get('tvwidgetsymbol');
+        if (widgetSymbol && onSelectSymbol) {
+            onSelectSymbol(widgetSymbol);
+            // Clean up the URL to prevent re-triggering on refresh
+            params.delete('tvwidgetsymbol');
+            const newSearch = params.toString();
+            navigate({
+                pathname: location.pathname,
+                search: newSearch ? `?${newSearch}` : ''
+            }, { replace: true });
+        }
+    }, [location.search, onSelectSymbol, navigate, location.pathname]);
 
     // Initial tool spawn - One time on mount
     useEffect(() => {

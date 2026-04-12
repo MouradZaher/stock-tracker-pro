@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import InstitutionalScreener from './InstitutionalScreener';
+import TradingViewScreener from './TradingViewScreener';
 import MarketPulsePage from './MarketPulsePage';
 import { Activity, Search } from 'lucide-react';
 
@@ -50,7 +50,7 @@ const RightTabbedPanel: React.FC<RightTabbedPanelProps> = ({ onSelectSymbol }) =
             
             <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
                 {activeTab === 'screener' ? (
-                    <InstitutionalScreener onSelectSymbol={onSelectSymbol} />
+                    <TradingViewScreener />
                 ) : (
                     <MarketPulsePage onSelectStock={onSelectSymbol} />
                 )}
