@@ -4,6 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useMarket } from '../contexts/MarketContext';
 import { socialFeedService } from '../services/SocialFeedService';
 import HeatmapMobileFallback from './HeatmapMobileFallback';
+import InstitutionalHeatmapGrid from './InstitutionalHeatmapGrid';
 
 const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -42,6 +43,13 @@ const StockHeatmap: React.FC = () => {
 
     useEffect(() => {
         setError(false);
+
+        // If using synthetic InstitutionalHeatmapGrid, we don't need TradingView widget scripts
+        if (!effectiveMarket.hasHeatmapSupport) {
+            setIsLoading(false);
+            return;
+        }
+
         const container = containerRef.current;
         if (!container) return;
 
@@ -159,20 +167,27 @@ const StockHeatmap: React.FC = () => {
                         </div>
                     )}
 
-                    <div
-                        className="tradingview-widget-container"
-                        ref={containerRef}
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            overflow: 'hidden',
-                            touchAction: 'pan-x pan-y',
-                            pointerEvents: 'auto',
-                        }}
-                    />
+                    {effectiveMarket.hasHeatmapSupport ? (
+                        <div
+                            className="tradingview-widget-container"
+                            ref={containerRef}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                overflow: 'hidden',
+                                touchAction: 'pan-x pan-y',
+                                pointerEvents: 'auto',
+                            }}
+                        />
+                    ) : (
+                        <InstitutionalHeatmapGrid 
+                            blockSize={blockSize}
+                            blockColor={blockColor}
+                        />
+                    )}
                 </>
             )}
         </div>
