@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const MarketNews: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const { theme } = useTheme();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -11,7 +13,7 @@ const MarketNews: React.FC = () => {
         script.async = true;
         script.innerHTML = JSON.stringify({
             "feedMode": "all_symbols",
-            "colorTheme": "dark",
+            "colorTheme": theme,
             "isTransparent": true,
             "displayMode": "regular",
             "width": "100%",
@@ -21,7 +23,7 @@ const MarketNews: React.FC = () => {
 
         containerRef.current.innerHTML = '';
         containerRef.current.appendChild(script);
-    }, []);
+    }, [theme]);
 
     return (
         <div style={{ height: '100%', width: '100%', background: '#000', display: 'flex', flexDirection: 'column' }}>

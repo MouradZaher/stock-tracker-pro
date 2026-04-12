@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useMarket } from '../contexts/MarketContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const TradingViewScreener: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const { selectedMarket } = useMarket();
+    const { theme } = useTheme();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -36,7 +38,7 @@ const TradingViewScreener: React.FC = () => {
             "defaultScreen": defaultScreen,
             "market": market,
             "showToolbar": true,
-            "colorTheme": "dark",
+            "colorTheme": theme,
             "locale": "en",
             "isTransparent": true,
             "largeChartUrl": currentUrl
@@ -55,7 +57,7 @@ const TradingViewScreener: React.FC = () => {
         widgetContainer.style.width = '100%';
 
         containerRef.current.appendChild(widgetContainer);
-    }, [selectedMarket.id]);
+    }, [selectedMarket.id, theme]);
 
     return (
         <div style={{ height: '100%', width: '100%', background: '#000', overflow: 'hidden' }}>
