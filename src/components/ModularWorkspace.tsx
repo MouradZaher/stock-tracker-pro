@@ -11,7 +11,7 @@ import MarketPulsePage from './MarketPulsePage';
 import AIRecommendations from './AIRecommendations';
 
 import AdminDashboard from './AdminDashboard';
-import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, Brain, ShieldCheck, Shield } from 'lucide-react';
+import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, ShieldCheck, Shield } from 'lucide-react';
 
 interface ModularWorkspaceProps {
     onSelectSymbol?: (symbol: string) => void;
@@ -141,10 +141,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                     <MarketPulsePage onSelectStock={onSelectSymbol} />
                 </TerminalWindow>
 
-                {/* 8. Recommendations Window */}
-                <TerminalWindow id="recommendations" title="Institutional Intelligence" minW={350} minH={350}>
-                    <AIRecommendations />
-                </TerminalWindow>
+
 
 
 
