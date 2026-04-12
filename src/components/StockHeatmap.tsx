@@ -157,7 +157,7 @@ const StockHeatmap: React.FC = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: '#0a0a0a',
+                            background: theme === 'dark' ? '#000' : '#f8fafc',
                             zIndex: 10,
                             gap: '12px'
                         }}>
@@ -178,6 +178,7 @@ const StockHeatmap: React.FC = () => {
                             overflow: 'hidden',
                             touchAction: 'pan-x pan-y',
                             pointerEvents: 'auto',
+                            filter: theme === 'dark' ? 'brightness(0.9) contrast(1.1)' : 'none'
                         }}
                     />
                 </>

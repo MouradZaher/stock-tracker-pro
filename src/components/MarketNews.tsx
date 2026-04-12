@@ -26,7 +26,14 @@ const MarketNews: React.FC = () => {
     }, [theme]);
 
     return (
-        <div style={{ height: '100%', width: '100%', background: '#000', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ 
+            height: '100%', 
+            width: '100%', 
+            background: theme === 'dark' ? '#000' : '#f8fafc',
+            display: 'flex', 
+            flexDirection: 'column',
+            filter: theme === 'dark' ? 'brightness(0.9) contrast(1.1)' : 'none'
+        }}>
             <div ref={containerRef} style={{ flex: 1 }} />
         </div>
     );

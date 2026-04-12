@@ -60,7 +60,13 @@ const TradingViewScreener: React.FC = () => {
     }, [selectedMarket.id, theme]);
 
     return (
-        <div style={{ height: '100%', width: '100%', background: '#000', overflow: 'hidden' }}>
+        <div style={{ 
+            height: '100%', 
+            width: '100%', 
+            background: theme === 'dark' ? '#000' : '#f8fafc',
+            overflow: 'hidden',
+            filter: theme === 'dark' ? 'brightness(0.9) contrast(1.1)' : 'none'
+        }}>
             <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
         </div>
     );
