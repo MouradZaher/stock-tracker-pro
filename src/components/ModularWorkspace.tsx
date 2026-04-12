@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TerminalWindow from './TerminalWindow';

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import React, { useState } from 'react';
 import TradingViewScreener from './TradingViewScreener';
 import MarketPulsePage from './MarketPulsePage';
 import { Activity, Search } from 'lucide-react';
