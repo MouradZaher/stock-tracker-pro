@@ -5,7 +5,7 @@ import {
     Search, Brain, Shield, Bell, HelpCircle, Settings,
     Sun, Moon, LogOut, MessageSquare, Star, ChevronDown,
     LayoutGrid, Activity, Globe, Zap, Command, Tv, Calendar,
-    PieChart, Eye, ShieldCheck
+    PieChart, Eye, ShieldCheck, Newspaper
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMarket, MARKETS, type MarketId } from '../contexts/MarketContext';
@@ -127,17 +127,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'market' && <div style={tooltipStyle}>{selectedMarket.name.toUpperCase()}</div>}
             </div>
 
-            {/* ─── SEARCH / INTELLIGENCE HUB ─── */}
-            <div
-                style={iconStyle('pulse', undefined, isWindowOpen('pulse'), isWindowMinimized('pulse'))}
-                onMouseEnter={() => setHoveredIcon('pulse')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('pulse', 'Search Matrix'); navigate('/home'); soundService.playTap(); }}
-            >
-                <Search size={16} />
-                {hoveredIcon === 'pulse' && !isWindowOpen('pulse') && <div style={tooltipStyle}>SEARCH ⌘K</div>}
-                {isWindowOpen('pulse') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
-            </div>
+
 
             <div
                 style={iconStyle('heatmap', 'var(--color-accent)', isWindowOpen('heatmap'), isWindowMinimized('heatmap'))}
@@ -154,7 +144,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('screener', 'var(--color-accent)', isWindowOpen('screener'), isWindowMinimized('screener'))}
                 onMouseEnter={() => setHoveredIcon('screener')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('screener', 'Data Matrix Screener'); navigate('/home'); soundService.playTap(); }}
+                onClick={() => { openWindow('screener', 'Screener'); navigate('/home'); soundService.playTap(); }}
             >
                 <Activity size={16} />
                 {hoveredIcon === 'screener' && !isWindowOpen('screener') && <div style={tooltipStyle}>SCREENER</div>}
@@ -170,7 +160,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 style={iconStyle('portfolio', '#10b981', isWindowOpen('portfolio'), isWindowMinimized('portfolio'))}
                 onMouseEnter={() => setHoveredIcon('portfolio')}
                 onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('portfolio', 'Institutional Portfolio'); navigate('/home'); soundService.playTap(); }}
+                onClick={() => { openWindow('portfolio', 'Portfolio'); navigate('/home'); soundService.playTap(); }}
             >
                 <PieChart size={16} />
                 {hoveredIcon === 'portfolio' && !isWindowOpen('portfolio') && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
@@ -211,6 +201,17 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 <Tv size={16} />
                 {isWindowOpen('tv') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#ef4444', borderRadius: '1px' }} />}
                 {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE NEWS</div>}
+            </div>
+
+            <div
+                style={{ ...iconStyle('news', '#3b82f6', isWindowOpen('news'), isWindowMinimized('news')), position: 'relative' }}
+                onMouseEnter={() => setHoveredIcon('news')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { openWindow('news', 'Market News'); navigate('/home'); soundService.playTap(); }}
+            >
+                <Newspaper size={16} />
+                {isWindowOpen('news') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#3b82f6', borderRadius: '1px' }} />}
+                {hoveredIcon === 'news' && !isWindowOpen('news') && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>NEWS FEED</div>}
             </div>
 
 

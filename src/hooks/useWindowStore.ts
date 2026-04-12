@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type WindowId = 'heatmap' | 'screener' | 'portfolio' | 'watchlist' | 'tv' | 'calendar' | 'pulse' | 'advisor' | 'recommendations' | 'admin';
+export type WindowId = 'heatmap' | 'screener' | 'portfolio' | 'watchlist' | 'tv' | 'calendar' | 'pulse' | 'advisor' | 'recommendations' | 'admin' | 'news';
 
 interface WindowState {
     id: WindowId;
@@ -223,8 +223,8 @@ export const useWindowStore = create<WindowStore>()(
                     // Update state to ensure it's open, centered (temporarily), and not minimized
                     openWindow(id, id === 'tv' ? 'Live News' : 
                                    id === 'heatmap' ? 'Heatmap' : 
-                                   id === 'screener' ? 'Data Matrix Screener' : 
-                                   id === 'portfolio' ? 'Active Portfolio' : 
+                                   id === 'screener' ? 'Screener' : 
+                                   id === 'portfolio' ? 'Portfolio' : 
                                    'Oracle Portfolio Audit');
                 });
                 

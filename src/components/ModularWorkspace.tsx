@@ -8,6 +8,8 @@ import WatchlistPage from './WatchlistPage';
 import LiveIntelligenceStreams from './LiveIntelligenceStreams';
 import CorporateActionsCalendar from './CorporateActionsCalendar';
 import MarketPulsePage from './MarketPulsePage';
+import RightTabbedPanel from './RightTabbedPanel';
+import MarketNews from './MarketNews';
 import AIRecommendations from './AIRecommendations';
 
 import AdminDashboard from './AdminDashboard';
@@ -39,7 +41,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 if (!isMobile) snapToLayout('heatmap', 'TL');
             }
             if (!currentWindows['screener'] || !currentWindows['screener'].isOpen) {
-                openWindow('screener', 'Data Matrix Screener');
+                openWindow('screener', 'Screener');
                 if (!isMobile) snapToLayout('screener', 'BL');
             }
 
@@ -111,13 +113,13 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                     <StockHeatmap />
                 </TerminalWindow>
 
-                {/* 2. Screener Window */}
-                <TerminalWindow id="screener" title="Data Matrix Screener" minW={350} minH={300}>
-                    <InstitutionalScreener onSelectSymbol={onSelectSymbol || (() => {})} />
+                {/* 2. Screener Window (Now supports Search Tabs) */}
+                <TerminalWindow id="screener" title="Screener" minW={350} minH={300}>
+                    <RightTabbedPanel onSelectSymbol={onSelectSymbol || (() => {})} />
                 </TerminalWindow>
 
                 {/* 3. Portfolio Window */}
-                <TerminalWindow id="portfolio" title="Active Portfolio" minW={350} minH={300}>
+                <TerminalWindow id="portfolio" title="Portfolio" minW={350} minH={300}>
                     <Portfolio />
                 </TerminalWindow>
 
@@ -136,9 +138,9 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                     <CorporateActionsCalendar />
                 </TerminalWindow>
 
-                {/* 7. Search Window */}
-                <TerminalWindow id="pulse" title="Search" minW={350} minH={300}>
-                    <MarketPulsePage onSelectStock={onSelectSymbol} />
+                {/* 7. News Window */}
+                <TerminalWindow id="news" title="Market News" minW={350} minH={300}>
+                    <MarketNews />
                 </TerminalWindow>
 
 
