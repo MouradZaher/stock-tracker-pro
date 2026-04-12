@@ -18,7 +18,7 @@ export const SECTORS = [
 export type Sector = typeof SECTORS[number];
 
 // Regional Indices Stocks (LOCKED: approved 2026-02-25)
-export const STOCKS_BY_INDEX: Record<string, { symbol: string; name: string }[]> = {
+export const STOCKS_BY_INDEX: Record<string, { symbol: string; name: string; sector?: string; weight?: number; }[]> = {
     'S&P 500': [
         { symbol: 'AAPL', name: 'Apple Inc.' },
         { symbol: 'MSFT', name: 'Microsoft Corp.' },
@@ -71,11 +71,25 @@ export const STOCKS_BY_INDEX: Record<string, { symbol: string; name: string }[]>
         { symbol: 'EMFD', name: 'Emaar Misr', sector: 'Real Estate', weight: 4 },
         { symbol: 'EAST', name: 'Eastern Company', sector: 'Consumer Defensive', weight: 3 },
         { symbol: 'EFID', name: 'e-finance', sector: 'Technology', weight: 3 },
+        { symbol: 'ORAS', name: 'Orascom Construction', sector: 'Industrials', weight: 3 },
+        { symbol: 'EKHO', name: 'Egypt Kuwait Holding', sector: 'Financial Services', weight: 2 },
         { symbol: 'CLHO', name: 'Cleopatra Hospitals', sector: 'Healthcare', weight: 2 },
         { symbol: 'SKPC', name: 'Sidi Kerir Petrocl', sector: 'Basic Materials', weight: 2 },
         { symbol: 'OLFI', name: 'Obour Land', sector: 'Consumer Defensive', weight: 2 },
-        { symbol: 'AZG', name: 'Azimut Egypt Equity', sector: 'Financial Services', weight: 1 },
-        { symbol: 'CI30', name: 'CI Capital EGX30 Fund', sector: 'Financial Services', weight: 1 },
+        { symbol: 'AMOC', name: 'Alex Mineral Oils', sector: 'Energy', weight: 2 },
+        { symbol: 'ISPH', name: 'Ibn Sina Pharma', sector: 'Healthcare', weight: 2 },
+        { symbol: 'AUTO', name: 'Ghabbour Auto', sector: 'Consumer Cyclical', weight: 1.5 },
+        { symbol: 'JUFO', name: 'Juhayna', sector: 'Consumer Defensive', weight: 1.5 },
+        { symbol: 'HELI', name: 'Heliopolis Housing', sector: 'Real Estate', weight: 1.5 },
+        { symbol: 'MNHD', name: 'Madinet Masr', sector: 'Real Estate', weight: 1.5 },
+        { symbol: 'PHDC', name: 'Palm Hills', sector: 'Real Estate', weight: 1.5 },
+        { symbol: 'DOMT', name: 'Domty', sector: 'Consumer Defensive', weight: 1 },
+        { symbol: 'RMDA', name: 'Rameda Pharma', sector: 'Healthcare', weight: 1 },
+        { symbol: 'CCAP', name: 'Qalaa Holdings', sector: 'Financial Services', weight: 1 },
+        { symbol: 'CIRA', name: 'Cairo For Investment', sector: 'Consumer Defensive', weight: 1 },
+        { symbol: 'ESRS', name: 'Ezz Steel', sector: 'Basic Materials', weight: 1 },
+        { symbol: 'AZG', name: 'Azimut Egypt Equity', sector: 'Financial Services', weight: 0.5 },
+        { symbol: 'CI30', name: 'CI Capital EGX30 Fund', sector: 'Financial Services', weight: 0.5 },
     ],
     'FTSE ADX 15': [
         { symbol: 'IHC', name: 'International Holding Co.', sector: 'Industrials', weight: 40 },

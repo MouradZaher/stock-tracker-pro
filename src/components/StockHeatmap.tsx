@@ -4,7 +4,6 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useMarket } from '../contexts/MarketContext';
 import { socialFeedService } from '../services/SocialFeedService';
 import HeatmapMobileFallback from './HeatmapMobileFallback';
-import InstitutionalHeatmapGrid from './InstitutionalHeatmapGrid';
 
 const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -42,10 +41,10 @@ const StockHeatmap: React.FC = () => {
     }, [retryKey]);
 
     useEffect(() => {
-        if (!containerRef.current) return;
-
         setError(false);
         const container = containerRef.current;
+        if (!container) return;
+
         container.innerHTML = '';
 
         const initWidget = () => {
@@ -53,63 +52,30 @@ const StockHeatmap: React.FC = () => {
             container.innerHTML = '';
 
             try {
-                const script = document.createElement('script');
-                
-                // If the market doesn't support the native heatmap widget, we use the Market Overview widget as a high-quality data matrix
-                if (effectiveMarket.hasHeatmapSupport) {
-                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-                    script.innerHTML = JSON.stringify({
-                        "exchanges": effectiveMarket.heatmapExchanges,
-                        "dataSource": effectiveMarket.heatmapDataSource,
-                        "grouping": effectiveMarket.heatmapExchanges.length > 0 ? "no_group" : "sector",
-                        "blockSize": blockSize,
-                        "blockColor": blockColor,
-                        "locale": "en",
-                        "symbolUrl": window.location.origin + "/recommendations?tab=navigator&aiStock={SYMBOL}",
-                        "colorTheme": theme === 'dark' ? 'dark' : 'light',
-                        "hasTopBar": true,
-                        "isDataSetEnabled": true,
-                        "isZoomEnabled": true,
-                        "hasSymbolTooltip": true,
-                        "width": "100%",
-                        "height": "100%"
-                    });
-                } else {
-                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-                    script.innerHTML = JSON.stringify({
-                        "colorTheme": theme === 'dark' ? 'dark' : 'light',
-                        "dateRange": "12M",
-                        "showChart": true,
-                        "locale": "en",
-                        "largeChartUrl": "",
-                        "isTransparent": true,
-                        "showSymbolLogo": true,
-                        "showFloatingTooltip": false,
-                        "width": "100%",
-                        "height": "100%",
-                        "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
-                        "plotLineColorFalling": "rgba(41, 98, 255, 1)",
-                        "gridLineColor": "rgba(240, 243, 250, 0)",
-                        "scaleFontColor": "rgba(106, 109, 120, 1)",
-                        "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
-                        "belowLineFillColorFalling": "rgba(41, 98, 255, 0.12)",
-                        "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
-                        "belowLineFillColorFallingBottom": "rgba(41, 98, 255, 0)",
-                        "symbolActiveColor": "rgba(41, 98, 255, 0.12)",
-                        "tabs": [
-                            {
-                                "title": effectiveMarket.name.toUpperCase() + " LEADERS",
-                                "symbols": [
-                                    { "s": effectiveMarket.indexSymbol, "d": effectiveMarket.indexName },
-                                    { "s": effectiveMarket.id === 'egypt' ? 'EGX:COMI' : effectiveMarket.id === 'abudhabi' ? 'ADX:FAB' : 'BINANCE:BTCUSDT' },
-                                    { "s": effectiveMarket.id === 'egypt' ? 'EGX:SWDY' : effectiveMarket.id === 'abudhabi' ? 'ADX:ETISALAT' : 'BINANCE:ETHUSDT' },
-                                    { "s": effectiveMarket.id === 'egypt' ? 'EGX:FWRY' : effectiveMarket.id === 'abudhabi' ? 'ADX:IHC' : 'AMEX:SPY' }
-                                ]
-                            }
-                        ]
-                    });
+                const config: any = {
+                    "grouping": "sector",
+                    "blockSize": blockSize,
+                    "blockColor": blockColor,
+                    "locale": "en",
+                    "symbolUrl": window.location.origin + "/recommendations?tab=navigator&aiStock={SYMBOL}",
+                    "colorTheme": theme === 'dark' ? 'dark' : 'light',
+                    "hasTopBar": true,
+                    "isDataSetEnabled": true,
+                    "isZoomEnabled": true,
+                    "hasSymbolTooltip": true,
+                    "width": "100%",
+                    "height": "100%"
+                };
+
+                if (effectiveMarket.heatmapDataSource) {
+                    config.dataSource = effectiveMarket.heatmapDataSource;
+                } else if (effectiveMarket.heatmapExchanges && effectiveMarket.heatmapExchanges.length > 0) {
+                    config.exchanges = effectiveMarket.heatmapExchanges;
                 }
-                
+
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                script.innerHTML = JSON.stringify(config);
                 script.async = true;
                 script.type = 'text/javascript';
 
@@ -189,31 +155,24 @@ const StockHeatmap: React.FC = () => {
                             gap: '12px'
                         }}>
                             <Activity size={24} color="var(--color-accent)" className="animate-pulse" />
-                            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>INITIALIZING {effectiveMarket.hasHeatmapSupport ? 'HEATMAP' : 'MARKET MATRIX'}...</span>
+                            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>INITIALIZING HEATMAP...</span>
                         </div>
                     )}
 
-                    {effectiveMarket.hasHeatmapSupport ? (
-                        <div
-                            className="tradingview-widget-container"
-                            ref={containerRef}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                overflow: 'hidden',
-                                touchAction: 'pan-x pan-y',
-                                pointerEvents: 'auto',
-                            }}
-                        />
-                    ) : (
-                        <InstitutionalHeatmapGrid 
-                            blockSize={blockSize}
-                            blockColor={blockColor}
-                        />
-                    )}
+                    <div
+                        className="tradingview-widget-container"
+                        ref={containerRef}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            overflow: 'hidden',
+                            touchAction: 'pan-x pan-y',
+                            pointerEvents: 'auto',
+                        }}
+                    />
                 </>
             )}
         </div>

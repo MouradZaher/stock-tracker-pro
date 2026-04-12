@@ -16,28 +16,39 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
         'BRK.B': 'https://financialmodelingprep.com/image-stock/BRKB.png',
         'COP': 'https://financialmodelingprep.com/image-stock/COP.png',
         'DHR': 'https://financialmodelingprep.com/image-stock/DHR.png',
-        'YAHSAT': 'https://yahsat.com/favicon.ico',
-        'BAYANAT': 'https://bayanat.ai/favicon.ico',
+        'YAHSAT': 'https://www.yahsat.com/favicon.ico',
+        'ALYAHSAT': 'https://www.yahsat.com/favicon.ico',
+        'BAYANAT': 'https://www.bayanat.ai/favicon.ico',
+        'FWRY': 'https://fawry.com/wp-content/uploads/2021/03/favicon.png',
+        'COMI': 'https://www.cibeg.com/o/cib-theme/images/favicon.ico',
         'SKY': 'https://www.sky.com/assets/favicon.ico'
     };
 
     const overrideUrl = LOGO_OVERRIDES[symbol.toUpperCase().trim()];
     
-    // Clean symbol for API sources (FMP, TwelveData)
-    const cleanSymbol = symbol.trim().replace(/[^a-zA-Z0-9]/g, '');
+    // Split ticker from market suffix (e.g., "MFOT.CA" -> ["MFOT", "CA"])
+    const symbolParts = symbol.toUpperCase().trim().split('.');
+    const ticker = symbolParts[0];
+    const suffix = symbolParts[1] || '';
     
     // Check for high-fidelity mapping first
     const mappedDomain = LOGO_DOMAINS[symbol.toUpperCase().trim()];
 
     // List of indices that definitely don't have FMP stock-images
-    const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(cleanSymbol);
+    const isIndex = symbol.startsWith('^') || ['GSPC', 'DJI', 'IXIC', 'VIX', 'RUT'].includes(ticker);
 
     // Egyptian Market (EGX) symbols often lack high-fidelity US-based logos
-    const isEGX = [
+    const isEGX = suffix === 'CA' || [
         'SKPC', 'OLFI', 'BFF', 'AZG', 'BIN', 'CI30', 'BMM', 'ABUK', 'COMI', 'HRHO', 
         'SWDY', 'FWRY', 'EKHO', 'ETEL', 'MFOT', 'HELI', 'ISPH', 'AMOC', 'TMGH', 
         'ALCN', 'MICH', 'SIDP', 'KIMA', 'GBAS', 'PORT', 'AMER', 'MNHD', 'OCDI'
-    ].includes(cleanSymbol.toUpperCase());
+    ].includes(ticker);
+
+    // Abu Dhabi Market (ADX)
+    const isADX = suffix === 'AD' || [
+        'IHC', 'FAB', 'ETISALAT', 'ADNOCDIST', 'ADCB', 'ALDAR', 'BOROUGE', 'ADPORTS',
+        'ALYAHSAT', 'ADNOCLS', 'ADNOCDRILL', 'MULTIPLY', 'BAYANAT', 'FERTIGLOBE', 'DANA'
+    ].includes(ticker);
 
     const logoSources: string[] = [];
 
@@ -57,23 +68,30 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
     }
 
     // 3. Financial Modeling Prep (Great for US Stocks)
-    logoSources.push(`https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`);
+    logoSources.push(`https://financialmodelingprep.com/image-stock/${ticker}.png`);
 
     // 4. Clearbit Fallback (Ticker-based)
-    logoSources.push(`https://logo.clearbit.com/${cleanSymbol.toLowerCase()}.com`);
+    logoSources.push(`https://logo.clearbit.com/${ticker.toLowerCase()}.com`);
 
     // 5. TwelveData (Global coverage)
-    logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${cleanSymbol}.png`);
+    logoSources.push(`https://raw.githubusercontent.com/twelvedata/p/master/logos/${ticker}.png`);
 
-    if (!cleanSymbol || isIndex || isEGX || fallbackLevel >= logoSources.length) {
+    // Prevent network requests for regional stocks that are known to fail standard sources
+    const isRegional = isEGX || isADX;
+
+    if (!ticker || isIndex || (isRegional && !mappedDomain && !overrideUrl) || fallbackLevel >= logoSources.length) {
         // Special styling for major indices
         let indexColor = 'var(--color-bg-elevated)';
-        let indexLabel = cleanSymbol.substring(0, 2).toUpperCase();
+        let indexLabel = ticker.substring(0, 2).toUpperCase();
 
-        if (cleanSymbol === 'GSPC') { indexColor = '#10B981'; indexLabel = 'SP'; }
-        else if (cleanSymbol === 'DJI') { indexColor = '#3b82f6'; indexLabel = 'DJ'; }
-        else if (cleanSymbol === 'IXIC') { indexColor = '#8B5CF6'; indexLabel = 'NQ'; }
-        else if (cleanSymbol === 'VIX') { indexColor = '#EF4444'; indexLabel = 'VX'; }
+        if (ticker === 'GSPC') { indexColor = '#10B981'; indexLabel = 'SP'; }
+        else if (ticker === 'DJI') { indexColor = '#3b82f6'; indexLabel = 'DJ'; }
+        else if (ticker === 'IXIC') { indexColor = '#8B5CF6'; indexLabel = 'NQ'; }
+        else if (ticker === 'VIX') { indexColor = '#EF4444'; indexLabel = 'VX'; }
+        else if (isRegional) { 
+            indexColor = isEGX ? '#b91c1c' : '#0369a1'; 
+            indexLabel = ticker.substring(0, 2);
+        }
 
         return (
             <div 
