@@ -9,7 +9,7 @@ import LiveIntelligenceStreams from './LiveIntelligenceStreams';
 import CorporateActionsCalendar from './CorporateActionsCalendar';
 import MarketPulsePage from './MarketPulsePage';
 import AIRecommendations from './AIRecommendations';
-import InstitutionalAdvisory from './InstitutionalAdvisory';
+
 import AdminDashboard from './AdminDashboard';
 import { LayoutGrid, Activity, PieChart, Eye, Tv, Calendar, Search, Brain, ShieldCheck, Shield } from 'lucide-react';
 
@@ -42,10 +42,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 openWindow('screener', 'Data Matrix Screener');
                 if (!isMobile) snapToLayout('screener', 'BL');
             }
-            if (!currentWindows['advisor'] || !currentWindows['advisor'].isOpen) {
-                openWindow('advisor', 'Oracle Portfolio Audit');
-                if (!isMobile) snapToLayout('advisor', 'SIDE');
-            }
+
             if (!currentWindows['recommendations'] || !currentWindows['recommendations'].isOpen) {
                 openWindow('recommendations', 'Institutional Intelligence');
                 if (!isMobile) snapToLayout('recommendations', 'TR');
@@ -152,10 +149,7 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                     <AIRecommendations />
                 </TerminalWindow>
 
-                {/* 9. Advisory Window */}
-                <TerminalWindow id="advisor" title="Oracle Portfolio Audit" minW={300} minH={400}>
-                    <InstitutionalAdvisory />
-                </TerminalWindow>
+
 
                 {/* 10. Admin Window */}
                 <TerminalWindow id="admin" title="Administrative Terminal" minW={600} minH={400}>

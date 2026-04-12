@@ -222,16 +222,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE TV</div>}
             </div>
 
-            <div
-                style={iconStyle('advisor', '#888', isWindowOpen('advisor'), isWindowMinimized('advisor'))}
-                onMouseEnter={() => setHoveredIcon('advisor')}
-                onMouseLeave={() => setHoveredIcon(null)}
-                onClick={() => { openWindow('advisor', 'Oracle Portfolio Audit'); navigate('/home'); soundService.playTap(); }}
-            >
-                <ShieldCheck size={16} />
-                {hoveredIcon === 'advisor' && !isWindowOpen('advisor') && <div style={tooltipStyle}>ADVISORY</div>}
-                {isWindowOpen('advisor') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#888', borderRadius: '1px' }} />}
-            </div>
+
 
             <div
                 style={iconStyle('bell')}

@@ -9,7 +9,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
 import OmniSearch from './components/OmniSearch';
-import InstitutionalAdvisory from './components/InstitutionalAdvisory';
 import LeftToolstrip from './components/LeftToolstrip';
 
 import StockDetail from './components/StockDetail';
