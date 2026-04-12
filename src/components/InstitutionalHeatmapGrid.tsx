@@ -99,20 +99,23 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
     // Squarified Treemap Algorithm implementation
     const squarify = (values: number[], width: number, height: number, offset: { x: number, y: number }) => {
         const rects: { w: number, h: number, x: number, y: number }[] = [];
-        const totalValue = values.reduce((a, b) => a + b, 0);
+        const totalValue = Math.max(0.01, values.reduce((a, b) => a + b, 0));
         const scale = (width * height) / totalValue;
 
         const worstAspectRatio = (row: number[], width: number) => {
             if (row.length === 0) return Infinity;
-            const sum = row.reduce((a, b) => a + b, 0) * scale;
-            const min = Math.min(...row) * scale;
-            const max = Math.max(...row) * scale;
-            return Math.max((width * width * max) / (sum * sum), (sum * sum) / (width * width * min));
+            const sum = Math.max(0.01, row.reduce((a, b) => a + b, 0)) * scale;
+            const min = Math.max(0.01, Math.min(...row)) * scale;
+            const max = Math.max(0.01, Math.max(...row)) * scale;
+            const side = Math.max(1, width);
+            return Math.max((side * side * max) / (sum * sum), (sum * sum) / (side * side * min));
         };
 
         const layoutRow = (row: number[], width: number, vertical: boolean, pos: { x: number, y: number }) => {
+            if (row.length === 0) return;
+            const side = Math.max(1, width);
             const rowValue = row.reduce((a, b) => a + b, 0);
-            const rowThickness = (rowValue * scale) / width;
+            const rowThickness = Math.max(0.1, (rowValue * scale) / side);
             let currentPos = vertical ? pos.y : pos.x;
 
             row.forEach(val => {
@@ -120,8 +123,8 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
                 rects.push({
                     x: vertical ? pos.x : currentPos,
                     y: vertical ? currentPos : pos.y,
-                    w: vertical ? rowThickness : length,
-                    h: vertical ? length : rowThickness,
+                    w: Math.max(0.1, vertical ? rowThickness : length),
+                    h: Math.max(0.1, vertical ? length : rowThickness),
                 });
                 currentPos += length;
             });
@@ -197,16 +200,17 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
     }, [stocks, dimensions]);
 
     const getHeatmapColor = (change: number) => {
+        if (isNaN(change)) return '#2a2e39';
         if (change > 3) return '#089981';
         if (change > 2) return '#057d69';
         if (change > 1) return '#045245';
         if (change > 0) return '#02342c';
-        if (change === 0) return '#1e222d';
+        if (change === 0) return '#2a2e39'; // Visual dark grey for zero change
         if (change < -3) return '#f23645';
         if (change < -2) return '#c21a2a';
         if (change < -1) return '#86252b';
         if (change < 0) return '#411e21';
-        return '#1e222d';
+        return '#2a2e39';
     };
 
     if (isLoading) {
@@ -276,8 +280,9 @@ const InstitutionalHeatmapGrid: React.FC<InstitutionalHeatmapGridProps> = ({
                 style={{ 
                     flex: 1, 
                     position: 'relative',
-                    background: '#000000',
-                    overflow: 'hidden'
+                    background: '#0a0a0a',
+                    overflow: 'hidden',
+                    minHeight: '400px' // Safety floor
                 }}
             >
                 {heatmapData.map((block, i) => (
