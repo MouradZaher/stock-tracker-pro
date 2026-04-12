@@ -3,7 +3,6 @@ import { useWindowStore, type WindowId } from '../hooks/useWindowStore';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TerminalWindow from './TerminalWindow';
 import StockHeatmap from './StockHeatmap';
-import InstitutionalScreener from './InstitutionalScreener';
 import Portfolio from './Portfolio';
 import WatchlistPage from './WatchlistPage';
 import LiveIntelligenceStreams from './LiveIntelligenceStreams';
