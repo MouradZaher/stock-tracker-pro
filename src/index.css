@@ -137,3 +137,17 @@ body::after {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(0.95); }
 }
+
+/* NUCLEAR UI HAMMER: Forced removal of legacy 'Live News' headers and filters */
+.live-streams-header,
+.live-badge,
+.category-filters,
+.filter-tabs-container,
+#live-news-header {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}

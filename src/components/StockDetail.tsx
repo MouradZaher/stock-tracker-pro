@@ -58,16 +58,16 @@ const LiveMomentum: React.FC<{ symbol: string; compact?: boolean }> = ({ symbol,
     }
     
     return (
-        <div className="alpha-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', borderTop: `4px solid ${color}`, background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+        <div className="alpha-card hover-glow" style={{ padding: '1.5rem', border: '1px solid var(--glass-border)', borderTop: `4px solid ${color}`, background: 'var(--color-bg-secondary)', borderRadius: '16px', boxShadow: 'var(--shadow-lg)' }}>
             <div className="alpha-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', letterSpacing: '0.1em' }}>
                 <span>INSTITUTIONAL MOMENTUM</span>
                 <span className="pulse-dot" style={{ width: '8px', height: '8px', background: color, boxShadow: `0 0 10px ${color}` }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '0.5rem' }}>
-                <div className="alpha-value" style={{ color, fontSize: '2rem', fontWeight: 900, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{momentum.toFixed(1)}%</div>
+                <div className="alpha-value" style={{ color, fontSize: '2rem', fontWeight: 900 }}>{momentum.toFixed(1)}%</div>
                 <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>{momentum > 50 ? 'ACCUMULATING' : 'RETRACING'}</div>
             </div>
-            <div className="momentum-meter" style={{ height: '6px', marginTop: '1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+            <div className="momentum-meter" style={{ height: '6px', marginTop: '1rem', background: 'var(--color-bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
                 <div className="momentum-bar" style={{ width: `${momentum}%`, background: color, height: '100%', transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 10px ${color}` }} />
             </div>
         </div>
@@ -171,8 +171,8 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
         <div className="stock-detail">
             <div className="stock-header glass-card hover-glow" style={{
                 padding: '2.5rem', marginBottom: 'var(--spacing-xl)', position: 'relative', overflow: 'hidden',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%)',
-                border: '1px solid var(--glass-border)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', borderRadius: '24px'
+                background: 'var(--color-bg-elevated)',
+                border: '1px solid var(--glass-border)', boxShadow: 'var(--shadow-xl)', borderRadius: '24px'
             }}>
                 <div className="stock-title">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -249,7 +249,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
             <div className="section">
                 <h3 className="section-title"><TrendingUp size={20} color="var(--color-success)" /> Relative Sector Strength</h3>
-                <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.01)' }}>
+                <div className="glass-card" style={{ padding: '1.5rem', background: 'var(--color-bg-secondary)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                         <div><div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Benchmarked against</div><div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{profile?.sector || 'Global Equities'}</div></div>
                         <div style={{ textAlign: 'right' }}><div className="badge-live" style={{ background: 'var(--color-success-light)', color: 'var(--color-success)', fontWeight: 700 }}>OUTPERFORMING</div></div>
@@ -270,7 +270,7 @@ const StockDetail: React.FC<StockDetailProps> = ({ symbol, onBack }) => {
 
             <div className="section">
                 <h3 className="section-title"><Clock size={20} color="var(--color-accent)" /> Smart Entry Timing</h3>
-                <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(139,92,246,0.05) 100%)', borderRadius: '24px' }}>
+                <div className="glass-card" style={{ padding: '1.5rem', background: 'var(--color-bg-elevated)', borderRadius: '24px', border: '1px solid var(--color-border)' }}>
                     <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
                         <div style={{ flex: 1, minWidth: '200px' }}>
                             <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>AI Timing Score</div>

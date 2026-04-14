@@ -67,7 +67,8 @@ const HeatmapMobileFallback: React.FC = () => {
                         gap: '8px',
                         boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
                         backdropFilter: 'blur(12px)',
-                        minHeight: '100px',
+                        minHeight: '120px',
+                        flex: 1,
                         justifyContent: 'center'
                     }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

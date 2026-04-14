@@ -38,7 +38,7 @@ const TradingViewScreener: React.FC = () => {
             "defaultScreen": defaultScreen,
             "market": market,
             "showToolbar": true,
-            "colorTheme": theme,
+            "colorTheme": "dark",
             "locale": "en",
             "isTransparent": true,
             "largeChartUrl": currentUrl
@@ -63,9 +63,8 @@ const TradingViewScreener: React.FC = () => {
         <div style={{ 
             height: '100%', 
             width: '100%', 
-            background: theme === 'dark' ? '#000' : '#f8fafc',
-            overflow: 'hidden',
-            filter: theme === 'dark' ? 'brightness(0.9) contrast(1.1)' : 'none'
+            background: 'var(--color-bg-secondary)',
+            overflow: 'hidden'
         }}>
             <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
         </div>

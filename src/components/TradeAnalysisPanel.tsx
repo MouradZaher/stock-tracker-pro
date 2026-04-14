@@ -142,8 +142,8 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
                     justifyContent: 'space-between',
                     width: '100%',
                     padding: '1rem 1.25rem',
-                    background: expanded ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(255,255,255,0.05)',
+                    background: expanded ? 'var(--color-bg-elevated)' : 'var(--color-bg-secondary)',
+                    border: '1px solid var(--color-border)',
                     borderRadius: expanded ? '8px 8px 0 0' : '8px',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
@@ -151,12 +151,12 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <BarChart2 size={16} color="var(--color-accent)" />
-                    <span style={{ fontWeight: 800, fontSize: '0.8rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.8rem', color: 'var(--color-text-primary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                         Institutional Trade Analysis
                     </span>
                     <span style={{
                         fontSize: '0.6rem', fontWeight: 900, padding: '2px 6px',
-                        borderRadius: '3px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-accent)'
+                        borderRadius: '3px', background: 'var(--color-bg-secondary)', color: 'var(--color-accent)'
                     }}>
                         {analysis.setup.bias}
                     </span>
@@ -166,8 +166,8 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
                         onClick={(e) => { e.stopPropagation(); setShowConfig(!showConfig); }}
                         style={{
                             fontSize: '0.6rem', fontWeight: 900, padding: '3px 7px',
-                            background: showConfig ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
-                            color: showConfig ? '#000' : '#888',
+                            background: showConfig ? 'var(--color-accent)' : 'var(--color-bg-secondary)',
+                            color: showConfig ? 'var(--color-bg-primary)' : 'var(--color-text-tertiary)',
                             borderRadius: '3px', textTransform: 'uppercase'
                         }}
                     >
@@ -181,28 +181,28 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
             {showConfig && (
                 <div style={{
                     padding: '0.75rem 1.25rem',
-                    background: '#0a0a0a',
-                    border: '1px solid #111',
+                    background: 'var(--color-bg-elevated)',
+                    border: '1px solid var(--color-border)',
                     borderTop: 'none',
                     display: 'flex',
                     gap: '1.5rem',
                     alignItems: 'center'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.6rem', color: '#444', fontWeight: 900 }}>ACCOUNT</span>
+                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900 }}>ACCOUNT</span>
                         <input
                             type="number"
                             value={accountSize}
                             onChange={(e) => setAccountSize(Number(e.target.value))}
-                            style={{ background: '#000', border: '1px solid #222', color: '#fff', fontSize: '0.75rem', width: '80px', padding: '2px 4px' }}
+                            style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', fontSize: '0.75rem', width: '80px', padding: '2px 4px' }}
                         />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.6rem', color: '#444', fontWeight: 900 }}>RISK %</span>
+                        <span style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 900 }}>RISK %</span>
                         <select
                             value={riskPercent}
                             onChange={(e) => setRiskPercent(Number(e.target.value))}
-                            style={{ background: '#000', border: '1px solid #222', color: '#fff', fontSize: '0.75rem' }}
+                            style={{ background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
                         >
                             {[0.25, 0.5, 1, 2, 5].map(v => <option key={v} value={v}>{v}%</option>)}
                         </select>
@@ -213,8 +213,8 @@ const TradeAnalysisPanel: React.FC<TradeAnalysisPanelProps> = ({
             {/* Analysis Dashboard */}
             {expanded && (
                 <div style={{
-                    background: '#040404',
-                    border: '1px solid #111',
+                    background: 'var(--color-bg-primary)',
+                    border: '1px solid var(--color-border)',
                     borderTop: 'none',
                     borderRadius: '0 0 8px 8px'
                  }}>

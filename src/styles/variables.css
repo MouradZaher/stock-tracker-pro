@@ -116,31 +116,31 @@
 
 /* Light Mode Overrides */
 html[data-theme='light'] {
-  --color-bg-primary: #f8fafc;
-  --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f1f5f9;
-  --color-bg-elevated: #e2e8f0;
+  --color-bg-primary: #f1f5f9; /* Institutional workspace floor */
+  --color-bg-secondary: #ffffff; /* Window/Card backgrounds */
+  --color-bg-tertiary: #e2e8f0;
+  --color-bg-elevated: #f8fafc;
 
   --color-surface: #ffffff;
-  --color-surface-hover: #f8fafc;
-  --color-surface-active: #f1f5f9;
+  --color-surface-hover: #f1f5f9;
+  --color-surface-active: #e2e8f0;
 
   --color-border: #cbd5e1;
   --color-border-light: #94a3b8;
 
   --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
+  --color-text-secondary: #334155;
   --color-text-tertiary: #64748b;
 
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-bg-hover: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-border-bright: rgba(0, 0, 0, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-bg-hover: rgba(255, 255, 255, 1.0);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-border-bright: rgba(15, 23, 42, 0.12);
+  --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04);
 
-  --topbar-bg: rgba(255,255,255,0.95);
+  --topbar-bg: #ffffff;
   --landing-nav-bg: #ffffff;
-  --topbar-border: rgba(148,163,184,0.4);
+  --topbar-border: #e2e8f0;
 
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);

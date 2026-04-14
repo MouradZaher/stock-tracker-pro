@@ -1,6 +1,6 @@
 {
-    "name": "StockTracker Pro",
-    "short_name": "StockTracker",
+    "name": "StockTracker Pro v2.0",
+    "short_name": "Pro v2.0",
     "description": "Professional US stock portfolio tracker with real-time data and AI recommendations",
     "start_url": "/",
     "display": "standalone",

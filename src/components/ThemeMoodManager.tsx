@@ -38,8 +38,7 @@ const ThemeMoodManager: React.FC<{ children: React.ReactNode }> = ({ children })
         root.style.setProperty('--mood-accent-light', accentLight);
         root.style.setProperty('--mood-glow', glow);
 
-        // Debug log for the Mega Deep Dive
-        console.log(`[Mood Engine] Sentiment: ${sentimentScore.toFixed(0)} - Theme Updated.`);
+
     }, [sentimentScore]);
 
     return <>{children}</>;

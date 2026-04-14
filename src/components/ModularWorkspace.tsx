@@ -20,7 +20,10 @@ interface ModularWorkspaceProps {
 }
 
 const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) => {
-    const { windows, openWindow, bringToFront, toggleMinimize, isDraggingId, snapTarget, snapToLayout } = useWindowStore();
+    const { 
+        windows, openWindow, bringToFront, toggleMinimize, 
+        isDraggingId, snapTarget, snapToLayout, resetToInstitutionalLayout 
+    } = useWindowStore();
     const [isInitialized, setIsInitialized] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -52,22 +55,44 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
     // Initial tool spawn - One time on mount
     useEffect(() => {
         if (!isInitialized) {
-            const currentWindows = useWindowStore.getState().windows;
+            // NUCLEAR SELF-HEAL: If any window is detected as 'lost' off-screen (e.g. x=848 on a 390px screen)
+            // Or if we specifically need to force-restore the institutional 2x2 grid on mobile
+            const currentWindows = windows;
+            const isCorrupted = Object.values(currentWindows).some(w => w.isOpen && w.x > window.innerWidth);
             
-            // Adjust initial sizes for mobile vs desktop grid
-            if (!currentWindows['heatmap'] || !currentWindows['heatmap'].isOpen) {
-                openWindow('heatmap', 'Heatmap');
-                if (!isMobile) snapToLayout('heatmap', 'TL');
-            }
-            if (!currentWindows['screener'] || !currentWindows['screener'].isOpen) {
-                openWindow('screener', 'Screener');
-                if (!isMobile) snapToLayout('screener', 'BL');
+            if (isCorrupted || (isMobile && !isInitialized)) {
+                console.log('ModularWorkspace: Detected corrupted layout. Triggering Factory Reset.');
+                resetToInstitutionalLayout();
+                setIsInitialized(true);
+                return;
             }
 
+
+
+            // Force-open 4 core quadrants + 1 Bottom Dock to ensure visibility on mobile
+            const targetLayouts: { id: WindowId, title: string, slot: any }[] = [
+                { id: 'heatmap', title: 'Heatmap', slot: 'TL' },
+                { id: 'screener', title: 'Screener', slot: 'TR' },
+                { id: 'news', title: 'Market News', slot: 'BL' },
+                { id: 'portfolio', title: 'Portfolio', slot: 'BR' },
+                { id: 'tv', title: 'Live News', slot: 'SIDE' }
+            ];
+
+            targetLayouts.forEach(layout => {
+                // FORCE: Always call openWindow and snapToLayout to bypass stale storage
+                openWindow(layout.id, layout.title);
+                snapToLayout(layout.id, layout.slot);
+            });
+
+            // ENSURE FRONT: Specifically bring Heatmap to absolute front
+            setTimeout(() => {
+                const { bringToFront } = useWindowStore.getState();
+                bringToFront('heatmap');
+            }, 100);
 
             setIsInitialized(true);
         }
-    }, [isInitialized, openWindow, isMobile, snapToLayout]);
+    }, [isInitialized, openWindow, isMobile, snapToLayout, resetToInstitutionalLayout, windows]);
 
     const minimizedWindows = Object.values(windows).filter(w => w.isOpen && w.isMinimized);
 
@@ -77,9 +102,12 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             width: '100%', 
             height: '100%', 
             overflow: 'hidden', 
-            background: '#000',
-            backgroundImage: 'radial-gradient(circle at 2px 2px, #080808 1px, transparent 0)',
-            backgroundSize: '40px 40px'
+            background: 'var(--color-bg-primary)',
+            backgroundImage: `
+                linear-gradient(var(--glass-border-bright) 1px, transparent 1px),
+                linear-gradient(90deg, var(--glass-border-bright) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px'
         }}>
             {/* SNAP GHOST / DROP ZONE PREVIEW */}
             {isDraggingId && snapTarget && (
@@ -88,86 +116,140 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                     zIndex: 2,
                     pointerEvents: 'none',
                     transition: 'all 0.1s ease-out',
-                    border: '2px solid rgba(74, 222, 128, 0.4)',
-                    background: 'rgba(74, 222, 128, 0.05)',
-                    boxShadow: '0 0 40px rgba(74, 222, 128, 0.1)',
+                    border: '2px solid var(--color-accent)',
+                    background: 'rgba(74, 222, 128, 0.1)',
+                    boxShadow: '0 0 50px rgba(74, 222, 128, 0.2)',
+                    backdropFilter: 'blur(4px)',
+                    borderRadius: '8px',
+                    margin: '10px',
                     ...((() => {
-                        const sidebarWidth = 0; // Relative to ModularWorkspace
-                        const SIDE_WIDTH = 350;
-                        const availW = window.innerWidth - 48 - SIDE_WIDTH;
+                        const SIDE_WIDTH = isMobile ? window.innerWidth * 0.8 : 350;
+                        const sidebarWidth = isMobile ? 50 : 48;
+                        const availW = Math.max(0, window.innerWidth - sidebarWidth - (isMobile ? 0 : SIDE_WIDTH));
                         const availH = window.innerHeight;
                         const halfW = availW / 2;
                         const halfH = availH / 2;
 
-                        switch (snapTarget) {
-                            case 'TL': return { left: 0, top: 0, width: halfW, height: halfH };
-                            case 'TR': return { left: halfW, top: 0, width: halfW, height: halfH };
-                            case 'BL': return { left: 0, top: halfH, width: halfW, height: halfH };
-                            case 'BR': return { left: halfW, top: halfH, width: halfW, height: halfH };
-                            case 'SIDE': return { right: 0, top: 0, width: SIDE_WIDTH, height: availH };
-                            default: return { display: 'none' };
+                        const margin = 10;
+                        if (isMobile) {
+                            const sidebarWidth = 50;
+                            const availW = window.innerWidth - sidebarWidth;
+                            const availH = window.innerHeight;
+                            const dockH = availH * 0.35;
+                            const gridH = availH - dockH;
+                            const hW = availW / 2;
+                            const hH = gridH / 2;
+
+                            switch (snapTarget) {
+                                case 'TL': return { left: 0, top: 0, width: hW - margin, height: hH - margin };
+                                case 'TR': return { left: hW + margin, top: 0, width: hW - margin, height: hH - margin };
+                                case 'BL': return { left: 0, top: hH + margin, width: hW - margin, height: hH - margin };
+                                case 'BR': return { left: hW + margin, top: hH + margin, width: hW - margin, height: hH - margin };
+                                case 'SIDE': return { left: 0, top: gridH + margin, width: availW - margin, height: dockH - margin };
+                                default: return { display: 'none' };
+                            }
+                        } else {
+                            const SIDE_WIDTH = 350;
+                            const sidebarWidth = 48;
+                            const availW = window.innerWidth - sidebarWidth - SIDE_WIDTH;
+                            const availH = window.innerHeight;
+                            const halfW = availW / 2;
+                            const halfH = availH / 2;
+
+                            switch (snapTarget) {
+                                case 'TL': return { left: 0, top: 0, width: halfW - margin, height: halfH - margin };
+                                case 'TR': return { left: halfW + margin, top: 0, width: halfW - margin, height: halfH - margin };
+                                case 'BL': return { left: 0, top: halfH + margin, width: halfW - margin, height: halfH - margin };
+                                case 'BR': return { left: halfW + margin, top: halfH + margin, width: halfW - margin, height: halfH - margin };
+                                case 'SIDE': return { right: 0, top: 0, width: SIDE_WIDTH - margin, height: availH - margin };
+                                default: return { display: 'none' };
+                            }
                         }
                     })())
                 }} />
             )}
             
             {/* GRID BACKGROUND / DROP ZONES */}
-            <div style={{ position: 'absolute', inset: 0, opacity: isDraggingId ? 1 : 0, transition: 'opacity 0.2s', pointerEvents: 'none', zIndex: 1 }}>
-                <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '350px', background: 'rgba(74, 222, 128, 0.03)', borderLeft: '1px solid rgba(74, 222, 128, 0.1)' }} />
-                <div style={{ position: 'absolute', top: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex' }}>
-                    <div style={{ flex: 1, borderRight: '1px solid rgba(255,255,255,0.05)' }} />
-                    <div style={{ flex: 1 }} />
-                </div>
-                <div style={{ position: 'absolute', bottom: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', display: 'flex' }}>
-                    <div style={{ flex: 1, borderRight: '1px solid rgba(255,255,255,0.05)' }} />
-                    <div style={{ flex: 1 }} />
-                </div>
+            <div style={{ position: 'absolute', inset: 0, opacity: isDraggingId ? 1 : 0.4, transition: 'opacity 0.5s', pointerEvents: 'none', zIndex: 0 }}>
+                {isMobile ? (
+                    // MOBILE GRID: Subtle 2x2 Grid (Top 65%) + 1 Dock (Bottom 35%)
+                    <>
+                        {/* 4 RECTANGULAR PANELS (Transparent Drop Zones) */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '32.5%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex' }}>
+                            <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255, 0.05)' }} />
+                            <div style={{ flex: 1 }} />
+                        </div>
+                        <div style={{ position: 'absolute', top: '32.5%', left: 0, width: '100%', height: '32.5%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex' }}>
+                            <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255, 0.05)' }} />
+                            <div style={{ flex: 1 }} />
+                        </div>
+                        {/* BOTTOM NEWS DOCK */}
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'rgba(255, 255, 255, 0.02)', borderTop: '1px solid var(--color-border)' }} />
+                    </>
+                ) : (
+
+
+
+                    // DESKTOP GRID: 2x2 LEFT, 1 SIDE RIGHT
+                    <>
+                        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '350px', background: 'rgba(74, 222, 128, 0.01)', borderLeft: '1px solid var(--color-border)' }} />
+                        <div style={{ position: 'absolute', top: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', borderBottom: '1px solid var(--color-border)', display: 'flex', opacity: 0.3 }}>
+                            <div style={{ flex: 1, borderRight: '1px solid var(--color-border)' }} />
+                            <div style={{ flex: 1 }} />
+                        </div>
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, width: 'calc(100% - 350px)', height: '50%', display: 'flex', opacity: 0.3 }}>
+                            <div style={{ flex: 1, borderRight: '1px solid var(--color-border)' }} />
+                            <div style={{ flex: 1 }} />
+                        </div>
+                    </>
+                )}
             </div>
             
-            {/* THE WORKSPACE (DESKTOP) */}
-            <div style={{ position: 'absolute', inset: 0, padding: 0 }}>
+            {/* THE WORKSPACE */}
+            <div style={{ 
+                position: 'absolute', 
+                inset: 0, 
+                padding: 0,
+                overflow: 'hidden'
+            }}>
                 
                 {/* 1. Heatmap Window */}
-                <TerminalWindow id="heatmap" title="Heatmap" minW={350} minH={300}>
+                <TerminalWindow id="heatmap" title="Heatmap">
                     <StockHeatmap />
                 </TerminalWindow>
 
                 {/* 2. Screener Window (Now supports Search Tabs) */}
-                <TerminalWindow id="screener" title="Screener" minW={350} minH={300}>
+                <TerminalWindow id="screener" title="Screener">
                     <RightTabbedPanel onSelectSymbol={onSelectSymbol || (() => {})} />
                 </TerminalWindow>
 
                 {/* 3. Portfolio Window */}
-                <TerminalWindow id="portfolio" title="Portfolio" minW={350} minH={300}>
+                <TerminalWindow id="portfolio" title="Portfolio">
                     <Portfolio />
                 </TerminalWindow>
 
                 {/* 4. Watchlist Window */}
-                <TerminalWindow id="watchlist" title="Global Watchlist" minW={350} minH={300}>
+                <TerminalWindow id="watchlist" title="Global Watchlist" minW={isMobile ? 320 : 350} minH={300}>
                     <WatchlistPage onSelectSymbol={onSelectSymbol || (() => {})} />
                 </TerminalWindow>
 
                 {/* 5. TV / Streams Window */}
-                <TerminalWindow id="tv" title="Live News" minW={300} minH={250}>
+                <TerminalWindow id="tv" title="Live News" minW={isMobile ? 300 : 300} minH={250}>
                     <LiveIntelligenceStreams />
                 </TerminalWindow>
 
                 {/* 6. Calendar Window */}
-                <TerminalWindow id="calendar" title="Corporate Actions" minW={300} minH={250}>
+                <TerminalWindow id="calendar" title="Corporate Actions" minW={isMobile ? 300 : 300} minH={250}>
                     <CorporateActionsCalendar />
                 </TerminalWindow>
 
                 {/* 7. News Window */}
-                <TerminalWindow id="news" title="Market News" minW={350} minH={300}>
+                <TerminalWindow id="news" title="Market News">
                     <MarketNews />
                 </TerminalWindow>
 
-
-
-
-
                 {/* 10. Admin Window */}
-                <TerminalWindow id="admin" title="Administrative Terminal" minW={600} minH={400}>
+                <TerminalWindow id="admin" title="Administrative Terminal" minW={isMobile ? 320 : 600} minH={400}>
                     <AdminDashboard isOpen={true} onClose={() => {}} />
                 </TerminalWindow>
 
@@ -182,8 +264,8 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 display: 'flex',
                 gap: '8px',
                 padding: '4px',
-                background: 'rgba(5, 5, 5, 0.8)',
-                border: '1px solid #111',
+                background: 'var(--glass-bg)',
+                border: '1px solid var(--glass-border)',
                 borderRadius: '8px',
                 backdropFilter: 'blur(10px)',
                 zIndex: 20000,
@@ -203,10 +285,10 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                         }}
                         style={{
                             padding: '6px 12px',
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid #222',
+                            background: 'var(--color-bg-elevated)',
+                            border: '1px solid var(--color-border)',
                             borderRadius: '4px',
-                            color: 'white',
+                            color: 'var(--color-text-primary)',
                             fontSize: '0.5rem',
                             fontWeight: 900,
                             letterSpacing: '0.05em',

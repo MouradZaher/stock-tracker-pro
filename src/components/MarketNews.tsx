@@ -13,7 +13,7 @@ const MarketNews: React.FC = () => {
         script.async = true;
         script.innerHTML = JSON.stringify({
             "feedMode": "all_symbols",
-            "colorTheme": theme,
+            "colorTheme": "dark",
             "isTransparent": true,
             "displayMode": "regular",
             "width": "100%",
@@ -29,10 +29,9 @@ const MarketNews: React.FC = () => {
         <div style={{ 
             height: '100%', 
             width: '100%', 
-            background: theme === 'dark' ? '#000' : '#f8fafc',
+            background: 'var(--color-bg-secondary)',
             display: 'flex', 
-            flexDirection: 'column',
-            filter: theme === 'dark' ? 'brightness(0.9) contrast(1.1)' : 'none'
+            flexDirection: 'column'
         }}>
             <div ref={containerRef} style={{ flex: 1 }} />
         </div>

@@ -60,6 +60,12 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
+  // GLOBAL CACHE BUSTER & VERSION TRACKER
+  useEffect(() => {
+    console.log('--- INSTITUTIONAL TERMINAL SYNC_21_55 ---');
+    console.log('[Stability Engine] Verifying mobile quadrant grid...');
+  }, []);
+
   const { isAuthenticated, logout, user } = usePinAuth();
   const syncPrices = usePortfolioStore(state => state.syncPrices);
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
@@ -240,7 +246,7 @@ function MainLayout({
   }, [location.search, navigate, location.pathname]);
 
   return (
-    <div className="app" style={{ background: '#000000', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="app" style={{ background: 'var(--color-bg-primary)', height: '100dvh', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <ErrorBoundary>
         <OmniSearch
           isOpen={isOmniSearchOpen}

@@ -42,7 +42,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
 
     const iconStyle = (id: string, color?: string, isActive?: boolean, isMinimized?: boolean): React.CSSProperties => ({
         cursor: 'pointer',
-        color: isActive ? (color || 'var(--color-accent)') : isMinimized ? '#222' : hoveredIcon === id ? (color || 'var(--color-accent)') : '#444',
+        color: isActive ? (color || 'var(--color-accent)') : isMinimized ? 'var(--color-text-tertiary)' : hoveredIcon === id ? (color || 'var(--color-accent)') : 'var(--color-text-secondary)',
         transition: 'all 0.2s ease',
         position: 'relative',
         display: 'flex',
@@ -61,8 +61,8 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
         left: '52px',
         top: '50%',
         transform: 'translateY(-50%)',
-        background: '#111',
-        border: '1px solid #222',
+        background: 'var(--color-bg-primary)',
+        border: '1px solid var(--color-border)',
         padding: '4px 8px',
         fontSize: '0.55rem',
         fontWeight: 800,
@@ -72,19 +72,23 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
         pointerEvents: 'none',
     };
 
-    const separator = <div style={{ width: '24px', height: '1px', background: '#111', margin: '6px 0' }} />;
+    const separator = <div style={{ width: '24px', height: '1px', background: 'var(--color-border)', margin: '6px 0' }} />;
 
     return (
-        <aside style={{
+        <aside className="left-toolstrip" style={{
             width: '48px',
-            borderRight: '1px solid #111',
+            borderRight: '1px solid var(--color-border)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             padding: '0.75rem 0',
             gap: '4px',
-            background: '#000',
+            background: 'var(--color-bg-elevated)',
             flexShrink: 0,
+            height: '100%',
+            overflowY: 'auto',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
         }}>
             
             {/* ─── TERMINAL LOGO (TOP / HOME / HEATMAP TICKET) ─── */}
@@ -97,6 +101,8 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                     justifyContent: 'center',
                     position: 'relative'
                 }}
+                onMouseEnter={() => setHoveredIcon('home')}
+                onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => { 
                     resetToInstitutionalLayout();
                     navigate('/home');
@@ -113,6 +119,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                         opacity: 0.9
                     }} 
                 />
+                {hoveredIcon === 'home' && <div style={tooltipStyle}>HOME</div>}
             </div>
             
             {/* ─── MARKET SELECTOR (TOP) ─── */}
@@ -136,7 +143,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 onClick={() => { openWindow('heatmap', 'Heatmap'); navigate('/home'); soundService.playTap(); }}
             >
                 <LayoutGrid size={16} />
-                {hoveredIcon === 'heatmap' && !isWindowOpen('heatmap') && <div style={tooltipStyle}>HEATMAP</div>}
+                {hoveredIcon === 'heatmap' && <div style={tooltipStyle}>HEATMAP</div>}
                 {isWindowOpen('heatmap') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
             </div>
 
@@ -147,7 +154,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 onClick={() => { openWindow('screener', 'Screener'); navigate('/home'); soundService.playTap(); }}
             >
                 <Activity size={16} />
-                {hoveredIcon === 'screener' && !isWindowOpen('screener') && <div style={tooltipStyle}>SCREENER</div>}
+                {hoveredIcon === 'screener' && <div style={tooltipStyle}>SCREENER</div>}
                 {isWindowOpen('screener') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: 'var(--color-accent)', borderRadius: '1px' }} />}
             </div>
 
@@ -163,7 +170,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 onClick={() => { openWindow('portfolio', 'Portfolio'); navigate('/home'); soundService.playTap(); }}
             >
                 <PieChart size={16} />
-                {hoveredIcon === 'portfolio' && !isWindowOpen('portfolio') && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
+                {hoveredIcon === 'portfolio' && <div style={{ ...tooltipStyle, color: '#10b981' }}>PORTFOLIO</div>}
                 {isWindowOpen('portfolio') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#10b981', borderRadius: '1px' }} />}
             </div>
 
@@ -174,7 +181,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 onClick={() => { openWindow('watchlist', 'Active Watchlist'); navigate('/home'); soundService.playTap(); }}
             >
                 <Eye size={16} />
-                {hoveredIcon === 'watchlist' && !isWindowOpen('watchlist') && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
+                {hoveredIcon === 'watchlist' && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>WATCHLIST</div>}
                 {isWindowOpen('watchlist') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#3b82f6', borderRadius: '1px' }} />}
             </div>
 
@@ -188,7 +195,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 onClick={() => { openWindow('calendar', 'Institutional Calendar'); navigate('/home'); soundService.playTap(); }}
             >
                 <Calendar size={16} />
-                {hoveredIcon === 'calendar' && !isWindowOpen('calendar') && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
+                {hoveredIcon === 'calendar' && <div style={{ ...tooltipStyle, color: '#f59e0b' }}>CALENDAR</div>}
                 {isWindowOpen('calendar') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#f59e0b', borderRadius: '1px' }} />}
             </div>
 
@@ -200,7 +207,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             >
                 <Tv size={16} />
                 {isWindowOpen('tv') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#ef4444', borderRadius: '1px' }} />}
-                {hoveredIcon === 'tv' && !isWindowOpen('tv') && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE NEWS</div>}
+                {hoveredIcon === 'tv' && <div style={{ ...tooltipStyle, color: '#ef4444' }}>LIVE NEWS</div>}
             </div>
 
             <div
@@ -211,7 +218,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
             >
                 <Newspaper size={16} />
                 {isWindowOpen('news') && <div style={{ position: 'absolute', right: '-1px', top: '50%', transform: 'translateY(-50%)', width: '2px', height: '14px', background: '#3b82f6', borderRadius: '1px' }} />}
-                {hoveredIcon === 'news' && !isWindowOpen('news') && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>NEWS FEED</div>}
+                {hoveredIcon === 'news' && <div style={{ ...tooltipStyle, color: '#3b82f6' }}>NEWS FEED</div>}
             </div>
 
 
@@ -228,7 +235,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                     <span style={{
                         position: 'absolute', top: '2px', right: '2px',
                         width: '8px', height: '8px', borderRadius: '50%',
-                        background: '#ef4444', border: '2px solid #000',
+                        background: '#ef4444', border: '2px solid var(--color-bg-primary)',
                     }} />
                 )}
                 {hoveredIcon === 'bell' && <div style={tooltipStyle}>SIGNALS</div>}
@@ -268,7 +275,23 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 </div>
             )}
 
+            {/* Layout Recovery (ShieldCheck) */}
+            <div
+                style={iconStyle('restore', 'var(--color-accent)')}
+                onMouseEnter={() => setHoveredIcon('restore')}
+                onMouseLeave={() => setHoveredIcon(null)}
+                onClick={() => { 
+                    resetToInstitutionalLayout(); 
+                    soundService.playTap();
+                }}
+                title="Restore Institutional Grid"
+            >
+                <ShieldCheck size={16} />
+                {hoveredIcon === 'restore' && <div style={tooltipStyle}>RESTORE GRID</div>}
+            </div>
+
             {/* Settings */}
+
             <div
                 style={iconStyle('settings')}
                 onMouseEnter={() => setHoveredIcon('settings')}
@@ -324,7 +347,7 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                     <div onClick={() => setIsMarketOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 9998 }} />
                     <div style={{
                         position: 'fixed', top: '24px', left: '56px', zIndex: 9999,
-                        background: '#0a0a0a', border: '1px solid #222',
+                        background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)',
                         padding: '0.5rem', minWidth: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.8)'
                     }}>
                         <div style={{ padding: '0.5rem 0.75rem 0.25rem', fontSize: '0.55rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 900 }}>
@@ -368,6 +391,9 @@ const LeftToolstrip: React.FC<LeftToolstripProps> = ({
                 }
                 .logo-flash {
                     animation: logoFlash 2s infinite ease-in-out;
+                }
+                .left-toolstrip::-webkit-scrollbar {
+                    display: none;
                 }
             `}</style>
         </aside>

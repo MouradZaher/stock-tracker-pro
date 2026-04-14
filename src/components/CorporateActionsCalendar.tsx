@@ -81,12 +81,12 @@ const CorporateActionsCalendar: React.FC = () => {
                 <div>
                     <h2 style={{ 
                         margin: 0, fontSize: '1.25rem', fontStyle: 'italic', fontWeight: 900, 
-                        letterSpacing: '-0.02em', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' 
+                        letterSpacing: '-0.02em', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '8px' 
                     }}>
                         <Calendar size={22} color="var(--color-accent)" />
                         CORPORATE ACTIONS CALENDAR
                     </h2>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: '#555', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                         Strategic Events for <span style={{ color: selectedMarket.color }}>{selectedMarket.name}</span> Institutional Coverage
                     </p>
                 </div>
@@ -97,9 +97,9 @@ const CorporateActionsCalendar: React.FC = () => {
                             key={type}
                             onClick={() => setFilterType(type)}
                             style={{
-                                background: filterType === type ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                border: filterType === type ? '1px solid #333' : '1px solid transparent',
-                                color: filterType === type ? 'white' : '#444',
+                                background: filterType === type ? 'var(--color-accent-light)' : 'transparent',
+                                border: filterType === type ? '1px solid var(--color-accent)' : '1px solid transparent',
+                                color: filterType === type ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
                                 padding: '4px 12px',
                                 borderRadius: '8px',
                                 fontSize: '0.65rem',
@@ -122,7 +122,7 @@ const CorporateActionsCalendar: React.FC = () => {
                 {filteredActions.length === 0 ? (
                     <div style={{ 
                         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', 
-                        justifyContent: 'center', color: '#333', gap: '1rem' 
+                        justifyContent: 'center', color: 'var(--color-text-tertiary)', gap: '1rem' 
                     }}>
                         <AlertCircle size={48} />
                         <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -132,8 +132,8 @@ const CorporateActionsCalendar: React.FC = () => {
                 ) : (
                     filteredActions.map(action => (
                         <div key={action.id} style={{
-                            background: 'rgba(2,2,6,0.5)',
-                            border: '1px solid #111',
+                            background: 'var(--color-bg-secondary)',
+                            border: '1px solid var(--color-border)',
                             borderRadius: '16px',
                             padding: '1.25rem',
                             display: 'flex',
@@ -145,12 +145,12 @@ const CorporateActionsCalendar: React.FC = () => {
                             cursor: 'pointer'
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = '#222';
-                            e.currentTarget.style.background = 'rgba(10,10,15,0.8)';
+                            e.currentTarget.style.borderColor = 'var(--color-accent)';
+                            e.currentTarget.style.background = 'var(--color-bg-elevated)';
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = '#111';
-                            e.currentTarget.style.background = 'rgba(2,2,6,0.5)';
+                            e.currentTarget.style.borderColor = 'var(--color-border)';
+                            e.currentTarget.style.background = 'var(--color-bg-secondary)';
                         }}
                         >
                             {/* Accent line */}
@@ -161,10 +161,10 @@ const CorporateActionsCalendar: React.FC = () => {
 
                             {/* Date Column */}
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
-                                <span style={{ fontSize: '0.6rem', fontWeight: 900, color: '#444', textTransform: 'uppercase' }}>
+                                <span style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>
                                     {new Date(action.date).toLocaleDateString('en-US', { month: 'short' })}
                                 </span>
-                                <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white' }}>
+                                <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>
                                     {new Date(action.date).getDate()}
                                 </span>
                             </div>
@@ -173,14 +173,15 @@ const CorporateActionsCalendar: React.FC = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                 <div style={{ 
                                     width: '40px', height: '40px', borderRadius: '10px', 
-                                    background: 'white', display: 'flex', alignItems: 'center', 
+                                    background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)',
+                                    display: 'flex', alignItems: 'center', 
                                     justifyContent: 'center', padding: '4px' 
                                 }}>
                                     <CompanyLogo symbol={action.symbol} size={32} />
                                 </div>
                                 <div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span style={{ fontSize: '0.95rem', fontWeight: 900, color: 'white' }}>{action.symbol}</span>
+                                        <span style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{action.symbol}</span>
                                         <span style={{ 
                                             background: `${getTypeColor(action.type)}22`, 
                                             color: getTypeColor(action.type),
@@ -192,29 +193,29 @@ const CorporateActionsCalendar: React.FC = () => {
                                             {action.type}
                                         </span>
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: '#888', fontWeight: 500, marginTop: '2px' }}>{action.name}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', fontWeight: 500, marginTop: '2px' }}>{action.name}</div>
                                 </div>
                             </div>
 
                             {/* Description */}
                             <div style={{ flex: 1.5 }}>
-                                <div style={{ fontSize: '0.7rem', color: '#555', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Event Brief</div>
-                                <div style={{ fontSize: '0.85rem', color: '#ccc', fontWeight: 600, marginTop: '4px' }}>{action.description}</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Event Brief</div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', fontWeight: 600, marginTop: '4px' }}>{action.description}</div>
                             </div>
 
                             {/* Value/Details */}
                             {action.value && (
                                 <div style={{ minWidth: '100px', textAlign: 'right' }}>
-                                    <div style={{ fontSize: '0.7rem', color: '#555', fontWeight: 800, textTransform: 'uppercase' }}>Distribution</div>
-                                    <div style={{ fontSize: '1rem', fontWeight: 900, color: '#10b981', marginTop: '2px' }}>{action.value}</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', fontWeight: 800, textTransform: 'uppercase' }}>Distribution</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--color-success)', marginTop: '2px' }}>{action.value}</div>
                                 </div>
                             )}
 
                             {/* Impact/Action */}
                             <div style={{ textAlign: 'center', minWidth: '80px' }}>
-                                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: action.impact === 'High' ? '#ef4444' : '#555', textTransform: 'uppercase' }}>Impact</div>
+                                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: action.impact === 'High' ? 'var(--color-error)' : 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Impact</div>
                                 <div style={{ 
-                                    marginTop: '4px', fontSize: '0.7rem', fontWeight: 900, color: 'white', 
+                                    marginTop: '4px', fontSize: '0.7rem', fontWeight: 900, color: 'var(--color-text-primary)', 
                                     display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' 
                                 }}>
                                     {action.impact.toUpperCase()}
@@ -226,26 +227,26 @@ const CorporateActionsCalendar: React.FC = () => {
                 )}
             </div>
 
-            {/* Institutional Summary Footer */}
+             {/* Institutional Summary Footer */}
             <div style={{ 
-                background: 'rgba(5,5,10,0.8)', border: '1px solid #111', borderRadius: '16px', padding: '1rem',
+                background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', borderRadius: '16px', padding: '1rem',
                 display: 'flex', alignItems: 'center', gap: '1rem'
             }}>
                 <div style={{ 
-                    width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(74, 222, 128, 0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(74, 222, 128, 0.2)'
+                    width: '32px', height: '32px', borderRadius: '8px', background: 'var(--color-accent-light)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--color-accent)'
                 }}>
                     <Zap size={16} color="var(--color-accent)" />
                 </div>
                 <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Institutional Intelligence Summary</div>
-                    <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '2px', fontStyle: 'italic' }}>
-                        High-volatility event window detected for <span style={{ color: 'white' }}>{selectedMarket.name}</span>. Recommended risk-offset via sector rotation prior to ex-dividend dates and IPO book-building completion.
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px', fontStyle: 'italic' }}>
+                        High-volatility event window detected for <span style={{ color: 'var(--color-text-primary)' }}>{selectedMarket.name}</span>. Recommended risk-offset via sector rotation prior to ex-dividend dates and IPO book-building completion.
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: '#444', textTransform: 'uppercase' }}>Next Major Event</div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'white', marginTop: '2px' }}>In 48 Hours</div>
+                    <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Next Major Event</div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--color-text-primary)', marginTop: '2px' }}>In 48 Hours</div>
                 </div>
             </div>
         </div>

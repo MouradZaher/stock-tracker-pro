@@ -1,4 +1,4 @@
-﻿/* 
+/* 
    ============================================================
    INSTITUTIONAL TERMINAL - WELCOME PAGE (REFINDED)
    ============================================================ 
@@ -114,7 +114,7 @@
     flex: 1;
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1.2fr 1fr 100px;
     gap: 8px;
     padding: 8px;
     z-index: 20;
@@ -122,6 +122,61 @@
     max-width: 1600px;
     margin: 0 auto;
     width: 100%;
+    overflow: hidden;
+}
+
+/* --- Responsive Layout: iPad Air 5 & Tablets --- */
+@media (max-width: 1024px) {
+    .login-workspace {
+        grid-template-columns: 1fr 0.8fr;
+        padding: 6px;
+        gap: 6px;
+    }
+}
+
+/* --- Responsive Layout: iPhone 13 Pro & Mobile --- */
+@media (max-width: 480px) {
+    .login-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+        gap: 8px;
+        padding: 10px;
+        overflow-y: auto;
+        max-height: calc(100vh - 80px); /* Strict zero-scroll anchor */
+        scrollbar-width: none;
+    }
+
+    .login-workspace::-webkit-scrollbar { display: none; }
+
+    .auth-terminal {
+        grid-row: span 1 !important;
+        min-height: 280px;
+        order: 1;
+        transform: none !important; /* Disable hover lift on mobile to save space */
+    }
+
+    .intelligence-monitor { order: 2; }
+    .sc-features-node { order: 3; }
+    .terminal-mini-grid { order: 4; }
+
+    .intelligence-monitor, .sc-features-node {
+        min-height: 120px;
+    }
+
+    .terminal-mini-grid {
+        grid-column: span 1 !important;
+        height: 70px !important;
+        opacity: 0.8;
+    }
+
+    .glitch-text {
+        font-size: 1.3rem !important;
+        text-align: center;
+    }
+
+    .auth-meta {
+        text-align: center;
+    }
 }
 
 /* --- Terminal Windows --- */
@@ -133,7 +188,29 @@
     flex-direction: column;
     overflow: hidden;
     backdrop-filter: blur(12px);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+    position: relative;
+}
+
+.login-window:hover {
+    background: rgba(10, 10, 10, 0.7);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.05);
+    transform: translateY(-2px);
+}
+
+.login-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, transparent 0%, rgba(74, 222, 128, 0.02) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.login-window:hover::after {
+    opacity: 1;
 }
 
 .window-header {
@@ -161,6 +238,11 @@
 .auth-terminal { grid-row: span 2; }
 .intelligence-monitor { grid-row: span 1; }
 .sc-features-node { grid-row: span 1; }
+
+@media (max-width: 480px) {
+    .auth-terminal { grid-row: span 1; }
+    .terminal-mini-grid { order: 10; } /* Keep diagnostics at the very bottom */
+}
 
 /* --- Auth Terminal Window --- */
 .auth-form-container {

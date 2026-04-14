@@ -159,7 +159,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
     return (
         <div className="admin-modal" style={{
             width: '100%', height: '100%',
-            background: '#000000',
+            background: 'var(--color-bg-primary)',
             display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
             <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="custom-scrollbar">
@@ -173,15 +173,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                         { label: 'TOTAL AUM', status: 'online', val: formatCurrency(profiles.reduce((sum, p) => sum + (p.portfolioValue || 0), 0)), icon: Wallet, sub: 'AGGREGATED' }
                     ].map((stat, i) => (
                         <div key={i} style={{ 
-                            background: '#020202', border: '1px solid #111', padding: '1rem', borderRadius: '12px',
+                            background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', padding: '1rem', borderRadius: '12px',
                             borderLeft: `3px solid ${stat.status === 'online' ? 'var(--color-accent)' : StatStatusColor(stat.status)}`
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                                <span style={{ fontSize: '0.6rem', fontWeight: 900, color: '#444', letterSpacing: '0.05em' }}>{stat.label}</span>
-                                <stat.icon size={12} color="#333" />
+                                <span style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.05em' }}>{stat.label}</span>
+                                <stat.icon size={12} color="var(--color-text-tertiary)" />
                             </div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>{stat.val}</div>
-                            <div style={{ fontSize: '0.55rem', color: '#333', fontWeight: 700, marginTop: '4px' }}>{stat.sub}</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{stat.val}</div>
+                            <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 700, marginTop: '4px' }}>{stat.sub}</div>
                         </div>
                     ))}
                 </div>
@@ -196,13 +196,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                     {loading ? (
                         <div style={{ padding: '4rem', textAlign: 'center' }}>
                             <div style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%', margin: '0 auto 1rem', animation: 'pulse 1.5s infinite' }} />
-                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#333' }}>SYNCHRONIZING SECURE TUNNEL...</span>
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-text-tertiary)' }}>SYNCHRONIZING SECURE TUNNEL...</span>
                         </div>
                     ) : (
-                        <div style={{ border: '1px solid #111', borderRadius: '12px', overflow: 'hidden' }}>
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', overflow: 'hidden' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
-                                    <tr style={{ background: '#050505', textAlign: 'left', borderBottom: '1px solid #111' }}>
+                                    <tr style={{ background: 'var(--color-bg-elevated)', textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>
                                         <th style={thStyle}>IDENTITY</th>
                                         <th style={thStyle}>CLEARANCE</th>
                                         <th style={thStyle}>STATUS</th>
@@ -212,10 +212,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                 </thead>
                                 <tbody>
                                     {profiles.map(profile => (
-                                        <tr key={profile.id} style={{ borderBottom: '1px solid #0a0a0a', background: '#010101' }}>
+                                        <tr key={profile.id} style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-bg-secondary)' }}>
                                             <td style={tdStyle}>
-                                                <div style={{ fontWeight: 800, color: 'white', fontSize: '0.8rem' }}>{profile.email || 'ENCRYPTED_ID'}</div>
-                                                <div style={{ fontSize: '0.55rem', color: '#333', fontWeight: 700 }}>HEX: {profile.id.slice(0, 12)}</div>
+                                                <div style={{ fontWeight: 800, color: 'var(--color-text-primary)', fontSize: '0.8rem' }}>{profile.email || 'ENCRYPTED_ID'}</div>
+                                                <div style={{ fontSize: '0.55rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>HEX: {profile.id.slice(0, 12)}</div>
                                             </td>
                                             <td style={tdStyle}>
                                                 <span style={{ 
@@ -231,7 +231,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
                                                     {profile.is_approved ? 'VERIFIED' : 'RESTRICTED'}
                                                 </div>
                                             </td>
-                                            <td style={{ ...tdStyle, color: 'white', fontWeight: 800, fontSize: '0.8rem' }}>
+                                            <td style={{ ...tdStyle, color: 'var(--color-text-primary)', fontWeight: 800, fontSize: '0.8rem' }}>
                                                 {formatCurrency(profile.portfolioValue || 0)}
                                             </td>
                                             <td style={{ ...tdStyle, textAlign: 'right' }}>
@@ -270,8 +270,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: '0.75rem 1.5rem', background: '#050505', borderTop: '1px solid #111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '0.5rem', color: '#222', fontWeight: 900, letterSpacing: '0.1em' }}>KERNEL_V4.0.2 // SECURE_HANDSHAKE_VALIDATED</div>
+            <div style={{ padding: '0.75rem 1.5rem', background: 'var(--color-bg-elevated)', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.5rem', color: 'var(--color-text-tertiary)', fontWeight: 900, letterSpacing: '0.1em' }}>KERNEL_V4.0.2 // SECURE_HANDSHAKE_VALIDATED</div>
                 <button onClick={() => { signOut(); }} style={{
                     background: 'transparent', border: '1px solid #441111', color: '#ef4444', 
                     fontSize: '0.55rem', fontWeight: 900, padding: '4px 10px', borderRadius: '4px', cursor: 'pointer'
@@ -292,7 +292,7 @@ const StatStatusColor = (status: string) => {
 };
 
 const thStyle: React.CSSProperties = {
-    padding: '0.75rem 1rem', fontSize: '0.55rem', fontWeight: 900, color: '#444', letterSpacing: '0.1em'
+    padding: '0.75rem 1rem', fontSize: '0.55rem', fontWeight: 900, color: 'var(--color-text-tertiary)', letterSpacing: '0.1em'
 };
 
 const tdStyle: React.CSSProperties = {

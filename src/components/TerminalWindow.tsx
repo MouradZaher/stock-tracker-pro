@@ -12,8 +12,11 @@ interface TerminalWindowProps {
 }
 
 const TerminalWindow: React.FC<TerminalWindowProps> = ({ 
-    id, title, children, minW = 400, minH = 300 
+    id, title, children, minW: propMinW, minH: propMinH 
 }) => {
+    const isMobile = window.innerWidth <= 768;
+    const minW = propMinW ?? (isMobile ? 150 : 400);
+    const minH = propMinH ?? (isMobile ? 150 : 300);
     const { 
         windows, activeWindow, bringToFront, closeWindow, 
         toggleMinimize, toggleMaximize, updatePosition, updateSize, updateScale,
@@ -31,7 +34,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
+        const handlePointerMove = (e: PointerEvent) => {
             if (isDragging && !isMaximized && windowState) {
                 const sidebarWidth = 48;
                 
@@ -42,16 +45,34 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 const ny = e.clientY - dragOffset.y;
                 
                 // Live Snap Target Detection for Ghosting
-                const SIDE_PANEL_WIDTH = 350;
-                const gridAreaWidth = availW - SIDE_PANEL_WIDTH;
-                const relativeX = e.clientX - sidebarWidth;
-
-                if (relativeX > gridAreaWidth) {
-                    setSnapTarget('SIDE');
+                if (isMobile) {
+                    const sidebarWidth = 50;
+                    const availAreaWidth = window.innerWidth - sidebarWidth;
+                    const availH = window.innerHeight;
+                    const dockH = availH * 0.35;
+                    const gridH = availH - dockH;
+                    
+                    const relativeX = e.clientX - sidebarWidth;
+                    
+                    if (e.clientY > gridH) {
+                        setSnapTarget('SIDE');
+                    } else {
+                        const isLeft = relativeX < (availAreaWidth / 2);
+                        const isTop = e.clientY < (gridH / 2);
+                        setSnapTarget(isTop ? (isLeft ? 'TL' : 'TR') : (isLeft ? 'BL' : 'BR'));
+                    }
                 } else {
-                    const isLeft = relativeX < (gridAreaWidth / 2);
-                    const isTop = e.clientY < (window.innerHeight / 2);
-                    setSnapTarget(isTop ? (isLeft ? 'TL' : 'TR') : (isLeft ? 'BL' : 'BR'));
+                    const SIDE_PANEL_WIDTH = 350;
+                    const gridAreaWidth = availW - SIDE_PANEL_WIDTH;
+                    const relativeX = e.clientX - sidebarWidth;
+
+                    if (relativeX > gridAreaWidth) {
+                        setSnapTarget('SIDE');
+                    } else {
+                        const isLeft = relativeX < (gridAreaWidth / 2);
+                        const isTop = e.clientY < (window.innerHeight / 2);
+                        setSnapTarget(isTop ? (isLeft ? 'TL' : 'TR') : (isLeft ? 'BL' : 'BR'));
+                    }
                 }
 
                 // Strict Containment: Clamp within ModularWorkspace bounds
@@ -67,26 +88,44 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             }
         };
 
-        const handleMouseUp = (e: MouseEvent) => {
+        const handlePointerUp = (e: PointerEvent) => {
             if (isDragging && windowState) {
                 // Aggressive Snap Logic: Full-screen quadrant detection
-                const sidebarWidth = 48;
-                const SIDE_PANEL_WIDTH = 350;
+                const sidebarWidth = isMobile ? 50 : 48;
                 const availAreaWidth = window.innerWidth - sidebarWidth;
-                const gridAreaWidth = availAreaWidth - SIDE_PANEL_WIDTH;
-                
+                const availH = window.innerHeight;
+
                 const relativeX = e.clientX - sidebarWidth;
                 
-                if (relativeX > gridAreaWidth) {
-                    snapToLayout(id, 'SIDE');
-                } else {
-                    const isLeft = relativeX < (gridAreaWidth / 2);
-                    const isTop = e.clientY < (window.innerHeight / 2);
-                    
-                    if (isTop) {
-                        snapToLayout(id, isLeft ? 'TL' : 'TR');
+                if (isMobile) {
+                    const dockH = availH * 0.35;
+                    const gridH = availH - dockH;
+                    if (e.clientY > gridH) {
+                        snapToLayout(id, 'SIDE');
                     } else {
-                        snapToLayout(id, isLeft ? 'BL' : 'BR');
+                        const isLeft = relativeX < (availAreaWidth / 2);
+                        const isTop = e.clientY < (gridH / 2);
+                        if (isTop) {
+                            snapToLayout(id, isLeft ? 'TL' : 'TR');
+                        } else {
+                            snapToLayout(id, isLeft ? 'BL' : 'BR');
+                        }
+                    }
+                } else {
+                    const SIDE_PANEL_WIDTH = 350;
+                    const gridAreaWidth = availAreaWidth - SIDE_PANEL_WIDTH;
+                    
+                    if (relativeX > gridAreaWidth) {
+                        snapToLayout(id, 'SIDE');
+                    } else {
+                        const isLeft = relativeX < (gridAreaWidth / 2);
+                        const isTop = e.clientY < (window.innerHeight / 2);
+                        
+                        if (isTop) {
+                            snapToLayout(id, isLeft ? 'TL' : 'TR');
+                        } else {
+                            snapToLayout(id, isLeft ? 'BL' : 'BR');
+                        }
                     }
                 }
             }
@@ -97,13 +136,13 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
         };
 
         if (isDragging || isResizing) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
+            window.addEventListener('pointermove', handlePointerMove);
+            window.addEventListener('pointerup', handlePointerUp);
         }
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerUp);
         };
     }, [isDragging, isResizing, dragOffset, id, updatePosition, updateSize, windowState?.x, windowState?.y, minW, minH, isMaximized]);
 
@@ -159,24 +198,25 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 width: isMaximized ? '100%' : `${Math.max(minW, windowState.w)}px`,
                 height: isMaximized ? '100%' : `${Math.max(minH, windowState.h)}px`,
                 zIndex: isMaximized ? 10000 : windowState.zIndex,
-                background: '#000',
-                border: isMaximized ? 'none' : `1px solid ${isFocused ? '#333' : '#1a1a1a'}`,
+                background: 'var(--color-bg-primary)',
+                overscrollBehavior: 'none',
+                border: isMaximized ? 'none' : `1px solid ${isFocused ? 'var(--color-border-light)' : 'var(--color-border)'}`,
                 borderRadius: isMaximized ? '0' : '4px',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
-                boxShadow: isFocused && !isMaximized ? '0 20px 50px rgba(0,0,0,0.9)' : '0 8px 30px rgba(0,0,0,0.6)',
+                boxShadow: isFocused && !isMaximized ? 'var(--shadow-xl)' : 'var(--shadow-lg)',
                 transition: isDragging || isResizing ? 'none' : 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
                 transformOrigin: 'top left',
-                transform: isMaximized ? 'none' : `scale(${currentScale})`
+                transform: isMaximized ? 'none' : `scale(${currentScale})`,
             }}
         >
             {/* Header / Draggable Area - STRICT WINDOWS STYLE */}
             <div
                 style={{
                     height: '28px',
-                    background: isFocused ? '#111' : '#0a0a0a',
-                    borderBottom: '1px solid #1a1a1a',
+                    background: isFocused ? 'var(--color-bg-tertiary)' : 'var(--color-bg-elevated)',
+                    borderBottom: '1px solid var(--color-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -212,10 +252,10 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                         gap: '4px', 
                         paddingRight: '6px',
                         height: '100%',
-                        background: isFocused ? '#111' : '#0a0a0a', // Solid background to prevent drag bleeding
+                        background: isFocused ? 'var(--color-bg-tertiary)' : 'var(--color-bg-elevated)', // Match refined header variables
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '4px', border: '1px solid #1a1a1a', marginRight: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-bg-secondary)', borderRadius: '4px', border: '1px solid var(--color-border)', marginRight: '4px' }}>
                         <button 
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); updateScale(id, currentScale - 0.1); }}
@@ -270,7 +310,7 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
             </div>
 
             {/* Window Content */}
-            <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#000' }}>
+            <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: 'var(--color-bg-primary)' }}>
                 {children}
             </div>
 
@@ -279,27 +319,30 @@ const TerminalWindow: React.FC<TerminalWindowProps> = ({
                 <>
                     {/* Corner */}
                     <div
-                        onMouseDown={(e) => handleResizeStart(e, 'both')}
+                        onPointerDown={(e) => handleResizeStart(e as any, 'both')}
                         style={{
                             position: 'absolute', bottom: 0, right: 0,
-                            width: '12px', height: '12px', cursor: 'nwse-resize',
-                            zIndex: 10, background: 'linear-gradient(135deg, transparent 8px, #333 8px)'
+                            width: '16px', height: '16px', cursor: 'nwse-resize',
+                            zIndex: 10, background: 'linear-gradient(135deg, transparent 12px, var(--color-border) 12px)',
+                            touchAction: 'none'
                         }}
                     />
                     {/* Right Edge */}
                     <div
-                        onMouseDown={(e) => handleResizeStart(e, 'h')}
+                        onPointerDown={(e) => handleResizeStart(e as any, 'h')}
                         style={{
                             position: 'absolute', right: 0, top: 0, bottom: 0,
-                            width: '4px', cursor: 'ew-resize', zIndex: 9
+                            width: '8px', cursor: 'ew-resize', zIndex: 9,
+                            touchAction: 'none'
                         }}
                     />
                     {/* Bottom Edge */}
                     <div
-                        onMouseDown={(e) => handleResizeStart(e, 'v')}
+                        onPointerDown={(e) => handleResizeStart(e as any, 'v')}
                         style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
-                            height: '4px', cursor: 'ns-resize', zIndex: 9
+                            height: '8px', cursor: 'ns-resize', zIndex: 9,
+                            touchAction: 'none'
                         }}
                     />
                 </>
@@ -315,7 +358,7 @@ const controlButtonStyle: React.CSSProperties = {
     justifyContent: 'center',
     background: 'transparent',
     border: 'none',
-    color: '#666',
+    color: 'var(--color-text-secondary)',
     cursor: 'pointer',
     transition: 'all 0.1s'
 };
@@ -331,8 +374,8 @@ if (typeof document !== 'undefined') {
     const style = document.createElement('style');
     style.innerHTML = `
         .window-control-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
+            background-color: var(--color-bg-elevated) !important;
+            color: var(--color-text-primary) !important;
         }
         .window-control-btn.close-btn:hover {
             background-color: #e81123 !important;

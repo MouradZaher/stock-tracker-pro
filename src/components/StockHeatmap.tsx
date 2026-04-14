@@ -5,6 +5,7 @@ import { useMarket } from '../contexts/MarketContext';
 import { socialFeedService } from '../services/SocialFeedService';
 import HeatmapMobileFallback from './HeatmapMobileFallback';
 
+// VERSION: v2.1.06_HARDENED_LAYOUT
 const StockHeatmap: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [error, setError] = useState(false);
@@ -39,6 +40,16 @@ const StockHeatmap: React.FC = () => {
             setSentiment(socialFeedService.getGlobalSentiment());
         });
     }, [retryKey]);
+
+    // NUCLEAR FIX: On mobile, force the high-performance native fallback instantly
+    // The TradingView widget is too unreliable in small quadrants.
+    if (isMobileView) {
+        return (
+            <div className="heatmap-wrapper">
+                <HeatmapMobileFallback />
+            </div>
+        );
+    }
 
     useEffect(() => {
         setError(false);
@@ -157,7 +168,7 @@ const StockHeatmap: React.FC = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: theme === 'dark' ? '#000' : '#f8fafc',
+                            background: 'var(--color-bg-primary)',
                             zIndex: 10,
                             gap: '12px'
                         }}>

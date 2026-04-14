@@ -27,7 +27,7 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({ symbol, size = 24, className 
         'TMGH': 'https://tmg.com.eg/favicon.ico',
         'SIDP': 'https://sidpec.com/favicon.ico',
         'ALCN': 'https://alex-containers.com/favicon.ico',
-        'SKY': 'https://www.sky.com/assets/favicon.ico'
+        'SKY': 'https://static.sky.com/favicon.ico'
     };
 
     const overrideUrl = LOGO_OVERRIDES[symbol.toUpperCase().trim()];

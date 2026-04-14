@@ -145,13 +145,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
     const handleRowClick = (symbol: string) => onSelectSymbol?.(symbol);
 
     return (
-        <div className="tab-content dashboard-viewport" style={{ padding: 0, gap: 0, background: '#000' }}>
+        <div className="tab-content dashboard-viewport" style={{ padding: 0, gap: 0, background: 'var(--color-bg-primary)' }}>
             
             {/* PORTFOLIO HEADER (Total Net Assets & Performance) */}
             <div style={{ 
                 padding: '0.75rem 1.5rem', 
-                background: 'rgba(0,0,0,0.6)', 
-                borderBottom: '1px solid #111',
+                background: 'var(--color-bg-secondary)', 
+                borderBottom: '1px solid var(--color-border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -159,18 +159,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.45rem', fontWeight: 900, color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>TOTAL NET ASSETS (USD)</span>
-                        <span style={{ fontSize: '1.25rem', fontWeight: 950, color: 'white', letterSpacing: '-0.02em' }}>{formatCurrency(summary.normalizedTotalValueUSD)}</span>
+                        <span style={{ fontSize: '0.45rem', fontWeight: 900, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>TOTAL NET ASSETS (USD)</span>
+                        <span style={{ fontSize: '1.25rem', fontWeight: 950, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>{formatCurrency(summary.normalizedTotalValueUSD)}</span>
                     </div>
                     
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.45rem', fontWeight: 900, color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>PERFORMANCE</span>
+                        <span style={{ fontSize: '0.45rem', fontWeight: 900, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>PERFORMANCE</span>
                         <span style={{ fontSize: '1.1rem', fontWeight: 950, color: summary.totalProfitLoss >= 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                             {summary.totalProfitLoss >= 0 ? '📈' : '📉'} {formatPercent(summary.totalProfitLossPercent)}
                         </span>
                     </div>
 
-                    <div style={{ height: '30px', width: '1px', background: '#111' }} />
+                    <div style={{ height: '30px', width: '1px', background: 'var(--color-border)' }} />
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ padding: '4px 8px', background: 'rgba(74, 222, 128, 0.05)', border: '1px solid rgba(74, 222, 128, 0.1)', borderRadius: '4px' }}>
@@ -189,12 +189,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             </div>
 
             <div className="positions-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '1.5rem' }}>
-                <div className="table-container glass-card custom-scrollbar" style={{ border: '1px solid #111', background: 'transparent' }}>
+                <div className="table-container glass-card custom-scrollbar" style={{ border: '1px solid var(--color-border)', background: 'var(--color-bg-secondary)' }}>
                     <table className="portfolio-table sticky-header">
                         <thead>
-                            <tr style={{ background: '#050505' }}>
-                                <th style={{ color: '#444', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Asset</th>
-                                <th style={{ textAlign: 'right', color: '#444', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Units</th>
+                            <tr style={{ background: 'var(--color-bg-elevated)' }}>
+                                <th style={{ color: 'var(--color-text-tertiary)', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Asset</th>
+                                <th style={{ textAlign: 'right', color: 'var(--color-text-tertiary)', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Units</th>
                                 <th style={{ textAlign: 'right', color: '#444', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Avg Cost</th>
                                 <th style={{ textAlign: 'right', color: '#444', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Price</th>
                                 <th style={{ textAlign: 'right', color: '#444', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Market Value</th>
@@ -206,22 +206,22 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                         <tbody>
                             {groupedPositions.map(([sector, sectorPositions]) => (
                                 <React.Fragment key={sector}>
-                                    <tr style={{ background: 'rgba(255,255,255,0.01)' }}>
-                                        <td colSpan={8} style={{ padding: '0.4rem 1rem', fontWeight: 900, fontSize: '0.55rem', color: '#333', borderBottom: '1px solid #0a0a0a' }}>{sector.toUpperCase()}</td>
+                                    <tr style={{ background: 'var(--color-bg-tertiary)' }}>
+                                        <td colSpan={8} style={{ padding: '0.4rem 1rem', fontWeight: 900, fontSize: '0.55rem', color: 'var(--color-text-tertiary)', borderBottom: '1px solid var(--color-border)' }}>{sector.toUpperCase()}</td>
                                     </tr>
                                     {sectorPositions.map((pos) => (
-                                        <tr key={pos.id} onClick={() => handleRowClick(pos.symbol)} className="portfolio-row" style={{ borderBottom: '1px solid #0a0a0a' }}>
+                                        <tr key={pos.id} onClick={() => handleRowClick(pos.symbol)} className="portfolio-row" style={{ borderBottom: '1px solid var(--color-border)' }}>
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                     <CompanyLogo symbol={pos.symbol} size={28} />
                                                     <div>
-                                                        <div style={{ fontWeight: 900, fontSize: '0.8rem', color: 'white' }}>{pos.symbol.replace(/[()]/g, '')}</div>
-                                                        <div style={{ fontSize: '0.6rem', color: '#444', fontWeight: 700 }}>{getFullCompanyName(pos.symbol, pos.name).toUpperCase()}</div>
+                                                        <div style={{ fontWeight: 900, fontSize: '0.8rem', color: 'var(--color-text-primary)' }}>{pos.symbol.replace(/[()]/g, '')}</div>
+                                                        <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', fontWeight: 700 }}>{getFullCompanyName(pos.symbol, pos.name).toUpperCase()}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td style={{ textAlign: 'right', fontWeight: 800, fontSize: '0.75rem' }}>{pos.units.toLocaleString()}</td>
-                                            <td style={{ textAlign: 'right', fontWeight: 800, fontSize: '0.75rem', color: '#666' }}>{fmt(pos.avgCost)}</td>
+                                            <td style={{ textAlign: 'right', fontWeight: 800, fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{fmt(pos.avgCost)}</td>
                                             <td style={{ textAlign: 'right', fontWeight: 900, fontSize: '0.75rem' }}><RealTimePrice price={pos.currentPrice} showCurrency={false} /></td>
                                             <td style={{ textAlign: 'right', fontWeight: 900, fontSize: '0.75rem', color: 'var(--color-accent)' }}>{fmt(pos.marketValue)}</td>
                                             <td style={{ textAlign: 'right' }}>
@@ -231,7 +231,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                                 {aiRecs[pos.symbol] ? (
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: 0.8 }}>
                                                         {getRecIcon(aiRecs[pos.symbol].recommendation)}
-                                                        <span style={{ fontSize: '0.6rem', fontWeight: 900, color: 'white' }}>{aiRecs[pos.symbol].recommendation?.toUpperCase()}</span>
+                                                        <span style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{aiRecs[pos.symbol].recommendation?.toUpperCase()}</span>
                                                     </div>
                                                 ) : '...'}
                                             </td>
@@ -253,7 +253,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
             {/* Add Position Modal */}
             {showModal && (
                 <div className="modal-overlay glass-blur" onClick={() => setShowModal(false)} style={{ zIndex: 10000 }}>
-                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', background: '#050505', border: '1px solid #111', borderRadius: '4px' }}>
+                    <div className="modal glass-effect" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
                         <div className="modal-header" style={{ padding: '1.25rem', borderBottom: '1px solid #111' }}>
                             <h3 className="modal-title" style={{ fontSize: '0.85rem', fontWeight: 900, textTransform: 'uppercase' }}>New Asset Position</h3>
                             <button className="btn btn-icon" onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', color: '#444' }}>
@@ -281,7 +281,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         placeholder="0.00"
                                         value={formData.units}
                                         onChange={(e) => setFormData({ ...formData, units: e.target.value })}
-                                        style={{ width: '100%', padding: '0.6rem', background: '#0a0a0a', border: '1px solid #111', color: 'white', fontWeight: 700, outline: 'none' }}
+                                        style={{ width: '100%', padding: '0.6rem', background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', fontWeight: 700, outline: 'none' }}
                                     />
                                 </div>
                                 <div className="form-group">
@@ -291,7 +291,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ onSelectSymbol }) => {
                                         placeholder="0.00"
                                         value={formData.avgCost}
                                         onChange={(e) => setFormData({ ...formData, avgCost: e.target.value })}
-                                        style={{ width: '100%', padding: '0.6rem', background: '#0a0a0a', border: '1px solid #111', color: 'white', fontWeight: 700, outline: 'none' }}
+                                        style={{ width: '100%', padding: '0.6rem', background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', fontWeight: 700, outline: 'none' }}
                                     />
                                 </div>
                             </div>

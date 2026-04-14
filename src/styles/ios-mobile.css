@@ -1,8 +1,5 @@
 /* =========================================================
-   iOS MOBILE RESPONSIVE FIXES
-   iPhone 13 Pro (390×844 CSS px) — Chrome Browser
-   Usable viewport: 390×704px (Chrome toolbar ~72px top + ~68px bottom)
-   Safe-area-top: 47px (notch), Safe-area-bottom: 34px (home bar)
+   iOS MOBILE & iPAD RESPONSIVE FIXES
    ========================================================= */
 
 /* iOS Safe Area Env Variables */
@@ -11,158 +8,72 @@
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     --safe-area-left: env(safe-area-inset-left, 0px);
     --safe-area-right: env(safe-area-inset-right, 0px);
-
-    --mobile-header-height: 48px;
-    --mobile-nav-height: 60px;
-    --mobile-topbar-height: 28px;
-    /* Total chrome used: 48 + 28 + 60 = 136px plus safe areas */
-    --mobile-content-height: calc(
-        100dvh
-        - var(--mobile-header-height)
-        - var(--mobile-topbar-height)
-        - var(--mobile-nav-height)
-        - var(--safe-area-top)
-        - var(--safe-area-bottom)
-    );
 }
 
 /* =========================================================
-   BASE MOBILE LAYOUT  (≤ 768px) — STRICT VIEWPORT LOCK
+   BASE MOBILE LAYOUT (≤ 768px) — STABLE VIEWPORT LOCK
    ========================================================= */
 @media (max-width: 768px) {
+    * {
+        box-sizing: border-box !important;
+    }
 
-    /* ── 1. GLOBAL RESET — nothing scrolls at the page level ── */
+    /* ── 1. GLOBAL RESET — ensure background fills notch area ── */
     html,
     body {
         height: 100dvh !important;
-        width: 100vw;
-        max-width: 100vw;
+        width: 100% !important;
         overflow: hidden !important;
+        overflow-x: hidden !important;
         position: fixed;
+        background: var(--color-bg-primary) !important;
         -webkit-overflow-scrolling: touch;
+        touch-action: none;
+    }
+
+    #root {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
     }
 
     #root,
     .app,
-    .main-content {
+    .main-content,
+    .main-wrapper {
         height: 100dvh !important;
-        max-width: 100vw !important;
+        width: 100% !important;
+        max-width: 100% !important;
         overflow: hidden !important;
     }
 
     .app {
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: hidden !important;
+        width: 100% !important;
+        flex-shrink: 1 !important;
+        min-width: 0 !important;
     }
 
-    /* ── 2. HEADER — compact iPhone 13 Pro ── */
-    .header {
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-
-        top: calc(var(--mobile-topbar-height) + var(--safe-area-top)) !important;
-        height: var(--mobile-header-height) !important;
-        background: var(--glass-bg) !important;
-        backdrop-filter: var(--glass-blur) !important;
-        border-bottom: 1px solid var(--glass-border) !important;
-        padding: 0 0.5rem !important; /* Reduced from 0.75rem */
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
-        gap: 4px; /* Reduced from 6px */
-        overflow: visible;
-        position: fixed;
-        left: 0;
-        right: 0;
-        z-index: 1002;
-    }
-
-    .header-logo {
-        flex-shrink: 0;
-        margin-bottom: 0;
-        padding: 4px 6px !important; /* Tighten */
-    }
-
-    .logo-text {
-        font-size: 0.7rem !important; /* Smaller text */
-        letter-spacing: -0.01em;
-        font-weight: 800 !important;
-    }
-
-    .header-actions {
-        flex-shrink: 0;
-        flex-wrap: nowrap;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .header-actions button {
-        height: 28px !important; /* Larger hit area */
-        min-width: 28px;
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    /* Remove absolute hit area extension on mobile to prevent overlaps */
-    .header-actions button::after {
-        display: none !important;
-    }
-
-    .header-actions button svg {
-        width: 18px !important; /* Large, clear icons */
-        height: 18px !important;
-    }
-
-    .header-actions button img {
-        width: 18px !important;
-        height: 12px !important;
-        border-radius: 2px !important;
-    }
-
-    .header-actions .desktop-only,
-    .header-center {
-        display: none !important;
-    }
-
-    /* ── 3. TOP BAR (market time ticker) ── */
-    .topbar,
-    .top-bar,
-    [class*="TopBar"],
-    [class*="topbar"] {
-        top: var(--safe-area-top) !important;
-        height: var(--mobile-topbar-height) !important;
-        min-height: var(--mobile-topbar-height) !important;
-        font-size: 0.6rem !important;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-        padding: 0 8px !important;
-    }
-
-    /* ── 4. MAIN CONTENT AREA — precise height ── */
+    /* ── 2. MAIN CONTENT AREA — precise height & safe-area padding ── */
     .main-content {
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        /* Flush against header which is flush against TopBar */
-        padding-top: calc(var(--mobile-topbar-height) + var(--mobile-header-height) + var(--safe-area-top)) !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        /* Reserve exact space for bottom nav — heatmap won't go past it */
-        padding-bottom: var(--mobile-nav-height) !important;
+        /* Safe area padding for both orientation types */
+        padding-top: var(--safe-area-top) !important;
+        padding-left: var(--safe-area-left) !important;
+        padding-right: var(--safe-area-right) !important;
+        padding-bottom: var(--safe-area-bottom) !important;
         overflow: hidden !important;
         position: relative;
         min-height: 0;
+        min-width: 0;
     }
 
-    /* ── 5. TAB CONTENT — locked, all children must fit ── */
+    /* ── 3. TAB CONTENT — locked, all children must fit ── */
     .tab-content {
         flex: 1 !important;
         display: flex !important;
@@ -171,24 +82,6 @@
         overflow: hidden !important;
         min-height: 0 !important;
         position: relative;
-    }
-
-    .mobile-nav-item, 
-    .mobile-nav-btn {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 2px !important;
-        color: var(--color-text-tertiary) !important;
-        background: transparent !important;
-        border: none !important;
-        font-size: 0.55rem !important;
-        font-weight: 700 !important;
-        position: relative !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        padding-top: 2px !important;
     }
 
     .dashboard-viewport {
@@ -204,56 +97,7 @@
         overscroll-behavior: contain;
     }
 
-    /* ── 6. MOBILE BOTTOM NAV ── */
-    .mobile-nav-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        /* Nav bar height matches content precisely, sits absolute bottom */
-        height: var(--mobile-nav-height);
-        /* padding-bottom: var(--safe-area-bottom); removed so they sit completely at end */
-        z-index: 1001;
-        background: rgba(5, 5, 8, 0.92);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .mobile-nav-pill {
-        width: 100%;
-        border-radius: 0;
-        padding: 6px 0;
-        justify-content: space-around;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        height: var(--mobile-nav-height);
-        display: flex;
-        align-items: center;
-    }
-
-    .mobile-nav-btn {
-        flex: 1;
-        min-width: 0;
-        padding: 6px 4px;
-        font-size: 0.58rem;
-        letter-spacing: 0.02em;
-        font-weight: 600;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-    }
-
-    .mobile-nav-btn svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    /* ── 7. WATCHLIST TAB ── */
-    /* Section header: ultra-compact on mobile */
+    /* ── 4. WATCHLIST TAB ── */
     .dashboard-viewport .section-header {
         padding: 0.5rem 0.75rem !important;
         margin-bottom: 0.4rem !important;
@@ -261,19 +105,12 @@
         gap: 0.4rem !important;
     }
 
-    /* Title: smaller on mobile */
     .dashboard-viewport .section-header h2 {
         font-size: 0.9rem !important;
         gap: 5px !important;
         font-weight: 900 !important;
     }
 
-    .dashboard-viewport .section-header h2 svg {
-        width: 16px !important;
-        height: 16px !important;
-    }
-
-    /* Search bar: compact */
     .dashboard-viewport .section-header > div:last-child {
         max-width: 100% !important;
         width: 100% !important;
@@ -283,7 +120,6 @@
         display: none !important;
     }
 
-    /* Grid: on mobile, go single-column */
     .grid-sidebar-layout {
         display: flex !important;
         flex-direction: column !important;
@@ -294,12 +130,6 @@
         min-height: 0;
     }
 
-    /* The watchlist asset table card */
-    .glass-card.hover-glow {
-        border-radius: 12px !important;
-    }
-
-    /* Compact table: optimize columns for 390px */
     .compact-table {
         font-size: 0.72rem !important;
         width: 100%;
@@ -325,76 +155,24 @@
         text-overflow: ellipsis;
     }
 
+    .left-toolstrip {
+        padding-left: var(--safe-area-left) !important;
+        width: calc(48px + var(--safe-area-left)) !important;
+    }
+
     .compact-table th:first-child,
-    .compact-table td:first-child {
-        padding-left: 0.6rem !important;
-        width: 38%;
-    }
+    .compact-table td:first-child { width: 38%; }
+    .compact-table th:nth-child(2), .compact-table td:nth-child(2) { width: 20%; text-align: right; }
+    .compact-table th:nth-child(3), .compact-table td:nth-child(3) { width: 18%; text-align: right; }
+    
+    .compact-table th:nth-child(4), .compact-table td:nth-child(4),
+    .compact-table th:nth-child(5), .compact-table td:nth-child(5) { display: none !important; }
+    
+    .compact-table tr:nth-child(n+10) { display: none !important; }
+    
+    .compact-table th:nth-child(6), .compact-table td:nth-child(6) { width: 24%; text-align: center; padding-right: 0.35rem !important; }
 
-    /* Price column */
-    .compact-table th:nth-child(2),
-    .compact-table td:nth-child(2) {
-        width: 20%;
-        text-align: right;
-    }
-
-    /* Change column */
-    .compact-table th:nth-child(3),
-    .compact-table td:nth-child(3) {
-        width: 18%;
-        text-align: right;
-    }
-
-    /* Hide AI Intelligence and Trend on mobile to save space */
-    .compact-table th:nth-child(4),
-    .compact-table td:nth-child(4),
-    .compact-table th:nth-child(5),
-    .compact-table td:nth-child(5) {
-        display: none !important;
-    }
-
-    /* PRUNE: Only show top 8 assets to fit viewport */
-    .compact-table tr:nth-child(n+10) {
-        display: none !important;
-    }
-
-    /* Actions column — compact icon buttons only */
-    .compact-table th:nth-child(6),
-    .compact-table td:nth-child(6) {
-        width: 24%;
-        text-align: center;
-        padding-right: 0.35rem !important;
-    }
-
-    .compact-table td div[style*="gap: 6px"] {
-        gap: 4px !important;
-    }
-
-    .compact-table button {
-        padding: 4px !important;
-        width: 28px;
-        height: 28px;
-    }
-
-    /* Company logo in table */
-    .compact-table .company-logo,
-    .compact-table img[class*="logo"] {
-        width: 22px !important;
-        height: 22px !important;
-    }
-
-    /* Market benchmark row label */
-    .compact-table .market-benchmark-label {
-        font-size: 0.55rem !important;
-    }
-
-    /* ── 8. PORTFOLIO TAB ── */
-    /* Thin action bar on mobile */
-    .tab-content.dashboard-viewport > div:first-child {
-        padding: 0.4rem 0.75rem !important;
-        margin-bottom: 4px !important;
-    }
-
+    /* ── 5. PORTFOLIO TAB ── */
     .portfolio-summary-grid,
     .admin-stats-grid,
     .portfolio-risk-audit-grid {
@@ -416,332 +194,57 @@
         padding: 0.5rem !important;
     }
 
-    .summary-value,
-    [class*="summary-value"] {
-        font-size: 1rem !important;
-    }
+    .portfolio-table tr:nth-child(n+12) { display: none !important; }
 
-    /* Prune portfolio table visually */
-    .portfolio-table tr:nth-child(n+12) {
-        display: none !important;
-    }
-
-    /* ── 9. AI RECOMMENDATIONS TAB ── */
-    /* Assets Table: compact rows */
-    .table-container table th,
-    .table-container table td {
-        padding: 0.5rem 0.6rem !important;
-        font-size: 0.68rem !important;
-    }
-
-    .table-container tr:nth-child(n+10) {
-        display: none !important; /* Prune to top 10 assets to fit viewport */
-    }
-
-    .table-container {
-        flex: 1 !important;
-        min-height: 0 !important;
-        overflow: hidden !important; /* No scroll! */
-    }
-
-    /* Signal badge: compact */
-    .table-container span[style*="borderRadius"] {
-        padding: 2px 6px !important;
-        font-size: 0.6rem !important;
-    }
-
-    /* Scan button: ultra-compact */
-    .dashboard-viewport .btn-primary[style*="width: 100%"] {
-        padding: 0.5rem !important;
-        font-size: 0.75rem !important;
-        border-radius: 10px !important;
-        margin-bottom: 0.5rem !important;
-    }
-
-    /* ── 10. PULSE TAB ── */
-    .grid-3col-pulse {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 0.5rem !important;
-        overflow: hidden;
-        padding: 0.25rem !important;
-    }
-
-    /* Fear & Greed: more compact */
-    .grid-3col-pulse .glass-card:first-child {
-        padding: 0.75rem !important;
-    }
-
-    /* Live stream player: ultra-compact on mobile */
-    .dashboard-viewport > div:first-child iframe,
-    .dashboard-viewport > div:first-child video {
-        height: 125px !important;
-        min-height: 125px !important;
-    }
-
-    /* ── 11. CARDS ── */
+    /* ── 6. CARDS & TYPOGRAPHY ── */
     .glass-card {
         border-radius: 12px !important;
         padding: 0.75rem !important;
         word-break: break-word;
         overflow-wrap: break-word;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
-    /* ── 12. TYPOGRAPHY SCALE for 390px ── */
     h1 { font-size: 1.35rem !important; }
     h2 { font-size: 1.1rem !important; }
     h3 { font-size: 0.95rem !important; }
 
-    /* ── 13. INPUTS — prevent iOS zoom (must stay ≥ 16px) ── */
-    input,
-    select,
-    textarea {
+    input, select, textarea {
         font-size: 16px !important;
         max-height: 44px;
     }
 
-    /* Search input: full-width compact */
-    input[type="text"],
-    input[type="search"] {
-        padding: 0.5rem 0.75rem !important;
-        border-radius: 10px !important;
-    }
-
-    /* ── 14. INTERACTION ── */
-    button,
-    a,
-    .mobile-nav-btn {
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    .btn {
-        padding: 0.5rem 1rem !important;
-        font-size: 0.8rem !important;
-        min-height: 36px;
-    }
-
-    /* ── 15. MODALS — full-screen ── */
-    .admin-modal,
-    [class*="Modal"]:not(.mobile-nav-container) {
-        width: 100vw !important;
-        max-width: 100vw !important;
-        margin: 0 !important;
-        border-radius: 16px 16px 0 0 !important;
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        max-height: 90dvh !important;
-        overflow-y: auto !important;
-    }
-
-    /* ── 16. FLOATING BUTTONS — above nav bar ── */
-    .aria-voice-assistant-trigger,
-    .ai-chat-widget-trigger,
-    [class*="VoiceAssistant"],
-    [class*="ChatWidget"] {
-        bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 12px) !important;
-        transform: scale(0.82);
-        z-index: 1005;
-    }
-
-    /* ── 17. AI CHAT WIDGET DRAG HANDLE ── */
-    [class*="ai-chat-trigger"] {
-        width: 48px !important;
-        height: 48px !important;
-    }
-
-    /* ── 18. HOME TAB ── */
-    .home-tab-content {
-        height: var(--mobile-content-height) !important;
-        overflow: hidden !important;
-        touch-action: none;
-        padding: 0 !important;
-        margin: 0 !important;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-
-    /* Force tab-content wrappers to be flush when on home */
-    .main-content > .tab-content.home-tab-content {
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
-    }
-
-    /* ── 19. HOME TAB COMMAND CENTER ── */
-    .dashboard-container {
-        padding: 0 !important;
-        gap: 0 !important;
-        height: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        overflow: hidden !important;
-    }
-
-    /* Dashboard container on home: flush fill, no extra padding or gaps */
+    /* ── 7. COMMAND CENTER WIDGETS ── */
     .dashboard-container.home-tab-content {
         gap: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
-        background: #000 !important;
-        /* Container fills the exact viewport down to the 60px nav edge */
-        height: calc(
-            100dvh
-            - var(--mobile-topbar-height)
-            - var(--mobile-header-height)
-            - var(--mobile-nav-height)
-            - var(--safe-area-top)
-        ) !important;
-        max-height: calc(
-            100dvh
-            - var(--mobile-topbar-height)
-            - var(--mobile-header-height)
-            - var(--mobile-nav-height)
-            - var(--safe-area-top)
-        ) !important;
+        background: var(--color-bg-primary) !important;
+        height: 100% !important;
     }
 
     .heatmap-main-wrapper {
         flex: 1 !important;
         width: 100% !important;
-        /* Explicit bounded height so it cannot overflow past bottom nav */
         height: 100% !important;
-        max-height: 100% !important;
-        min-height: 0 !important;
         position: relative !important;
-        background: transparent !important;
         border-radius: 0 !important;
         overflow: hidden !important;
     }
 
-    .dashboard-container.home-tab-content .heatmap-main-wrapper {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 10px !important; /* Maximum bleed right above the navigation tabs */
-        height: auto !important;
-        max-height: none !important;
-        flex: none !important;
-        overflow: hidden !important;
-    }
-
-    .heatmap-wrapper {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        display: flex !important;
-        overflow: hidden !important;
-    }
-
-    .market-breadth-wrapper {
-        z-index: 60 !important;
-        top: 8px !important;
-        right: 8px !important;
-        transform: scale(0.8) !important;
-        transform-origin: top right;
-    }
-
-    /* Compact Cards for Command Center */
-    .dashboard-container .glass-card {
-        padding: 0.65rem !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        margin-bottom: 0 !important;
-    }
-
-    /* Prevent TradingView widget default 350px height collapse */
     .tradingview-widget-container,
-    .tradingview-widget-container iframe,
-    .tradingview-widget-container__widget {
+    .tradingview-widget-container iframe {
         height: 100% !important;
         min-height: 100% !important;
-        max-height: 100% !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
     }
 
-    /* Portfolio Intelligence Scaling */
-    .portfolio-intelligence-wrapper {
-        padding: 0.5rem !important;
-        gap: 0.5rem !important;
-    }
-    
-    .portfolio-intelligence-wrapper .glass-card {
-        padding: 0.75rem !important;
-        border-radius: 12px !important;
-    }
-
-    .portfolio-intelligence-wrapper h3 { font-size: 0.8rem !important; }
-    .portfolio-intelligence-wrapper p { font-size: 0.65rem !important; }
-    .portfolio-intelligence-wrapper button { padding: 0.5rem 0.75rem !important; font-size: 0.6rem !important; }
-
-    /* ── 20. SCROLLBARS: hide on mobile (touch devices) ── */
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 3px !important;
-        height: 3px !important;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent !important;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.12) !important;
-        border-radius: 2px !important;
-    }
-
-    /* ── 21. KEYBOARD OPEN state ── */
-    .keyboard-open .mobile-nav-container {
-        display: none;
-    }
-
-    .keyboard-open .main-content {
-        padding-bottom: 0;
-    }
-
-    /* ── 22. MISC GRID OVERRIDES ── */
-    .pulse-ticker-container {
-        margin: 0 -8px 0.5rem !important;
-        width: calc(100% + 16px) !important;
-    }
+    /* ── 8. SCROLLBARS ── */
+    .custom-scrollbar::-webkit-scrollbar { width: 3px !important; height: 3px !important; }
 }
 
 /* =========================================================
-   iPhone SE / Mini  (≤ 375px) — extra-compact overrides
+   iPhone SE / Mini (≤ 375px) — extra-compact overrides
    ========================================================= */
 @media (max-width: 375px) {
-    :root {
-        --mobile-header-height: 42px;
-        --mobile-nav-height: 54px;
-    }
-
-    .logo-text {
-        font-size: 0.72rem !important;
-    }
-
-    .header-actions button {
-        height: 24px !important;
-        padding: 0 4px !important;
-    }
-
-    .header-actions button svg {
-        width: 11px !important;
-        height: 11px !important;
-    }
-
     h1 { font-size: 1.2rem !important; }
     h2 { font-size: 1rem !important; }
     h3 { font-size: 0.85rem !important; }
@@ -750,55 +253,53 @@
         padding: 0.6rem !important;
         border-radius: 10px !important;
     }
+}
 
-    .btn {
-        padding: 0.4rem 0.75rem !important;
-        font-size: 0.72rem !important;
-    }
-
-    .compact-table th,
-    .compact-table td {
-        padding: 0.4rem 0.3rem !important;
-        font-size: 0.68rem !important;
-    }
-
-    .portfolio-summary-grid > *,
-    .admin-stats-grid > * {
-        min-width: 120px !important;
-        padding: 0.5rem !important;
+/* =========================================================
+   iPhone 13 Pro / Modern Phones (≤ 430px)
+   ========================================================= */
+@media (max-width: 430px) {
+    .portfolio-summary-grid, .admin-stats-grid, .pulse-grid, .watchlist-grid {
+        gap: 6px !important;
     }
 }
 
 /* =========================================================
-   iPhone 13 Pro / Pro Max / modern "Thin" phones (≤ 430px)
+   iPad / Tablet (769px - 1024px)
    ========================================================= */
-@media (max-width: 430px) {
-    :root {
-        --spacing-xl: 12px;
-        --spacing-lg: 10px;
-        --spacing-md: 8px;
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Main Layout Viewport Checks */
+    html,
+    body,
+    #root,
+    .app {
+        height: 100dvh !important;
+        width: 100vw;
+        max-width: 100vw;
+        overflow: hidden !important;
     }
 
-    .header {
-        padding: 0 10px !important;
+    .main-content {
+        padding: 0.75rem !important;
     }
 
-    /* Force all grid gaps to be compact */
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    
+    .dashboard-viewport {
+        gap: 0.75rem !important;
+    }
+    
     .portfolio-summary-grid,
     .admin-stats-grid,
     .pulse-grid,
     .watchlist-grid {
-        gap: 6px !important;
+        gap: 0.75rem !important;
     }
 
-    .summary-card,
-    [class*="summary-card"] {
-        padding: 0.75rem !important;
-    }
-
-    .summary-value,
-    [class*="summary-value"] {
-        font-size: 1.15rem !important;
+    /* Windows scale appropriately avoiding LeftToolstrip overlap */
+    [class*="TerminalWindow"] {
+        max-width: calc(100vw - 48px) !important;
     }
 }
 
@@ -809,18 +310,6 @@
         height: 100% !important;
     }
     
-    .zoom-in-btn, .zoom-out-btn {
-        width: 32px !important;
-    }
-
-    /* Resizers: Larger hit areas for touch */
-    [style*="cursor: ew-resize"],
-    [style*="cursor: ns-resize"],
-    [style*="cursor: nwse-resize"] {
-        pointer-events: auto !important;
-        touch-action: none !important;
-    }
-
     [style*="cursor: nwse-resize"] {
         width: 20px !important;
         height: 20px !important;
@@ -829,7 +318,7 @@
 
     /* Mobile Taskbar Optimization */
     [style*="zIndex: 20000"] {
-        bottom: calc(var(--mobile-nav-height) + 12px) !important;
+        bottom: 12px !important;
         transform: translateX(-50%) scale(0.9) !important;
         width: 90vw !important;
         flex-wrap: wrap !important;

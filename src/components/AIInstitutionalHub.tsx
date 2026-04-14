@@ -92,7 +92,7 @@ const AIInstitutionalHub: React.FC = () => {
               <div style={{ background: 'var(--color-accent)', height: '1px', width: '40px' }} />
               <Shield size={24} />
             </div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 950, letterSpacing: '-0.03em', color: 'white', margin: 0 }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 950, letterSpacing: '-0.03em', color: 'var(--color-text-primary)', margin: 0 }}>
               INSTITUTIONAL <span style={{ color: 'var(--color-accent)' }}>ORACLE</span>
             </h1>
             <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.9rem', fontWeight: 500, marginTop: '8px' }}>
@@ -106,11 +106,11 @@ const AIInstitutionalHub: React.FC = () => {
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid var(--glass-border-bright)',
+            background: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-border)',
             borderRadius: '16px',
             padding: '0 1.25rem',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.3), 0 0 20px rgba(168, 85, 247, 0.1)',
+            boxShadow: 'var(--shadow-xl)',
             backdropFilter: 'blur(10px)',
             transition: 'all 0.3s ease'
           }}>
@@ -126,7 +126,7 @@ const AIInstitutionalHub: React.FC = () => {
                 background: 'transparent',
                 border: 'none',
                 padding: '1.25rem',
-                color: 'white',
+                color: 'var(--color-text-primary)',
                 fontSize: '1rem',
                 fontWeight: 600,
                 outline: 'none',
@@ -143,14 +143,14 @@ const AIInstitutionalHub: React.FC = () => {
               top: '100%',
               left: 0,
               right: 0,
-              background: 'rgba(10,10,18,0.98)',
-              border: '1px solid var(--glass-border-bright)',
+              background: 'var(--color-bg-elevated)',
+              border: '1px solid var(--color-border)',
               borderRadius: '12px',
               marginTop: '8px',
               maxHeight: '300px',
               overflowY: 'auto',
               zIndex: 1000,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+              boxShadow: 'var(--shadow-xl)',
               padding: '6px'
             }}>
               {results.map((item) => (
@@ -171,7 +171,7 @@ const AIInstitutionalHub: React.FC = () => {
                 >
                   <CompanyLogo symbol={item.symbol} size={28} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ color: 'white', fontSize: '0.85rem', fontWeight: 900 }}>{item.symbol}</div>
+                    <div style={{ color: 'var(--color-text-primary)', fontSize: '0.85rem', fontWeight: 900 }}>{item.symbol}</div>
                     <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.7rem' }}>{item.name}</div>
                   </div>
                   <ChevronRight size={14} color="var(--color-text-tertiary)" />
@@ -200,17 +200,17 @@ const AIInstitutionalHub: React.FC = () => {
             <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <div style={{ position: 'relative' }}>
                 <CompanyLogo symbol={selectedAsset.symbol} size={64} />
-                <div style={{ position: 'absolute', bottom: -4, right: -4, background: 'var(--color-accent)', padding: '4px', borderRadius: '50%', border: '2px solid var(--color-bg)' }}>
-                  <Sparkles size={12} color="white" />
+                <div style={{ position: 'absolute', bottom: -4, right: -4, background: 'var(--color-accent)', padding: '4px', borderRadius: '50%', border: '2px solid var(--color-bg-primary)' }}>
+                  <Sparkles size={12} color="var(--color-bg-primary)" />
                 </div>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'white', margin: 0 }}>{selectedAsset.name}</h2>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'var(--color-text-primary)', margin: 0 }}>{selectedAsset.name}</h2>
                   <span style={{ fontSize: '1rem', color: 'var(--color-text-tertiary)', fontWeight: 800 }}>{selectedAsset.symbol}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '4px' }}>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white' }}>{formatCurrency(selectedAsset.price)}</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>{formatCurrency(selectedAsset.price)}</div>
                   <div className={selectedAsset.change >= 0 ? 'text-success' : 'text-error'} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem', fontWeight: 800 }}>
                     {selectedAsset.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                     {formatPercent(selectedAsset.changePercent)}
@@ -233,7 +233,7 @@ const AIInstitutionalHub: React.FC = () => {
                   <Target size={14} /> ALPHA INTEL SYNOPSIS
                 </div>
                 <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
-                  Consensus institutional accumulation detected for <span style={{ color: 'white', fontWeight: 700 }}>{selectedAsset.symbol}</span>. 
+                  Consensus institutional accumulation detected for <span style={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>{selectedAsset.symbol}</span>. 
                   Order flow density suggests a massive consolidation phase between <span style={{ color: 'var(--color-warning)' }}>{formatCurrency(selectedAsset.low || selectedAsset.price * 0.98)}</span> and 
                   <span style={{ color: 'var(--color-success)' }}>{formatCurrency(selectedAsset.high || selectedAsset.price * 1.02)}</span>. 
                   Market sentiment is skewed towards <span style={{ color: 'var(--color-success)' }}>ACCUMULATION</span>.
@@ -250,7 +250,7 @@ const AIInstitutionalHub: React.FC = () => {
                     { label: 'Liquidity Depth', val: 'High', color: 'var(--color-accent)' },
                     { label: 'Short Interest Beta', val: '0.24', color: 'var(--color-warning)' },
                   ].map(stat => (
-                    <div key={stat.label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '4px' }}>
+                    <div key={stat.label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: '4px' }}>
                       <span style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>{stat.label}</span>
                       <span style={{ fontSize: '0.75rem', fontWeight: 800, color: stat.color }}>{stat.val}</span>
                     </div>
@@ -268,7 +268,7 @@ const AIInstitutionalHub: React.FC = () => {
                   <div key={i} style={{ 
                     flex: 1, 
                     height: `${Math.random() * 80 + 20}%`, 
-                    background: i > 25 ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
+                    background: i > 25 ? 'var(--color-accent)' : 'var(--color-bg-elevated)',
                     borderRadius: '2px 2px 0 0',
                     opacity: 0.3 + (i / 40) * 0.7
                   }} />
@@ -285,14 +285,14 @@ const AIInstitutionalHub: React.FC = () => {
                 <span style={{ fontSize: '0.8rem', fontWeight: 950, letterSpacing: '0.05em' }}>AI STRATEGY NODE</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ fontSize: '0.75rem', color: 'white', fontWeight: 800 }}>SCENARIO: MEAN REVERSION</div>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-primary)', fontWeight: 800 }}>SCENARIO: MEAN REVERSION</div>
+                <div style={{ background: 'var(--color-bg-primary)', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                   <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>PROBABILITY</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
+                    <div style={{ flex: 1, height: '4px', background: 'var(--color-bg-secondary)', borderRadius: '2px' }}>
                       <div style={{ width: '74%', height: '100%', background: 'var(--color-accent)', borderRadius: '2px' }} />
                     </div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white' }}>74%</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>74%</span>
                   </div>
                 </div>
                 <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', fontStyle: 'italic' }}>
@@ -304,16 +304,17 @@ const AIInstitutionalHub: React.FC = () => {
             <div className="glass-card" style={{ padding: '1.25rem', flex: 1 }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--color-text-tertiary)', marginBottom: '1rem' }}>TACTICAL SIGNALS</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {/* Tactical Signals */}
                 {[
                   { label: 'Dark Pool Interest', val: 'Extreme', icon: Shield, color: 'var(--color-error)' },
                   { label: 'RSI Divergence', val: 'Bullish', icon: TrendingUp, color: 'var(--color-success)' },
                   { label: 'Gamma Squeeze', val: 'Low', icon: Zap, color: 'var(--color-warning)' },
                 ].map((signal, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
                     <signal.icon size={16} color={signal.color} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)' }}>{signal.label}</div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>{signal.val}</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{signal.val}</div>
                     </div>
                   </div>
                 ))}

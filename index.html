@@ -5,13 +5,35 @@
   <!-- Inline script to prevent theme flash - runs before anything else -->
   <script>
     (function () {
-      // Force dark theme as default on every load to fix accidental toggles
-      // The user can still switch it manually, but this ensures a dark start.
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', 'dark');
-      if (!localStorage.getItem('theme')) {
-        localStorage.setItem('theme', 'dark');
+      // NUCLEAR CACHE PURGE: Force-clear state for version 21.55
+      console.log('--- CACHE PURGE ENGINE ACTIVE: SYNC_21_55 ---');
+      
+      // 1. Unregister all Service Workers (The common cause of "Sticky" sessions)
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (let registration of registrations) { registration.unregister(); }
+        });
       }
+
+      // 2. Clear old terminal state to allow the new layout to take over
+      localStorage.removeItem('window-store');
+      
+      // 3. Force dark theme
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+
+      // 4. CONSOLE INTERCEPTOR & AUTO-RELOAD: Forcefully kill the persistent 'Ghost Logs'
+      const _log = console.log;
+      console.log = function(...args) {
+        const str = args.join(' ');
+        if (str.includes('SYNC_21_05') || str.includes('Mood Engine')) {
+          // GHOST CACHE DETECTED: Forcefully purge and reload the terminal
+          localStorage.clear();
+          window.location.reload(true);
+          return;
+        } 
+        _log.apply(console, args);
+      };
     })();
   </script>
 
@@ -110,7 +132,7 @@
   <div id="root"></div>
 
   <!-- Security Protection Script Removed -->
-  <script type="module" src="/src/main.tsx"></script>
+  <script type="module" src="/src/app-core-v2.tsx?v=21.60"></script>
 </body>
 
 </html>

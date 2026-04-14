@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Tv, Volume2, VolumeX, Maximize2, RefreshCw, Radio, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Tv, Maximize2, RefreshCw, Radio, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Channel {
     id: string;
@@ -22,7 +22,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Bloomberg',
         youtubeId: 'UCIALMKvObZNtJ6AmdCLP7Lg',
         videoId: '', 
-        logo: 'https://www.google.com/s2/favicons?sz=64&domain=bloomberg.com',
+        logo: 'https://www.bloomberg.com/favicon.ico',
         color: '#FF6600',
         region: 'Global',
         category: 'Finance'
@@ -33,7 +33,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'CNBC',
         youtubeId: 'UCvJJ_dzjViJCoLf5uKUTwoA',
         videoId: '',
-        logo: 'https://www.google.com/s2/favicons?sz=64&domain=cnbc.com',
+        logo: 'https://www.cnbc.com/favicon.ico',
         color: '#0066FF',
         region: 'Global',
         category: 'Finance'
@@ -44,7 +44,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Fox News',
         youtubeId: 'UCJg9wBPyKMNA5sRDnvzmkdg',
         videoId: 'SlNE7izkWjc', // Direct stable ID
-        logo: 'https://www.google.com/s2/favicons?sz=64&domain=foxnews.com',
+        logo: 'https://www.foxnews.com/favicon.ico',
         color: '#003087',
         region: 'USA',
         category: 'News'
@@ -55,7 +55,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Sky News',
         youtubeId: 'UCoMdktPbSTixAyNGwb-UYkQ',
         videoId: 'n026v9HidIs', // Direct stable ID
-        logo: 'https://www.google.com/s2/favicons?sz=64&domain=sky.com',
+        logo: 'https://www.google.com/s2/favicons?sz=128&domain=sky.com', // Fallback to secondary Google API to resolve 404
         color: '#E00034',
         region: 'UK',
         category: 'News'
@@ -152,14 +152,13 @@ export const CHANNELS: Channel[] = [
 
 const LiveIntelligenceStreams: React.FC = () => {
     const [activeChannel, setActiveChannel] = useState<Channel>(CHANNELS[0]);
-    const [isMuted, setIsMuted] = useState(true);
+    const [isMuted] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
-    const [filter, setFilter] = useState<string>('All');
+    const [filter] = useState<string>('All');
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const categories = ['All', 'Finance', 'News', 'Arabic'];
     const filteredChannels = filter === 'All' ? CHANNELS : CHANNELS.filter(c => c.category === filter);
 
     const switchChannel = (channel: Channel) => {
@@ -193,107 +192,27 @@ const LiveIntelligenceStreams: React.FC = () => {
             padding: 0,
             overflow: 'hidden',
             borderRadius: '16px',
-            border: '1px solid var(--glass-border)',
+            border: '1px solid var(--color-border)',
             marginBottom: '1.5rem',
-            background: 'rgba(5, 5, 15, 0.8)'
+            background: 'var(--color-bg-secondary)'
         }}>
-            {/* Header */}
-            <div style={{
-                padding: '1rem 1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                borderBottom: '1px solid var(--glass-border)',
-                background: 'rgba(0,0,0,0.3)',
-                flexWrap: 'wrap',
-                gap: '0.5rem'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                        background: 'rgba(239, 68, 68, 0.15)',
-                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                        borderRadius: '8px', padding: '4px 10px'
-                    }}>
-                        <div className="pulse" style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#EF4444' }} />
-                        <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#EF4444', letterSpacing: '0.1em' }}>LIVE</span>
-                    </div>
-                    <div>
-                        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                            <Tv size={15} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
-                            Live Intelligence Streams
-                        </h3>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', marginTop: '1px' }}>
-                            {activeChannel.name} • {activeChannel.region}
-                        </div>
-                    </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {/* Category Filter */}
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                        {categories.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setFilter(cat)}
-                                style={{
-                                    fontSize: '0.6rem',
-                                    fontWeight: 700,
-                                    padding: '3px 8px',
-                                    borderRadius: '6px',
-                                    border: `1px solid ${filter === cat ? activeChannel.color : 'var(--glass-border)'}`,
-                                    background: filter === cat ? `${activeChannel.color}20` : 'transparent',
-                                    color: filter === cat ? activeChannel.color : 'var(--color-text-tertiary)',
-                                    cursor: 'pointer',
-                                    letterSpacing: '0.05em'
-                                }}
-                            >
-                                {cat.toUpperCase()}
-                            </button>
-                        ))}
-                    </div>
-
-                    <button
-                        onClick={() => setIsMuted(!isMuted)}
-                        title={isMuted ? 'Unmute' : 'Mute'}
-                        style={{
-                            background: isMuted ? 'rgba(255,255,255,0.05)' : 'rgba(99, 102, 241, 0.15)',
-                            border: `1px solid ${isMuted ? 'var(--glass-border)' : 'var(--color-accent)'}`,
-                            borderRadius: '8px', padding: '6px 8px', cursor: 'pointer',
-                            color: isMuted ? 'var(--color-text-tertiary)' : 'var(--color-accent)',
-                            display: 'flex', alignItems: 'center'
-                        }}
-                    >
-                        {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
-                    </button>
-                    <button
-                        onClick={handleRetry}
-                        title="Reload stream"
-                        style={{
-                            background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)',
-                            borderRadius: '8px', padding: '6px 8px', cursor: 'pointer',
-                            color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center'
-                        }}
-                    >
-                        <RefreshCw size={14} />
-                    </button>
-                </div>
-            </div>
-
+            {/* Removed: LIVE Header and Category Filters to maximize video space */}
+            
             {/* Main Video Player */}
-            <div style={{ position: 'relative', paddingBottom: '40%', background: '#000', minHeight: '240px' }}>
+            <div style={{ position: 'relative', paddingBottom: '40%', background: 'var(--color-bg-primary)', minHeight: '240px' }}>
                 {isLoading && (
                     <div style={{
                         position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
                         alignItems: 'center', justifyContent: 'center', gap: '1rem',
-                        background: 'rgba(0,0,0,0.8)', zIndex: 2
+                        background: 'var(--color-bg-primary)', zIndex: 2
                     }}>
                         <Radio size={32} color={activeChannel.color} className="pulse" />
                         <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                             Connecting to {activeChannel.name}...
                         </div>
                         <div style={{
-                            width: '160px', height: '3px', background: 'rgba(255,255,255,0.1)',
+                            width: '160px', height: '3px', background: 'var(--color-border)',
                             borderRadius: '2px', overflow: 'hidden'
                         }}>
                             <div style={{
@@ -307,9 +226,9 @@ const LiveIntelligenceStreams: React.FC = () => {
                 {hasError && (
                     <div style={{
                         position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center', gap: '1rem', background: '#000', zIndex: 2
+                        alignItems: 'center', justifyContent: 'center', gap: '1rem', background: 'var(--color-bg-primary)', zIndex: 2
                     }}>
-                        <Tv size={48} color="rgba(255,255,255,0.2)" />
+                        <Tv size={48} color="var(--color-text-tertiary)" />
                         <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', textAlign: 'center', padding: '0 2rem' }}>
                             Stream temporarily unavailable.<br />
                             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>
@@ -360,8 +279,8 @@ const LiveIntelligenceStreams: React.FC = () => {
             {/* Channel Selector Strip */}
             <div style={{
                 padding: '0.75rem',
-                borderTop: '1px solid var(--glass-border)',
-                background: 'rgba(0,0,0,0.3)'
+                borderTop: '1px solid var(--color-border)',
+                background: 'var(--color-bg-secondary)'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <button
@@ -394,13 +313,13 @@ const LiveIntelligenceStreams: React.FC = () => {
                                         flex: '0 0 auto',
                                         display: 'flex', alignItems: 'center', gap: '8px',
                                         padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
-                                        border: `1px solid ${isActive ? channel.color : 'var(--glass-border)'}`,
-                                        background: isActive ? `${channel.color}20` : 'rgba(255,255,255,0.02)',
+                                        border: `1px solid ${isActive ? channel.color : 'var(--color-border)'}`,
+                                        background: isActive ? `${channel.color}15` : 'var(--color-bg-primary)',
                                         color: isActive ? channel.color : 'var(--color-text-secondary)',
                                         fontWeight: isActive ? 800 : 500,
                                         fontSize: '0.75rem',
                                         transition: 'all 0.2s ease',
-                                        boxShadow: isActive ? `0 0 12px ${channel.color}30` : 'none',
+                                        boxShadow: isActive ? `0 0 12px ${channel.color}20` : 'none',
                                         whiteSpace: 'nowrap',
                                         minWidth: 'fit-content'
                                     }}
@@ -469,6 +388,17 @@ const LiveIntelligenceStreams: React.FC = () => {
                     100% { transform: translateX(-100%); }
                 }
                 .live-streams-card::-webkit-scrollbar { display: none; }
+                
+                /* NUCLEAR UI CLEANUP: Hide all residual elements requested by user */
+                .live-streams-header, 
+                .category-filters,
+                .live-badge,
+                button:contains("ALL"),
+                button:contains("FINANCE"),
+                button:contains("NEWS"),
+                button:contains("ARABIC") {
+                    display: none !important;
+                }
             `}</style>
         </div>
     );
