@@ -155,11 +155,9 @@ const LiveIntelligenceStreams: React.FC = () => {
     const [isMuted] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
-    const [filter] = useState<string>('All');
+    const filteredChannels = CHANNELS;
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
-
-    const filteredChannels = filter === 'All' ? CHANNELS : CHANNELS.filter(c => c.category === filter);
 
     const switchChannel = (channel: Channel) => {
         setIsLoading(true);
@@ -393,10 +391,8 @@ const LiveIntelligenceStreams: React.FC = () => {
                 .live-streams-header, 
                 .category-filters,
                 .live-badge,
-                button:contains("ALL"),
-                button:contains("FINANCE"),
-                button:contains("NEWS"),
-                button:contains("ARABIC") {
+                .filter-btn,
+                .tab-header {
                     display: none !important;
                 }
             `}</style>
