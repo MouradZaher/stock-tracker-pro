@@ -21,7 +21,7 @@ export const CHANNELS: Channel[] = [
         name: 'Bloomberg Television',
         shortName: 'Bloomberg',
         youtubeId: 'UCIALMKvObZNtJ6AmdCLP7Lg',
-        videoId: '', 
+        videoId: '',
         logo: 'https://www.bloomberg.com/favicon.ico',
         color: '#FF6600',
         region: 'Global',
@@ -132,7 +132,7 @@ export const CHANNELS: Channel[] = [
         shortName: 'Asharq Biz',
         youtubeId: 'UCxjpGbfoLy6oodYdiyzQE4g',
         videoId: '',
-        logo: 'https://www.google.com/s2/favicons?sz=64&domain=asharq.com', 
+        logo: 'https://www.google.com/s2/favicons?sz=64&domain=asharq.com',
         color: '#FFD700',
         region: 'Arabic',
         category: 'Finance'
@@ -181,7 +181,7 @@ const LiveIntelligenceStreams: React.FC = () => {
 
     // Use specific Video ID if available to bypass Error 153 configuration issues
     // Fall back to live_stream?channel= only if videoId is empty
-    const embedUrl = activeChannel.videoId 
+    const embedUrl = activeChannel.videoId
         ? `https://www.youtube.com/embed/${activeChannel.videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`
         : `https://www.youtube.com/embed/live_stream?channel=${activeChannel.youtubeId}&autoplay=1&mute=${isMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`;
 
@@ -196,7 +196,7 @@ const LiveIntelligenceStreams: React.FC = () => {
         }}>
 
             {/* Removed: LIVE Header and Category Filters to maximize video space */}
-            
+
             {/* Main Video Player */}
             <div style={{ position: 'relative', paddingBottom: '40%', background: 'var(--color-bg-primary)', minHeight: '240px' }}>
                 {isLoading && (
@@ -328,8 +328,8 @@ const LiveIntelligenceStreams: React.FC = () => {
                                         justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
                                         padding: '1px', border: '1px solid rgba(0,0,0,0.1)'
                                     }}>
-                                        <img 
-                                            src={channel.logo} 
+                                        <img
+                                            src={channel.logo}
                                             alt={channel.shortName}
                                             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                             onError={(e) => {

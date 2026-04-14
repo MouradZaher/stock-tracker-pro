@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import TradingViewScreener from './TradingViewScreener';
 import MarketPulsePage from './MarketPulsePage';
-import { Activity, Search } from 'lucide-react';
+import MarketNews from './MarketNews';
+import { Activity, Search, Newspaper } from 'lucide-react';
 
 interface RightTabbedPanelProps {
     onSelectSymbol: (symbol: string) => void;
 }
 
 const RightTabbedPanel: React.FC<RightTabbedPanelProps> = ({ onSelectSymbol }) => {
-    const [activeTab, setActiveTab] = useState<'screener' | 'search'>('screener');
+    const [activeTab, setActiveTab] = useState<'screener' | 'search' | 'news'>('screener');
 
-    const tabStyle = (id: 'screener' | 'search'): React.CSSProperties => ({
-        padding: '10px 20px',
+    const tabStyle = (id: 'screener' | 'search' | 'news'): React.CSSProperties => ({
+        padding: '10px 15px',
         cursor: 'pointer',
-        fontSize: '0.65rem',
+        fontSize: '0.62rem',
         fontWeight: 900,
         textTransform: 'uppercase',
         letterSpacing: '0.08em',
@@ -23,9 +24,9 @@ const RightTabbedPanel: React.FC<RightTabbedPanelProps> = ({ onSelectSymbol }) =
         alignItems: 'center',
         gap: '6px',
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-        background: activeTab === id ? 'var(--color-bg-secondary)' : 'transparent',
+        background: activeTab === id ? 'rgba(168, 85, 247, 0.05)' : 'transparent',
         borderRight: '1px solid var(--color-border)',
-        marginTop: '1px'
+        marginTop: '0'
     });
 
     return (
@@ -40,22 +41,26 @@ const RightTabbedPanel: React.FC<RightTabbedPanelProps> = ({ onSelectSymbol }) =
                     style={tabStyle('screener')} 
                     onClick={() => setActiveTab('screener')}
                 >
-                    <Activity size={12} /> SCREENER
+                    <Activity size={11} /> SCREENER
+                </div>
+                <div 
+                    style={tabStyle('news')} 
+                    onClick={() => setActiveTab('news')}
+                >
+                    <Newspaper size={11} /> NEWS
                 </div>
                 <div 
                     style={tabStyle('search')} 
                     onClick={() => setActiveTab('search')}
                 >
-                    <Search size={12} /> SEARCH
+                    <Search size={11} /> SEARCH
                 </div>
             </div>
             
             <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-                {activeTab === 'screener' ? (
-                    <TradingViewScreener />
-                ) : (
-                    <MarketPulsePage onSelectStock={onSelectSymbol} />
-                )}
+                {activeTab === 'screener' && <TradingViewScreener />}
+                {activeTab === 'news' && <MarketNews />}
+                {activeTab === 'search' && <MarketPulsePage onSelectStock={onSelectSymbol} />}
             </div>
         </div>
     );
