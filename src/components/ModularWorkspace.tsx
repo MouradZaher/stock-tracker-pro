@@ -5,7 +5,7 @@ import TerminalWindow from './TerminalWindow';
 import StockHeatmap from './StockHeatmap';
 import Portfolio from './Portfolio';
 import WatchlistPage from './WatchlistPage';
-import LiveIntelligenceStreams from './LiveIntelligenceStreams';
+import LiveIntelligenceStreams from './InstitutionalStreams';
 import CorporateActionsCalendar from './CorporateActionsCalendar';
 import MarketPulsePage from './MarketPulsePage';
 import RightTabbedPanel from './RightTabbedPanel';

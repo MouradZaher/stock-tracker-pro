@@ -6,7 +6,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 // NUCLEAR CACHE INVALIDATION: Physically Renamed Entry Point
 // Version: SYNC_21_99
 console.clear();
-console.log('--- INSTITUTIONAL TERMINAL CORE: SYNC_21_99 ---');
+console.log('--- INSTITUTIONAL TERMINAL CORE: SYNC_23_01 ---');
 console.log('[Stability Engine] V2 Entry Point Active. Ghost Cache Purged.');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

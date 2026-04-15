@@ -21,7 +21,7 @@ const Portfolio = lazy(() => import('./components/Portfolio'));
 const AIRecommendations = lazy(() => import('./components/AIRecommendations'));
 const PortfolioIntelligencePanel = lazy(() => import('./components/PortfolioIntelligencePanel'));
 const PricingPage = lazy(() => import('./components/PricingPage'));
-const LiveIntelligenceStreams = lazy(() => import('./components/LiveIntelligenceStreams'));
+const LiveIntelligenceStreams = lazy(() => import('./components/InstitutionalStreams'));
 const CorporateActionsCalendar = lazy(() => import('./components/CorporateActionsCalendar'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
@@ -62,8 +62,18 @@ const queryClient = new QueryClient({
 function AppContent() {
   // GLOBAL CACHE BUSTER & VERSION TRACKER
   useEffect(() => {
-    console.log('--- INSTITUTIONAL TERMINAL SYNC_22_15 ---');
-    console.log('[Stability Engine] Verifying mobile quadrant grid...');
+    const CURRENT_VERSION = 'SYNC_23_01';
+    console.log(`--- INSTITUTIONAL TERMINAL ${CURRENT_VERSION} ---`);
+    
+    // Nuclear Cache Purge: If version has changed, clear cache and reload
+    const lastVersion = localStorage.getItem('app_version');
+    if (lastVersion !== CURRENT_VERSION) {
+       console.log('[Stability Engine] Version mismatch. Purging ghost cache...');
+       localStorage.clear();
+       sessionStorage.clear();
+       localStorage.setItem('app_version', CURRENT_VERSION);
+       window.location.reload();
+    }
   }, []);
 
   const { isAuthenticated, logout, user } = usePinAuth();

@@ -143,7 +143,8 @@ body::after {
 .live-badge,
 .category-filters,
 .filter-tabs-container,
-#live-news-header {
+#live-news-header,
+.live-streams-card > div:first-child:not([style*="position: relative"]):not([style*="padding: 0.75rem"]) {
   display: none !important;
   visibility: hidden !important;
   height: 0 !important;
