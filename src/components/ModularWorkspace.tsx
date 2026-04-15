@@ -73,9 +73,9 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             const targetLayouts: { id: WindowId, title: string, slot: any }[] = [
                 { id: 'heatmap', title: 'Heatmap', slot: 'TL' },
                 { id: 'screener', title: 'Screener', slot: 'TR' },
-                { id: 'news', title: 'Market News', slot: 'BL' },
+                { id: 'news', title: 'Market News', slot: 'SIDE' },
                 { id: 'portfolio', title: 'Portfolio', slot: 'BR' },
-                { id: 'tv', title: 'Live News', slot: 'SIDE' }
+                { id: 'tv', title: 'Live News', slot: 'BL' }
             ];
 
             targetLayouts.forEach(layout => {
