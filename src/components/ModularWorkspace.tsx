@@ -212,6 +212,23 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
                 padding: 0,
                 overflow: 'hidden'
             }}>
+                {/* GLOBAL WIDGET DARK MODE ENFORCER */}
+                <style dangerouslySetInnerHTML={{ __html: `
+                    iframe { 
+                        background: #000000 !important; 
+                        color-scheme: dark !important;
+                    }
+                    .tradingview-widget-container, 
+                    .tradingview-widget-container__widget,
+                    .tv-embed-widget-wrapper {
+                        background: #000000 !important;
+                        background-color: #000000 !important;
+                    }
+                    /* Fail-safe for widgets that attempt to render white content */
+                    .tradingview-widget-container iframe {
+                        filter: brightness(0.9) contrast(1.1) !important;
+                    }
+                `}} />
                 
                 {/* 1. Heatmap Window */}
                 <TerminalWindow id="heatmap" title="Heatmap">
