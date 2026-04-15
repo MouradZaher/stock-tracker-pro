@@ -62,7 +62,7 @@ const queryClient = new QueryClient({
 function AppContent() {
   // GLOBAL CACHE BUSTER & VERSION TRACKER
   useEffect(() => {
-    console.log('--- INSTITUTIONAL TERMINAL SYNC_22_10 ---');
+    console.log('--- INSTITUTIONAL TERMINAL SYNC_22_12 ---');
     console.log('[Stability Engine] Verifying mobile quadrant grid...');
   }, []);
 

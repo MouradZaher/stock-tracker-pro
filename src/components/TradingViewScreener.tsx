@@ -45,7 +45,7 @@ const TradingViewScreener: React.FC = () => {
             script.innerHTML = JSON.stringify(config);
             widgetContainer.appendChild(script);
             container.appendChild(widgetContainer);
-        }, 300);
+        }, 1000);
 
         return () => {
             clearTimeout(timer);
