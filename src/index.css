@@ -151,3 +151,24 @@ body::after {
   padding: 0 !important;
   pointer-events: none !important;
 }
+
+/* ============================================================
+   THERMO-NUCLEAR WIDGET OVERRIDES (FORCE DARK MODE)
+   ============================================================ */
+.tradingview-widget-container,
+.tradingview-widget-container iframe {
+  color-scheme: dark !important;
+  background: black !important;
+  background-color: #000000 !important;
+}
+
+/* High-priority filter to ensure obsidian aesthetic parity */
+[data-theme='dark'] .tradingview-widget-container,
+.tradingview-widget-container[data-theme='dark'] {
+  filter: brightness(0.9) contrast(1.1) !important;
+}
+
+/* Force any internal white backgrounds to transparent/dark */
+.tradingview-widget-container__widget {
+  background: transparent !important;
+}

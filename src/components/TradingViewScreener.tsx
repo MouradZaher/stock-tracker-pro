@@ -11,62 +11,56 @@ const TradingViewScreener: React.FC = () => {
         if (!containerRef.current) return;
 
         // Map internal market IDs to TradingView market names
-        const marketMap: Record<string, string> = {
-            'us': 'america',
-            'egypt': 'egypt',
-            'abudhabi': 'united_arab_emirates'
+        const container = containerRef.current;
+        if (!container) return;
+
+        // Clear previous content
+        container.innerHTML = '';
+
+        // NUCLEAR: Slight delay to ensure DOM is ready and bypass script conflicts
+        const timer = setTimeout(() => {
+            const widgetContainer = document.createElement('div');
+            widgetContainer.className = 'tradingview-widget-container__widget';
+            // Force dark theme at container level for CSS targeting
+            widgetContainer.setAttribute('data-theme', 'dark');
+
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+            script.type = 'text/javascript';
+            script.async = true;
+
+            const config = {
+                "width": "100%",
+                "height": "100%",
+                "defaultColumn": "overview",
+                "defaultScreen": "most_capitalized",
+                "market": "america",
+                "showToolbar": true,
+                "colorTheme": "dark",
+                "isTransparent": false,
+                "locale": "en",
+                "theme": "dark" // FAIL-SAFE: Some versions use theme instead of colorTheme
+            };
+
+            script.innerHTML = JSON.stringify(config);
+            widgetContainer.appendChild(script);
+            container.appendChild(widgetContainer);
+        }, 300);
+
+        return () => {
+            clearTimeout(timer);
+            if (container) container.innerHTML = '';
         };
-
-        const market = marketMap[selectedMarket.id] || 'america';
-        const defaultScreen = selectedMarket.id === 'us' ? 'most_capitalized' : 'general';
-
-        // Clear previous widget
-        containerRef.current.innerHTML = '';
-
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-        script.async = true;
-        script.type = 'text/javascript';
-        
-        // Construct the base URL for redirection
-        const currentUrl = window.location.origin + window.location.pathname;
-
-        script.innerHTML = JSON.stringify({
-            "width": "100%",
-            "height": "100%",
-            "defaultColumn": "overview",
-            "defaultScreen": defaultScreen,
-            "market": market,
-            "showToolbar": true,
-            "colorTheme": "dark",
-            "locale": "en",
-            "isTransparent": true,
-            "largeChartUrl": currentUrl
-        });
-
-        const widgetContainer = document.createElement('div');
-        widgetContainer.className = 'tradingview-widget-container';
-        const widgetSubContainer = document.createElement('div');
-        widgetSubContainer.className = 'tradingview-widget-container__widget';
-        widgetSubContainer.style.height = '100%';
-        widgetSubContainer.style.width = '100%';
-        
-        widgetContainer.appendChild(widgetSubContainer);
-        widgetContainer.appendChild(script);
-        widgetContainer.style.height = '100%';
-        widgetContainer.style.width = '100%';
-
-        containerRef.current.appendChild(widgetContainer);
-    }, [selectedMarket.id, theme]);
+    }, []);
 
     return (
         <div style={{ 
             height: '100%', 
             width: '100%', 
-            background: 'var(--color-bg-secondary)',
+            background: '#000000',
             overflow: 'hidden'
         }}>
-            <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
+            <div ref={containerRef} style={{ height: '100%', width: '100%', filter: theme === 'dark' ? 'brightness(0.9) contrast(1.1)' : 'none' }} />
         </div>
     );
 };
