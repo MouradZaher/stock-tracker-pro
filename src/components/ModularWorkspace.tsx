@@ -70,7 +70,14 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
 
 
             // Force-open 4 core quadrants + 1 Bottom Dock to ensure visibility on mobile
-            const targetLayouts: { id: WindowId, title: string, slot: any }[] = [
+            const isMobileView = window.innerWidth <= 768;
+            const targetLayouts: { id: WindowId, title: string, slot: any }[] = isMobileView ? [
+                { id: 'heatmap', title: 'Heatmap', slot: 'TL' },
+                { id: 'screener', title: 'Screener', slot: 'TR' },
+                { id: 'portfolio', title: 'Portfolio', slot: 'BL' },
+                { id: 'watchlist', title: 'Watchlist', slot: 'BR' },
+                { id: 'tv', title: 'Live News', slot: 'SIDE' }
+            ] : [
                 { id: 'heatmap', title: 'Heatmap', slot: 'TL' },
                 { id: 'screener', title: 'Screener', slot: 'TR' },
                 { id: 'news', title: 'Market News', slot: 'SIDE' },
@@ -172,19 +179,23 @@ const ModularWorkspace: React.FC<ModularWorkspaceProps> = ({ onSelectSymbol }) =
             {/* GRID BACKGROUND / DROP ZONES */}
             <div style={{ position: 'absolute', inset: 0, opacity: isDraggingId ? 1 : 0.4, transition: 'opacity 0.5s', pointerEvents: 'none', zIndex: 0 }}>
                 {isMobile ? (
-                    // MOBILE GRID: Subtle 2x2 Grid (Top 65%) + 1 Dock (Bottom 35%)
+                    // MOBILE GRID: High-Density 2x2 Square (Top 65%) + 1 Footer Box (Bottom 35%)
                     <>
-                        {/* 4 RECTANGULAR PANELS (Transparent Drop Zones) */}
-                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '32.5%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex' }}>
-                            <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255, 0.05)' }} />
-                            <div style={{ flex: 1 }} />
+                        {/* THE 'ONE BIG SQUARE' GRID (Upper 65%) */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '65%', border: '1px solid rgba(168, 85, 247, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+                            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '50%', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex' }}>
+                                <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255, 0.1)' }} />
+                                <div style={{ flex: 1 }} />
+                            </div>
+                            <div style={{ position: 'absolute', top: '50%', left: 0, width: '100%', height: '50%', display: 'flex' }}>
+                                <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255, 0.1)' }} />
+                                <div style={{ flex: 1 }} />
+                            </div>
                         </div>
-                        <div style={{ position: 'absolute', top: '32.5%', left: 0, width: '100%', height: '32.5%', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex' }}>
-                            <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255, 0.05)' }} />
-                            <div style={{ flex: 1 }} />
+                        {/* THE FOOTER NEWS BOX (Bottom 35%) */}
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'rgba(168, 85, 247, 0.03)', borderTop: '2px solid var(--color-accent)', borderRadius: '12px 12px 0 0' }}>
+                            <div style={{ padding: '4px 10px', fontSize: '0.5rem', fontWeight: 900, color: 'var(--color-accent)', opacity: 0.6 }}>LIVE_INTEL_FOOTER</div>
                         </div>
-                        {/* BOTTOM NEWS DOCK */}
-                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'rgba(255, 255, 255, 0.02)', borderTop: '1px solid var(--color-border)' }} />
                     </>
                 ) : (
 

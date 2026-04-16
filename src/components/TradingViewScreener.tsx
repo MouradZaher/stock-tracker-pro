@@ -34,12 +34,12 @@ const TradingViewScreener: React.FC = () => {
                 "height": "100%",
                 "defaultColumn": "overview",
                 "defaultScreen": "most_capitalized",
-                "market": "america",
+                "market": "egypt",
                 "showToolbar": true,
                 "colorTheme": "dark",
                 "isTransparent": false,
                 "locale": "en",
-                "theme": "dark" // FAIL-SAFE: Some versions use theme instead of colorTheme
+                "theme": "dark"
             };
 
             script.innerHTML = JSON.stringify(config);

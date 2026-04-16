@@ -62,7 +62,7 @@ const queryClient = new QueryClient({
 function AppContent() {
   // GLOBAL CACHE BUSTER & VERSION TRACKER
   useEffect(() => {
-    const CURRENT_VERSION = 'SYNC_23_02';
+    const CURRENT_VERSION = 'SYNC_23_05';
     console.log(`--- INSTITUTIONAL TERMINAL ${CURRENT_VERSION} ---`);
     
     // Nuclear Cache Purge: If version has changed, clear cache and reload

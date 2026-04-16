@@ -271,14 +271,27 @@ export const useWindowStore = create<WindowStore>()(
                 // 2. Snap them into the high-density grid
                 // Delay slightly to ensure the windows are registered in the state for the next tick
                 setTimeout(() => {
-                    snapToLayout('heatmap', 'TL');
-                    snapToLayout('screener', 'TR');
-                    snapToLayout('news', 'BL');
-                    snapToLayout('portfolio', 'BR');
-                    snapToLayout('tv', 'SIDE');
+                    const isMobile = window.innerWidth <= 768;
+                    
+                    if (isMobile) {
+                        // iPhone 13 Pro High-Density Layout
+                        snapToLayout('heatmap', 'TL');
+                        snapToLayout('screener', 'TR');
+                        snapToLayout('portfolio', 'BL');
+                        snapToLayout('watchlist', 'BR');
+                        snapToLayout('tv', 'SIDE');
+                        snapToLayout('news', 'SIDE');
+                    } else {
+                        // Desktop Institutional Layout
+                        snapToLayout('heatmap', 'TL');
+                        snapToLayout('screener', 'TR');
+                        snapToLayout('news', 'BL');
+                        snapToLayout('portfolio', 'BR');
+                        snapToLayout('tv', 'SIDE');
+                    }
+                    
                     snapToLayout('advisor', 'SIDE');
 
-                    
                     // Force a z-index synchronization
                     set(state => ({
                         activeWindow: 'heatmap'
