@@ -9,7 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import TutorialModal from './components/TutorialModal';
 import SettingsModal from './components/SettingsModal';
 import OmniSearch from './components/OmniSearch';
-import LeftToolstrip from './components/LeftToolstrip';
+import InstitutionalHeader from './components/InstitutionalHeader';
 
 import StockDetail from './components/StockDetail';
 import StockHeatmap from './components/StockHeatmap';
@@ -62,7 +62,7 @@ const queryClient = new QueryClient({
 function AppContent() {
   // GLOBAL CACHE BUSTER & VERSION TRACKER
   useEffect(() => {
-    const CURRENT_VERSION = 'SYNC_23_05';
+    const CURRENT_VERSION = 'SYNC_23_10';
     console.log(`--- INSTITUTIONAL TERMINAL ${CURRENT_VERSION} ---`);
     
     // Nuclear Cache Purge: If version has changed, clear cache and reload
@@ -268,18 +268,17 @@ function MainLayout({
           <AdminDashboard isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
         </Suspense>
 
-        <div className="main-wrapper" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        {/* TOP INSTITUTIONAL HEADER */}
+        <InstitutionalHeader
+          onOpenOmniSearch={() => setIsOmniSearchOpen(true)}
+          onOpenSettings={onOpenSettings}
+          onOpenTutorial={onOpenTutorial}
+          onAdminClick={() => setIsAdminOpen(true)}
+          onLogout={logout}
+          showAdmin={role === 'admin'}
+        />
 
-          {/* LEFT TOOLSTRIP (SIDEBAR) */}
-          <LeftToolstrip
-            onOpenOmniSearch={() => setIsOmniSearchOpen(true)}
-            onOpenSettings={onOpenSettings}
-            onOpenTutorial={onOpenTutorial}
-            onAdminClick={() => setIsAdminOpen(true)}
-            onLogout={logout}
-            showAdmin={role === 'admin'}
-          />
-
+        <div className="main-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* MAIN DATA MONITOR */}
           <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minWidth: 0, padding: 0 }}>
             <div className="content-route-shell" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

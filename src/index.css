@@ -139,6 +139,7 @@ body::after {
 }
 
 /* NUCLEAR UI HAMMER: Forced removal of legacy 'Live News' headers and filters */
+.left-toolstrip,
 .live-streams-header,
 .live-badge,
 .category-filters,

@@ -157,10 +157,10 @@ export const useWindowStore = create<WindowStore>()(
                     if (!win) return state;
 
                     // NUCLEAR POSITION GUARD: Force coordinates to stay within logical bounds
-                    const sidebarWidth = (window.innerWidth <= 768) ? 50 : 48;
+                    const sidebarWidth = 0; // Header is top-mounted, side is clear
                     const SIDE_WIDTH = 350;
                     const isMobile = window.innerWidth <= 768;
-                    const availW = window.innerWidth - sidebarWidth - (isMobile ? 0 : SIDE_WIDTH);
+                    const availW = window.innerWidth - (isMobile ? 0 : SIDE_WIDTH);
 
                     const clampedX = Math.max(0, Math.min(availW - 50, x));
                     const clampedY = Math.max(0, Math.min(window.innerHeight - 50, y));
@@ -202,13 +202,14 @@ export const useWindowStore = create<WindowStore>()(
                 if (!win) return;
 
                 const isMobile = window.innerWidth <= 768;
-                const sidebarWidth = isMobile ? 50 : 48;
+                const sidebarWidth = 0; // Sidebar is gone
+                const HEADER_HEIGHT = 48;
                 const SIDE_WIDTH = 350;
                 
                 // SAFETY CLAMP: Ensure availArea is never negative even if resolution is messed up
-                const baseAvailW = window.innerWidth - sidebarWidth - (isMobile ? 0 : SIDE_WIDTH);
+                const baseAvailW = window.innerWidth - (isMobile ? 0 : SIDE_WIDTH);
                 const availW = Math.max(170, baseAvailW); 
-                const availH = Math.max(200, window.innerHeight);
+                const availH = Math.max(200, window.innerHeight - HEADER_HEIGHT);
                 
                 const halfW = availW / 2;
                 const halfH = availH / 2;
